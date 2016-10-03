@@ -1,0 +1,22 @@
+/********** Base styles **********/
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+#h1 {
+    padding: 30px;
+    background-color: whitesmoke;
+    text-align: center;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+#workspaceList {
+    position: relative;
+    background-color: white;
+    margin-left: 20%;
+    margin-right: 20%;
+    padding: 10px;
+}

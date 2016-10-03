@@ -3,77 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>SMT-PMR</title>
-    <style>
-        text {
-            fill: #000;
-            font: 10px sans-serif;
-            pointer-events: none;
-        }
-
-        @media screen and (min-width: 600px) {
-            .wList {
-                position: fixed;
-                top: 200px;
-                max-width: 600px;
-                height: 80vh;
-                overflow-y: scroll;
-                /*border: 1px solid #e3e3e3;*/
-            }
-
-            .txt {
-                position: fixed;
-                top: 100px;
-            }
-
-            .btn {
-                position: fixed;
-                top: 125px;
-            }
-
-            .mList {
-                position: fixed;
-                top: 200px;
-                margin-left: 610px;
-                height: 80vh;
-                /*overflow-y: scroll;*/
-                /*border: 1px solid #e3e3e3;*/
-            }
-
-            .box {
-                position: fixed;
-                left: 0px;
-                right: 0px;
-                top: 200px;
-                padding: 1px;
-                background-color: #f5f5f5;
-                border: 1px solid #e3e3e3;
-            }
-        }
-
-    </style>
-    <h1 style="top: 0px; margin: 0px auto">SMT-PMR</h1>
-
-    <P style="top: 60px; margin: 0px auto">A Prototype Implementation of Connecting Graph in PMR Using Seiner Minimal
-        Tree</P>
-
-    <div class="box">
-        <h4 style="position: fixed; top: 90px;"></h4>
-        <h4 style="position: fixed; top: 90px; margin-left: 50%"></h4>
-    </div>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
 
 <body>
 
-<div id="workspaceList" class="wList"></div>
-<div id="textbox" class="txt">
-    <input type="text" id="Text" value=""/>
-</div>
-<div style="position:fixed; top: 160px; color: red">Your search results: </div>
-<div id="button" class="btn">
-    <button id="Search">Search</button>
-</div>
-<div id="metadataList" class="mList"></div>
+<h1 id="h1">A Prototype Implementation of Connecting Graph in PMR</h1>
 
+<div id="workspaceList" class="wList"></div>
+
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
 <script src="index.js"></script>
 
 </body>
