@@ -7,6 +7,10 @@ var query = 'SELECT ?id WHERE { ?id  <http://biomodels.net/biology-qualifiers/is
 
 var SMT = function () {
 
+    var item = [];
+    var label = [];
+    var chkBox, button;
+
     var sparqlQueryJson = function (queryStr, endpoint) {
 
         var xmlhttp = new XMLHttpRequest();
@@ -32,7 +36,6 @@ var SMT = function () {
         var workspaceList = document.getElementById("workspaceList");
         var list = document.createElement("ul");
 
-        var item = [];
         for (var i = 0; i < jsonObj.results.bindings.length; i++) {
 
             // id
@@ -44,17 +47,33 @@ var SMT = function () {
                 + "/" + jsonObj.results.bindings[i].id.value;
 
             item[i] = document.createElement("li");
-            item[i].innerHTML = '<a href=' + workspaceurl + '>' + wname + " / " + idstr + '</a>';
+            item[i].id = idstr;
+            item[i].innerHTML = '<a href=' + workspaceurl + ' + target=_blank>' + wname + " / " + idstr + '</a><br>';
+            item[i].innerHTML += '<input id="item[i]" type="checkbox" value="item[i]"><label>&nbsp;&nbsp;Annotations</label>';
 
             workspaceList.appendChild(list.appendChild(item[i]));
             workspaceList.appendChild(document.createElement("br"));
+        }
+    };
 
-            //var n = idstr.search("#");
-            //var idn = idstr.slice(n + 1, idstr.length);
-            //
-            //var raw = "https://models.physiomeproject.org/workspace" + "/" + wname + "/" + "rawfile" + "/" + "HEAD"
-            //    + "/" + jsonObj.results.bindings[i].id.value;
-            //rawQueryJson(raw, idn);
+
+    button = document.getElementById("calculate");
+    button.onclick = function () {
+        chkBox = document.getElementsByTagName('input');
+        for (var i = 0; i < item.length; i++) {
+            if (chkBox[i].checked) {
+                var idstr = item[i].id;
+                var n = idstr.search("#");
+                var idn = idstr.slice(n + 1, idstr.length);
+
+                // id
+                var index = idstr.search(".cellml");
+                var wname = idstr.slice(0, index);
+
+                var raw = "https://models.physiomeproject.org/workspace" + "/" + wname + "/" + "rawfile" + "/" + "HEAD"
+                    + "/" + idstr;
+                rawQueryJson(raw, idn);
+            }
         }
     };
 
