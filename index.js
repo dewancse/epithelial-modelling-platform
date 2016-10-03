@@ -46,7 +46,7 @@ var myCallback = function (str) {
         item[i] = document.createElement("li");
         item[i].id = idstr;
         item[i].innerHTML = '<a href=' + workspaceurl + ' + target=_blank>' + wname + " / " + idstr + '</a><br>';
-        item[i].innerHTML += '<input id="item[i]" type="checkbox" value="item[i]"><label>&nbsp;&nbsp;Annotations</label>';
+        item[i].innerHTML += '<input id="item[i]" type="checkbox" value="item[i]"><label>&nbsp;&nbsp;Annotations</label><br>';
 
         workspaceList.appendChild(list.appendChild(item[i]));
         workspaceList.appendChild(document.createElement("br"));
@@ -67,12 +67,12 @@ $("#calculate").click(function () {
 
             var raw = "https://models.physiomeproject.org/workspace" + "/" + wname + "/" + "rawfile" + "/" + "HEAD"
                 + "/" + idstr;
-            rawQueryJson(raw, idn);
+            rawQueryJson(item[i], raw, idn);
         }
     }
 });
 
-var rawQueryJson = function (vEndPoint, id) {
+var rawQueryJson = function (itemHtml, vEndPoint, id) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open('POST', vEndPoint, true);
 
@@ -83,11 +83,38 @@ var rawQueryJson = function (vEndPoint, id) {
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(text, "text/xml");
 
+            // Look up by variable tag
             for (var i = 0; i < xmlDoc.getElementsByTagName("variable").length; i++) {
                 if (xmlDoc.getElementsByTagName("variable")[i].getAttribute("cmeta:id") == id) {
-                    console.log(xmlDoc.getElementsByTagName("variable")[i].getAttribute("name"));
+                    itemHtml.innerHTML += '<hr>';
+                    itemHtml.innerHTML += id + '<br>';
+                    itemHtml.innerHTML += xmlDoc.getElementsByTagName("variable")[i].getAttribute("name") + '<br>';
+                    itemHtml.innerHTML += "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
+                        "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, " +
+                        "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                        "aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla " +
+                        "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt " +
+                        "mollit anim id est laborum";
+                    itemHtml.innerHTML += '<hr>';
                 }
             }
+
+            // Look up by component tag
+            for (var i = 0; i < xmlDoc.getElementsByTagName("component").length; i++) {
+                if (xmlDoc.getElementsByTagName("component")[i].getAttribute("cmeta:id") == id) {
+                    itemHtml.innerHTML += '<hr>';
+                    itemHtml.innerHTML += id + '<br>';
+                    itemHtml.innerHTML += xmlDoc.getElementsByTagName("component")[i].getAttribute("name") + '<br>';
+                    itemHtml.innerHTML += "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
+                        "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, " +
+                        "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis " +
+                        "aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla " +
+                        "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt " +
+                        "mollit anim id est laborum";
+                    itemHtml.innerHTML += '<hr>';
+                }
+            }
+
         }
     }
     xmlhttp.send();
