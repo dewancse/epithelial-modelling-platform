@@ -83,6 +83,7 @@ var rawQueryJson = function (itemHtml, vEndPoint, id) {
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(text, "text/xml");
 
+
             // Look up by variable tag
             for (var i = 0; i < xmlDoc.getElementsByTagName("variable").length; i++) {
                 if (xmlDoc.getElementsByTagName("variable")[i].getAttribute("cmeta:id") == id) {
