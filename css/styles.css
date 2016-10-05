@@ -1,29 +1,21 @@
 /********** Base styles **********/
 * {
     box-sizing: border-box;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
-.btn {
-    position: fixed;
-    top: 50px;
-    margin-left: 0px;
-    padding: 0px;
-}
-
-#h1 {
-    padding: 40px;
-    background-color: whitesmoke;
+#header {
     text-align: center;
-    margin-left: 20%;
-    margin-right: 20%;
+    margin: 50px;
+    font-size: large;
 }
 
-#workspaceList {
-    position: relative;
-    background-color: whitesmoke;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding: 10px;
+.navbtn {
+    width: 250px;
+}
+
+#navigation, #workspacelist {
+    background-color: white;
+    margin: 10px;
 }

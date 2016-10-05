@@ -30,7 +30,7 @@ var myCallback = function (str) {
     // Convert result to JSON
     var jsonObj = eval('(' + str + ')');
 
-    var workspaceList = document.getElementById("workspaceList");
+    var workspaceList = document.getElementById("workspacelist");
     var list = document.createElement("ul");
 
     for (var i = 0; i < jsonObj.results.bindings.length; i++) {
@@ -89,31 +89,25 @@ var rawQueryJson = function (itemHtml, vEndPoint, id) {
                     itemHtml.innerHTML += '<hr>';
                     itemHtml.innerHTML += id + '<br>';
                     itemHtml.innerHTML += xmlDoc.getElementsByTagName("variable")[i].getAttribute("name") + '<br>';
-                    itemHtml.innerHTML += "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
-                        "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, " +
-                        "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                        "aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla " +
-                        "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt " +
-                        "mollit anim id est laborum";
+
                     itemHtml.innerHTML += '<hr>';
                 }
             }
 
             // Look up by component tag
-            for (var i = 0; i < xmlDoc.getElementsByTagName("component").length; i++) {
-                if (xmlDoc.getElementsByTagName("component")[i].getAttribute("cmeta:id") == id) {
-                    itemHtml.innerHTML += '<hr>';
-                    itemHtml.innerHTML += id + '<br>';
-                    itemHtml.innerHTML += xmlDoc.getElementsByTagName("component")[i].getAttribute("name") + '<br>';
-                    itemHtml.innerHTML += "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
-                        "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, " +
-                        "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis " +
-                        "aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla " +
-                        "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt " +
-                        "mollit anim id est laborum";
-                    itemHtml.innerHTML += '<hr>';
-                }
-            }
+            //for (var i = 0; i < xmlDoc.getElementsByTagName("component").length; i++) {
+            //    if (xmlDoc.getElementsByTagName("component")[i].getAttribute("cmeta:id") == id) {
+            //        itemHtml.innerHTML += '<hr>';
+            //        itemHtml.innerHTML += id + '<br>';
+            //        itemHtml.innerHTML += xmlDoc.getElementsByTagName("component")[i].getAttribute("name") + '<br>';
+            //
+            //        for (var k = 0; k < 2; k++) {
+            //            itemHtml.innerHTML += '<input id="k" type="checkbox" value="k"><label>&nbsp;Annotations</label><br>';
+            //        }
+            //
+            //        itemHtml.innerHTML += '<hr>';
+            //    }
+            //}
 
         }
     }
