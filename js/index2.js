@@ -35,6 +35,8 @@ var myCallback = function (str) {
 
     for (var i = 0; i < jsonObj.results.bindings.length; i++) {
 
+        console.log(jsonObj.results.bindings[i]);
+
         // id
         var idstr = jsonObj.results.bindings[i].id.value;
         var index = idstr.search(".cellml");
@@ -53,7 +55,7 @@ var myCallback = function (str) {
     }
 };
 
-$("#calculate").click(function () {
+$("#ClickMe").click(function () {
     chkBox = $('input');
     for (var i = 0; i < item.length; i++) {
         if (chkBox[i].checked) {
@@ -67,6 +69,7 @@ $("#calculate").click(function () {
 
             var raw = "https://models.physiomeproject.org/workspace" + "/" + wname + "/" + "rawfile" + "/" + "HEAD"
                 + "/" + idstr;
+
             rawQueryJson(item[i], raw, idn);
         }
     }
@@ -83,7 +86,6 @@ var rawQueryJson = function (itemHtml, vEndPoint, id) {
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(text, "text/xml");
 
-
             // Look up by variable tag
             for (var i = 0; i < xmlDoc.getElementsByTagName("variable").length; i++) {
                 if (xmlDoc.getElementsByTagName("variable")[i].getAttribute("cmeta:id") == id) {
@@ -94,22 +96,6 @@ var rawQueryJson = function (itemHtml, vEndPoint, id) {
                     itemHtml.innerHTML += '<hr>';
                 }
             }
-
-            // Look up by component tag
-            //for (var i = 0; i < xmlDoc.getElementsByTagName("component").length; i++) {
-            //    if (xmlDoc.getElementsByTagName("component")[i].getAttribute("cmeta:id") == id) {
-            //        itemHtml.innerHTML += '<hr>';
-            //        itemHtml.innerHTML += id + '<br>';
-            //        itemHtml.innerHTML += xmlDoc.getElementsByTagName("component")[i].getAttribute("name") + '<br>';
-            //
-            //        for (var k = 0; k < 2; k++) {
-            //            itemHtml.innerHTML += '<input id="k" type="checkbox" value="k"><label>&nbsp;Annotations</label><br>';
-            //        }
-            //
-            //        itemHtml.innerHTML += '<hr>';
-            //    }
-            //}
-
         }
     }
     xmlhttp.send();
