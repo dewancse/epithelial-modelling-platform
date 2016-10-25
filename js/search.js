@@ -5,23 +5,12 @@ var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 var query = 'PREFIX dcterms: <http://purl.org/dc/terms/> ' +
     'SELECT ?subject ?Species ?subject2 ?Gene ' +
     'WHERE { ' +
-        '?subject dcterms:Species ?Species .' +
-        '?subject2 dcterms:Gene ?Gene .' +
+    '?subject dcterms:Species ?Species .' +
+    '?subject2 dcterms:Gene ?Gene .' +
     '}';
 
-var test = function () {
-    var t = document.getElementById("workspacelist");
-    var item = ["one", "two", "three", "four", "five"];
-    var label = [];
-    for (var i = 0; i < item.length; i++) {
-        label[i] = document.createElement('label');
-        label[i].className = "checkbox-inline";
-        label[i].innerHTML = '<input id="item[i]" type="checkbox" value="item[i]">' + item[i] + '</label>';
-
-        t.appendChild(label[i]);
-        t.appendChild(document.createElement("br"));
-    }
-};
+var chkBox;
+var label = [];
 
 var sparqlQueryJson = function (queryStr, endpoint) {
 
@@ -45,8 +34,6 @@ var myCallback = function (str) {
     // Convert result to JSON
     var jsonObj = JSON.parse(str);
 
-    console.log(jsonObj);
-
     var workspaceList = document.getElementById("workspacelist");
     var table = document.createElement("table");
     table.className = "table";
@@ -54,6 +41,12 @@ var myCallback = function (str) {
     var thead = document.createElement("thead");
     var tr = document.createElement("tr");
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
+        if (i == 0) {
+            var th = document.createElement("th");
+            th.appendChild(document.createTextNode(""));
+            tr.appendChild(th);
+        }
+
         var th = document.createElement("th");
         th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
         tr.appendChild(th);
@@ -65,16 +58,24 @@ var myCallback = function (str) {
     for (var i = 0; i < jsonObj.results.bindings.length; i++) {
         var tr = document.createElement("tr");
 
+        var td = document.createElement("td");
         var td1 = document.createElement("td");
         var td2 = document.createElement("td");
         var td3 = document.createElement("td");
         var td4 = document.createElement("td");
 
+        var id = jsonObj.results.bindings[i].subject.value;
+        label[i] = document.createElement('label');
+        label[i].className = "checkbox-inline";
+        label[i].innerHTML = '<input id="' + id + '" type="checkbox" value="' + id + '"></label>';
+
+        td.appendChild(label[i]);
         td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].subject.value));
         td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Species.value));
         td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].subject2.value));
         td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].Gene.value));
 
+        tr.appendChild(td);
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);
@@ -86,6 +87,15 @@ var myCallback = function (str) {
     table.appendChild(tbody);
     workspaceList.appendChild(table);
 }
+
+$("#ClickMe").click(function () {
+    chkBox = $('input');
+    for (var i = 0; i < label.length; i++) {
+        if (chkBox[i].checked) {
+            var id = chkBox[i].id;
+        }
+    }
+});
 
 $(document).ready(function () {
     //test();
