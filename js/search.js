@@ -46,8 +46,6 @@ var myCallback = function (str) {
     console.log(jsonObj.results.bindings[0].sub.value);
     console.log(jsonObj.results.bindings[0].obj.value);
 
-
-    /****************** Fix this table *********************/
     var workspaceList = document.getElementById("workspacelist");
     var table = document.createElement("table");
     table.className = "table";
@@ -63,16 +61,20 @@ var myCallback = function (str) {
     table.appendChild(thead);
 
     var tbody = document.createElement("tbody");
-    var tr = document.createElement("tr");
     for (var i = 0; i < jsonObj.results.bindings.length; i++) {
-        var td = document.createElement("td");
-        td.appendChild(document.createTextNode(jsonObj.results.bindings[i].sub.value));
-        //td.appendChild(document.createTextNode(jsonObj.results.bindings[i].obj.value));
-        tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
-    table.appendChild(tbody);
+        var tr = document.createElement("tr");
 
+        var td1 = document.createElement("td");
+        var td2 = document.createElement("td");
+
+        td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].sub.value));
+        td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].obj.value));
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
     workspaceList.appendChild(table);
 }
 
