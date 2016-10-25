@@ -3,7 +3,11 @@
  */
 var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 var query = 'PREFIX dcterms: <http://purl.org/dc/terms/> ' +
-    'SELECT ?sub ?obj WHERE { ?sub dcterms:Species ?obj}';
+    'SELECT ?subject ?Species ?subject2 ?Gene ' +
+    'WHERE { ' +
+        '?subject dcterms:Species ?Species .' +
+        '?subject2 dcterms:Gene ?Gene .' +
+    '}';
 
 var test = function () {
     var t = document.getElementById("workspacelist");
@@ -42,9 +46,6 @@ var myCallback = function (str) {
     var jsonObj = JSON.parse(str);
 
     console.log(jsonObj);
-    console.log(jsonObj.head.vars);
-    console.log(jsonObj.results.bindings[0].sub.value);
-    console.log(jsonObj.results.bindings[0].obj.value);
 
     var workspaceList = document.getElementById("workspacelist");
     var table = document.createElement("table");
@@ -66,11 +67,19 @@ var myCallback = function (str) {
 
         var td1 = document.createElement("td");
         var td2 = document.createElement("td");
+        var td3 = document.createElement("td");
+        var td4 = document.createElement("td");
 
-        td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].sub.value));
-        td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].obj.value));
+        td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].subject.value));
+        td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Species.value));
+        td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].subject2.value));
+        td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].Gene.value));
+
         tr.appendChild(td1);
         tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+
         tbody.appendChild(tr);
     }
 
