@@ -43,6 +43,8 @@ var myCallback = function (str) {
         var index = idstr.search(".cellml");
         var wname = idstr.slice(0, index);
 
+        console.log(wname);
+
         var workspaceurl = "https://models.physiomeproject.org/workspace" + "/" + wname + "/" + "@@file" + "/" + "HEAD"
             + "/" + jsonObj.results.bindings[i].id.value;
 

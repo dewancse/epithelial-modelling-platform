@@ -24,14 +24,6 @@
             </button>
             <a id="header" class="navbar-brand">SMT-PMR</a>
         </div>
-
-        <form class="navbar-form navbar-right">
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="Search Models">
-            </div>
-            <button type="search" class="btn btn-default">Search</button>
-        </form>
-
     </div><!-- container-fluid -->
 </nav>
 
@@ -48,14 +40,21 @@
     </div>
 
     <div class="col-lg-9 col-md-8 col-sm-7 col-xs-12">
-        <div id="workspacelist"></div>
+        <div id="workspacelist" class="container">
+            <div class="form-group container">
+                <input id="searchTxt" name="searchTxt" value="" type="text" class="form-control" placeholder="Search Models">
+                <button id="searchBtn" type="search" class="btn btn-default">Search</button>
+                <button id="viewBtn" type="view" class="btn btn-default">View</button>
+                <button id="epithelialBtn" type="epithelial" class="btn btn-default">Add to Model</button>
+            </div>
+        </div>
     </div>
 </div>
 </div>
 
 <script src="../js/jquery-2.1.4.min.js"></script>
 <script src="../js/bootstrap.min.js"></script>
-<script src="../js/search.js"></script>
+<script src="../js/search2.js"></script>
 
 </body>
 </html>
