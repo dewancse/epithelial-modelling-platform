@@ -15,13 +15,6 @@
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed visible-xs" data-toggle="collapse"
-                    data-target="#collapsable-nav" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
             <a id="header" class="navbar-brand">SMT-PMR</a>
         </div>
     </div><!-- container-fluid -->
@@ -32,20 +25,29 @@
         <div id="navigation">
             <div class="btn-group-vertical navbtn" role="group" aria-label="...">
                 <button type="button" class="btn btn-default"><a href="../index.html">Home</a></button>
-                <button type="button" id="ClickMe" class="btn btn-default"><a href="#">ClickMe</a></button>
-                <button type="button" class="btn btn-default"><a href="search.html">Search</a></button>
-                <button type="button" class="btn btn-default"><a href="epithelial.html">Epithelial platform</a></button>
+                <button type="button" class="btn btn-default"><a href="../snippets/search.html">Search</a></button>
+                <button type="button" class="btn btn-default"><a href="../snippets/epithelial.html">Model platform</a>
+                </button>
+                <button type="button" class="btn btn-default"><a href="../snippets/epithelial.html">Epithelial
+                    platform</a>
+                </button>
             </div>
         </div>
     </div>
 
     <div class="col-lg-9 col-md-8 col-sm-7 col-xs-12">
-        <div id="workspacelist"></div>
+        <div id="workspacelist" class="container">
+            <div class="container">
+                <button id="confirmBtn" type="confirm" class="btn btn-default">Confirm</button>
+                <button id="deleteBtn" type="delete" class="btn btn-default">Delete</button>
+            </div>
+        </div>
     </div>
 </div>
+</div>
 
-<script src="../js/jquery-2.1.4.min.js"></script>
-<script src="../js/bootstrap.min.js"></script>
+<script src="../lib/jquery-2.1.4.min.js"></script>
+<script src="../lib/bootstrap.min.js"></script>
 <script src="../js/epithelial.js"></script>
 </body>
 </html>

@@ -2,6 +2,12 @@
  * Created by dsar941 on 10/5/2016.
  */
 var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+var query = 'PREFIX dcterms: <http://purl.org/dc/terms/> ' +
+    'SELECT ?subject ?Species ?subject2 ?Gene ' +
+    'WHERE { ' +
+    '?subject dcterms:Species ?Species .' +
+    '?subject2 dcterms:Gene ?Gene .' +
+    '}';
 
 var chkBox;
 var label = [];
@@ -53,21 +59,34 @@ var myCallback = function (str) {
     var tbody = document.createElement("tbody");
     for (var i = 0; i < jsonObj.results.bindings.length; i++) {
 
+        var idstr = jsonObj.results.bindings[i].subject.value;
+        console.log(idstr);
+
+
         var tr = document.createElement("tr");
 
         var td = document.createElement("td");
         var td1 = document.createElement("td");
+        var td2 = document.createElement("td");
+        var td3 = document.createElement("td");
+        var td4 = document.createElement("td");
 
-        var id = jsonObj.results.bindings[i].name.value;
+        var id = jsonObj.results.bindings[i].subject.value;
         label[i] = document.createElement('label');
         label[i].className = "checkbox-inline";
         label[i].innerHTML = '<input id="' + id + '" type="checkbox" value="' + id + '"></label>';
 
         td.appendChild(label[i]);
-        td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].name.value));
+        td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].subject.value));
+        td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Species.value));
+        td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].subject2.value));
+        td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].Gene.value));
 
         tr.appendChild(td);
         tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
 
         tbody.appendChild(tr);
     }
@@ -86,10 +105,12 @@ $("#ClickMe").click(function () {
     }
 });
 
+var searchTxt = document.getElementById("searchTxt");
+$("#searchBtn").click(function () {
+    console.log(searchTxt.value);
+});
+
 $(document).ready(function () {
-    $("#searchBtn").click(function () {
-        var searchTxt = document.getElementById("searchTxt").value;
-        var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
-        sparqlQueryJson(query, endpoint);
-    });
+    //test();
+    sparqlQueryJson(query, endpoint);
 });

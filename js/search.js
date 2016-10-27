@@ -1,116 +1,110 @@
 /**
  * Created by dsar941 on 10/5/2016.
  */
-var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
-var query = 'PREFIX dcterms: <http://purl.org/dc/terms/> ' +
-    'SELECT ?subject ?Species ?subject2 ?Gene ' +
-    'WHERE { ' +
-    '?subject dcterms:Species ?Species .' +
-    '?subject2 dcterms:Gene ?Gene .' +
-    '}';
 
-var chkBox;
-var label = [];
+var search = function () {
 
-var sparqlQueryJson = function (queryStr, endpoint) {
 
-    var xmlhttp = new XMLHttpRequest();
+    var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
-    xmlhttp.open('POST', endpoint, true);
-    xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xmlhttp.setRequestHeader("Accept", "application/sparql-results+json");
+    var chkBox;
+    var label = [];
 
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            myCallback(xmlhttp.responseText);
+    var sparqlQueryJson = function (queryStr, endpoint) {
+
+        var xmlhttp = new XMLHttpRequest();
+
+        xmlhttp.open('POST', endpoint, true);
+        xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xmlhttp.setRequestHeader("Accept", "application/sparql-results+json");
+
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                myCallback(xmlhttp.responseText);
+            }
         }
-    }
 
-    // Send the query to the endpoint.
-    xmlhttp.send(queryStr);
-};
+        // Send the query to the endpoint.
+        xmlhttp.send(queryStr);
+    };
 
-var myCallback = function (str) {
-    // Convert result to JSON
-    var jsonObj = JSON.parse(str);
+    var myCallback = function (str) {
+        // Convert result to JSON
+        var jsonObj = JSON.parse(str);
 
-    console.log(jsonObj);
+        var workspaceList = document.getElementById("workspacelist");
 
-    var workspaceList = document.getElementById("workspacelist");
-    var table = document.createElement("table");
-    table.className = "table";
+        if (jsonObj.results.bindings.length == 0) {
+            workspaceList.innerHTML = "No items matching your search terms.";
+            return;
+        }
 
-    var thead = document.createElement("thead");
-    var tr = document.createElement("tr");
-    for (var i = 0; i < jsonObj.head.vars.length; i++) {
-        if (i == 0) {
+        // Empty space for the new search result
+        workspaceList.innerHTML = "";
+
+        var table = document.createElement("table");
+        table.className = "table";
+
+        var thead = document.createElement("thead");
+        var tr = document.createElement("tr");
+        for (var i = 0; i < jsonObj.head.vars.length; i++) {
+            if (i == 0) {
+                var th = document.createElement("th");
+                th.appendChild(document.createTextNode(""));
+                tr.appendChild(th);
+            }
+
             var th = document.createElement("th");
-            th.appendChild(document.createTextNode(""));
+            th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
             tr.appendChild(th);
         }
+        thead.appendChild(tr);
+        table.appendChild(thead);
 
-        var th = document.createElement("th");
-        th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
-        tr.appendChild(th);
-    }
-    thead.appendChild(tr);
-    table.appendChild(thead);
+        var tbody = document.createElement("tbody");
 
-    var tbody = document.createElement("tbody");
-    for (var i = 0; i < jsonObj.results.bindings.length; i++) {
+        for (var i = 0; i < jsonObj.results.bindings.length; i++) {
 
-        var idstr = jsonObj.results.bindings[i].subject.value;
-        console.log(idstr);
+            var tr = document.createElement("tr");
 
+            var td = document.createElement("td");
+            var td1 = document.createElement("td");
 
-        var tr = document.createElement("tr");
+            var id = jsonObj.results.bindings[i].name.value;
+            label[i] = document.createElement('label');
+            label[i].className = "checkbox-inline";
+            label[i].innerHTML = '<input id="' + id + '" type="checkbox" value="' + id + '"></label>';
 
-        var td = document.createElement("td");
-        var td1 = document.createElement("td");
-        var td2 = document.createElement("td");
-        var td3 = document.createElement("td");
-        var td4 = document.createElement("td");
+            td.appendChild(label[i]);
+            td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].name.value));
 
-        var id = jsonObj.results.bindings[i].subject.value;
-        label[i] = document.createElement('label');
-        label[i].className = "checkbox-inline";
-        label[i].innerHTML = '<input id="' + id + '" type="checkbox" value="' + id + '"></label>';
+            tr.appendChild(td);
+            tr.appendChild(td1);
 
-        td.appendChild(label[i]);
-        td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].subject.value));
-        td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Species.value));
-        td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].subject2.value));
-        td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].Gene.value));
-
-        tr.appendChild(td);
-        tr.appendChild(td1);
-        tr.appendChild(td2);
-        tr.appendChild(td3);
-        tr.appendChild(td4);
-
-        tbody.appendChild(tr);
-    }
-
-    table.appendChild(tbody);
-    workspaceList.appendChild(table);
-}
-
-$("#ClickMe").click(function () {
-    chkBox = $('input');
-    for (var i = 0; i < label.length; i++) {
-        if (chkBox[i].checked) {
-            var id = chkBox[i].id;
-            console.log(id);
+            tbody.appendChild(tr);
         }
+
+        table.appendChild(tbody);
+        workspaceList.appendChild(table);
     }
-});
 
-var searchTxt = document.getElementById("searchTxt");
-$("#searchBtn").click(function () {
-    console.log(searchTxt.value);
-});
+    $("#ClickMe").click(function () {
+        chkBox = $('input');
+        for (var i = 0; i < label.length; i++) {
+            if (chkBox[i].checked) {
+                var id = chkBox[i].id;
+                console.log(id);
+            }
+        }
+    });
 
-$(document).ready(function () {
-    //test();
-    sparqlQueryJson(query, endpoint);
-});
+    $(document).ready(function () {
+        document.addEventListener('keydown', function (event) {
+            if (event.key == 'Enter') {
+                var searchTxt = document.getElementById("searchTxt").value;
+                var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
+                sparqlQueryJson(query, endpoint);
+            }
+        });
+    });
+}();
