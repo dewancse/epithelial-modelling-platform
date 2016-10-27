@@ -28,6 +28,23 @@
         request.send(null); // for POST only
     };
 
+    // Makes an Ajax POST request to 'requestUrl'
+    ajaxUtils.sendPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
+        var request = getRequestObject();
+
+        request.onreadystatechange = function () {
+            handleResponse(request, responseHandler, isJsonResponse);
+        };
+
+        request.open("POST", requestUrl, true);
+
+        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        request.setRequestHeader("Accept", "application/sparql-results+json");
+
+        request.send(query); // for POST only
+    };
+
+
     // Only calls user provided 'responseHandler'
     // function if response is ready
     // and not an error

@@ -8,38 +8,19 @@ var table = function () {
     var query = 'PREFIX dcterms: <http://purl.org/dc/terms/> ' +
         'SELECT ?subject ?Species ?subject2 ?Gene ' +
         'WHERE { ' +
-        '?subject dcterms:Species ?Species .' +
-        '?subject2 dcterms:Gene ?Gene .' +
+            '?subject dcterms:Species ?Species .' +
+            '?subject2 dcterms:Gene ?Gene .' +
         '}';
 
     var label = [];
 
-    var sparqlQueryJson = function (queryStr, endpoint) {
-
-        var xmlhttp = new XMLHttpRequest();
-
-        xmlhttp.open('POST', endpoint, true);
-        xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xmlhttp.setRequestHeader("Accept", "application/sparql-results+json");
-
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                myCallback(xmlhttp.responseText);
-            }
-        }
-
-        // Send the query to the endpoint.
-        xmlhttp.send(queryStr);
-    };
-
-    var myCallback = function (str) {
-        // Convert result to JSON
-        var jsonObj = JSON.parse(str);
+    var sampleTable = function (jsonObj) {
 
         var workspaceList = document.getElementById("workspacelist");
         var table = document.createElement("table");
         table.className = "table";
 
+        // Table header
         var thead = document.createElement("thead");
         var tr = document.createElement("tr");
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
@@ -53,9 +34,11 @@ var table = function () {
             th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
             tr.appendChild(th);
         }
+
         thead.appendChild(tr);
         table.appendChild(thead);
 
+        // Table body
         var tbody = document.createElement("tbody");
         for (var i = 0; i < jsonObj.results.bindings.length; i++) {
 
@@ -91,7 +74,9 @@ var table = function () {
     }
 
     $(document).ready(function () {
-        sparqlQueryJson(query, endpoint);
+
+        $ajaxUtils.sendPostRequest(endpoint, query, sampleTable, true);
+
     });
 
 }();
