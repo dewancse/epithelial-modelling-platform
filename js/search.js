@@ -81,11 +81,51 @@ var search = function () {
         document.addEventListener('keydown', function (event) {
             if (event.key == 'Enter') {
                 var searchTxt = document.getElementById("searchTxt").value;
-                var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
+                //var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
+                //$ajaxUtils.sendPostRequest(endpoint, query, searchList, true);
 
-                $ajaxUtils.sendPostRequest(endpoint, query, searchList, true);
+                //////////////////////////////////
+                // Testing cascading SqparQL query
+                //////////////////////////////////
+                var query = 'SELECT ?Model WHERE { ?Model <http://purl.org/dc/terms/Protein> "Sodium/hydrogen exchanger 3" }';
+
+                // 1ST
+                $ajaxUtils.sendPostRequest(
+                    endpoint,
+                    query,
+                    function (jsonObj) {
+                        console.log(jsonObj);
+
+                        var model = jsonObj.results.bindings[0].Model.value;
+                        var query = 'SELECT ?Species WHERE { <' + model + '> <http://purl.org/dc/terms/Species> ?Species }';
+
+                        // 2ND
+                        $ajaxUtils.sendPostRequest(
+                            endpoint,
+                            query,
+                            function (jsonObj) {
+                                console.log(jsonObj);
+
+                                var Species = jsonObj.results.bindings[0].Species.value;
+                                var query = 'SELECT ?Model WHERE { ?Model <http://purl.org/dc/terms/Species> "' + Species + '" }';
+
+                                // 3RD
+                                $ajaxUtils.sendPostRequest(
+                                    endpoint,
+                                    query,
+                                    function (jsonObj) {
+                                        console.log(jsonObj);
+                                    },
+                                    true);
+                            },
+                            true);
+                    },
+                    true);
+
+                //////////////////////////////
+                // End of Testing SparQL query
+                //////////////////////////////
             }
         });
-
     });
 }();
