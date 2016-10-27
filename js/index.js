@@ -3,6 +3,7 @@
  */
 
 var SMTPMR = function () {
+
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var query = 'SELECT ?id WHERE { ?id  <http://biomodels.net/biology-qualifiers/isVersionOf> ' +
         '<http://identifiers.org/go/GO:0005272> }';
@@ -33,7 +34,6 @@ var SMTPMR = function () {
         var jsonObj = JSON.parse(str);
 
         var workspaceList = document.getElementById("workspacelist");
-        var list = document.createElement("ul");
 
         for (var i = 0; i < jsonObj.results.bindings.length; i++) {
 
@@ -45,12 +45,12 @@ var SMTPMR = function () {
             var workspaceurl = "https://models.physiomeproject.org/workspace" + "/" + wname + "/" + "@@file" + "/" + "HEAD"
                 + "/" + jsonObj.results.bindings[i].id.value;
 
-            item[i] = document.createElement("li");
+            item[i] = document.createElement("label");
             item[i].id = idstr;
-            item[i].innerHTML = '<a href=' + workspaceurl + ' + target=_blank>' + wname + " / " + idstr + '</a><br>';
-            item[i].innerHTML += '<input id="' + item[i] + '" type="checkbox" value="" class="checkbox-inline"><label>&nbsp;&nbsp;Annotations</label><br>';
+            item[i].innerHTML = '<input id="' + item[i].id + '" type="checkbox" value="" class="checkbox-inline"> ';
+            item[i].innerHTML += '<a href=' + workspaceurl + ' + target=_blank>' + wname + " / " + idstr + '</a></label>';
 
-            workspaceList.appendChild(list.appendChild(item[i]));
+            workspaceList.appendChild(item[i]);
             workspaceList.appendChild(document.createElement("br"));
         }
     };
@@ -65,6 +65,9 @@ var SMTPMR = function () {
                 var text = xmlhttp.responseText;
                 var parser = new DOMParser();
                 var xmlDoc = parser.parseFromString(text, "text/xml");
+
+                console.log(itemHtml.firstChild);
+                console.log(itemHtml);
 
                 // Look up by variable tag
                 for (var i = 0; i < xmlDoc.getElementsByTagName("variable").length; i++) {
@@ -82,27 +85,24 @@ var SMTPMR = function () {
 
     document.addEventListener('click', function (event) {
         if (event.srcElement.className == "checkbox-inline") {
-            chkBox = $('input');
-            for (var i = 0; i < item.length; i++) {
-                if (chkBox[i].checked) {
-                    var idstr = item[i].id;
-                    var n = idstr.search("#");
-                    var idn = idstr.slice(n + 1, idstr.length);
+            var idstr = event.srcElement.id;
+            var n = idstr.search("#");
+            var idn = idstr.slice(n + 1, idstr.length);
 
-                    // id
-                    var index = idstr.search(".cellml");
-                    var wname = idstr.slice(0, index);
+            // id
+            var index = idstr.search(".cellml");
+            var wname = idstr.slice(0, index);
 
-                    var raw = "https://models.physiomeproject.org/workspace" + "/" + wname + "/" + "rawfile" + "/" + "HEAD"
-                        + "/" + idstr;
+            var raw = "https://models.physiomeproject.org/workspace" + "/" + wname + "/" + "rawfile" + "/" + "HEAD"
+                + "/" + idstr;
 
-                    rawQueryJson(item[i], raw, idn);
-                }
-            }
+            rawQueryJson(event.srcElement.parentElement, raw, idn);
         }
     });
 
     $(document).ready(function () {
+
         sparqlQueryJson(query, endpoint);
+
     });
 }();

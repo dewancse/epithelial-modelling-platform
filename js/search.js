@@ -4,7 +4,6 @@
 
 var search = function () {
 
-
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
     var chkBox;
@@ -72,8 +71,7 @@ var search = function () {
 
             var id = jsonObj.results.bindings[i].name.value;
             label[i] = document.createElement('label');
-            label[i].className = "checkbox-inline";
-            label[i].innerHTML = '<input id="' + id + '" type="checkbox" value="' + id + '"></label>';
+            label[i].innerHTML = '<input id="' + id + '" type="checkbox" value="' + id + '" class="checkbox-inline"></label>';
 
             td.appendChild(label[i]);
             td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].name.value));
@@ -87,14 +85,12 @@ var search = function () {
         table.appendChild(tbody);
         workspaceList.appendChild(table);
     }
-
-    $("#ClickMe").click(function () {
-        chkBox = $('input');
-        for (var i = 0; i < label.length; i++) {
-            if (chkBox[i].checked) {
-                var id = chkBox[i].id;
-                console.log(id);
-            }
+    
+    document.addEventListener('click', function (event) {
+        if (event.srcElement.className == "checkbox-inline") {
+            var id = event.srcElement.id;
+            console.log(event.srcElement);
+            console.log(event.srcElement.parentElement);
         }
     });
 
