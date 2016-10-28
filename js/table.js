@@ -2,14 +2,15 @@
  * Created by dsar941 on 10/5/2016.
  */
 
-var table = function () {
+(function () {
+    'use strict';
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var query = 'PREFIX dcterms: <http://purl.org/dc/terms/> ' +
         'SELECT ?subject ?Species ?subject2 ?Gene ' +
         'WHERE { ' +
-            '?subject dcterms:Species ?Species .' +
-            '?subject2 dcterms:Gene ?Gene .' +
+        '?subject dcterms:Species ?Species .' +
+        '?subject2 dcterms:Gene ?Gene .' +
         '}';
 
     var label = [];
@@ -79,4 +80,4 @@ var table = function () {
 
     });
 
-}();
+})();

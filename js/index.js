@@ -2,7 +2,8 @@
  * Created by dsar941 on 9/8/2016.
  */
 
-var SMTPMR = function () {
+(function (global) {
+    'use strict';
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var query = 'SELECT ?id WHERE { ?id  <http://biomodels.net/biology-qualifiers/isVersionOf> ' +
@@ -10,7 +11,10 @@ var SMTPMR = function () {
 
     var label = [];
 
-    var showWorkspace = function (jsonObj) {
+    // Set up a namespace for our utility
+    var indexUtils = {};
+
+    indexUtils.showWorkspace = function (jsonObj) {
 
         var workspaceList = document.getElementById("workspacelist");
 
@@ -36,7 +40,10 @@ var SMTPMR = function () {
     };
 
     document.addEventListener('click', function (event) {
-        if (event.srcElement.className == "checkbox-inline") {
+        if (event.srcElement.className == "checkbox-inline" && event.srcElement.checked == true) {
+
+            console.log(event);
+
             var idWithStr = event.srcElement.id;
             var n = idWithStr.search("#");
             var id = idWithStr.slice(n + 1, idWithStr.length);
@@ -48,7 +55,7 @@ var SMTPMR = function () {
             var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + workspaceName + "/" + "rawfile" +
                 "/" + "HEAD" + "/" + idWithStr;
 
-            var showVariableName = function (str) {
+            indexUtils.showVariableName = function (str) {
                 var parser = new DOMParser();
                 var xmlDoc = parser.parseFromString(str, "text/xml");
 
@@ -63,15 +70,19 @@ var SMTPMR = function () {
                         vHtml.innerHTML += '<hr>';
                     }
                 }
-            }
+            };
 
-            $ajaxUtils.sendGetRequest(vEndPoint, showVariableName, false);
+            $ajaxUtils.sendGetRequest(vEndPoint, indexUtils.showVariableName, false);
         }
     });
 
     $(document).ready(function () {
 
-        $ajaxUtils.sendPostRequest(endpoint, query, showWorkspace, true);
+        $ajaxUtils.sendPostRequest(endpoint, query, indexUtils.showWorkspace, true);
 
     });
-}();
+
+    // Expose utility to the global object
+    global.$indexUtils = indexUtils;
+
+})(window);

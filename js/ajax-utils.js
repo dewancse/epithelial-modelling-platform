@@ -1,5 +1,6 @@
 (function (global) {
-
+    'use strict';
+    
     // Set up a namespace for our utility
     var ajaxUtils = {};
 

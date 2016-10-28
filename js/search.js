@@ -2,12 +2,16 @@
  * Created by dsar941 on 10/5/2016.
  */
 
-var search = function () {
+(function (global) {
+    'use strict';
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var label = [];
 
-    var searchList = function (jsonObj) {
+    // Set up a namespace for our utility
+    var searchUtils = {};
+
+    searchUtils.searchList = function (jsonObj) {
 
         var workspaceList = document.getElementById("workspacelist");
 
@@ -17,7 +21,7 @@ var search = function () {
             return;
         }
 
-        // Empty space for the new search result
+        // Make empty space for new search result
         workspaceList.innerHTML = "";
 
         // Dynamic table
@@ -69,10 +73,20 @@ var search = function () {
 
     // testing ... checkbox id
     document.addEventListener('click', function (event) {
-        if (event.srcElement.className == "checkbox-inline") {
+        if (event.srcElement.className == "checkbox-inline" && event.srcElement.checked == true) {
             var id = event.srcElement.id;
-            console.log(event.srcElement);
-            console.log(event.srcElement.parentElement);
+            console.log(event);
+            //console.log(event.srcElement.parentElement);
+        }
+    });
+
+    $("#modelBtn").click(function () {
+        var chkBox = $('input');
+        for (var i = 0; i < label.length; i++) {
+            if (chkBox[i].checked) {
+                var id = chkBox[i].id;
+                console.log(id);
+            }
         }
     });
 
@@ -81,51 +95,72 @@ var search = function () {
         document.addEventListener('keydown', function (event) {
             if (event.key == 'Enter') {
                 var searchTxt = document.getElementById("searchTxt").value;
-                //var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
-                //$ajaxUtils.sendPostRequest(endpoint, query, searchList, true);
+                var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
 
-                //////////////////////////////////
-                // Testing cascading SqparQL query
-                //////////////////////////////////
-                var query = 'SELECT ?Model WHERE { ?Model <http://purl.org/dc/terms/Protein> "Sodium/hydrogen exchanger 3" }';
-
-                // 1ST
-                $ajaxUtils.sendPostRequest(
-                    endpoint,
-                    query,
-                    function (jsonObj) {
-                        console.log(jsonObj);
-
-                        var model = jsonObj.results.bindings[0].Model.value;
-                        var query = 'SELECT ?Species WHERE { <' + model + '> <http://purl.org/dc/terms/Species> ?Species }';
-
-                        // 2ND
-                        $ajaxUtils.sendPostRequest(
-                            endpoint,
-                            query,
-                            function (jsonObj) {
-                                console.log(jsonObj);
-
-                                var Species = jsonObj.results.bindings[0].Species.value;
-                                var query = 'SELECT ?Model WHERE { ?Model <http://purl.org/dc/terms/Species> "' + Species + '" }';
-
-                                // 3RD
-                                $ajaxUtils.sendPostRequest(
-                                    endpoint,
-                                    query,
-                                    function (jsonObj) {
-                                        console.log(jsonObj);
-                                    },
-                                    true);
-                            },
-                            true);
-                    },
-                    true);
-
-                //////////////////////////////
-                // End of Testing SparQL query
-                //////////////////////////////
+                $ajaxUtils.sendPostRequest(endpoint, query, searchUtils.searchList, true);
             }
         });
     });
-}();
+
+    // Expose utility to the global object
+    global.$searchUtils = searchUtils;
+
+})(window);
+
+///////////////////////////////////////////////////////////////
+// Idea is to find the model name of the searched item and then
+// in the 2nd POST call list the rdf indexed information
+///////////////////////////////////////////////////////////////
+
+//var query = 'SELECT ?Model WHERE { ?Model <http://purl.org/dc/terms/Protein> "Sodium/hydrogen exchanger 3" }';
+//
+//// 1ST
+//$ajaxUtils.sendPostRequest(
+//    endpoint,
+//    query,
+//    function (jsonObj) {
+//        console.log(jsonObj);
+//
+//        var model = jsonObj.results.bindings[0].Model.value;
+//        var query = 'SELECT ?Species WHERE { <' + model + '> <http://purl.org/dc/terms/Species> ?Species }';
+//
+//        // 2ND
+//        $ajaxUtils.sendPostRequest(
+//            endpoint,
+//            query,
+//            function (jsonObj) {
+//                console.log(jsonObj);
+//
+//                var Species = jsonObj.results.bindings[0].Species.value;
+//                var query = 'SELECT ?Model WHERE { ?Model <http://purl.org/dc/terms/Species> "' + Species + '" }';
+//
+//                // 3RD
+//                $ajaxUtils.sendPostRequest(
+//                    endpoint,
+//                    query,
+//                    function (jsonObj) {
+//                        console.log(jsonObj);
+//                    },
+//                    true);
+//            },
+//            true);
+//    },
+//    true);
+
+/*
+ PREFIX dcterms: <http://purl.org/dc/terms/>
+ PREFIX bqmodel: <http://biomodels.net/model-qualifiers/>
+ PREFIX ro: <http://purl.obolibrary.org/obo/ro.owl#>
+ PREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+
+ SELECT ?Title ?Author ?Protein ?Species ?Gene ?Located_in ?DOI
+ WHERE {
+ <weinstein_1995.cellml#title> dcterms:title ?Title .
+ <weinstein_1995.cellml#author1VcardN> vCard:FN ?Author .
+ <weinstein_1995.cellml#UniProtKB> dcterms:Protein ?Protein .
+ <weinstein_1995.cellml#UniProtKB> dcterms:Species ?Species .
+ <weinstein_1995.cellml#UniProtKB> dcterms:Gene ?Gene .
+ <weinstein_1995.cellml#located_in> ro:located_in ?Located_in .
+ <weinstein_1995.cellml#DOI> bqmodel:isDescribedBy ?DOI .
+ }
+ */
