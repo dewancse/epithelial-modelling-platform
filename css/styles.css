@@ -19,3 +19,13 @@
     background-color: white;
     margin: 10px;
 }
+
+.compartmentsList {
+    position: absolute;
+    max-width: 300px;
+}
+
+.svgGraph {
+    position: relative;
+    margin-left: 300px;
+}

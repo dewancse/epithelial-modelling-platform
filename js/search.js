@@ -8,8 +8,23 @@
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var label = [];
 
+    var modelHtml = "../snippets/model.html";
+
     // Set up a namespace for our utility
     var searchUtils = {};
+
+    // Convenience function for inserting innerHTML for 'select'
+    var insertHtml = function (selector, html) {
+        var targetElem = document.querySelector(selector);
+        targetElem.innerHTML = html;
+    };
+
+    // Show loading icon inside element identified by 'selector'.
+    var showLoading = function (selector) {
+        var html = "<div class='text-center'>";
+        html += "<img src='../images/ajax-loader.gif'></div>";
+        insertHtml(selector, html);
+    };
 
     searchUtils.searchList = function (jsonObj) {
 
@@ -71,27 +86,40 @@
         workspaceList.appendChild(table);
     }
 
-    // testing ... checkbox id
-    document.addEventListener('click', function (event) {
-        if (event.srcElement.className == "checkbox-inline" && event.srcElement.checked == true) {
-            var id = event.srcElement.id;
-            console.log(event);
-            //console.log(event.srcElement.parentElement);
+    function buildModelHtml(str) {
+
+        console.log(str);
+
+        var parser = new DOMParser();
+        var xmlDoc = parser.parseFromString(str, "text/xml");
+
+        var vHtml = event.srcElement;
+
+        console.log(xmlDoc);
+
+
+        // Look up inside div tag
+        for (var i = 0; i < xmlDoc.getElementsByTagName("div").length; i++) {
+            if (xmlDoc.getElementsByTagName("div")[i].getAttribute("id") == "workspacelist") {
+                console.log("Inside Div");
+                vHtml.innerHTML += '<hr>';
+                vHtml.innerHTML += id + '<br>';
+                vHtml.innerHTML += '<hr>';
+
+            }
         }
-    });
+    }
 
     $("#modelBtn").click(function () {
         var chkBox = $('input');
         for (var i = 0; i < label.length; i++) {
             if (chkBox[i].checked) {
-                var id = chkBox[i].id;
-                console.log(id);
+                $ajaxUtils.sendGetRequest(modelHtml, buildModelHtml, false);
             }
         }
     });
 
     $(document).ready(function () {
-
         document.addEventListener('keydown', function (event) {
             if (event.key == 'Enter') {
                 var searchTxt = document.getElementById("searchTxt").value;
