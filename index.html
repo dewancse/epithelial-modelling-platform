@@ -8,6 +8,12 @@
     <title>SMT-PMR</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
+
+    <!--bringing in the dependencies-->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/d3.min.js"></script>
+
 </head>
 
 <body>
@@ -21,27 +27,38 @@
 </nav>
 
 <div class="row">
+    <!-- main menu -->
     <div class="col-lg-3 col-md-4 col-sm-5 col-xs-12">
         <div id="navigation">
             <div class="btn-group-vertical navbtn" role="group" aria-label="...">
-                <button type="button" class="btn btn-default"><a href="">Home</a></button>
-                <button type="button" class="btn btn-default"><a href="snippets/search.html">Search</a></button>
-                <button type="button" class="btn btn-default"><a href="snippets/model.html">Model platform</a>
+                <button type="button" class="btn btn-default">
+                    <a href="#" onclick="$mainUtils.loadAnnotationHtml();">Annotation</a>
                 </button>
-                <button type="button" class="btn btn-default"><a href="snippets/model.html">Epithelial platform</a>
+
+                <button type="button" class="btn btn-default">
+                    <a href="#" onclick="$mainUtils.loadSearchHtml();">Search Models</a>
                 </button>
+
+                <!--<button type="button" class="btn btn-default">-->
+                    <!--<a href="#" onclick="$mainUtils.loadModelHtml();">Model platform</a>-->
+                <!--</button>-->
+
+                <!--<button type="button" class="btn btn-default">-->
+                    <!--<a href="#" onclick="$mainUtils.loadEpithelialHtml();">Epithelial platform</a>-->
+                <!--</button>-->
             </div>
         </div>
     </div>
 
+    <!-- main content -->
     <div class="col-lg-9 col-md-8 col-sm-7 col-xs-12">
-        <div id="workspacelist" class="container-fluid"></div>
+        <div id="main-content" class="container-fluid"></div>
     </div>
-</div>
+</div><!-- .row -->
 
-<script src="lib/jquery-2.1.4.min.js"></script>
-<script src="lib/bootstrap.min.js"></script>
+<!-- main scripts -->
 <script src="js/ajax-utils.js"></script>
 <script src="js/index.js"></script>
+
 </body>
 </html>
