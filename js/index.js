@@ -19,6 +19,9 @@
     // Save models
     var listOfModels = [];
 
+    // Save table rows for epithelial
+    var listOfItemsForEpithelial = [];
+
     // Count number of instances in the loadModelHtml
     mainUtils.count = 0;
     var table = document.createElement("table");
@@ -288,7 +291,8 @@
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
             var searchTxt = document.getElementById("searchTxt").value;
-            var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
+            //var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
+            var query = 'SELECT ?name WHERE { ?name ?located_in "' + searchTxt + '" }';
 
             $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.searchList, true);
         }
@@ -298,6 +302,8 @@
     mainUtils.loadViewHtml = function () {
 
         var workspaceURI = mainUtils.workspaceName.concat(".cellml");
+
+        console.log(workspaceURI);
 
         var query = 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
             'PREFIX bqmodel: <http://biomodels.net/model-qualifiers/>' +
@@ -335,6 +341,8 @@
 
         var label = [];
         var finalHtml = viewHtmlContent;
+
+        console.log("showView: ", jsonObj);
 
         var html = "<section class='row'>";
 
@@ -401,7 +409,8 @@
             '<' + workspaceURI + '#UniProtKB> dcterms:Species ?Species . ' +
             '<' + workspaceURI + '#UniProtKB> dcterms:Gene ?Gene . ' +
             '<' + workspaceURI + '#located_in> ro:located_in ?Located_in . ' +
-            '<' + workspaceURI + '#DOI> bqmodel:isDescribedBy ?DOI .}';
+            '<' + workspaceURI + '#DOI> bqmodel:isDescribedBy ?DOI . ' +
+            '}';
 
         showLoading("#main-content");
         $ajaxUtils.sendGetRequest(
@@ -495,7 +504,7 @@
 
     mainUtils.deleteRowModelHtml = function () {
 
-        function hasElement(id) {
+        var hasElement = function (id) {
 
             for (var i = 0; i < $('table tr').length; i++) {
 
@@ -508,7 +517,7 @@
                     return id;
                 }
             }
-        }
+        };
 
         var filtered = listOfModels.filter(hasElement);
         console.log(filtered);
@@ -520,6 +529,25 @@
     };
 
     mainUtils.loadEpithelialHtml = function () {
+        var deleteElement = function (id) {
+
+            for (var i = 0; i < $('table tr').length; i++) {
+
+                if ($('table tr')[i].id == 0)
+                    continue;
+
+                if ($('table tr')[i].id == id) {
+                    listOfItemsForEpithelial.push($('table tr')[i]);
+                    table.deleteRow(i);
+
+                    return id;
+                }
+            }
+        };
+
+        var deleted = listOfModels.filter(deleteElement);
+        console.log(deleted);
+
         showLoading("#main-content");
 
         $ajaxUtils.sendGetRequest(
@@ -537,11 +565,22 @@
         // List of compartments
         var compartmentsList = document.getElementById("compartmentsList");
 
-        var numberOfRows = table.getElementsByTagName('tbody')[0].rows;
+        //var numberOfRows = table.getElementsByTagName('tbody')[0].rows;
 
-        for (var i = 0; i < numberOfRows.length; i++) {
-            compartmentsList.innerHTML += '<p id="drag1" draggable="true" ondragstart="$mainUtils.drag(event)">' +
-                numberOfRows[i].getElementsByTagName('td')[3].innerText + '</p>';
+        for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
+
+            if (listOfModels.length == 0)
+                break;
+
+            for (var j = 0; j < listOfModels.length; j++) {
+                if (listOfModels[j] == listOfItemsForEpithelial[i].id) {
+                    compartmentsList.innerHTML += '<p id="drag1" draggable="true" ondragstart="$mainUtils.drag(event)">' +
+                        listOfItemsForEpithelial[i].getElementsByTagName('td')[3].innerText + '</p>';
+
+                    // Make empty using splice
+                    //listOfModels.splice(j, 1);
+                }
+            }
         }
 
         // Helper functions for drag and drop

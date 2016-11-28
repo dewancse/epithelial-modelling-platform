@@ -2,34 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="20602936-733a-4b68-a1c6-61cabd7b5454" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/node_modules.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.name" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/images/PMRLogo.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/epithelial.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/model.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/search.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/table.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/bootstrap.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/d3-dispatch.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/d3-drag.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/d3-selection.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/d3.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/jquery-2.1.4.min.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/images/ajax-loader.gif" afterPath="$PROJECT_DIR$/images/ajax-loader.gif" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/SMT-PMR.iml" afterPath="$PROJECT_DIR$/.idea/SMT-PMR.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/dsar941.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/dsar941.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/css/styles.css" afterPath="$PROJECT_DIR$/css/styles.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/index.js" afterPath="$PROJECT_DIR$/js/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snippets/epithelial.html" afterPath="$PROJECT_DIR$/snippets/epithelial.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snippets/annotation.html" afterPath="$PROJECT_DIR$/snippets/annotation.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snippets/model.html" afterPath="$PROJECT_DIR$/snippets/model.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snippets/search.html" afterPath="$PROJECT_DIR$/snippets/search.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snippets/view.html" afterPath="$PROJECT_DIR$/snippets/view.html" />
     </list>
     <ignored path="SMT-PMR.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -50,6 +30,16 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="model.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/snippets/model.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-1.4705882">
+              <caret line="2" column="58" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="58" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="epithelial.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/snippets/epithelial.html">
           <provider selected="true" editor-type-id="text-editor">
@@ -63,11 +53,9 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.5123153">
-              <caret line="102" column="12" selection-start-line="102" selection-start-column="12" selection-end-line="102" selection-end-column="12" />
-              <folding>
-                <marker date="1479427195294" expanded="true" signature="20344:20427" placeholder="..." />
-              </folding>
+            <state vertical-scroll-proportion="0.7536946">
+              <caret line="580" column="48" selection-start-line="580" selection-start-column="48" selection-end-line="580" selection-end-column="48" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -112,13 +100,13 @@
         <option value="$PROJECT_DIR$/scripts/index.js" />
         <option value="$PROJECT_DIR$/snippets/homeHtml.html" />
         <option value="$PROJECT_DIR$/snippets/home.html" />
+        <option value="$PROJECT_DIR$/snippets/epithelial.html" />
+        <option value="$PROJECT_DIR$/css/styles.css" />
         <option value="$PROJECT_DIR$/snippets/annotation.html" />
-        <option value="$PROJECT_DIR$/snippets/view.html" />
         <option value="$PROJECT_DIR$/snippets/model.html" />
         <option value="$PROJECT_DIR$/snippets/search.html" />
+        <option value="$PROJECT_DIR$/snippets/view.html" />
         <option value="$PROJECT_DIR$/index.html" />
-        <option value="$PROJECT_DIR$/css/styles.css" />
-        <option value="$PROJECT_DIR$/snippets/epithelial.html" />
         <option value="$PROJECT_DIR$/js/index.js" />
       </list>
     </option>
@@ -159,10 +147,10 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="Scope">
         <subPane subId="Project Files" />
       </pane>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -242,7 +230,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../connected-brain-regions" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DavidChuRestaurant" />
     <property name="settings.editor.selected.configurable" value="JavaScript.Libraries" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -376,6 +364,22 @@
     <entry file="file://$PROJECT_DIR$/snippets/epithelial.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="51" selection-start-line="0" selection-start-column="51" selection-end-line="0" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/snippets/epithelial.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
           <caret line="2" column="25" selection-start-line="2" selection-start-column="25" selection-end-line="2" selection-end-column="25" />
           <folding />
         </state>
@@ -393,9 +397,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1479427195294" expanded="true" signature="20344:20427" placeholder="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -544,42 +546,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/css/styles.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.352941">
+          <caret line="10" column="21" selection-start-line="10" selection-start-column="21" selection-end-line="10" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/snippets/annotation.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.0">
-          <caret line="0" column="46" selection-start-line="0" selection-start-column="46" selection-end-line="0" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.294118">
-          <caret line="29" column="22" selection-start-line="29" selection-start-column="22" selection-end-line="29" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/snippets/model.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.882353">
-          <caret line="8" column="50" selection-start-line="8" selection-start-column="50" selection-end-line="8" selection-end-column="50" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="40" selection-start-line="0" selection-start-column="40" selection-end-line="0" selection-end-column="40" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/snippets/view.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.0">
-          <caret line="0" column="17" selection-start-line="0" selection-start-column="9" selection-end-line="0" selection-end-column="17" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="35" selection-start-line="0" selection-start-column="35" selection-end-line="0" selection-end-column="35" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/css/styles.css">
+    <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-24.264706">
-          <caret line="33" column="21" selection-start-line="33" selection-start-column="21" selection-end-line="33" selection-end-column="21" />
+        <state vertical-scroll-proportion="-15.441176">
+          <caret line="21" column="33" selection-start-line="21" selection-start-column="33" selection-end-line="21" selection-end-column="33" />
           <folding />
         </state>
       </provider>
@@ -587,7 +581,7 @@
     <entry file="file://$PROJECT_DIR$/snippets/search.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-7.352941">
-          <caret line="10" column="43" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="43" />
+          <caret line="10" column="53" selection-start-line="10" selection-start-column="53" selection-end-line="10" selection-end-column="53" />
           <folding />
         </state>
       </provider>
@@ -600,13 +594,19 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/snippets/model.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.4705882">
+          <caret line="2" column="58" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/js/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.5123153">
-          <caret line="102" column="12" selection-start-line="102" selection-start-column="12" selection-end-line="102" selection-end-column="12" />
-          <folding>
-            <marker date="1479427195294" expanded="true" signature="20344:20427" placeholder="..." />
-          </folding>
+        <state vertical-scroll-proportion="0.7536946">
+          <caret line="580" column="48" selection-start-line="580" selection-start-column="48" selection-end-line="580" selection-end-column="48" />
+          <folding />
         </state>
       </provider>
     </entry>

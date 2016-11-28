@@ -24,36 +24,16 @@
             <a id="header" class="navbar-brand">SMT-PMR</a>
         </div>
     </div><!-- container-fluid -->
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="#">Home</a></li>
+        <li role="presentation"><a href="#" onclick="$mainUtils.loadAnnotationHtml();">Annotation</a></li>
+        <li role="presentation"><a href="#" onclick="$mainUtils.loadSearchHtml();">Search Models</a></li>
+    </ul>
 </nav>
 
 <div class="row">
-    <!-- main menu -->
-    <div class="col-lg-3 col-md-4 col-sm-5 col-xs-12">
-        <div id="navigation">
-            <div class="btn-group-vertical navbtn" role="group" aria-label="...">
-                <button type="button" class="btn btn-default">
-                    <a href="#" onclick="$mainUtils.loadAnnotationHtml();">Annotation</a>
-                </button>
-
-                <button type="button" class="btn btn-default">
-                    <a href="#" onclick="$mainUtils.loadSearchHtml();">Search Models</a>
-                </button>
-
-                <!--<button type="button" class="btn btn-default">-->
-                    <!--<a href="#" onclick="$mainUtils.loadModelHtml();">Model platform</a>-->
-                <!--</button>-->
-
-                <!--<button type="button" class="btn btn-default">-->
-                    <!--<a href="#" onclick="$mainUtils.loadEpithelialHtml();">Epithelial platform</a>-->
-                <!--</button>-->
-            </div>
-        </div>
-    </div>
-
     <!-- main content -->
-    <div class="col-lg-9 col-md-8 col-sm-7 col-xs-12">
-        <div id="main-content" class="container-fluid"></div>
-    </div>
+    <div id="main-content" class="container"></div>
 </div><!-- .row -->
 
 <!-- main scripts -->
