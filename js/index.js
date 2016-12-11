@@ -140,6 +140,8 @@
                     "/" + "HEAD" + "/" + idWithStr;
 
                 mainUtils.showVariableName = function (str) {
+                    console.log(event);
+
                     var parser = new DOMParser();
                     var xmlDoc = parser.parseFromString(str, "text/xml");
 
@@ -213,7 +215,6 @@
 
     // Load the search view
     mainUtils.loadSearchHtml = function () {
-        showLoading("#main-content");
 
         $ajaxUtils.sendGetRequest(
             searchHtml,
@@ -268,17 +269,26 @@
 
             var td1 = document.createElement("td");
             var td2 = document.createElement("td");
+            var td3 = document.createElement("td");
+            var td4 = document.createElement("td");
+            var td5 = document.createElement("td");
 
-            var id = jsonObj.results.bindings[i].name.value;
+            var id = jsonObj.results.bindings[i].Subject.value;
             label[i] = document.createElement('label');
             label[i].innerHTML = '<input id="' + id + '" type="checkbox" data-action="search" value="' +
                 id + '" class="checkbox-inline"></label>';
 
             td1.appendChild(label[i]);
-            td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].name.value));
+            td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Workspace.value));
+            td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].Subject.value));
+            td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].ActualTermsInRDF.value));
+            td5.appendChild(document.createTextNode(jsonObj.results.bindings[i].Location.value));
 
             tr.appendChild(td1);
             tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+            tr.appendChild(td5);
 
             tbody.appendChild(tr);
         }
@@ -291,12 +301,27 @@
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
             var searchTxt = document.getElementById("searchTxt").value;
-            //var query = 'SELECT ?name WHERE { ?name <http://www.w3.org/2001/vcard-rdf/3.0#Family> "' + searchTxt + '" }';
-            var query = 'SELECT ?name WHERE { ?name ?located_in "' + searchTxt + '" }';
+
+            // Regular expression
+            var re = /[^\s*]\B(.*\s*)*\B[^\s*$]/g;
+
+            var searchstr = searchTxt.match(re).toString()
+                .replace(/\s+/g, ' ', "i")
+                .replace(/\s*\/\s*/g, '/', "i")
+                .replace(/\s*\-\s*/g, '-', "i");
+
+            console.log(searchstr);
+
+            var query = 'SELECT ?Workspace ?Subject ?ActualTermsInRDF ?Location WHERE ' +
+                '{ GRAPH ?Workspace { ?Subject ?Location ?ActualTermsInRDF . ' +
+                'FILTER regex(str(?ActualTermsInRDF), "' + searchstr + '", "i") . ' +
+                '}}';
+
+            showLoading("#searchList");
 
             $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.searchList, true);
         }
-    });
+});
 
     // Load the view
     mainUtils.loadViewHtml = function () {
@@ -309,15 +334,16 @@
             'PREFIX bqmodel: <http://biomodels.net/model-qualifiers/>' +
             'PREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>' +
             'PREFIX ro: <http://purl.obolibrary.org/obo/ro.owl#>' +
-            'SELECT ?Title ?Author ?Protein ?Species ?Gene ?Located_in ?DOI ' +
-            'WHERE { ' +
+            'SELECT ?g ?Title ?Author ?Protein ?Species ?Gene ?Located_in ?DOI ' +
+            'WHERE { GRAPH ?g { ' +
             '<' + workspaceURI + '#title> dcterms:title ?Title . ' +
-            '<' + workspaceURI + '#author1VcardN> vCard:FN ?Author . ' +
-            '<' + workspaceURI + '#UniProtKB> dcterms:Protein ?Protein . ' +
-            '<' + workspaceURI + '#UniProtKB> dcterms:Species ?Species . ' +
-            '<' + workspaceURI + '#UniProtKB> dcterms:Gene ?Gene . ' +
-            '<' + workspaceURI + '#located_in> ro:located_in ?Located_in . ' +
-            '<' + workspaceURI + '#DOI> bqmodel:isDescribedBy ?DOI .}';
+            'OPTIONAL { <' + workspaceURI + '#author1VcardN> vCard:FN ?Author } . ' +
+            'OPTIONAL { <' + workspaceURI + '#UniProtKB> dcterms:Protein ?Protein } . ' +
+            'OPTIONAL { <' + workspaceURI + '#UniProtKB> dcterms:Species ?Species } . ' +
+            'OPTIONAL { <' + workspaceURI + '#UniProtKB> dcterms:Gene ?Gene } . ' +
+            'OPTIONAL { <' + workspaceURI + '#located_in> ro:located_in ?Located_in } . ' +
+            'OPTIONAL { <' + workspaceURI + '#DOI> bqmodel:isDescribedBy ?DOI } . ' +
+            '}}';
 
         showLoading("#main-content");
         $ajaxUtils.sendPostRequest(
@@ -339,22 +365,36 @@
     // Should make a table -- CHANGE THE STATIC CODE
     mainUtils.showView = function (jsonObj, viewHtmlContent) {
 
+        console.log("showView: ", jsonObj);
+
         var label = [];
         var finalHtml = viewHtmlContent;
 
-        console.log("showView: ", jsonObj);
-
         var html = "<section class='row'>";
 
+        var Title, Author, Protein, Species, Gene, Located_in, DOI;
         for (var i = 0; i < jsonObj.results.bindings.length; i++) {
 
-            var Title = jsonObj.results.bindings[i].Title.value;
-            var Author = jsonObj.results.bindings[i].Author.value;
-            var Protein = jsonObj.results.bindings[i].Protein.value;
-            var Species = jsonObj.results.bindings[i].Species.value;
-            var Gene = jsonObj.results.bindings[i].Gene.value;
-            var Located_in = jsonObj.results.bindings[i].Located_in.value;
-            var DOI = jsonObj.results.bindings[i].DOI.value;
+            Title = jsonObj.results.bindings[i].Title.value;
+            Author = jsonObj.results.bindings[i].Author.value;
+
+            if (jsonObj.results.bindings[i].Protein == undefined)
+                Protein = -1;
+            else
+                Protein = jsonObj.results.bindings[i].Protein.value;
+
+            if (jsonObj.results.bindings[i].Species == undefined)
+                Species = -1;
+            else
+                Species = jsonObj.results.bindings[i].Species.value;
+
+            if (jsonObj.results.bindings[i].Gene == undefined)
+                Gene = -1;
+            else
+                Gene = jsonObj.results.bindings[i].Gene.value;
+
+            Located_in = jsonObj.results.bindings[i].Located_in.value;
+            DOI = jsonObj.results.bindings[i].DOI.value;
 
             label[i] = document.createElement("label");
 
@@ -366,15 +406,25 @@
                 label[i].innerHTML += '<h2>Author</h2><br>';
                 label[i].innerHTML += Author + '<br>';
                 label[i].innerHTML += '<hr>';
-                label[i].innerHTML += '<h2>Protein</h2><br>';
-                label[i].innerHTML += Protein + '<br>';
-                label[i].innerHTML += '<hr>';
-                label[i].innerHTML += '<h2>Species</h2><br>';
-                label[i].innerHTML += Species + '<br>';
-                label[i].innerHTML += '<hr>';
-                label[i].innerHTML += '<h2>Gene</h2><br>';
-                label[i].innerHTML += Gene + '<br>';
-                label[i].innerHTML += '<hr>';
+
+                if (Protein != -1) {
+                    label[i].innerHTML += '<h2>Protein</h2><br>';
+                    label[i].innerHTML += Protein + '<br>';
+                    label[i].innerHTML += '<hr>';
+                }
+
+                if (Species != -1) {
+                    label[i].innerHTML += '<h2>Species</h2><br>';
+                    label[i].innerHTML += Species + '<br>';
+                    label[i].innerHTML += '<hr>';
+                }
+
+                if (Gene != -1) {
+                    label[i].innerHTML += '<h2>Gene</h2><br>';
+                    label[i].innerHTML += Gene + '<br>';
+                    label[i].innerHTML += '<hr>';
+                }
+
                 label[i].innerHTML += '<h2>DOI</h2><br>';
                 label[i].innerHTML += DOI + '<br>';
                 label[i].innerHTML += '<hr>';
