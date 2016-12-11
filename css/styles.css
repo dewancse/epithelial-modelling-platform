@@ -28,8 +28,21 @@
 .svgGraph {
     position: relative;
     margin-left: 300px;
-    width: 350px;
-    height: 350px;
+    /*width: 350px;*/
+    /*height: 350px;*/
+    width: 800px;
+    height: 800px;
     padding: 10px;
     border: 1px solid;
+}
+
+.graph {
+    border: 1px solid #e3e3e3;
+    width: 800px;
+    height: 1000px;
+}
+
+.active {
+    stroke: #000;
+    stroke-width: 2px;
 }

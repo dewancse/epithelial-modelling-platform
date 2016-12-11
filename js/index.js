@@ -649,7 +649,206 @@
         }
 
         // SVG diagram
-        var svgGraph = document.getElementById("svgGraph");
+        var g = document.getElementById("#svgGraph"),
+            width = 800,
+            height = 800;
+
+        var svg = d3.select("#svgVisualize").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g");
+
+        // line
+        var data = [
+            {x: 0, y: 0},
+            {x: 20, y: 0}
+        ];
+
+        // line for paracellular pathway
+        var dataParacellular = [
+            {x: 10, y: 415},
+            {x: 10, y: 485}
+        ];
+
+        // function to get line data
+        var lineFunc = d3.line()
+            .x(function (d) {
+                return d.x;
+            })
+            .y(function (d) {
+                return d.y;
+            });
+
+        // line in paracellular
+        svg.append("svg:path")
+            .attr("transform", "translate(30,0)")
+            .attr("d", lineFunc(dataParacellular))
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .style("stroke-dasharray", "5, 5")
+            .attr("id", "paracellular");
+
+        // rectangle
+        var rectangle = svg.attr("transform", "translate(150,50)")
+            .append("rect")
+            .attr("width", 300)
+            .attr("height", 400)
+            .attr("rx", 10)
+            .attr("ry", 20)
+            .attr("fill", "white")
+            .attr("stroke", "#7bb3f7")
+            .attr("stroke-width", 20);
+
+        var luminalCompartments = [];
+        var serosalCompartments = [];
+
+        var compartmentFunc = function (compartment) {
+            if (compartment == "luminal")
+                luminalCompartments.push(compartment);
+            else if (compartment == "serosal")
+                serosalCompartments.push(compartment);
+        };
+
+        var circles = [];
+        var circlePos = 0;
+        var radius = 15;
+
+        for (var i = 0; i < 3; i++) {
+            if (i % 2 == 0) {
+                circles[i] = svg.append("circle")
+                    .attr("transform", "translate(-100," + circlePos + ")")
+                    .attr("cx", 10)
+                    .attr("cy", 10)
+                    .attr("r", radius)
+                    .attr("fill", "lightgreen")
+                    .attr("id", "luminal");
+            }
+            else {
+                circles[i] = svg.append("circle")
+                    .attr("transform", "translate(-100," + circlePos + ")")
+                    .attr("cx", 10)
+                    .attr("cy", 10)
+                    .attr("r", radius)
+                    .attr("fill", "purple")
+                    .attr("id", "serosal");
+            }
+
+            compartmentFunc(circles[i]._groups[0][0].getAttribute("id"));
+            circlePos = circlePos + 50;
+        }
+
+        console.log(rectangle._groups[0][0]);
+        console.log("height: ", rectangle._groups[0][0].getAttribute("height"));
+        console.log("width: ", rectangle._groups[0][0].getAttribute("width"));
+
+        // variables used to plot lines in compartments
+        var rectHeight = rectangle._groups[0][0].getAttribute("height");
+        var rectWidth = rectangle._groups[0][0].getAttribute("width");
+        var lengthOfLuminal = luminalCompartments.length;
+        var lengthOfSerosal = serosalCompartments.length;
+        var luminal = [], serosal = [];
+
+        // components in luminal compartment
+        for (var i = 50, j = 0; i < rectHeight; i = i + 50, j++) {
+
+            lengthOfLuminal--;
+            if (lengthOfLuminal < 0)
+                break;
+
+            luminal[j] = svg.append("svg:path")
+                .attr("transform", "translate(-20, " + i + ")")
+                .attr("d", lineFunc(data))
+                .attr("stroke", "black")
+                .attr("stroke-width", 5)
+                .attr("id", "luminal");
+        }
+
+        console.log(luminal[0]._groups[0][0]);
+        console.log(luminal[1]._groups[0][0]);
+
+        // components in serosal compartment
+        for (var i = 50, j = 0; i < rectHeight; i = i + 50, j++) {
+
+            lengthOfSerosal--;
+            if (lengthOfSerosal < 0)
+                break;
+
+            serosal[j] = svg.append("svg:path")
+                .attr("transform", "translate(" + rectWidth + ", " + i + ")")
+                .attr("d", lineFunc(data))
+                .attr("stroke", "black")
+                .attr("stroke-width", 5)
+                .attr("id", "serosal");
+        }
+
+        console.log(serosal[0]._groups[0][0]);
+
+        // line drag and drop
+        svg.selectAll("path")
+            .on("mouseover", handleMouseOver);
+
+        function handleMouseOver(d) {
+            //console.log("handleMouseOver: ", d3.select(this)._groups[0][0].id);
+            console.log("handleMouseOver: ", this.getAttribute("id"));
+
+            $mainUtils.line = this;
+
+            d3.select("path#" + this.getAttribute("id") + "").raise().classed("active", true);
+
+            // If circle is red, change back to previous color
+            if ($mainUtils.circle.getAttribute("fill") == "red") {
+                d3.select($mainUtils.circle)
+                    .attr("fill", $mainUtils.fillback);
+            }
+
+            //If circle is placed in wrong compartment
+            //change its color to red
+            if ($mainUtils.circle.getAttribute("id") != $mainUtils.line.getAttribute("id")) {
+                $mainUtils.fillback = $mainUtils.circle.getAttribute("fill");
+
+                d3.select($mainUtils.circle)
+                    .attr("fill", "red");
+            }
+        }
+
+        // circle drag and drop
+        svg.selectAll("circle")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        function dragstarted(d) {
+            // If circle is red, change back to previous color
+            if (this.getAttribute("fill") == "red") {
+                d3.select(this)
+                    .attr("fill", $mainUtils.fillback);
+            }
+
+            //d3.select("path#" + $mainUtils.circle.getAttribute("id") + "").raise().classed("active", true);
+        }
+
+        function dragged(d) {
+            d3.select(this)
+                .attr("cx", d = d3.mouse(this)[0])
+                .attr("cy", d = d3.mouse(this)[1]);
+        }
+
+        function dragended(d) {
+            d3.select(this)
+                .classed("active", false);
+
+            $mainUtils.circle = this;
+
+            d3.select("path#" + $mainUtils.circle.getAttribute("id") + "").raise().classed("active", true);
+        }
+
+        svg.append("svg:path")
+            .attr("transform", "translate(0,500)")
+            .attr("d", "M0,0 L300,0 V0,100 M0,-10 V0,100")
+            .attr("fill", "none")
+            .attr("stroke", "#7bb3f7")
+            .attr("stroke-width", 20);
     }
 
     // Expose utility to the global object
