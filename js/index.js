@@ -615,8 +615,6 @@
         // List of compartments
         var compartmentsList = document.getElementById("compartmentsList");
 
-        //var numberOfRows = table.getElementsByTagName('tbody')[0].rows;
-
         for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
 
             if (listOfModels.length == 0)
@@ -626,9 +624,6 @@
                 if (listOfModels[j] == listOfItemsForEpithelial[i].id) {
                     compartmentsList.innerHTML += '<p id="drag1" draggable="true" ondragstart="$mainUtils.drag(event)">' +
                         listOfItemsForEpithelial[i].getElementsByTagName('td')[3].innerText + '</p>';
-
-                    // Make empty using splice
-                    //listOfModels.splice(j, 1);
                 }
             }
         }
@@ -649,7 +644,7 @@
         }
 
         // SVG diagram
-        var g = document.getElementById("#svgGraph"),
+        var g = document.getElementById("#svgVisualize"),
             width = 800,
             height = 800;
 
@@ -732,6 +727,8 @@
                     .attr("fill", "purple")
                     .attr("id", "serosal");
             }
+
+            console.log(circles[i][0]);
 
             compartmentFunc(circles[i]._groups[0][0].getAttribute("id"));
             circlePos = circlePos + 50;

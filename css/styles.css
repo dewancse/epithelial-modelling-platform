@@ -25,7 +25,7 @@
     max-width: 300px;
 }
 
-.svgGraph {
+.graph {
     position: relative;
     margin-left: 300px;
     /*width: 350px;*/
@@ -36,11 +36,11 @@
     border: 1px solid;
 }
 
-.graph {
-    border: 1px solid #e3e3e3;
-    width: 800px;
-    height: 1000px;
-}
+/*.graph {*/
+    /*border: 1px solid #e3e3e3;*/
+    /*width: 800px;*/
+    /*height: 1000px;*/
+/*}*/
 
 .active {
     stroke: #000;
