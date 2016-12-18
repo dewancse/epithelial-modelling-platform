@@ -12,6 +12,7 @@
     var modelHtml = "snippets/model.html";
     var searchHtml = "snippets/search.html";
     var viewHtml = "snippets/view.html";
+    var olsHtml = "snippets/ols.html";
 
     // Set up a namespace for our utility
     var mainUtils = {};
@@ -206,7 +207,6 @@
     };
 
     document.addEventListener('click', function (event) {
-
         // If there's an action with the given name, call it
         if (typeof actions[event.srcElement.dataset.action] === "function") {
             actions[event.srcElement.dataset.action].call(this, event);
@@ -321,7 +321,25 @@
 
             $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.searchList, true);
         }
-});
+    });
+
+    // Load Ontology Lookup Service
+    mainUtils.loadOLS = function () {
+
+        //FMA:70973 Epithelial cell of proximal tubule
+        //FMA:17693 Proximal convoluted tubule
+        //FMA:17716 Proximal straight tubule
+        //FMA:84666 Apical plasma membrane
+
+        var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_17693";
+
+        $ajaxUtils.sendGetRequest(endpointOLS, mainUtils.showOLS, true);
+    };
+
+    mainUtils.showOLS = function (jsonObj) {
+        console.log("OLS Label: ", jsonObj._embedded.terms[0].label);
+        console.log("OLS Synonyms: ", jsonObj._embedded.terms[0].synonyms);
+    };
 
     // Load the view
     mainUtils.loadViewHtml = function () {
@@ -635,6 +653,8 @@
 
         $mainUtils.drag = function (ev) {
             ev.dataTransfer.setData("text", ev.target.id);
+
+            console.log("drag ev, ev.target.id: ", ev, ev.target.id);
         }
 
         $mainUtils.drop = function (ev) {
@@ -653,36 +673,6 @@
             .attr("height", height)
             .append("g");
 
-        // line
-        var data = [
-            {x: 0, y: 0},
-            {x: 20, y: 0}
-        ];
-
-        // line for paracellular pathway
-        var dataParacellular = [
-            {x: 10, y: 415},
-            {x: 10, y: 485}
-        ];
-
-        // function to get line data
-        var lineFunc = d3.line()
-            .x(function (d) {
-                return d.x;
-            })
-            .y(function (d) {
-                return d.y;
-            });
-
-        // line in paracellular
-        svg.append("svg:path")
-            .attr("transform", "translate(30,0)")
-            .attr("d", lineFunc(dataParacellular))
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .style("stroke-dasharray", "5, 5")
-            .attr("id", "paracellular");
-
         // rectangle
         var rectangle = svg.attr("transform", "translate(150,50)")
             .append("rect")
@@ -694,121 +684,18 @@
             .attr("stroke", "#7bb3f7")
             .attr("stroke-width", 20);
 
-        var luminalCompartments = [];
-        var serosalCompartments = [];
-
-        var compartmentFunc = function (compartment) {
-            if (compartment == "luminal")
-                luminalCompartments.push(compartment);
-            else if (compartment == "serosal")
-                serosalCompartments.push(compartment);
-        };
-
-        var circles = [];
-        var circlePos = 0;
-        var radius = 15;
-
-        for (var i = 0; i < 3; i++) {
-            if (i % 2 == 0) {
-                circles[i] = svg.append("circle")
-                    .attr("transform", "translate(-100," + circlePos + ")")
-                    .attr("cx", 10)
-                    .attr("cy", 10)
-                    .attr("r", radius)
-                    .attr("fill", "lightgreen")
-                    .attr("id", "luminal");
-            }
-            else {
-                circles[i] = svg.append("circle")
-                    .attr("transform", "translate(-100," + circlePos + ")")
-                    .attr("cx", 10)
-                    .attr("cy", 10)
-                    .attr("r", radius)
-                    .attr("fill", "purple")
-                    .attr("id", "serosal");
-            }
-
-            console.log(circles[i][0]);
-
-            compartmentFunc(circles[i]._groups[0][0].getAttribute("id"));
-            circlePos = circlePos + 50;
-        }
-
-        console.log(rectangle._groups[0][0]);
-        console.log("height: ", rectangle._groups[0][0].getAttribute("height"));
-        console.log("width: ", rectangle._groups[0][0].getAttribute("width"));
-
-        // variables used to plot lines in compartments
-        var rectHeight = rectangle._groups[0][0].getAttribute("height");
-        var rectWidth = rectangle._groups[0][0].getAttribute("width");
-        var lengthOfLuminal = luminalCompartments.length;
-        var lengthOfSerosal = serosalCompartments.length;
-        var luminal = [], serosal = [];
-
-        // components in luminal compartment
-        for (var i = 50, j = 0; i < rectHeight; i = i + 50, j++) {
-
-            lengthOfLuminal--;
-            if (lengthOfLuminal < 0)
-                break;
-
-            luminal[j] = svg.append("svg:path")
-                .attr("transform", "translate(-20, " + i + ")")
-                .attr("d", lineFunc(data))
-                .attr("stroke", "black")
-                .attr("stroke-width", 5)
-                .attr("id", "luminal");
-        }
-
-        console.log(luminal[0]._groups[0][0]);
-        console.log(luminal[1]._groups[0][0]);
-
-        // components in serosal compartment
-        for (var i = 50, j = 0; i < rectHeight; i = i + 50, j++) {
-
-            lengthOfSerosal--;
-            if (lengthOfSerosal < 0)
-                break;
-
-            serosal[j] = svg.append("svg:path")
-                .attr("transform", "translate(" + rectWidth + ", " + i + ")")
-                .attr("d", lineFunc(data))
-                .attr("stroke", "black")
-                .attr("stroke-width", 5)
-                .attr("id", "serosal");
-        }
-
-        console.log(serosal[0]._groups[0][0]);
-
         // line drag and drop
+        // drag and drop compartments from the text ... ***
         svg.selectAll("path")
             .on("mouseover", handleMouseOver);
 
         function handleMouseOver(d) {
-            //console.log("handleMouseOver: ", d3.select(this)._groups[0][0].id);
-            console.log("handleMouseOver: ", this.getAttribute("id"));
-
-            $mainUtils.line = this;
-
-            d3.select("path#" + this.getAttribute("id") + "").raise().classed("active", true);
-
-            // If circle is red, change back to previous color
-            if ($mainUtils.circle.getAttribute("fill") == "red") {
-                d3.select($mainUtils.circle)
-                    .attr("fill", $mainUtils.fillback);
-            }
-
-            //If circle is placed in wrong compartment
-            //change its color to red
-            if ($mainUtils.circle.getAttribute("id") != $mainUtils.line.getAttribute("id")) {
-                $mainUtils.fillback = $mainUtils.circle.getAttribute("fill");
-
-                d3.select($mainUtils.circle)
-                    .attr("fill", "red");
-            }
+            console.log("handleMouseOver: ", this);
+            d3.select(this).raise().classed("active", true);
         }
 
         // circle drag and drop
+        // drag and drop compartments from the text ... ***
         svg.selectAll("circle")
             .call(d3.drag()
                 .on("start", dragstarted)
@@ -816,13 +703,7 @@
                 .on("end", dragended));
 
         function dragstarted(d) {
-            // If circle is red, change back to previous color
-            if (this.getAttribute("fill") == "red") {
-                d3.select(this)
-                    .attr("fill", $mainUtils.fillback);
-            }
-
-            //d3.select("path#" + $mainUtils.circle.getAttribute("id") + "").raise().classed("active", true);
+            d3.select(this).raise().classed("active", true);
         }
 
         function dragged(d) {
@@ -832,14 +713,20 @@
         }
 
         function dragended(d) {
-            d3.select(this)
-                .classed("active", false);
-
-            $mainUtils.circle = this;
-
-            d3.select("path#" + $mainUtils.circle.getAttribute("id") + "").raise().classed("active", true);
+            d3.select(this).classed("active", false);
         }
 
+        // Define drag beavior
+        //var drag = d3.behavior.drag()
+        //    .on("drag", dragmove);
+        //
+        //function dragmove(d) {
+        //    var x = d3.event.x;
+        //    var y = d3.event.y;
+        //    d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
+        //}
+
+        // Half rectangle after paracellular pathway
         svg.append("svg:path")
             .attr("transform", "translate(0,500)")
             .attr("d", "M0,0 L300,0 V0,100 M0,-10 V0,100")
