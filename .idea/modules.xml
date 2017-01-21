@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SMT-PMR.iml" filepath="$PROJECT_DIR$/.idea/SMT-PMR.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../epithelial-model-platform/.idea/epithelial-model-platform.iml" filepath="$PROJECT_DIR$/../epithelial-model-platform/.idea/epithelial-model-platform.iml" />
     </modules>
   </component>
 </project>

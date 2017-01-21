@@ -12,7 +12,6 @@
     var modelHtml = "snippets/model.html";
     var searchHtml = "snippets/search.html";
     var viewHtml = "snippets/view.html";
-    var olsHtml = "snippets/ols.html";
 
     // Set up a namespace for our utility
     var mainUtils = {};
@@ -248,11 +247,11 @@
         var thead = document.createElement("thead");
         var tr = document.createElement("tr");
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
-            if (i == 0) {
-                var th = document.createElement("th");
-                th.appendChild(document.createTextNode(""));
-                tr.appendChild(th);
-            }
+            //if (i == 0) {
+            //    var th = document.createElement("th");
+            //    th.appendChild(document.createTextNode(""));
+            //    tr.appendChild(th);
+            //}
 
             var th = document.createElement("th");
             th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
@@ -267,28 +266,33 @@
         for (var i = 0; i < jsonObj.results.bindings.length; i++) {
             var tr = document.createElement("tr");
 
-            var td1 = document.createElement("td");
+            //var td1 = document.createElement("td");
             var td2 = document.createElement("td");
             var td3 = document.createElement("td");
             var td4 = document.createElement("td");
-            var td5 = document.createElement("td");
+            //var td5 = document.createElement("td");
 
-            var id = jsonObj.results.bindings[i].Subject.value;
-            label[i] = document.createElement('label');
-            label[i].innerHTML = '<input id="' + id + '" type="checkbox" data-action="search" value="' +
-                id + '" class="checkbox-inline"></label>';
+            var id = jsonObj.results.bindings[i].CellML_entity.value;
+            //label[i] = document.createElement('label');
+            //label[i].innerHTML = '<input id="' + id + '" type="checkbox" data-action="search" value="' +
+            //    id + '" class="checkbox-inline"></label>';
 
-            td1.appendChild(label[i]);
+            var workspaceUrl = "https://models.physiomeproject.org/workspace" + "/" + 267 + "/" + "@@file" +
+                "/" + "HEAD" + "/" + "semgen-annotation";
+
+            console.log(workspaceUrl);
+
+            //td1.appendChild(label[i]);
             td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Workspace.value));
-            td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].Subject.value));
-            td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].ActualTermsInRDF.value));
-            td5.appendChild(document.createTextNode(jsonObj.results.bindings[i].Location.value));
+            td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].CellML_entity.value));
+            td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].Biological_meaning.value));
+            //td5.appendChild(document.createTextNode(jsonObj.results.bindings[i].Location.value));
 
-            tr.appendChild(td1);
+            //tr.appendChild(td1);
             tr.appendChild(td2);
             tr.appendChild(td3);
             tr.appendChild(td4);
-            tr.appendChild(td5);
+            //tr.appendChild(td5);
 
             tbody.appendChild(tr);
         }
@@ -312,9 +316,9 @@
 
             console.log(searchstr);
 
-            var query = 'SELECT ?Workspace ?Subject ?ActualTermsInRDF ?Location WHERE ' +
-                '{ GRAPH ?Workspace { ?Subject ?Location ?ActualTermsInRDF . ' +
-                'FILTER regex(str(?ActualTermsInRDF), "' + searchstr + '", "i") . ' +
+            var query = 'SELECT ?Workspace ?CellML_entity ?Biological_meaning WHERE ' +
+                '{ GRAPH ?Workspace { ?CellML_entity ?Location ?Biological_meaning . ' +
+                'FILTER regex(str(?Biological_meaning), "' + searchstr + '", "i") . ' +
                 '}}';
 
             showLoading("#searchList");
@@ -322,24 +326,6 @@
             $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.searchList, true);
         }
     });
-
-    // Load Ontology Lookup Service
-    mainUtils.loadOLS = function () {
-
-        //FMA:70973 Epithelial cell of proximal tubule
-        //FMA:17693 Proximal convoluted tubule
-        //FMA:17716 Proximal straight tubule
-        //FMA:84666 Apical plasma membrane
-
-        var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_17693";
-
-        $ajaxUtils.sendGetRequest(endpointOLS, mainUtils.showOLS, true);
-    };
-
-    mainUtils.showOLS = function (jsonObj) {
-        console.log("OLS Label: ", jsonObj._embedded.terms[0].label);
-        console.log("OLS Synonyms: ", jsonObj._embedded.terms[0].synonyms);
-    };
 
     // Load the view
     mainUtils.loadViewHtml = function () {
