@@ -267,7 +267,7 @@
             var tr = document.createElement("tr");
 
             //var td1 = document.createElement("td");
-            var td2 = document.createElement("td");
+            //var td2 = document.createElement("td");
             var td3 = document.createElement("td");
             var td4 = document.createElement("td");
             //var td5 = document.createElement("td");
@@ -277,19 +277,14 @@
             //label[i].innerHTML = '<input id="' + id + '" type="checkbox" data-action="search" value="' +
             //    id + '" class="checkbox-inline"></label>';
 
-            var workspaceUrl = "https://models.physiomeproject.org/workspace" + "/" + 267 + "/" + "@@file" +
-                "/" + "HEAD" + "/" + "semgen-annotation";
-
-            console.log(workspaceUrl);
-
             //td1.appendChild(label[i]);
-            td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Workspace.value));
+            //td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Workspace.value));
             td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].CellML_entity.value));
             td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].Biological_meaning.value));
             //td5.appendChild(document.createTextNode(jsonObj.results.bindings[i].Location.value));
 
             //tr.appendChild(td1);
-            tr.appendChild(td2);
+            //tr.appendChild(td2);
             tr.appendChild(td3);
             tr.appendChild(td4);
             //tr.appendChild(td5);
@@ -316,7 +311,7 @@
 
             console.log(searchstr);
 
-            var query = 'SELECT ?Workspace ?CellML_entity ?Biological_meaning WHERE ' +
+            var query = 'SELECT ?CellML_entity ?Biological_meaning WHERE ' +
                 '{ GRAPH ?Workspace { ?CellML_entity ?Location ?Biological_meaning . ' +
                 'FILTER regex(str(?Biological_meaning), "' + searchstr + '", "i") . ' +
                 '}}';
