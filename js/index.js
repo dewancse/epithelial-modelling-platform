@@ -223,16 +223,33 @@
             false);
     };
 
+    // Compartments
+    mainUtils.compartment = function () {
+        for (var i = 0; i < 5; i++) {
+            var model = "weinstein_1995.cellml#weinstein_1995";
+            var query = 'SELECT ?Compartment WHERE { <' + model + '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#_' + i + '> ?Compartment }';
+
+            $ajaxUtils.sendPostRequest(
+                endpoint,
+                query,
+                function (jsonObj) {
+                    for (var i = 0; i < jsonObj.results.bindings.length; i++) {
+                        var value = jsonObj.results.bindings[i].Compartment.value;
+                        console.log("Compartment: ", value);
+                    }
+                },
+                true);
+        }
+    }
+
     // Search results
-    mainUtils.searchList = function (jsonObj) {
+    mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
         var searchList = document.getElementById("searchList");
 
-        var label = [];
-
         // Search result does not match
-        if (jsonObj.results.bindings.length == 0) {
-            searchList.innerHTML = "<section class='container-fluid'><label><br>No Items Matching Your Search Terms!</label></section>";
+        if (head.length == 0) {
+            searchList.innerHTML = "<section class='container-fluid'><label><br>No Search Results!</label></section>";
             return;
         }
 
@@ -246,15 +263,9 @@
         // Table header
         var thead = document.createElement("thead");
         var tr = document.createElement("tr");
-        for (var i = 0; i < jsonObj.head.vars.length; i++) {
-            //if (i == 0) {
-            //    var th = document.createElement("th");
-            //    th.appendChild(document.createTextNode(""));
-            //    tr.appendChild(th);
-            //}
-
+        for (var i = 0; i < head.length; i++) {
             var th = document.createElement("th");
-            th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
+            th.appendChild(document.createTextNode(head[i]));
             tr.appendChild(th);
         }
 
@@ -263,31 +274,26 @@
 
         // Table body
         var tbody = document.createElement("tbody");
-        for (var i = 0; i < jsonObj.results.bindings.length; i++) {
+        for (var i = 0; i < modelEntity.length; i++) {
             var tr = document.createElement("tr");
 
-            //var td1 = document.createElement("td");
-            //var td2 = document.createElement("td");
+            var td1 = document.createElement("td");
+            var td2 = document.createElement("td");
             var td3 = document.createElement("td");
             var td4 = document.createElement("td");
-            //var td5 = document.createElement("td");
+            var td5 = document.createElement("td");
 
-            var id = jsonObj.results.bindings[i].CellML_entity.value;
-            //label[i] = document.createElement('label');
-            //label[i].innerHTML = '<input id="' + id + '" type="checkbox" data-action="search" value="' +
-            //    id + '" class="checkbox-inline"></label>';
+            td1.appendChild(document.createTextNode(modelEntity[i]));
+            td2.appendChild(document.createTextNode(biologicalMeaning[i]));
+            td3.appendChild(document.createTextNode(speciesList[i]));
+            td4.appendChild(document.createTextNode(geneList[i]));
+            td5.appendChild(document.createTextNode(proteinList[i]));
 
-            //td1.appendChild(label[i]);
-            //td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Workspace.value));
-            td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].CellML_entity.value));
-            td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].Biological_meaning.value));
-            //td5.appendChild(document.createTextNode(jsonObj.results.bindings[i].Location.value));
-
-            //tr.appendChild(td1);
-            //tr.appendChild(td2);
+            tr.appendChild(td1);
+            tr.appendChild(td2);
             tr.appendChild(td3);
             tr.appendChild(td4);
-            //tr.appendChild(td5);
+            tr.appendChild(td5);
 
             tbody.appendChild(tr);
         }
@@ -296,33 +302,127 @@
         searchList.appendChild(table);
     }
 
+    // Extract model name
+    var parseModel = function (modelEntity) {
+        var indexOfCellML = modelEntity.search(".cellml");
+        var indexOfHash = modelEntity.search("#");
+        var modelName = modelEntity.slice(0, indexOfCellML);
+        var modelNameWithExt = modelEntity.slice(0, indexOfHash + 1);
+        var model = modelNameWithExt.concat(modelName);
+
+        return model;
+    }
+
+    // Titles of the search table
+    var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
+        var head = [];
+
+        for (var i = 0; i < jsonModel.head.vars.length; i++)
+            head.push(jsonModel.head.vars[i]);
+
+        head.push(jsonSpecies.head.vars[0]);
+        head.push(jsonGene.head.vars[0]);
+        head.push(jsonProtein.head.vars[0]);
+
+        return head;
+    }
+
     // Enter search keywords
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
+
             var searchTxt = document.getElementById("searchTxt").value;
 
-            // Regular expression
-            var re = /[^\s*]\B(.*\s*)*\B[^\s*$]/g;
-
-            var searchstr = searchTxt.match(re).toString()
-                .replace(/\s+/g, ' ', "i")
-                .replace(/\s*\/\s*/g, '/', "i")
-                .replace(/\s*\-\s*/g, '-', "i");
-
-            console.log(searchstr);
-
-            var query = 'SELECT ?CellML_entity ?Biological_meaning WHERE ' +
-                '{ GRAPH ?Workspace { ?CellML_entity ?Location ?Biological_meaning . ' +
-                'FILTER regex(str(?Biological_meaning), "' + searchstr + '", "i") . ' +
+            var query = 'SELECT ?Model_entity ?Biological_meaning WHERE ' +
+                '{ GRAPH ?Workspace { ?Model_entity ?Location ?Biological_meaning . ' +
+                'FILTER regex(str(?Biological_meaning), "' + searchTxt + '", "i") . ' +
                 '}}';
 
             showLoading("#searchList");
 
-            $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.searchList, true);
+            // Index to get model name for species, genes, and breaking condition
+            var idxSpecies = 0, idxGene = 0, idxBreak = 0;
+            var modelEntity = [], biologicalMeaning = [];
+            var speciesList = [], geneList = [], proteinList = [];
+
+            // Model
+            $ajaxUtils.sendPostRequest(
+                endpoint,
+                query,
+                function (jsonModel) {
+                    for (var id = 0; id < jsonModel.results.bindings.length; id++) {
+                        modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
+                        biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
+
+                        var model = parseModel(jsonModel.results.bindings[id].Model_entity.value);
+                        var query = 'SELECT ?Species WHERE { <' + model + '> <http://purl.org/dc/terms/Species> ?Species }';
+
+                        // Species
+                        $ajaxUtils.sendPostRequest(
+                            endpoint,
+                            query,
+                            function (jsonSpecies) {
+                                if (jsonSpecies.results.bindings.length == 0)
+                                    speciesList.push("Undefined");
+                                else
+                                    speciesList.push(jsonSpecies.results.bindings[0].Species.value);
+
+                                model = parseModel(jsonModel.results.bindings[idxSpecies++].Model_entity.value);
+
+                                var query = 'SELECT ?Gene WHERE { <' + model + '> <http://purl.org/dc/terms/Gene> ?Gene }';
+
+                                // Gene
+                                $ajaxUtils.sendPostRequest(
+                                    endpoint,
+                                    query,
+                                    function (jsonGene) {
+                                        if (jsonGene.results.bindings.length == 0)
+                                            geneList.push("Undefined");
+                                        else
+                                            geneList.push(jsonGene.results.bindings[0].Gene.value);
+
+                                        model = parseModel(jsonModel.results.bindings[idxGene++].Model_entity.value);
+
+                                        var query = 'SELECT ?Protein WHERE ' +
+                                            '{ <' + model + '> <http://purl.org/dc/terms/Protein> ?Protein }';
+
+                                        // Protein
+                                        $ajaxUtils.sendPostRequest(
+                                            endpoint,
+                                            query,
+                                            function (jsonProtein) {
+                                                if (jsonProtein.results.bindings.length == 0)
+                                                    proteinList.push("Undefined");
+                                                else
+                                                    proteinList.push(jsonProtein.results.bindings[0].Protein.value);
+
+                                                idxBreak++;
+
+                                                if (idxBreak == jsonModel.results.bindings.length) {
+                                                    var head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
+
+                                                    mainUtils.searchList(
+                                                        head,
+                                                        modelEntity,
+                                                        biologicalMeaning,
+                                                        speciesList,
+                                                        geneList,
+                                                        proteinList);
+                                                }
+                                            },
+                                            true);
+                                    },
+                                    true);
+                            },
+                            true);
+                    }
+                },
+                true
+            );
         }
     });
 
-    // Load the view
+// Load the view
     mainUtils.loadViewHtml = function () {
 
         var workspaceURI = mainUtils.workspaceName.concat(".cellml");
@@ -360,8 +460,8 @@
             true);
     };
 
-    // Show rdf indexed information in the view html
-    // Should make a table -- CHANGE THE STATIC CODE
+// Show rdf indexed information in the view html
+// Should make a table -- CHANGE THE STATIC CODE
     mainUtils.showView = function (jsonObj, viewHtmlContent) {
 
         console.log("showView: ", jsonObj);
@@ -441,7 +541,7 @@
         return finalHtml;
     };
 
-    // Load the model
+// Load the model
     mainUtils.loadModelHtml = function () {
 
         var workspaceURI = mainUtils.workspaceName.concat(".cellml");
@@ -472,7 +572,7 @@
             false);
     };
 
-    // Show selected items in a table
+// Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
         var label = [];
@@ -716,7 +816,8 @@
             .attr("stroke-width", 20);
     }
 
-    // Expose utility to the global object
+// Expose utility to the global object
     global.$mainUtils = mainUtils;
 
-})(window);
+})
+(window);
