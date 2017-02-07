@@ -270,41 +270,14 @@
         switchListItemToActive(activeItem, "#listDiscovery");
     };
 
-<<<<<<< HEAD
     // Show semantic annotation extracted from PMR
-=======
-    // Compartments
-    mainUtils.compartment = function () {
-        for (var i = 0; i < 5; i++) {
-            var model = "weinstein_1995.cellml#weinstein_1995";
-            var query = 'SELECT ?Compartment WHERE { <' + model + '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#_' + i + '> ?Compartment }';
-
-            $ajaxUtils.sendPostRequest(
-                endpoint,
-                query,
-                function (jsonObj) {
-                    for (var i = 0; i < jsonObj.results.bindings.length; i++) {
-                        var value = jsonObj.results.bindings[i].Compartment.value;
-                        console.log("Compartment: ", value);
-                    }
-                },
-                true);
-        }
-    }
-
-    // Search results
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
     mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
         var searchList = document.getElementById("searchList");
 
         // Search result does not match
         if (head.length == 0) {
-<<<<<<< HEAD
             searchList.innerHTML = "<section class='container-fluid'><No Search Results!</section>";
-=======
-            searchList.innerHTML = "<section class='container-fluid'><label><br>No Search Results!</label></section>";
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
             return;
         }
 
@@ -318,7 +291,6 @@
         var thead = document.createElement("thead");
         var tr = document.createElement("tr");
         for (var i = 0; i < head.length; i++) {
-<<<<<<< HEAD
 
             // Empty header for checkbox column
             if (i == 0) {
@@ -327,8 +299,6 @@
                 tr.appendChild(th);
             }
 
-=======
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
             var th = document.createElement("th");
             th.appendChild(document.createTextNode(head[i]));
             tr.appendChild(th);
@@ -342,7 +312,6 @@
         for (var i = 0; i < modelEntity.length; i++) {
             var tr = document.createElement("tr");
 
-<<<<<<< HEAD
             var temp = [];
             var td = [];
             temp.push(modelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
@@ -362,25 +331,6 @@
                 td[j].appendChild(document.createTextNode(temp[j]));
                 tr.appendChild(td[j]);
             }
-=======
-            var td1 = document.createElement("td");
-            var td2 = document.createElement("td");
-            var td3 = document.createElement("td");
-            var td4 = document.createElement("td");
-            var td5 = document.createElement("td");
-
-            td1.appendChild(document.createTextNode(modelEntity[i]));
-            td2.appendChild(document.createTextNode(biologicalMeaning[i]));
-            td3.appendChild(document.createTextNode(speciesList[i]));
-            td4.appendChild(document.createTextNode(geneList[i]));
-            td5.appendChild(document.createTextNode(proteinList[i]));
-
-            tr.appendChild(td1);
-            tr.appendChild(td2);
-            tr.appendChild(td3);
-            tr.appendChild(td4);
-            tr.appendChild(td5);
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
 
             tbody.appendChild(tr);
         }
@@ -422,46 +372,14 @@
         return head;
     }
 
-<<<<<<< HEAD
     // Plain text search for semantic annotation
-=======
-    // Extract model name
-    var parseModel = function (modelEntity) {
-        var indexOfCellML = modelEntity.search(".cellml");
-        var indexOfHash = modelEntity.search("#");
-        var modelName = modelEntity.slice(0, indexOfCellML);
-        var modelNameWithExt = modelEntity.slice(0, indexOfHash + 1);
-        var model = modelNameWithExt.concat(modelName);
-
-        return model;
-    }
-
-    // Titles of the search table
-    var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
-        var head = [];
-
-        for (var i = 0; i < jsonModel.head.vars.length; i++)
-            head.push(jsonModel.head.vars[i]);
-
-        head.push(jsonSpecies.head.vars[0]);
-        head.push(jsonGene.head.vars[0]);
-        head.push(jsonProtein.head.vars[0]);
-
-        return head;
-    }
-
-    // Enter search keywords
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
 
             var searchTxt = document.getElementById("searchTxt").value;
-<<<<<<< HEAD
 
             // set local storage
             localStorage.setItem('searchTxtContent', searchTxt);
-=======
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
 
             var query = 'SELECT ?Model_entity ?Biological_meaning WHERE ' +
                 '{ GRAPH ?Workspace { ?Model_entity ?Location ?Biological_meaning . ' +
@@ -474,10 +392,7 @@
             var idxSpecies = 0, idxGene = 0, idxBreak = 0;
             var modelEntity = [], biologicalMeaning = [];
             var speciesList = [], geneList = [], proteinList = [];
-<<<<<<< HEAD
             var head = [];
-=======
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
 
             // Model
             $ajaxUtils.sendPostRequest(
@@ -533,11 +448,7 @@
                                                 idxBreak++;
 
                                                 if (idxBreak == jsonModel.results.bindings.length) {
-<<<<<<< HEAD
                                                     head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
-=======
-                                                    var head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
 
                                                     mainUtils.searchList(
                                                         head,
@@ -554,20 +465,17 @@
                             },
                             true);
                     }
-<<<<<<< HEAD
 
                     // No search results found, so sent empty arrays
                     if (!jsonModel.results.bindings.length)
                         mainUtils.searchList(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
-=======
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
                 },
                 true
             );
         }
     });
 
-// Load the view
+    // Load the view
     mainUtils.loadViewHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -606,7 +514,6 @@
             true);
     };
 
-<<<<<<< HEAD
     // Test a valid URL
     var isURL = function (str) {
         // var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
@@ -616,13 +523,6 @@
         //     '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
         //     '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
         // return pattern.test(str);
-=======
-// Show rdf indexed information in the view html
-// Should make a table -- CHANGE THE STATIC CODE
-    mainUtils.showView = function (jsonObj, viewHtmlContent) {
-
-        console.log("showView: ", jsonObj);
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
 
         if (str.indexOf("http") === -1)
             return false;
@@ -692,7 +592,7 @@
         }
     };
 
-// Load the model
+    // Load the model
     mainUtils.loadModelHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -720,7 +620,7 @@
             false);
     };
 
-// Show selected items in a table
+    // Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
         console.log("showModel: ", jsonObj);
@@ -1129,11 +1029,7 @@
             .attr("stroke-width", 20);
     }
 
-// Expose utility to the global object
+    // Expose utility to the global object
     global.$mainUtils = mainUtils;
-<<<<<<< HEAD
-=======
-
->>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
 })
 (window);
