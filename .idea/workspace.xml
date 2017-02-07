@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="20602936-733a-4b68-a1c6-61cabd7b5454" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+<<<<<<< HEAD
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/css/styles.css" afterPath="$PROJECT_DIR$/css/styles.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/index.js" afterPath="$PROJECT_DIR$/js/index.js" />
@@ -10,6 +11,9 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snippets/model.html" afterPath="$PROJECT_DIR$/snippets/model.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snippets/search.html" afterPath="$PROJECT_DIR$/snippets/search.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snippets/view.html" afterPath="$PROJECT_DIR$/snippets/view.html" />
+=======
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/index.js" afterPath="$PROJECT_DIR$/js/index.js" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
     </list>
     <ignored path="SMT-PMR.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,21 +33,44 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/index.html">
+      <file leaf-file-name="index.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/js/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="356">
-              <caret line="22" column="22" lean-forward="false" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+            <state vertical-scroll-proportion="0.024630541">
+              <caret line="367" column="83" selection-start-line="367" selection-start-column="83" selection-end-line="367" selection-end-column="83" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+            <state relative-caret-position="356">
+              <caret line="22" column="22" lean-forward="false" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+=======
+            <state vertical-scroll-proportion="6.4411764">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="15" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+<<<<<<< HEAD
       <file leaf-file-name="index.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/index.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="465">
               <caret line="792" column="0" lean-forward="true" selection-start-line="792" selection-start-column="0" selection-end-line="792" selection-end-column="0" />
+=======
+      <file leaf-file-name="search.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/snippets/search.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-10.294118">
+              <caret line="14" column="19" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="19" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
               <folding />
             </state>
           </provider>
@@ -133,6 +160,7 @@
         <option value="$PROJECT_DIR$/../SMT-PMR/css/styles.css" />
         <option value="$PROJECT_DIR$/../SMT-PMR/js/index.js" />
         <option value="$PROJECT_DIR$/../SMT-PMR/index.html" />
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/js/index2.js" />
         <option value="$PROJECT_DIR$/index-text-search.html" />
         <option value="$PROJECT_DIR$/css/bootstrap.min.css" />
@@ -142,6 +170,11 @@
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/snippets/epithelial.html" />
         <option value="$PROJECT_DIR$/css/styles.css" />
+=======
+        <option value="$PROJECT_DIR$/snippets/search.html" />
+        <option value="$PROJECT_DIR$/js/index2.js" />
+        <option value="$PROJECT_DIR$/index.html" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
         <option value="$PROJECT_DIR$/js/index.js" />
       </list>
     </option>
@@ -157,6 +190,19 @@
     <option name="y" value="-8" />
     <option name="width" value="1936" />
     <option name="height" value="1176" />
+<<<<<<< HEAD
+=======
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -174,8 +220,18 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+<<<<<<< HEAD
+=======
+      <pane id="Scope" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
       <pane id="ProjectPane">
         <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="epithelial-model-platform" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
           <PATH>
             <PATH_ELEMENT>
               <option name="myItemId" value="epithelial-model-platform" />
@@ -216,13 +272,22 @@
           </PATH>
         </subPane>
       </pane>
+<<<<<<< HEAD
       <pane id="Scope" />
+=======
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
       <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+<<<<<<< HEAD
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../SVG-Epithelial" />
     <property name="settings.editor.selected.configurable" value="project.propDebugger" />
+=======
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DavidChuRestaurant" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="settings.editor.splitter.proportion" value="0.2" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="js-jscs-nodeInterpreter" value="C:\Program Files\nodejs\node.exe" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
@@ -234,6 +299,7 @@
     <property name="js.eslint.eslintPackage" value="" />
   </component>
   <component name="RecentsManager">
+<<<<<<< HEAD
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\WebStormProjects\epithelial-model-platform\css" />
       <recent name="C:\WebStormProjects\epithelial-model-platform\js" />
@@ -241,12 +307,21 @@
       <recent name="C:\WebStormProjects\SMT-PMR\snippets" />
       <recent name="C:\WebStormProjects\SMT-PMR\lib" />
     </key>
+=======
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\WebStormProjects\SMT-PMR\lib" />
       <recent name="C:\WebStormProjects\SMT-PMR\snippets" />
       <recent name="C:\WebStormProjects\SMT-PMR\js" />
       <recent name="C:\WebStormProjects\SMT-PMR\snippet" />
       <recent name="C:\WebStormProjects\SMT-PMR" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\WebStormProjects\epithelial-model-platform\js" />
+      <recent name="C:\WebStormProjects\SMT-PMR\js" />
+      <recent name="C:\WebStormProjects\SMT-PMR\snippets" />
+      <recent name="C:\WebStormProjects\SMT-PMR\lib" />
+      <recent name="C:\WebStormProjects\SMT-PMR\images" />
     </key>
   </component>
   <component name="RunManager">
@@ -353,10 +428,17 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
+<<<<<<< HEAD
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14752372" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+=======
+    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15911485" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981783" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2186002" sideWeight="0.5021075" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981783" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -416,6 +498,17 @@
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/js/index.js">
+<<<<<<< HEAD
+=======
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -423,17 +516,35 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/snippets/search.html">
+=======
+    <entry file="file://$PROJECT_DIR$/js/index.js">
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="43" column="7" lean-forward="false" selection-start-line="43" selection-start-column="7" selection-end-line="43" selection-end-column="7" />
+=======
+    <entry file="file://$PROJECT_DIR$/snippets/search.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="43" column="7" selection-start-line="43" selection-start-column="7" selection-end-line="43" selection-end-column="7" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
           <folding />
         </state>
       </provider>
@@ -708,13 +819,18 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/js/ajax-utils.js">
+=======
+    <entry file="file://$PROJECT_DIR$/snippets/annotation.html">
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="14" column="9" lean-forward="false" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/snippets/annotation.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -772,22 +888,75 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="402">
           <caret line="27" column="23" lean-forward="true" selection-start-line="27" selection-start-column="23" selection-end-line="27" selection-end-column="23" />
+=======
+    <entry file="file://$PROJECT_DIR$/snippets/epithelial.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/snippets/model.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.05807201">
+          <caret line="2" column="48" selection-start-line="2" selection-start-column="48" selection-end-line="2" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/styles.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.20325203">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/snippets/view.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="37" selection-start-line="0" selection-start-column="37" selection-end-line="0" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/ajax-utils.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="9" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/snippets/search.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.294118">
+          <caret line="14" column="19" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="19" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/snippets/epithelial.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="25">
           <caret line="1" column="36" lean-forward="false" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
+=======
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="6.4411764">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="15" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/index.js">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="465">
           <caret line="792" column="0" lean-forward="true" selection-start-line="792" selection-start-column="0" selection-end-line="792" selection-end-column="0" />
+=======
+        <state vertical-scroll-proportion="0.024630541">
+          <caret line="367" column="83" selection-start-line="367" selection-start-column="83" selection-end-line="367" selection-end-column="83" />
+>>>>>>> 1a53570495f60b412c487c6498bc4c00d55cee34
           <folding />
         </state>
       </provider>
