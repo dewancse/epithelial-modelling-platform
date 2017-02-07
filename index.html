@@ -22,11 +22,13 @@
         <div class="navbar-header">
             <a id="header" class="navbar-brand">Epithelial Model Platform</a>
         </div>
-    </div><!-- container-fluid -->
-    <ul class="nav nav-tabs container">
-        <li role="presentation"><a href="#">Home</a></li>
-        <!--<li role="presentation"><a href="#" onclick="$mainUtils.loadAnnotationHtml();">Annotation</a></li>-->
-        <li role="presentation" class="active"><a href="#" onclick="$mainUtils.loadSearchHtml();">Model Discovery</a></li>
+    </div>
+    <ul id="ulistItems" class="nav nav-tabs container">
+        <li id="listHome" role="presentation" class="active"><a href="#" onclick="$mainUtils.loadHomeHtml();">Home</a></li>
+        <li id="listAnnotation" role="presentation"><a href="#" onclick="$mainUtils.loadAnnotationHtml();">Annotation</a>
+        </li>
+        <li id="listDiscovery" role="presentation"><a href="#" onclick="$mainUtils.loadSearchHtml();">Model Discovery</a>
+        </li>
     </ul>
 </nav>
 

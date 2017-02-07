@@ -16,18 +16,27 @@
     // Set up a namespace for our utility
     var mainUtils = {};
 
-    // Save models
-    var listOfModels = [];
+    // Track models for delete operation
+    mainUtils.listOfModels = [];
+
+    // List of workspace names
+    // mainUtils.workspaceName = [];
+
+    // Pre-process models before list of models
+    // selection for delete operation
+    mainUtils.templistOfModel = [];
 
     // Save table rows for epithelial
     var listOfItemsForEpithelial = [];
 
-    // Count number of instances in the loadModelHtml
-    mainUtils.count = 0;
+    // Add models in the loadModelHtml
+    mainUtils.model = [];
+    mainUtils.model2DArr = [];
+    mainUtils.headCount;
+
+    // Initial declarations for a table
     var table = document.createElement("table");
     table.className = "table";
-    var thead = document.createElement("thead");
-    var tbody = document.createElement("tbody");
 
     // Convenience function for inserting innerHTML for 'select'
     var insertHtml = function (selector, html) {
@@ -50,15 +59,48 @@
         return string;
     };
 
+    // Find the current active menu button
+    var findActiveItem = function () {
+        var classes = document.querySelector("#ulistItems");
+        for (var i = 0; i < classes.getElementsByTagName("li").length; i++) {
+            if (classes.getElementsByTagName("li")[i].className === "active")
+                return classes.getElementsByTagName("li")[i].id;
+        }
+    };
+
+    // Remove the class 'active' from source to target button
+    var switchListItemToActive = function (source, target) {
+        // Remove 'active' from source button
+        var classes = document.querySelector(source).className;
+        classes = classes.replace(new RegExp("active", "g"), "");
+        document.querySelector(source).className = classes;
+
+        // Add 'active' to target button if not already there
+        classes = document.querySelector(target).className;
+        if (classes.indexOf("active") === -1) {
+            classes += "active";
+            document.querySelector(target).className = classes;
+        }
+    };
+
+    mainUtils.loadHomeHtml = function () {
+        // Switch from current active button to home button
+        var activeItem = "#" + findActiveItem();
+        switchListItemToActive(activeItem, "#listHome");
+
+        insertHtml("#main-content", "");
+    };
+
     // On page load (before images or CSS)
     document.addEventListener("DOMContentLoaded", function (event) {
-
         // Place some startup code here
-
     });
 
     // Load the annotation view
     mainUtils.loadAnnotationHtml = function () {
+        // Switch from current active button to annotation button
+        var activeItem = "#" + findActiveItem();
+        switchListItemToActive(activeItem, "#listAnnotation");
 
         var query = 'SELECT ?id WHERE { ?id  <http://biomodels.net/biology-qualifiers/isVersionOf> ' +
             '<http://identifiers.org/go/GO:0005272> }';
@@ -116,16 +158,13 @@
         return finalHtml;
     };
 
-    // Different actions for checkbox events
-    // ANNOTATION, SEARCH, MODEL pages
+    // Even handling for ANNOTATION, SEARCH, MODEL
     var actions = {
-
-        // Click event in annotation page
         annotation: function (event) {
-            if (event.srcElement.className == "checkbox-inline" && event.srcElement.checked == true) {
 
-                console.log("Annotation event: ", event);
+            console.log("annotation event: ", event);
 
+            if (event.srcElement.className == "checkbox" && event.srcElement.checked == true) {
                 var idWithStr = event.srcElement.id;
                 var n = idWithStr.search("#");
                 var id = idWithStr.slice(n + 1, idWithStr.length);
@@ -134,14 +173,16 @@
                 var index = idWithStr.search(".cellml");
                 var workspaceName = idWithStr.slice(0, index);
 
+                /*
+                 * TODO: choose multiple checkboxes, mainUtils.workspaceName array!!
+                 * */
                 mainUtils.workspaceName = workspaceName;
 
                 var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + workspaceName + "/" + "rawfile" +
                     "/" + "HEAD" + "/" + idWithStr;
 
+                // Get variable name for a particular CellML Id
                 mainUtils.showVariableName = function (str) {
-                    console.log(event);
-
                     var parser = new DOMParser();
                     var xmlDoc = parser.parseFromString(str, "text/xml");
 
@@ -162,49 +203,52 @@
             }
         },
 
-        // Click event in search page
         search: function (event) {
 
-            if (event.srcElement.className == "checkbox-inline" && event.srcElement.checked == true) {
+            console.log("search event: ", event);
 
-                console.log("Search event: ", event);
-
+            if (event.srcElement.className == "checkbox" && event.srcElement.checked == true) {
                 var idWithStr = event.srcElement.id;
-                var index = idWithStr.search(".cellml");
+                var index = idWithStr.search("#");
                 var workspaceName = idWithStr.slice(0, index);
 
+                // mainUtils.workspaceName.push(workspaceName);
                 mainUtils.workspaceName = workspaceName;
             }
         },
 
-        // Click event in model page
         model: function (event) {
 
-            if (event.srcElement.className == "checkbox-inline" && event.srcElement.checked == true) {
+            console.log("model event: ", event);
 
-                console.log("Model event: ", event);
+            if (event.srcElement.className == "checkbox" && event.srcElement.checked == true) {
 
-                if (document.getElementsByClassName("checkbox-inline")[0].checked == true) {
+                if (document.getElementsByClassName("checkbox")[0].checked == true) {
                     for (var i = 0; i < $('table tr').length; i++) {
-                        document.getElementsByClassName("checkbox-inline")[i].checked = true;
+                        if (i == 0) {
+                            mainUtils.templistOfModel.push(event.srcElement);
+                        }
 
-                        // Push checked item
-                        listOfModels.push(document.getElementsByClassName("checkbox-inline")[i].id);
+                        // Assign TRUE to all table data
+                        if (i < $('table tr').length - 1)
+                            $('table tr td label')[i].firstChild.checked = true;
                     }
                 }
                 else {
-                    listOfModels.push(event.srcElement.id);
+                    mainUtils.templistOfModel.push(event.srcElement);
 
                     var idWithStr = event.srcElement.id;
-                    var index = idWithStr.search(".cellml");
+                    var index = idWithStr.search("#");
                     var workspaceName = idWithStr.slice(0, index);
 
+                    // mainUtils.workspaceName.push(workspaceName);
                     mainUtils.workspaceName = workspaceName;
                 }
             }
         }
     };
 
+    // Even invocation to ANNOTATION, SEARCH, MODEL
     document.addEventListener('click', function (event) {
         // If there's an action with the given name, call it
         if (typeof actions[event.srcElement.dataset.action] === "function") {
@@ -212,51 +256,34 @@
         }
     })
 
-    // Load the search view
+    // Load search html
     mainUtils.loadSearchHtml = function () {
 
-        $ajaxUtils.sendGetRequest(
-            searchHtml,
-            function (searchHtmlContent) {
-                insertHtml("#main-content", searchHtmlContent);
-            },
-            false);
+        if (!localStorage.getItem("searchListContent"))
+            insertHtml("#main-content", "<section class='container-fluid'>Empty Content!</section>");
+        else {
+            insertHtml("#main-content", localStorage.getItem('searchListContent'));
+        }
+
+        // Switch from current active button to discovery button
+        var activeItem = "#" + findActiveItem();
+        switchListItemToActive(activeItem, "#listDiscovery");
     };
 
-    // Compartments
-    mainUtils.compartment = function () {
-        for (var i = 0; i < 5; i++) {
-            var model = "weinstein_1995.cellml#weinstein_1995";
-            var query = 'SELECT ?Compartment WHERE { <' + model + '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#_' + i + '> ?Compartment }';
-
-            $ajaxUtils.sendPostRequest(
-                endpoint,
-                query,
-                function (jsonObj) {
-                    for (var i = 0; i < jsonObj.results.bindings.length; i++) {
-                        var value = jsonObj.results.bindings[i].Compartment.value;
-                        console.log("Compartment: ", value);
-                    }
-                },
-                true);
-        }
-    }
-
-    // Search results
+    // Show semantic annotation extracted from PMR
     mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
         var searchList = document.getElementById("searchList");
 
         // Search result does not match
         if (head.length == 0) {
-            searchList.innerHTML = "<section class='container-fluid'><label><br>No Search Results!</label></section>";
+            searchList.innerHTML = "<section class='container-fluid'><No Search Results!</section>";
             return;
         }
 
-        // Make empty space for new search result
+        // Make empty space for a new search
         searchList.innerHTML = "";
 
-        // Dynamic table
         var table = document.createElement("table");
         table.className = "table";
 
@@ -264,6 +291,14 @@
         var thead = document.createElement("thead");
         var tr = document.createElement("tr");
         for (var i = 0; i < head.length; i++) {
+
+            // Empty header for checkbox column
+            if (i == 0) {
+                var th = document.createElement("th");
+                th.appendChild(document.createTextNode(""));
+                tr.appendChild(th);
+            }
+
             var th = document.createElement("th");
             th.appendChild(document.createTextNode(head[i]));
             tr.appendChild(th);
@@ -277,32 +312,42 @@
         for (var i = 0; i < modelEntity.length; i++) {
             var tr = document.createElement("tr");
 
-            var td1 = document.createElement("td");
-            var td2 = document.createElement("td");
-            var td3 = document.createElement("td");
-            var td4 = document.createElement("td");
-            var td5 = document.createElement("td");
+            var temp = [];
+            var td = [];
+            temp.push(modelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
 
-            td1.appendChild(document.createTextNode(modelEntity[i]));
-            td2.appendChild(document.createTextNode(biologicalMeaning[i]));
-            td3.appendChild(document.createTextNode(speciesList[i]));
-            td4.appendChild(document.createTextNode(geneList[i]));
-            td5.appendChild(document.createTextNode(proteinList[i]));
+            for (var j = 0; j < temp.length; j++) {
+                if (j == 0) {
+                    td[j] = document.createElement("td");
+                    var label = document.createElement('label');
+                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" data-action="search" value="' +
+                        modelEntity[i] + '" class="checkbox"></label>';
 
-            tr.appendChild(td1);
-            tr.appendChild(td2);
-            tr.appendChild(td3);
-            tr.appendChild(td4);
-            tr.appendChild(td5);
+                    td[j].appendChild(label);
+                    tr.appendChild(td[j]);
+                }
+
+                td[j] = document.createElement("td");
+                td[j].appendChild(document.createTextNode(temp[j]));
+                tr.appendChild(td[j]);
+            }
 
             tbody.appendChild(tr);
         }
 
         table.appendChild(tbody);
         searchList.appendChild(table);
+
+        // Fill in the search attribute value
+        var searchTxt = document.getElementById("searchTxt");
+        searchTxt.setAttribute('value', localStorage.getItem('searchTxtContent'));
+
+        // SET main content in the local storage
+        var maincontent = document.getElementById('main-content');
+        localStorage.setItem('searchListContent', $(maincontent).html());
     }
 
-    // Extract model name
+    // Utility function to extract a model name
     var parseModel = function (modelEntity) {
         var indexOfCellML = modelEntity.search(".cellml");
         var indexOfHash = modelEntity.search("#");
@@ -313,7 +358,7 @@
         return model;
     }
 
-    // Titles of the search table
+    // Table headers in search table
     var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
         var head = [];
 
@@ -327,11 +372,14 @@
         return head;
     }
 
-    // Enter search keywords
+    // Plain text search for semantic annotation
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
 
             var searchTxt = document.getElementById("searchTxt").value;
+
+            // set local storage
+            localStorage.setItem('searchTxtContent', searchTxt);
 
             var query = 'SELECT ?Model_entity ?Biological_meaning WHERE ' +
                 '{ GRAPH ?Workspace { ?Model_entity ?Location ?Biological_meaning . ' +
@@ -344,6 +392,7 @@
             var idxSpecies = 0, idxGene = 0, idxBreak = 0;
             var modelEntity = [], biologicalMeaning = [];
             var speciesList = [], geneList = [], proteinList = [];
+            var head = [];
 
             // Model
             $ajaxUtils.sendPostRequest(
@@ -399,7 +448,7 @@
                                                 idxBreak++;
 
                                                 if (idxBreak == jsonModel.results.bindings.length) {
-                                                    var head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
+                                                    head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
                                                     mainUtils.searchList(
                                                         head,
@@ -416,32 +465,37 @@
                             },
                             true);
                     }
+
+                    // No search results found, so sent empty arrays
+                    if (!jsonModel.results.bindings.length)
+                        mainUtils.searchList(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
                 },
                 true
             );
         }
     });
 
-// Load the view
+    // Load the view
     mainUtils.loadViewHtml = function () {
 
-        var workspaceURI = mainUtils.workspaceName.concat(".cellml");
+        var cellmlModel = mainUtils.workspaceName;
 
-        console.log(workspaceURI);
+        var indexOfCellML = cellmlModel.search(".cellml");
+        var modelName = "#" + cellmlModel.slice(0, indexOfCellML);
+        var subject = cellmlModel.concat(modelName);
 
-        var query = 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-            'PREFIX bqmodel: <http://biomodels.net/model-qualifiers/>' +
-            'PREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>' +
-            'PREFIX ro: <http://purl.obolibrary.org/obo/ro.owl#>' +
-            'SELECT ?g ?Title ?Author ?Protein ?Species ?Gene ?Located_in ?DOI ' +
-            'WHERE { GRAPH ?g { ' +
-            '<' + workspaceURI + '#title> dcterms:title ?Title . ' +
-            'OPTIONAL { <' + workspaceURI + '#author1VcardN> vCard:FN ?Author } . ' +
-            'OPTIONAL { <' + workspaceURI + '#UniProtKB> dcterms:Protein ?Protein } . ' +
-            'OPTIONAL { <' + workspaceURI + '#UniProtKB> dcterms:Species ?Species } . ' +
-            'OPTIONAL { <' + workspaceURI + '#UniProtKB> dcterms:Gene ?Gene } . ' +
-            'OPTIONAL { <' + workspaceURI + '#located_in> ro:located_in ?Located_in } . ' +
-            'OPTIONAL { <' + workspaceURI + '#DOI> bqmodel:isDescribedBy ?DOI } . ' +
+        var query = 'SELECT ?Workspace ?Title ?Author ?Abstract ?Keyword ?Protein ?Species ?Gene ?Compartment ?Located_in ?DOI ' +
+            'WHERE { GRAPH ?Workspace { ' +
+            '<' + subject + '> <http://purl.org/dc/terms/title> ?Title . ' +
+            'OPTIONAL { <' + subject + '> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
+            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Abstract> ?Abstract } . ' +
+            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Keyword> ?Keyword } . ' +
+            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Protein> ?Protein } . ' +
+            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Species> ?Species } . ' +
+            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Gene> ?Gene } . ' +
+            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Compartment> ?Compartment } . ' +
+            'OPTIONAL { <' + subject + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . ' +
+            'OPTIONAL { <' + subject + '> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . ' +
             '}}';
 
         showLoading("#main-content");
@@ -452,114 +506,108 @@
                 $ajaxUtils.sendGetRequest(
                     viewHtml,
                     function (viewHtmlContent) {
-                        var viewHtmlViewToIndexHtml = mainUtils.showView(jsonObj, viewHtmlContent);
-                        insertHtml("#main-content", viewHtmlViewToIndexHtml);
+                        insertHtml("#main-content", viewHtmlContent);
+                        $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.showView, true);
                     },
                     false);
             },
             true);
     };
 
-// Show rdf indexed information in the view html
-// Should make a table -- CHANGE THE STATIC CODE
-    mainUtils.showView = function (jsonObj, viewHtmlContent) {
+    // Test a valid URL
+    var isURL = function (str) {
+        // var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+        //     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
+        //     '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        //     '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        //     '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        //     '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+        // return pattern.test(str);
 
-        console.log("showView: ", jsonObj);
+        if (str.indexOf("http") === -1)
+            return false;
 
-        var label = [];
-        var finalHtml = viewHtmlContent;
-
-        var html = "<section class='row'>";
-
-        var Title, Author, Protein, Species, Gene, Located_in, DOI;
-        for (var i = 0; i < jsonObj.results.bindings.length; i++) {
-
-            Title = jsonObj.results.bindings[i].Title.value;
-            Author = jsonObj.results.bindings[i].Author.value;
-
-            if (jsonObj.results.bindings[i].Protein == undefined)
-                Protein = -1;
-            else
-                Protein = jsonObj.results.bindings[i].Protein.value;
-
-            if (jsonObj.results.bindings[i].Species == undefined)
-                Species = -1;
-            else
-                Species = jsonObj.results.bindings[i].Species.value;
-
-            if (jsonObj.results.bindings[i].Gene == undefined)
-                Gene = -1;
-            else
-                Gene = jsonObj.results.bindings[i].Gene.value;
-
-            Located_in = jsonObj.results.bindings[i].Located_in.value;
-            DOI = jsonObj.results.bindings[i].DOI.value;
-
-            label[i] = document.createElement("label");
-
-            // CHANGE LATER !!!
-            if (i == 0) {
-                label[i].innerHTML += '<h2>Title</h2><br>';
-                label[i].innerHTML += Title + '<br>';
-                label[i].innerHTML += '<hr>';
-                label[i].innerHTML += '<h2>Author</h2><br>';
-                label[i].innerHTML += Author + '<br>';
-                label[i].innerHTML += '<hr>';
-
-                if (Protein != -1) {
-                    label[i].innerHTML += '<h2>Protein</h2><br>';
-                    label[i].innerHTML += Protein + '<br>';
-                    label[i].innerHTML += '<hr>';
-                }
-
-                if (Species != -1) {
-                    label[i].innerHTML += '<h2>Species</h2><br>';
-                    label[i].innerHTML += Species + '<br>';
-                    label[i].innerHTML += '<hr>';
-                }
-
-                if (Gene != -1) {
-                    label[i].innerHTML += '<h2>Gene</h2><br>';
-                    label[i].innerHTML += Gene + '<br>';
-                    label[i].innerHTML += '<hr>';
-                }
-
-                label[i].innerHTML += '<h2>DOI</h2><br>';
-                label[i].innerHTML += DOI + '<br>';
-                label[i].innerHTML += '<hr>';
-                label[i].innerHTML += '<h2>Located_in</h2><br>';
-            }
-
-            label[i].innerHTML += '<a href=' + Located_in + ' + target=_blank>' + Located_in + '</a><br>';
-
-            html += '<label>' + label[i].innerHTML + '</label><br>';
-        }
-
-        html += "</section>";
-        finalHtml = insertProperty(finalHtml, "description", html);
-
-        return finalHtml;
+        return true;
     };
 
-// Load the model
+    // Create anchor tag
+    var createAnchor = function (value) {
+        var aText = document.createElement('a');
+        aText.setAttribute('href', value);
+        aText.setAttribute('target', "_blank");
+        aText.innerHTML = value;
+        return aText;
+    };
+
+    // Find duplicate items
+    var searchFn = function (searchItem, arrayOfItems) {
+        var counter = 0;
+        for (var i = 0; i < arrayOfItems.length; i++) {
+            if (arrayOfItems[i] == searchItem)
+                counter++;
+        }
+
+        return counter;
+    };
+
+    // Show a selected entry from the search results
+    mainUtils.showView = function (jsonObj, viewHtmlContent) {
+        var viewList = document.getElementById("viewList");
+
+        for (var i = 0; i < jsonObj.head.vars.length; i++) {
+            var divHead = document.createElement("div");
+            divHead.className = "h2";
+
+            var divText = document.createElement("div");
+            divText.className = "p";
+
+            divHead.appendChild(document.createTextNode(jsonObj.head.vars[i]));
+            divHead.appendChild(document.createElement("hr"));
+            viewList.appendChild(divHead);
+
+            var tempArrayOfURL = [];
+            var tempArray = [];
+
+            // IF more than one result in the JSON object
+            for (var j = 0; j < jsonObj.results.bindings.length; j++) {
+                var tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
+                // Checking a valid URL
+                if (isURL(tempValue)) {
+                    var aText = createAnchor(tempValue);
+                    tempArrayOfURL.push(tempValue);
+                    if (searchFn(tempValue, tempArrayOfURL) <= 1)
+                        divText.appendChild(aText);
+                }
+                else {
+                    tempArray.push(tempValue);
+                    if (searchFn(tempValue, tempArray) <= 1)
+                        divText.appendChild(document.createTextNode(tempValue));
+                }
+
+                viewList.appendChild(divText);
+
+                var divText = document.createElement("div");
+                divText.className = "p";
+            }
+        }
+    };
+
+    // Load the model
     mainUtils.loadModelHtml = function () {
 
-        var workspaceURI = mainUtils.workspaceName.concat(".cellml");
+        var cellmlModel = mainUtils.workspaceName;
 
-        var query = 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-            'PREFIX bqmodel: <http://biomodels.net/model-qualifiers/>' +
-            'PREFIX vCard: <http://www.w3.org/2001/vcard-rdf/3.0#>' +
-            'PREFIX ro: <http://purl.obolibrary.org/obo/ro.owl#>' +
-            'SELECT ?Title ?Author ?Protein ?Species ?Gene ?Located_in ?DOI ' +
-            'WHERE { ' +
-            '<' + workspaceURI + '#title> dcterms:title ?Title . ' +
-            '<' + workspaceURI + '#author1VcardN> vCard:FN ?Author . ' +
-            '<' + workspaceURI + '#UniProtKB> dcterms:Protein ?Protein . ' +
-            '<' + workspaceURI + '#UniProtKB> dcterms:Species ?Species . ' +
-            '<' + workspaceURI + '#UniProtKB> dcterms:Gene ?Gene . ' +
-            '<' + workspaceURI + '#located_in> ro:located_in ?Located_in . ' +
-            '<' + workspaceURI + '#DOI> bqmodel:isDescribedBy ?DOI . ' +
-            '}';
+        var indexOfCellML = cellmlModel.search(".cellml");
+        var modelName = "#" + cellmlModel.slice(0, indexOfCellML);
+        var subject = cellmlModel.concat(modelName); // e.g. weinstein_1995.cellml#weinstein_1995
+
+        var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ' +
+            'WHERE { GRAPH ?Workspace { ' +
+            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Protein> ?Protein } . ' +
+            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Species> ?Species } . ' +
+            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Gene> ?Gene } . ' +
+            'FILTER (?Model_entity = <' + subject + '>) . ' +
+            '}}';
 
         showLoading("#main-content");
         $ajaxUtils.sendGetRequest(
@@ -572,77 +620,75 @@
             false);
     };
 
-// Show selected items in a table
+    // Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
-        var label = [];
+        console.log("showModel: ", jsonObj);
+
         var modelList = document.getElementById("modelList");
 
-        if (mainUtils.count == 0) {
-            // Table header
-            var tr = document.createElement("tr");
-            tr.id = mainUtils.count;
+        var table = document.createElement("table");
+        table.className = "table";
 
-            for (var i = 0; i < jsonObj.head.vars.length; i++) {
-                if (i == 0) {
-                    var label = [];
-                    var th = document.createElement("th");
-                    var id = mainUtils.count;
-                    label[i] = document.createElement('label');
-                    label[i].innerHTML = '<input id="' + id + '" type="checkbox" data-action="model" value="' +
-                        id + '" class="checkbox-inline"></label>';
-
-                    th.appendChild(label[i]);
-                    tr.appendChild(th);
-                }
-
+        // Table header
+        var thead = document.createElement("thead");
+        var tr = document.createElement("tr");
+        mainUtils.headCount = jsonObj.head.vars.length;
+        for (var i = 0; i < jsonObj.head.vars.length; i++) {
+            if (i == 0) {
                 var th = document.createElement("th");
-                th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
+                mainUtils.headId = jsonObj.head.vars[0];
+                tr.id = mainUtils.headId;
+                var label = document.createElement('label');
+                label.innerHTML = '<input id="' + mainUtils.headId + '" type="checkbox" data-action="model" value="' +
+                    mainUtils.headId + '" class="checkbox"></label>';
+
+                th.appendChild(label);
                 tr.appendChild(th);
             }
 
-            thead.appendChild(tr);
-            table.appendChild(thead);
+            var th = document.createElement("th");
+            th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
+            tr.appendChild(th);
         }
 
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
         // Table body
-        for (var i = 0; i < jsonObj.results.bindings.length; i++) {
+        for (var i = 0; i < jsonObj.head.vars.length; i++) {
+            if (i == 0) {
+                var id = jsonObj.results.bindings[i].Model_entity.value;
+                var label = document.createElement('label');
+                label.innerHTML = '<input id="' + id + '" type="checkbox" data-action="model" value="' +
+                    id + '" class="checkbox"></label>';
 
+                mainUtils.model.push(label);
+            }
+            mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
+        }
+
+        // 1D to 2D array
+        while (mainUtils.model.length) mainUtils.model2DArr.push(mainUtils.model.splice(0, 5));
+
+        var td = [];
+        var tbody = document.createElement("tbody");
+        for (var ix = 0; ix < mainUtils.model2DArr.length; ix++) {
             var tr = document.createElement("tr");
+            // +1 for adding checkbox column
+            for (var j = 0; j < jsonObj.head.vars.length + 1; j++) {
+                td[j] = document.createElement("td");
+                if (j == 0)
+                    td[j].appendChild(mainUtils.model2DArr[ix][j]);
+                else
+                    td[j].appendChild(document.createTextNode(mainUtils.model2DArr[ix][j]));
 
-            var td = document.createElement("td");
-            var td1 = document.createElement("td");
-            var td2 = document.createElement("td");
-            var td3 = document.createElement("td");
-            var td4 = document.createElement("td");
-            var td5 = document.createElement("td");
-            var td6 = document.createElement("td");
-            var td7 = document.createElement("td");
+                // Id for each row
+                if (j == 1)
+                    tr.setAttribute("id", mainUtils.model2DArr[ix][j]);
 
-            var id = ++mainUtils.count;
-
-            tr.id = id;
-            label[i] = document.createElement('label');
-            label[i].innerHTML = '<input id="' + id + '" type="checkbox" data-action="model" value="' +
-                id + '" class="checkbox-inline"></label>';
-
-            td.appendChild(label[i]);
-            td1.appendChild(document.createTextNode(jsonObj.results.bindings[i].Title.value));
-            td2.appendChild(document.createTextNode(jsonObj.results.bindings[i].Author.value));
-            td3.appendChild(document.createTextNode(jsonObj.results.bindings[i].Protein.value));
-            td4.appendChild(document.createTextNode(jsonObj.results.bindings[i].Species.value));
-            td5.appendChild(document.createTextNode(jsonObj.results.bindings[i].Gene.value));
-            td6.appendChild(document.createTextNode(jsonObj.results.bindings[i].Located_in.value));
-            td7.appendChild(document.createTextNode(jsonObj.results.bindings[i].DOI.value));
-
-            tr.appendChild(td);
-            tr.appendChild(td1);
-            tr.appendChild(td2);
-            tr.appendChild(td3);
-            tr.appendChild(td4);
-            tr.appendChild(td5);
-            tr.appendChild(td6);
-            tr.appendChild(td7);
+                tr.appendChild(td[j]);
+            }
 
             tbody.appendChild(tr);
         }
@@ -652,28 +698,79 @@
     };
 
     mainUtils.deleteRowModelHtml = function () {
+        /*
+         * TODO: Uncheck and then check does not work
+         */
+        // IF header checkbox exist, but length of pre processed
+        // list of models is greater than 1, delete header checkbox
+        if (mainUtils.templistOfModel.length > 1) {
+            for (var i = 0; i < mainUtils.templistOfModel.length; i++) {
+                if ($('table tr th label')[0].firstChild.id == mainUtils.templistOfModel[i].id) {
+                    mainUtils.templistOfModel.splice(i, 1);
+                }
+            }
+        }
+
+        console.log("mainUtils.templistOfModel: ", mainUtils.templistOfModel);
+        // Handling current instance of (un)checked status
+        for (var i = 0; i < mainUtils.templistOfModel.length; i++) {
+            // IF header checkbox is selected
+            console.log("TRUE mainUtils.templistOfModel: ", mainUtils.templistOfModel);
+            console.log("TRUE mainUtils.listOfModels: ", mainUtils.listOfModels);
+            if (mainUtils.templistOfModel[i].checked == true) {
+                if ($('table tr th label')[0].firstChild.id == mainUtils.templistOfModel[0].id) {
+
+                    console.log("$('table tr td'): ", $('table tr td label')[i].firstChild.checked);
+
+                    for (var i = 0; i < mainUtils.model2DArr.length; i++) {
+                        mainUtils.listOfModels.push(mainUtils.model2DArr[i][1]);
+                    }
+                }
+                else {
+                    mainUtils.listOfModels.push(mainUtils.templistOfModel[i].id);
+                }
+            }
+        }
+
+        console.log("mainUtils.listOfModels BEFORE: ", mainUtils.listOfModels);
 
         var hasElement = function (id) {
-
             for (var i = 0; i < $('table tr').length; i++) {
 
-                if ($('table tr')[i].id == 0)
-                    continue;
-
                 if ($('table tr')[i].id == id) {
-                    table.deleteRow(i);
+                    // Remove selected row
+                    $('table tr')[i].remove();
+
+                    // Remove the selected row from the model2DArr that
+                    // populated the table, see showModel function
+                    for (var i = 0; i < mainUtils.model2DArr.length; i++) {
+                        if (mainUtils.model2DArr[i][1] == id)
+                            mainUtils.model2DArr.splice(i, 1);
+                    }
 
                     return id;
                 }
             }
         };
 
-        var filtered = listOfModels.filter(hasElement);
-        console.log(filtered);
+        var deleted = mainUtils.listOfModels.filter(hasElement);
 
-        // Uncheck after delete
-        for (var i = 0; i < $('table tr').length; i++) {
-            document.getElementsByClassName('checkbox-inline')[i].checked = false;
+        // Remove deleted items from the list of models
+        for (var i = 0; i < deleted.length; i++) {
+            for (var j = 0; j < mainUtils.listOfModels.length; j++) {
+                if (mainUtils.listOfModels[j] == deleted[i])
+                    mainUtils.listOfModels.splice(j, 1);
+            }
+        }
+
+        console.log("mainUtils.listOfModels AFTER: ", mainUtils.listOfModels);
+        console.log("deleted: ", deleted);
+        console.log("table: ", $('table tr'));
+
+        // Un-check header checkbox if body is empty
+        if ($('table tr th label')[0].firstChild.checked == true) {
+            if ($('table tr').length == 1)
+                $('table tr th label')[0].firstChild.checked = false;
         }
     };
 
@@ -694,7 +791,7 @@
             }
         };
 
-        var deleted = listOfModels.filter(deleteElement);
+        var deleted = mainUtils.listOfModels.filter(deleteElement);
         console.log(deleted);
 
         showLoading("#main-content");
@@ -716,32 +813,15 @@
 
         for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
 
-            if (listOfModels.length == 0)
+            if (mainUtils.listOfModels.length == 0)
                 break;
 
-            for (var j = 0; j < listOfModels.length; j++) {
-                if (listOfModels[j] == listOfItemsForEpithelial[i].id) {
+            for (var j = 0; j < mainUtils.listOfModels.length; j++) {
+                if (mainUtils.listOfModels[j] == listOfItemsForEpithelial[i].id) {
                     compartmentsList.innerHTML += '<p id="drag1" draggable="true" ondragstart="$mainUtils.drag(event)">' +
                         listOfItemsForEpithelial[i].getElementsByTagName('td')[3].innerText + '</p>';
                 }
             }
-        }
-
-        // Helper functions for drag and drop
-        $mainUtils.allowDrop = function (ev) {
-            ev.preventDefault();
-        }
-
-        $mainUtils.drag = function (ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
-
-            console.log("drag ev, ev.target.id: ", ev, ev.target.id);
-        }
-
-        $mainUtils.drop = function (ev) {
-            ev.preventDefault();
-            var data = ev.dataTransfer.getData("text");
-            ev.target.appendChild(document.getElementById(data));
         }
 
         // SVG diagram
@@ -749,10 +829,42 @@
             width = 800,
             height = 800;
 
+        var mainUtils = {};
+
         var svg = d3.select("#svgVisualize").append("svg")
             .attr("width", width)
             .attr("height", height)
             .append("g");
+
+        // line
+        var data = [
+            {x: 0, y: 0},
+            {x: 20, y: 0}
+        ];
+
+        // line for paracellular pathway
+        var dataParacellular = [
+            {x: 10, y: 415},
+            {x: 10, y: 485}
+        ];
+
+        // function to get line data
+        var lineFunc = d3.line()
+            .x(function (d) {
+                return d.x;
+            })
+            .y(function (d) {
+                return d.y;
+            });
+
+        // line in paracellular
+        svg.append("svg:path")
+            .attr("transform", "translate(30,0)")
+            .attr("d", lineFunc(dataParacellular))
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .style("stroke-dasharray", "5, 5")
+            .attr("id", "paracellular");
 
         // rectangle
         var rectangle = svg.attr("transform", "translate(150,50)")
@@ -765,18 +877,119 @@
             .attr("stroke", "#7bb3f7")
             .attr("stroke-width", 20);
 
+        var luminalCompartments = [];
+        var serosalCompartments = [];
+
+        var compartmentFunc = function (compartment) {
+            if (compartment == "luminal")
+                luminalCompartments.push(compartment);
+            else if (compartment == "serosal")
+                serosalCompartments.push(compartment);
+        };
+
+        var circles = [];
+        var circlePos = 0;
+        var radius = 15;
+
+        for (var i = 0; i < 3; i++) {
+            if (i % 2 == 0) {
+                circles[i] = svg.append("circle")
+                    .attr("transform", "translate(-100," + circlePos + ")")
+                    .attr("cx", 10)
+                    .attr("cy", 10)
+                    .attr("r", radius)
+                    .attr("fill", "lightgreen")
+                    .attr("id", "luminal");
+            }
+            else {
+                circles[i] = svg.append("circle")
+                    .attr("transform", "translate(-100," + circlePos + ")")
+                    .attr("cx", 10)
+                    .attr("cy", 10)
+                    .attr("r", radius)
+                    .attr("fill", "purple")
+                    .attr("id", "serosal");
+            }
+
+            compartmentFunc(circles[i]._groups[0][0].getAttribute("id"));
+            circlePos = circlePos + 50;
+        }
+
+        console.log(rectangle._groups[0][0]);
+        console.log("height: ", rectangle._groups[0][0].getAttribute("height"));
+        console.log("width: ", rectangle._groups[0][0].getAttribute("width"));
+
+        // variables used to plot lines in compartments
+        var rectHeight = rectangle._groups[0][0].getAttribute("height");
+        var rectWidth = rectangle._groups[0][0].getAttribute("width");
+        var lengthOfLuminal = luminalCompartments.length;
+        var lengthOfSerosal = serosalCompartments.length;
+        var luminal = [], serosal = [];
+
+        // components in luminal compartment
+        for (var i = 50, j = 0; i < rectHeight; i = i + 50, j++) {
+
+            lengthOfLuminal--;
+            if (lengthOfLuminal < 0)
+                break;
+
+            luminal[j] = svg.append("svg:path")
+                .attr("transform", "translate(-20, " + i + ")")
+                .attr("d", lineFunc(data))
+                .attr("stroke", "black")
+                .attr("stroke-width", 5)
+                .attr("id", "luminal");
+        }
+
+        console.log(luminal[0]._groups[0][0]);
+        console.log(luminal[1]._groups[0][0]);
+
+        // components in serosal compartment
+        for (var i = 50, j = 0; i < rectHeight; i = i + 50, j++) {
+
+            lengthOfSerosal--;
+            if (lengthOfSerosal < 0)
+                break;
+
+            serosal[j] = svg.append("svg:path")
+                .attr("transform", "translate(" + rectWidth + ", " + i + ")")
+                .attr("d", lineFunc(data))
+                .attr("stroke", "black")
+                .attr("stroke-width", 5)
+                .attr("id", "serosal");
+        }
+
+        console.log(serosal[0]._groups[0][0]);
+
         // line drag and drop
-        // drag and drop compartments from the text ... ***
         svg.selectAll("path")
             .on("mouseover", handleMouseOver);
 
         function handleMouseOver(d) {
-            console.log("handleMouseOver: ", this);
-            d3.select(this).raise().classed("active", true);
+            //console.log("handleMouseOver: ", d3.select(this)._groups[0][0].id);
+            console.log("handleMouseOver: ", this.getAttribute("id"));
+
+            $mainUtils.line = this;
+
+            d3.select("path#" + this.getAttribute("id") + "").raise().classed("active", true);
+
+            // If circle is red, change back to previous color
+            if ($mainUtils.circle.getAttribute("fill") == "red") {
+                d3.select($mainUtils.circle)
+                    .attr("fill", $mainUtils.fillback);
+            }
+
+            //If circle is placed in wrong compartment
+            //change its color to red
+            if ($mainUtils.circle.getAttribute("id") != $mainUtils.line.getAttribute("id")) {
+                $mainUtils.fillback = $mainUtils.circle.getAttribute("fill");
+
+                d3.select($mainUtils.circle)
+                    .attr("fill", "red");
+            }
         }
 
         // circle drag and drop
-        // drag and drop compartments from the text ... ***
         svg.selectAll("circle")
             .call(d3.drag()
                 .on("start", dragstarted)
@@ -784,7 +997,13 @@
                 .on("end", dragended));
 
         function dragstarted(d) {
-            d3.select(this).raise().classed("active", true);
+            // If circle is red, change back to previous color
+            if (this.getAttribute("fill") == "red") {
+                d3.select(this)
+                    .attr("fill", $mainUtils.fillback);
+            }
+
+            //d3.select("path#" + $mainUtils.circle.getAttribute("id") + "").raise().classed("active", true);
         }
 
         function dragged(d) {
@@ -794,20 +1013,14 @@
         }
 
         function dragended(d) {
-            d3.select(this).classed("active", false);
+            d3.select(this)
+                .classed("active", false);
+
+            $mainUtils.circle = this;
+
+            d3.select("path#" + $mainUtils.circle.getAttribute("id") + "").raise().classed("active", true);
         }
 
-        // Define drag beavior
-        //var drag = d3.behavior.drag()
-        //    .on("drag", dragmove);
-        //
-        //function dragmove(d) {
-        //    var x = d3.event.x;
-        //    var y = d3.event.y;
-        //    d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
-        //}
-
-        // Half rectangle after paracellular pathway
         svg.append("svg:path")
             .attr("transform", "translate(0,500)")
             .attr("d", "M0,0 L300,0 V0,100 M0,-10 V0,100")
@@ -816,8 +1029,7 @@
             .attr("stroke-width", 20);
     }
 
-// Expose utility to the global object
+    // Expose utility to the global object
     global.$mainUtils = mainUtils;
-
 })
 (window);

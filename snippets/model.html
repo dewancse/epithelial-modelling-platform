@@ -1,8 +1,11 @@
 <div class="container-fluid">
-    <button id="confirmBtn" type="confirm" class="btn btn-default">
+    <button id="viewBtn" type="view" class="btn btn-default btn-sm">
+        <a href="#" onclick="$mainUtils.loadViewHtml();">View</a>
+    </button>
+    <button id="confirmBtn" type="confirm" class="btn btn-default btn-sm">
         <a href="#" onclick="$mainUtils.loadEpithelialHtml();">Confirm</a>
     </button>
-    <button id="deleteBtn" type="delete" class="btn btn-default">
+    <button id="deleteBtn" type="delete" class="btn btn-default btn-sm">
         <a href="#" onclick="$mainUtils.deleteRowModelHtml();">Delete</a>
     </button>
 </div>

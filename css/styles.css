@@ -6,7 +6,6 @@
 }
 
 #header {
-    text-align: left;
     margin: 20px;
     font-size: Medium;
 }
@@ -27,13 +26,11 @@
 
 .graph {
     position: relative;
-    margin-left: 300px;
-    /*width: 350px;*/
-    /*height: 350px;*/
-    width: 800px;
-    height: 800px;
+    margin-left: 400px;
     padding: 10px;
-    border: 1px solid;
+    /*width: 800px;*/
+    /*height: 1000px;*/
+    border: 1px solid #e3e3e3;
 }
 
 /*.graph {*/
