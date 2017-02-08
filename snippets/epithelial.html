@@ -1,2 +1,25 @@
-<div id="compartmentsList" class="compartmentsList"></div>
+<div class="container">
+    <div class="container">
+        <button id="viewBtn" type="view" class="btn btn-default btn-sm">
+            <a href="#" onclick="$mainUtils.loadViewHtml();">View</a>
+        </button>
+        <button id="modelBtn" type="model" class="btn btn-default btn-sm">
+            <a href="#" onclick="$mainUtils.loadModelHtml();">Back to Model</a>
+        </button>
+    </div>
+</div>
+<div id="compartmentsList" class="compartmentsList">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Ion channels</h3>
+        </div>
+        <div id="Ionchannels" class="panel-body"></div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Transporters</h3>
+        </div>
+        <div id="Transporters" class="panel-body"></div>
+    </div>
+</div>
 <div id="svgVisualize" class="graph"></div>

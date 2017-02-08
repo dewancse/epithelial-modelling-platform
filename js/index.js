@@ -280,8 +280,7 @@
         // Switch from current active button to discovery button
         var activeItem = "#" + findActiveItem();
         switchListItemToActive(activeItem, "#listDiscovery");
-    }
-    ;
+    };
 
     /*
      * TODO: Should make a common table platform for all functions
@@ -538,7 +537,7 @@
     };
 
     /*
-     * TODO: make a valid url
+     * TODO: make a valid url function
      * */
     // Test a valid URL
     var isURL = function (str) {
@@ -618,6 +617,10 @@
         }
     };
 
+    /*
+     * TODO: Fix updated sessionstorage when 'back to model' is clicked
+     * TODO: add one more column and show compartments
+     * */
     // Load the model
     mainUtils.loadModelHtml = function () {
 
@@ -802,26 +805,14 @@
 
     /*
      * TODO: Show them nicely in the epithelial model
+     * TODO: model_entity is undefined except weinstein, mackenzie and eskandari model.
+     * TODO: why? search with 'concentration' or 'flux of keyword'
      * */
     mainUtils.loadEpithelialHtml = function () {
-        var deleteElement = function (id) {
 
-            for (var i = 0; i < $('table tr').length; i++) {
-
-                if ($('table tr')[i].id == 0)
-                    continue;
-
-                if ($('table tr')[i].id == id) {
-                    listOfItemsForEpithelial.push($('table tr')[i]);
-                    table.deleteRow(i);
-
-                    return id;
-                }
-            }
-        };
-
-        var deleted = mainUtils.listOfModels.filter(deleteElement);
-        console.log(deleted);
+        for (var i = 0; i < $('table tr').length; i++) {
+            listOfItemsForEpithelial.push($('table tr')[i]);
+        }
 
         showLoading("#main-content");
 
@@ -835,22 +826,22 @@
             false);
     }
 
+    /*
+     * TODO: Find a way to show content in the epithelial html based on compartments
+     * */
     mainUtils.showEpithelial = function (epithelialHtmlContent) {
 
-        // List of compartments
-        var compartmentsList = document.getElementById("compartmentsList");
+        var Ionchannels = document.getElementById("Ionchannels");
+        var Transporters = document.getElementById("Transporters");
 
         for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
+            Ionchannels.innerHTML += listOfItemsForEpithelial[i].id;
+            Ionchannels.innerHTML += '<br>';
+        }
 
-            if (mainUtils.listOfModels.length == 0)
-                break;
-
-            for (var j = 0; j < mainUtils.listOfModels.length; j++) {
-                if (mainUtils.listOfModels[j] == listOfItemsForEpithelial[i].id) {
-                    compartmentsList.innerHTML += '<p id="drag1" draggable="true" ondragstart="$mainUtils.drag(event)">' +
-                        listOfItemsForEpithelial[i].getElementsByTagName('td')[3].innerText + '</p>';
-                }
-            }
+        for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
+            Transporters.innerHTML += listOfItemsForEpithelial[i].id;
+            Transporters.innerHTML += '<br>';
         }
 
         // SVG diagram
