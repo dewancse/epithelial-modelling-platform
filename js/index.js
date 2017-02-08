@@ -264,7 +264,7 @@
     // Load search html
     mainUtils.loadSearchHtml = function () {
 
-        if (!localStorage.getItem("searchListContent")) {
+        if (!sessionStorage.getItem("searchListContent")) {
             $ajaxUtils.sendGetRequest(
                 searchHtml,
                 function (searchHtmlContent) {
@@ -274,7 +274,7 @@
 
         }
         else {
-            insertHtml("#main-content", localStorage.getItem('searchListContent'));
+            insertHtml("#main-content", sessionStorage.getItem('searchListContent'));
         }
 
         // Switch from current active button to discovery button
@@ -356,11 +356,11 @@
 
         // Fill in the search attribute value
         var searchTxt = document.getElementById("searchTxt");
-        searchTxt.setAttribute('value', localStorage.getItem('searchTxtContent'));
+        searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
 
         // SET main content in the local storage
         var maincontent = document.getElementById('main-content');
-        localStorage.setItem('searchListContent', $(maincontent).html());
+        sessionStorage.setItem('searchListContent', $(maincontent).html());
     }
 
     // Utility function to extract a model name
@@ -401,7 +401,7 @@
             var searchTxt = document.getElementById("searchTxt").value;
 
             // set local storage
-            localStorage.setItem('searchTxtContent', searchTxt);
+            sessionStorage.setItem('searchTxtContent', searchTxt);
 
             var query = 'SELECT ?Model_entity ?Biological_meaning WHERE ' +
                 '{ GRAPH ?Workspace { ?Model_entity ?Location ?Biological_meaning . ' +
