@@ -264,7 +264,7 @@
     // Load search html
     mainUtils.loadSearchHtml = function () {
 
-        if (!sessionStorage.getItem("searchListContent")) {
+        if (!localStorage.getItem("searchListContent")) {
             $ajaxUtils.sendGetRequest(
                 searchHtml,
                 function (searchHtmlContent) {
@@ -274,7 +274,7 @@
 
         }
         else {
-            insertHtml("#main-content", sessionStorage.getItem('searchListContent'));
+            insertHtml("#main-content", localStorage.getItem('searchListContent'));
         }
 
         // Switch from current active button to discovery button
@@ -284,7 +284,6 @@
     ;
 
     /*
-     * TODO: Checkboxes do not show up in the Github link
      * TODO: Should make a common table platform for all functions
      * */
     // Show semantic annotation extracted from PMR
@@ -357,11 +356,11 @@
 
         // Fill in the search attribute value
         var searchTxt = document.getElementById("searchTxt");
-        searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
+        searchTxt.setAttribute('value', localStorage.getItem('searchTxtContent'));
 
         // SET main content in the local storage
         var maincontent = document.getElementById('main-content');
-        sessionStorage.setItem('searchListContent', $(maincontent).html());
+        localStorage.setItem('searchListContent', $(maincontent).html());
     }
 
     // Utility function to extract a model name
@@ -402,7 +401,7 @@
             var searchTxt = document.getElementById("searchTxt").value;
 
             // set local storage
-            sessionStorage.setItem('searchTxtContent', searchTxt);
+            localStorage.setItem('searchTxtContent', searchTxt);
 
             var query = 'SELECT ?Model_entity ?Biological_meaning WHERE ' +
                 '{ GRAPH ?Workspace { ?Model_entity ?Location ?Biological_meaning . ' +
