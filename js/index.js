@@ -1,5 +1,6 @@
 /**
  * Created by dsar941 on 9/8/2016.
+ * TODO: optimize code
  */
 
 (function (global) {
@@ -122,6 +123,9 @@
             true);
     };
 
+    /*
+     * TODO: make use of accordion
+     * */
     // Show workspaces in the annotation html
     mainUtils.showWorkspace = function (jsonObj, annotationHtmlContent) {
 
@@ -175,6 +179,7 @@
 
                 /*
                  * TODO: choose multiple checkboxes, mainUtils.workspaceName array!!
+                 * TODO: Choose multiple items from the search results
                  * */
                 mainUtils.workspaceName = workspaceName;
 
@@ -259,17 +264,29 @@
     // Load search html
     mainUtils.loadSearchHtml = function () {
 
-        if (!localStorage.getItem("searchListContent"))
-            insertHtml("#main-content", "<section class='container-fluid'>Empty Content!</section>");
+        if (!sessionStorage.getItem("searchListContent")) {
+            $ajaxUtils.sendGetRequest(
+                searchHtml,
+                function (searchHtmlContent) {
+                    insertHtml("#main-content", searchHtmlContent);
+                },
+                false);
+
+        }
         else {
-            insertHtml("#main-content", localStorage.getItem('searchListContent'));
+            insertHtml("#main-content", sessionStorage.getItem('searchListContent'));
         }
 
         // Switch from current active button to discovery button
         var activeItem = "#" + findActiveItem();
         switchListItemToActive(activeItem, "#listDiscovery");
-    };
+    }
+    ;
 
+    /*
+     * TODO: Checkboxes do not show up in the Github link
+     * TODO: Should make a common table platform for all functions
+     * */
     // Show semantic annotation extracted from PMR
     mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
@@ -277,7 +294,7 @@
 
         // Search result does not match
         if (head.length == 0) {
-            searchList.innerHTML = "<section class='container-fluid'><No Search Results!</section>";
+            searchList.innerHTML = "<section class='container-fluid'><label><br>No Search Results!</label></section>";
             return;
         }
 
@@ -340,11 +357,11 @@
 
         // Fill in the search attribute value
         var searchTxt = document.getElementById("searchTxt");
-        searchTxt.setAttribute('value', localStorage.getItem('searchTxtContent'));
+        searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
 
         // SET main content in the local storage
         var maincontent = document.getElementById('main-content');
-        localStorage.setItem('searchListContent', $(maincontent).html());
+        sessionStorage.setItem('searchListContent', $(maincontent).html());
     }
 
     // Utility function to extract a model name
@@ -372,14 +389,20 @@
         return head;
     }
 
+    /*
+     * TODO: make it more efficient, use less variables
+     * */
     // Plain text search for semantic annotation
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
 
+            /*
+             * TODO: regular expression
+             * */
             var searchTxt = document.getElementById("searchTxt").value;
 
             // set local storage
-            localStorage.setItem('searchTxtContent', searchTxt);
+            sessionStorage.setItem('searchTxtContent', searchTxt);
 
             var query = 'SELECT ?Model_entity ?Biological_meaning WHERE ' +
                 '{ GRAPH ?Workspace { ?Model_entity ?Location ?Biological_meaning . ' +
@@ -467,8 +490,9 @@
                     }
 
                     // No search results found, so sent empty arrays
-                    if (!jsonModel.results.bindings.length)
+                    if (!jsonModel.results.bindings.length) {
                         mainUtils.searchList(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
+                    }
                 },
                 true
             );
@@ -514,6 +538,9 @@
             true);
     };
 
+    /*
+     * TODO: make a valid url
+     * */
     // Test a valid URL
     var isURL = function (str) {
         // var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
@@ -774,6 +801,9 @@
         }
     };
 
+    /*
+     * TODO: Show them nicely in the epithelial model
+     * */
     mainUtils.loadEpithelialHtml = function () {
         var deleteElement = function (id) {
 
