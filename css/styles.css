@@ -13,24 +13,17 @@
     width: 250px;
 }
 
-#navigation, #workspacelist {
-    background-color: white;
-    margin: 10px;
-}
-
-.compartmentsList {
-    position: absolute;
-    padding: 10px;
-    max-width: 300px;
-}
+/*.compartmentsList {*/
+    /*position: absolute;*/
+    /*padding: 10px;*/
+    /*max-width: 300px;*/
+/*}*/
 
 .graph {
-    position: relative;
-    margin-left: 400px;
+    /*position: relative;*/
+    /*margin-left: 400px;*/
     padding: 10px;
-    /*width: 800px;*/
-    /*height: 1000px;*/
-    /*border: 1px solid #e3e3e3;*/
+    border: 1px solid #e3e3e3;
 }
 
 .active {

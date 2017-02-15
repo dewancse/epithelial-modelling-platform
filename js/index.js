@@ -1,6 +1,8 @@
 /**
  * Created by dsar941 on 9/8/2016.
- * TODO: optimize code
+ * TODO: OPTIMIZE CODE
+ * TODO: OPTIMIZE CODE
+ * TODO: OPTIMIZE CODE
  */
 
 (function (global) {
@@ -19,9 +21,6 @@
 
     // Track models for delete operation
     mainUtils.listOfModels = [];
-
-    // List of workspace names
-    // mainUtils.workspaceName = [];
 
     // Pre-process models before list of models
     // selection for delete operation
@@ -125,8 +124,8 @@
 
     /*
      * TODO: make use of accordion
+     * Show workspaces in the annotation html
      * */
-    // Show workspaces in the annotation html
     mainUtils.showWorkspace = function (jsonObj, annotationHtmlContent) {
 
         var label = [];
@@ -147,7 +146,7 @@
             label[i] = document.createElement("label");
             label[i].id = idWithStr;
             label[i].innerHTML = '<input id="' + label[i].id + '" type="checkbox" data-action="annotation" value="" ' +
-                'class="checkbox-inline"> ';
+                'class="checkbox"> ';
 
             label[i].innerHTML += '<a href=' + workspaceUrl + ' + target=_blank>' + workspaceName + " / " + idWithStr +
                 '</a></label>';
@@ -284,8 +283,8 @@
 
     /*
      * TODO: Should make a common table platform for all functions
+     * Show semantic annotation extracted from PMR
      * */
-    // Show semantic annotation extracted from PMR
     mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
         var searchList = document.getElementById("searchList");
@@ -389,8 +388,8 @@
 
     /*
      * TODO: make it more efficient, use less variables
+     * Plain text search for semantic annotation
      * */
-    // Plain text search for semantic annotation
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
 
@@ -538,8 +537,8 @@
 
     /*
      * TODO: make a valid url function
+     * Test a valid URL
      * */
-    // Test a valid URL
     var isURL = function (str) {
         // var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
         //     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
@@ -619,9 +618,9 @@
 
     /*
      * TODO: Fix updated sessionstorage when 'back to model' is clicked
-     * TODO: add one more column and show compartments
+     * TODO: add columns for compartments and located in with names
+     * Load the model
      * */
-    // Load the model
     mainUtils.loadModelHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -698,7 +697,9 @@
         }
 
         // 1D to 2D array
-        while (mainUtils.model.length) mainUtils.model2DArr.push(mainUtils.model.splice(0, 5));
+        while (mainUtils.model.length) {
+            mainUtils.model2DArr.push(mainUtils.model.splice(0, 5));
+        }
 
         var td = [];
         var tbody = document.createElement("tbody");
@@ -729,9 +730,9 @@
     mainUtils.deleteRowModelHtml = function () {
         /*
          * TODO: Uncheck and then check does not work
+         * IF header checkbox exist, but length of pre processed
+         * list of models is greater than 1, delete header checkbox
          */
-        // IF header checkbox exist, but length of pre processed
-        // list of models is greater than 1, delete header checkbox
         if (mainUtils.templistOfModel.length > 1) {
             for (var i = 0; i < mainUtils.templistOfModel.length; i++) {
                 if ($('table tr th label')[0].firstChild.id == mainUtils.templistOfModel[i].id) {
@@ -804,7 +805,6 @@
     };
 
     /*
-     * TODO: Show them nicely in the epithelial model
      * TODO: model_entity is undefined except weinstein, mackenzie and eskandari model.
      * TODO: why? search with 'concentration' or 'flux of keyword'
      * */
@@ -826,230 +826,114 @@
             false);
     }
 
-    /*
-     * TODO: Find a way to show content in the epithelial html based on compartments
-     * */
     mainUtils.showEpithelial = function (epithelialHtmlContent) {
 
-        var Ionchannels = document.getElementById("Ionchannels");
-        var Transporters = document.getElementById("Transporters");
-
-        for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
-            Ionchannels.innerHTML += listOfItemsForEpithelial[i].id;
-            Ionchannels.innerHTML += '<br>';
-        }
-
-        for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
-            Transporters.innerHTML += listOfItemsForEpithelial[i].id;
-            Transporters.innerHTML += '<br>';
-        }
-
-        // SVG diagram
         var g = document.getElementById("#svgVisualize"),
-            width = 800,
-            height = 800;
-
-        var mainUtils = {};
+            w = 700,
+            h = 700;
 
         var svg = d3.select("#svgVisualize").append("svg")
-            .attr("width", width)
-            .attr("height", height)
+            .attr("width", w)
+            .attr("height", h)
             .append("g");
 
-        // line
-        var data = [
-            {x: 0, y: 0},
-            {x: 20, y: 0}
-        ];
+        // Table
+        var table = d3.select("body").append("table");
+        var thead = table.append("thead");
+        var tbody = table.append("tbody");
 
-        // line for paracellular pathway
-        var dataParacellular = [
-            {x: 10, y: 415},
-            {x: 10, y: 485}
-        ];
+        // append the header row
+        thead.append('tr')
+            .append('th')
+            .text("Molecules and Transporters");
 
-        // function to get line data
-        var lineFunc = d3.line()
-            .x(function (d) {
-                return d.x;
+        // create a row for each object in the data
+        var rows = tbody.append('tr')
+            .data(listOfItemsForEpithelial)
+            .enter()
+            .append('tr')
+            .text(function (d) {
+                return d.value;
             })
-            .y(function (d) {
-                return d.y;
-            });
 
-        // line in paracellular
-        svg.append("svg:path")
-            .attr("transform", "translate(30,0)")
-            .attr("d", lineFunc(dataParacellular))
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .style("stroke-dasharray", "5, 5")
-            .attr("id", "paracellular");
+        // create a cell in each row for each column
+        // var cells = rows.append('td')
+        //     .data(listOfItemsForEpithelial)
+        //     .enter()
+        //     .append('td')
+        //     .text(function (d) { return d.value; });
 
-        // rectangle
-        var rectangle = svg.attr("transform", "translate(150,50)")
-            .append("rect")
-            .attr("width", 300)
-            .attr("height", 400)
-            .attr("rx", 10)
-            .attr("ry", 20)
-            .attr("fill", "white")
-            .attr("stroke", "#7bb3f7")
-            .attr("stroke-width", 20);
+        // var Ionchannels = document.getElementById("Ionchannels");
+        // var Transporters = document.getElementById("Transporters");
+        //
+        // var label;
+        //
+        // // Ion channels
+        // for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
+        //     label = document.createElement("ul");
+        //     label.id = listOfItemsForEpithelial[i].id;
+        //     label.innerHTML = '<p id="' + label.id + '">' + label.id + '<p>';
+        //
+        //     $(label).draggable();
+        //
+        //     Ionchannels.appendChild(label);
+        // }
+        //
+        // // Transporters
+        // for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
+        //     label = document.createElement("ul");
+        //     label.id = listOfItemsForEpithelial[i].id;
+        //     label.innerHTML = '<p id="' + label.id + '">' + label.id + '<p>';
+        //
+        //     $(label).draggable();
+        //
+        //     Transporters.appendChild(label);
+        // }
 
-        var luminalCompartments = [];
-        var serosalCompartments = [];
-
-        var compartmentFunc = function (compartment) {
-            if (compartment == "luminal")
-                luminalCompartments.push(compartment);
-            else if (compartment == "serosal")
-                serosalCompartments.push(compartment);
-        };
-
-        var circles = [];
-        var circlePos = 0;
-        var radius = 15;
-
-        for (var i = 0; i < 3; i++) {
-            if (i % 2 == 0) {
-                circles[i] = svg.append("circle")
-                    .attr("transform", "translate(-100," + circlePos + ")")
-                    .attr("cx", 10)
-                    .attr("cy", 10)
-                    .attr("r", radius)
-                    .attr("fill", "lightgreen")
-                    .attr("id", "luminal");
-            }
-            else {
-                circles[i] = svg.append("circle")
-                    .attr("transform", "translate(-100," + circlePos + ")")
-                    .attr("cx", 10)
-                    .attr("cy", 10)
-                    .attr("r", radius)
-                    .attr("fill", "purple")
-                    .attr("id", "serosal");
-            }
-
-            compartmentFunc(circles[i]._groups[0][0].getAttribute("id"));
-            circlePos = circlePos + 50;
-        }
-
-        console.log(rectangle._groups[0][0]);
-        console.log("height: ", rectangle._groups[0][0].getAttribute("height"));
-        console.log("width: ", rectangle._groups[0][0].getAttribute("width"));
-
-        // variables used to plot lines in compartments
-        var rectHeight = rectangle._groups[0][0].getAttribute("height");
-        var rectWidth = rectangle._groups[0][0].getAttribute("width");
-        var lengthOfLuminal = luminalCompartments.length;
-        var lengthOfSerosal = serosalCompartments.length;
-        var luminal = [], serosal = [];
-
-        // components in luminal compartment
-        for (var i = 50, j = 0; i < rectHeight; i = i + 50, j++) {
-
-            lengthOfLuminal--;
-            if (lengthOfLuminal < 0)
-                break;
-
-            luminal[j] = svg.append("svg:path")
-                .attr("transform", "translate(-20, " + i + ")")
-                .attr("d", lineFunc(data))
-                .attr("stroke", "black")
-                .attr("stroke-width", 5)
-                .attr("id", "luminal");
-        }
-
-        console.log(luminal[0]._groups[0][0]);
-        console.log(luminal[1]._groups[0][0]);
-
-        // components in serosal compartment
-        for (var i = 50, j = 0; i < rectHeight; i = i + 50, j++) {
-
-            lengthOfSerosal--;
-            if (lengthOfSerosal < 0)
-                break;
-
-            serosal[j] = svg.append("svg:path")
-                .attr("transform", "translate(" + rectWidth + ", " + i + ")")
-                .attr("d", lineFunc(data))
-                .attr("stroke", "black")
-                .attr("stroke-width", 5)
-                .attr("id", "serosal");
-        }
-
-        console.log(serosal[0]._groups[0][0]);
-
-        // line drag and drop
-        svg.selectAll("path")
-            .on("mouseover", handleMouseOver);
-
-        function handleMouseOver(d) {
-            //console.log("handleMouseOver: ", d3.select(this)._groups[0][0].id);
-            console.log("handleMouseOver: ", this.getAttribute("id"));
-
-            $mainUtils.line = this;
-
-            d3.select("path#" + this.getAttribute("id") + "").raise().classed("active", true);
-
-            // If circle is red, change back to previous color
-            if ($mainUtils.circle.getAttribute("fill") == "red") {
-                d3.select($mainUtils.circle)
-                    .attr("fill", $mainUtils.fillback);
-            }
-
-            //If circle is placed in wrong compartment
-            //change its color to red
-            if ($mainUtils.circle.getAttribute("id") != $mainUtils.line.getAttribute("id")) {
-                $mainUtils.fillback = $mainUtils.circle.getAttribute("fill");
-
-                d3.select($mainUtils.circle)
-                    .attr("fill", "red");
-            }
-        }
-
-        // circle drag and drop
-        svg.selectAll("circle")
-            .call(d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended));
-
-        function dragstarted(d) {
-            // If circle is red, change back to previous color
-            if (this.getAttribute("fill") == "red") {
-                d3.select(this)
-                    .attr("fill", $mainUtils.fillback);
-            }
-
-            //d3.select("path#" + $mainUtils.circle.getAttribute("id") + "").raise().classed("active", true);
-        }
-
-        function dragged(d) {
-            d3.select(this)
-                .attr("cx", d = d3.mouse(this)[0])
-                .attr("cy", d = d3.mouse(this)[1]);
-        }
-
-        function dragended(d) {
-            d3.select(this)
-                .classed("active", false);
-
-            $mainUtils.circle = this;
-
-            d3.select("path#" + $mainUtils.circle.getAttribute("id") + "").raise().classed("active", true);
-        }
-
-        svg.append("svg:path")
-            .attr("transform", "translate(0,500)")
-            .attr("d", "M0,0 L300,0 V0,100 M0,-10 V0,100")
-            .attr("fill", "none")
-            .attr("stroke", "#7bb3f7")
-            .attr("stroke-width", 20);
+        // SVG Diagram
+        // var g = document.getElementById("#svgVisualize"),
+        //     w = 700,
+        //     h = 700,
+        //     width = 300,
+        //     height = 400;
+        //
+        // var svg = d3.select("#svgVisualize").append("svg")
+        //     .attr("width", w)
+        //     .attr("height", h)
+        //     .append("g")
+        //     .data([{x: 10, y: 10}]);
+        //
+        // // rectangle
+        // var rectangle = svg.append("rect")
+        //     .attr("id", "rectangle")
+        //     .attr("x", function (d) {
+        //         return d.x;
+        //     })
+        //     .attr("y", function (d) {
+        //         return d.y;
+        //     })
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //     .attr("rx", 10)
+        //     .attr("ry", 20)
+        //     .attr("fill", "white")
+        //     .attr("stroke", "#7bb3f7")
+        //     .attr("stroke-width", 20)
+        //     .attr("cursor", "move");
+        //
+        // svg.selectAll("rect")
+        //     .call(d3.drag()
+        //         .on("drag", dragmove));
+        //
+        // function dragmove(d) {
+        //     rectangle
+        //         .attr("x", d.x = d3.event.x);
+        //
+        //     rectangle
+        //         .attr("y", d.y = d3.event.y);
+        // }
     }
 
     // Expose utility to the global object
     global.$mainUtils = mainUtils;
-})
-(window);
+})(window);
