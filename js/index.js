@@ -828,110 +828,449 @@
 
     mainUtils.showEpithelial = function (epithelialHtmlContent) {
 
-        var g = document.getElementById("#svgVisualize"),
-            w = 700,
-            h = 700;
-
-        var svg = d3.select("#svgVisualize").append("svg")
-            .attr("width", w)
-            .attr("height", h)
-            .append("g");
-
-        // Table
-        var table = d3.select("body").append("table");
-        var thead = table.append("thead");
-        var tbody = table.append("tbody");
-
-        // append the header row
-        thead.append('tr')
-            .append('th')
-            .text("Molecules and Transporters");
-
-        // create a row for each object in the data
-        var rows = tbody.append('tr')
-            .data(listOfItemsForEpithelial)
-            .enter()
-            .append('tr')
-            .text(function (d) {
-                return d.value;
-            })
-
-        // create a cell in each row for each column
-        // var cells = rows.append('td')
-        //     .data(listOfItemsForEpithelial)
-        //     .enter()
-        //     .append('td')
-        //     .text(function (d) { return d.value; });
-
-        // var Ionchannels = document.getElementById("Ionchannels");
-        // var Transporters = document.getElementById("Transporters");
-        //
-        // var label;
-        //
-        // // Ion channels
-        // for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
-        //     label = document.createElement("ul");
-        //     label.id = listOfItemsForEpithelial[i].id;
-        //     label.innerHTML = '<p id="' + label.id + '">' + label.id + '<p>';
-        //
-        //     $(label).draggable();
-        //
-        //     Ionchannels.appendChild(label);
-        // }
-        //
-        // // Transporters
-        // for (var i = 0; i < listOfItemsForEpithelial.length; i++) {
-        //     label = document.createElement("ul");
-        //     label.id = listOfItemsForEpithelial[i].id;
-        //     label.innerHTML = '<p id="' + label.id + '">' + label.id + '<p>';
-        //
-        //     $(label).draggable();
-        //
-        //     Transporters.appendChild(label);
-        // }
-
-        // SVG Diagram
         // var g = document.getElementById("#svgVisualize"),
         //     w = 700,
-        //     h = 700,
-        //     width = 300,
-        //     height = 400;
+        //     h = 700;
         //
         // var svg = d3.select("#svgVisualize").append("svg")
         //     .attr("width", w)
         //     .attr("height", h)
-        //     .append("g")
-        //     .data([{x: 10, y: 10}]);
+        //     .append("g");
         //
-        // // rectangle
-        // var rectangle = svg.append("rect")
-        //     .attr("id", "rectangle")
-        //     .attr("x", function (d) {
-        //         return d.x;
+        // // Table
+        // var table = d3.select("body").append("table");
+        // var thead = table.append("thead");
+        // var tbody = table.append("tbody");
+        //
+        // // append the header row
+        // thead.append('tr')
+        //     .append('th')
+        //     .text("Molecules and Transporters");
+        //
+        // // create a row for each object in the data
+        // var rows = tbody.append('tr')
+        //     .data(listOfItemsForEpithelial)
+        //     .enter()
+        //     .append('tr')
+        //     .text(function (d) {
+        //         return d.value;
         //     })
-        //     .attr("y", function (d) {
-        //         return d.y;
-        //     })
-        //     .attr("width", width)
-        //     .attr("height", height)
-        //     .attr("rx", 10)
-        //     .attr("ry", 20)
-        //     .attr("fill", "white")
-        //     .attr("stroke", "#7bb3f7")
-        //     .attr("stroke-width", 20)
-        //     .attr("cursor", "move");
-        //
-        // svg.selectAll("rect")
-        //     .call(d3.drag()
-        //         .on("drag", dragmove));
-        //
-        // function dragmove(d) {
-        //     rectangle
-        //         .attr("x", d.x = d3.event.x);
-        //
-        //     rectangle
-        //         .attr("y", d.y = d3.event.y);
-        // }
+
+        var g = document.getElementById("#svgVisualize"),
+            w = 700,
+            h = 700,
+            width = 300,
+            height = 400;
+
+        var svg = d3.select("#svgVisualize").append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+        // TODO: extend this with lines and circles
+        var newgdefs = svg.append("g");
+        newgdefs.append("defs")
+            .append("pattern")
+            .attr("id", "basicPattern")
+            .attr("patternUnits", "userSpaceOnUse")
+            .attr("width", 4)
+            .attr("height", 4)
+            .append("circle")
+            .attr("cx", "0")
+            .attr("cy", "0")
+            .attr("r", "1.5")
+            // .append("line")
+            // .attr("x1", "0")
+            // .attr("y1", "0")
+            // .attr("x2", "4")
+            // .attr("y2", "0")
+            .attr("stroke", "#6495ED")
+            .attr("stroke-width", 1.5);
+
+        /**
+         * Rectangle
+         */
+        var newg = svg.append("g").data([{x: 100, y: 10}]);
+
+        var dragrect = newg.append("rect")
+            .attr("id", "rectangle")
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .attr("width", width)
+            .attr("height", height)
+            .attr("rx", 10)
+            .attr("ry", 20)
+            .attr("fill", "white")
+            .attr("stroke", "url(#basicPattern)")
+            .attr("stroke-width", 20)
+            .attr("cursor", "move")
+            .call(d3.drag()
+                .on("drag", dragmove));
+
+        var dragleft = newg.append("rect")
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .attr("height", height)
+            .attr("id", "dragleft")
+            .attr("cursor", "ew-resize")
+            .call(d3.drag()
+                .on("drag", ldragresize)
+                .on("end", ended));
+
+        function ended() {
+            console.log("ended: ", d3.select(this)._groups[0][0].id);
+            d3.select(this).classed("dragging", false);
+        }
+
+        var dragright = newg.append("rect")
+            .attr("x", function (d) {
+                return d.x + width;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .attr("id", "dragright")
+            .attr("height", height)
+            .attr("cursor", "ew-resize")
+            .call(d3.drag()
+                .on("drag", rdragresize)
+                .on("end", ended));
+
+        var dragtop = newg.append("rect")
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .attr("id", "dragtop")
+            .attr("width", width)
+            .attr("cursor", "ns-resize")
+            .call(d3.drag()
+                .on("drag", tdragresize)
+                .on("end", ended));
+
+        var dragbottom = newg.append("rect")
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y + height;
+            })
+            .attr("id", "dragbottom")
+            .attr("width", width)
+            .attr("cursor", "ns-resize")
+            .call(d3.drag()
+                .on("drag", bdragresize)
+                .on("end", ended));
+
+        function dragmove(d) {
+
+            console.log("id: ", d3.select(this)._groups[0][0].id);
+
+            // drag move
+            dragrect
+                .attr("x", d.x = Math.max(0, Math.min(w - width, d3.event.x)));
+            dragrect
+                .attr("y", d.y = Math.max(0, Math.min(h - height, d3.event.y)));
+
+            // drag left
+            dragleft
+                .attr("x", function (d) {
+                    return d.x;
+                });
+            dragleft
+                .attr("y", function (d) {
+                    return d.y;
+                });
+
+            // drag right
+            dragright
+                .attr("x", function (d) {
+                    return d.x + width;
+                });
+            dragright
+                .attr("y", function (d) {
+                    return d.y;
+                });
+
+            // drag top
+            dragtop
+                .attr("x", function (d) {
+                    return d.x;
+                });
+            dragtop
+                .attr("y", function (d) {
+                    return d.y;
+                });
+
+            // drag bottom
+            dragbottom
+                .attr("x", function (d) {
+                    return d.x;
+                });
+            dragbottom
+                .attr("y", function (d) {
+                    return d.y + height;
+                });
+        }
+
+        function ldragresize(d) {
+
+            console.log("id: ", d3.select(this)._groups[0][0].id);
+
+            var oldx = d.x;
+            //Max x on the right is x + width
+            //Max x on the left is 0
+            d.x = Math.max(0, Math.min(d.x + width, d3.event.x));
+            width = width + (oldx - d.x);
+            dragleft
+                .attr("x", function (d) {
+                    return d.x;
+                });
+
+            dragrect
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("width", width);
+
+            dragtop
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("width", width);
+            dragbottom
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("width", width)
+        }
+
+        function rdragresize(d) {
+
+            console.log("id: ", d3.select(this)._groups[0][0].id);
+
+            //Max x on the left is x - width
+            //Max x on the right is width of screen
+            var dragx = Math.max(d.x, Math.min(w, d.x + width + d3.event.dx));
+
+            //recalculate width
+            width = dragx - d.x;
+
+            //move the right drag handle
+            dragright
+                .attr("x", function (d) {
+                    return dragx
+                });
+
+            //resize the drag rectangle
+            //as we are only resizing from the right, the x coordinate does not need to change
+            dragrect
+                .attr("width", width);
+            dragtop
+                .attr("width", width)
+            dragbottom
+                .attr("width", width)
+        }
+
+        function tdragresize(d) {
+
+            console.log("id: ", d3.select(this)._groups[0][0].id);
+
+            var oldy = d.y;
+            //Max x on the right is x + width
+            //Max x on the left is 0
+            d.y = Math.max(0, Math.min(d.y + height, d3.event.y));
+            height = height + (oldy - d.y);
+            dragtop
+                .attr("y", function (d) {
+                    return d.y;
+                });
+
+            dragrect
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("height", height);
+
+            dragleft
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("height", height);
+            dragright
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("height", height);
+        }
+
+        function bdragresize(d) {
+
+            console.log("id: ", d3.select(this)._groups[0][0].id);
+
+            //Max x on the left is x - width
+            //Max x on the right is width of screen
+            var dragy = Math.max(d.y, Math.min(h, d.y + height + d3.event.dy));
+
+            //recalculate width
+            height = dragy - d.y;
+
+            //move the right drag handle
+            dragbottom
+                .attr("y", function (d) {
+                    return dragy
+                });
+
+            //resize the drag rectangle
+            //as we are only resizing from the right, the x coordinate does not need to change
+            dragrect
+                .attr("height", height);
+            dragleft
+                .attr("height", height);
+            dragright
+                .attr("height", height);
+        }
+
+        /**
+         * Circle
+         */
+        var circleg = svg.append("g").data([{x: 20, y: 20}]);
+
+        circleg.append("circle")
+            .attr("transform", "translate(100, 450)")
+            .attr("id", "circle")
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("r", 20)
+            .attr("fill", "lightgreen")
+            .attr("stroke-width", 20)
+            .attr("cursor", "move")
+            .call(d3.drag().on("drag", dragcircle));
+
+        function dragcircle(d) {
+            d3.select(this)
+                .attr("cx", d.x = d3.event.x)
+                .attr("cy", d.y = d3.event.y);
+        }
+
+        var circleg2 = svg.append("g").data([{x: 20, y: 20}]);
+
+        circleg2.append("circle")
+            .attr("transform", "translate(100, 500)")
+            .attr("id", "circle")
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("r", 20)
+            .attr("fill", "orange")
+            .attr("stroke-width", 20)
+            .attr("cursor", "move")
+            .call(d3.drag().on("drag", dragcircle));
+
+        /**
+         * Text
+         * Map with "Native HTML5 Drag and Drop"
+         * https://www.html5rocks.com/en/tutorials/dnd/basics/#toc-dragging-events
+         */
+        var svgtext = svg.append("g").data([{x: 500, y: 30}]);
+
+        var compartment = ["Luminal", "Serosal", "Paracellular"];
+
+        compartment.forEach(function (element, index) {
+            if (index > 0)
+                svgtext.data([{x: 500, y: 30 * (index + 1)}]);
+
+            svgtext.append("text")
+                .attr("id", element)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-family", "Times New Roman")
+                .attr("font-size", "30px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(element);
+        });
+
+        svgtext.selectAll("text")
+            .call(d3.drag()
+                .on("drag", dragtext)
+                .on("end", dragendtext));
+
+        function dragtext(d) {
+            d3.select(this)
+                .attr("pointer-events", "none") // hide text and make visible rectangles
+                .attr("x", d.x = d3.event.x)
+                .attr("y", d.y = d3.event.y);
+        }
+
+        function dragendtext(d) {
+            d3.select(this)
+                .classed("dragging", false)
+                .attr("pointer-events", "all");
+            console.log("dragendtext: ", d3.select(this)._groups[0][0].id);
+        }
+
+        /**
+         * Mouse over and out event
+         */
+        d3.select("rect").on("mouseover", function () {
+            d3.select(this).style("fill", "green");
+        });
+
+        d3.select("rect").on("mouseout", function () {
+            d3.select(this).style("fill", "white");
+        });
+
+        /**
+         * Line
+         */
+        var svgline = svg.append("g").data([{x: 500, y: 300}]);
+
+        var data = [
+            {x: 0, y: 0},
+            {x: 20, y: 0}
+        ];
+
+        var lineFunc = d3.line()
+            .x(function (d) {
+                return d.x;
+            })
+            .y(function (d) {
+                return d.y;
+            });
+
+        svgline.append("svg:path")
+            .attr("transform", "translate(500, 200)")
+            .attr("id", "Luminal")
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .attr("d", lineFunc(data))
+            .attr("stroke", "black")
+            .attr("stroke-width", 5);
     }
 
     // Expose utility to the global object

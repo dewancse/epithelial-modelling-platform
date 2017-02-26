@@ -5,19 +5,13 @@
 }
 
 #header {
-    margin: 20px;
-    font-size: Medium;
+    /*margin: 10px;*/
+    font-size: medium;
 }
 
 .navbtn {
     width: 250px;
 }
-
-/*.compartmentsList {*/
-    /*position: absolute;*/
-    /*padding: 10px;*/
-    /*max-width: 300px;*/
-/*}*/
 
 .graph {
     /*position: relative;*/
