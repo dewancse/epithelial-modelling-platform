@@ -122,10 +122,8 @@
             true);
     };
 
-    /*
-     * TODO: make use of accordion
-     * Show workspaces in the annotation html
-     * */
+    // TODO: make use of accordion
+    // Show workspaces in the annotation html
     mainUtils.showWorkspace = function (jsonObj, annotationHtmlContent) {
 
         var label = [];
@@ -176,10 +174,8 @@
                 var index = idWithStr.search(".cellml");
                 var workspaceName = idWithStr.slice(0, index);
 
-                /*
-                 * TODO: choose multiple checkboxes, mainUtils.workspaceName array!!
-                 * TODO: Choose multiple items from the search results
-                 * */
+                // TODO: choose multiple checkboxes, mainUtils.workspaceName array!!
+                // TODO: Choose multiple items from the search results
                 mainUtils.workspaceName = workspaceName;
 
                 var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + workspaceName + "/" + "rawfile" +
@@ -281,10 +277,8 @@
         switchListItemToActive(activeItem, "#listDiscovery");
     };
 
-    /*
-     * TODO: Should make a common table platform for all functions
-     * Show semantic annotation extracted from PMR
-     * */
+    // TODO: make a common table platform for all functions
+    // Show semantic annotation extracted from PMR
     mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
         var searchList = document.getElementById("searchList");
@@ -305,7 +299,6 @@
         var thead = document.createElement("thead");
         var tr = document.createElement("tr");
         for (var i = 0; i < head.length; i++) {
-
             // Empty header for checkbox column
             if (i == 0) {
                 var th = document.createElement("th");
@@ -386,24 +379,28 @@
         return head;
     }
 
-    /*
-     * TODO: make it more efficient, use less variables
-     * Plain text search for semantic annotation
-     * */
+    // TODO: make it more efficient, use less variables
+    // Plain text search for semantic annotation
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
 
-            /*
-             * TODO: regular expression
-             * */
             var searchTxt = document.getElementById("searchTxt").value;
+
+            // TODO: avoid using regex inside SPARQL!!
+            // TODO: could use PMR services (PMR text search, RICORDO, etc)
+            var re = /^.*$/g;
+
+            var searchstr = searchTxt.match(re).toString()
+                .replace(/\s+/g, " ", "i")
+                .replace(/\s*\/\s*/g, '/', "i")
+                .replace(/\s*\-\s*/g, '-', "i");
 
             // set local storage
             sessionStorage.setItem('searchTxtContent', searchTxt);
 
             var query = 'SELECT ?Model_entity ?Biological_meaning WHERE ' +
                 '{ GRAPH ?Workspace { ?Model_entity ?Location ?Biological_meaning . ' +
-                'FILTER regex(str(?Biological_meaning), "' + searchTxt + '", "i") . ' +
+                'FILTER regex(str(?Biological_meaning), "' + searchstr + '", "i") . ' +
                 '}}';
 
             showLoading("#searchList");
@@ -419,6 +416,7 @@
                 endpoint,
                 query,
                 function (jsonModel) {
+                    console.log(jsonModel);
                     for (var id = 0; id < jsonModel.results.bindings.length; id++) {
                         modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
                         biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
@@ -535,25 +533,6 @@
             true);
     };
 
-    /*
-     * TODO: make a valid url function
-     * Test a valid URL
-     * */
-    var isURL = function (str) {
-        // var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-        //     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
-        //     '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        //     '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        //     '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        //     '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
-        // return pattern.test(str);
-
-        if (str.indexOf("http") === -1)
-            return false;
-
-        return true;
-    };
-
     // Create anchor tag
     var createAnchor = function (value) {
         var aText = document.createElement('a');
@@ -595,8 +574,9 @@
             // IF more than one result in the JSON object
             for (var j = 0; j < jsonObj.results.bindings.length; j++) {
                 var tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
-                // Checking a valid URL
-                if (isURL(tempValue)) {
+
+                // TODO: regular expression to validate a valid URL
+                if (tempValue.indexOf("http") != -1) {
                     var aText = createAnchor(tempValue);
                     tempArrayOfURL.push(tempValue);
                     if (searchFn(tempValue, tempArrayOfURL) <= 1)
@@ -616,11 +596,9 @@
         }
     };
 
-    /*
-     * TODO: Fix updated sessionstorage when 'back to model' is clicked
-     * TODO: add columns for compartments and located in with names
-     * Load the model
-     * */
+    // TODO: Fix updated sessionstorage when 'back to model' is clicked
+    // TODO: add columns for compartments and located in with names
+    // Load the model
     mainUtils.loadModelHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -728,11 +706,9 @@
     };
 
     mainUtils.deleteRowModelHtml = function () {
-        /*
-         * TODO: Uncheck and then check does not work
-         * IF header checkbox exist, but length of pre processed
-         * list of models is greater than 1, delete header checkbox
-         */
+        // TODO: Uncheck and then check does not work
+        // IF header checkbox exist, but length of pre processed
+        // list of models is greater than 1, delete header checkbox
         if (mainUtils.templistOfModel.length > 1) {
             for (var i = 0; i < mainUtils.templistOfModel.length; i++) {
                 if ($('table tr th label')[0].firstChild.id == mainUtils.templistOfModel[i].id) {
@@ -804,10 +780,6 @@
         }
     };
 
-    /*
-     * TODO: model_entity is undefined except weinstein, mackenzie and eskandari model.
-     * TODO: why? search with 'concentration' or 'flux of keyword'
-     * */
     mainUtils.loadEpithelialHtml = function () {
 
         for (var i = 0; i < $('table tr').length; i++) {
