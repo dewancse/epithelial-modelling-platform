@@ -1177,45 +1177,46 @@
         // });
 
         // Line
-        // TODO: Fix this!!!
-        var svgline = svg.append("g");
+        var svgline = svg.append("g").data([{x: 500, y: 200}]);
+        var lineLen = 40;
 
-        var data = [
-            {x: 0, y: 0},
-            {x: 20, y: 0}
-        ];
-
-        var lineFunc = d3.line()
-            .x(function (d) {
+        var line = svgline.append("line")
+            .attr("id", "lineLuminal")
+            .attr("x1", function (d) {
                 return d.x;
             })
-            .y(function (d) {
+            .attr("y1", function (d) {
                 return d.y;
-            });
-
-        svgline.append("svg:path")
-            .attr("transform", "translate(500, 200)")
-            .attr("id", "lineLuminal")
-            .attr("x1", 500)
-            .attr("y1", 300)
-            .attr("x2", 500)
-            .attr("y2", 320)
-            .attr("d", lineFunc(data))
+            })
+            .attr("x2", function (d) {
+                return d.x + lineLen;
+            })
+            .attr("y2", function (d) {
+                return d.y;
+            })
             .attr("stroke", "black")
             .attr("stroke-width", 5)
             .attr("cursor", "move");
 
-        svgline.select("path#lineLuminal")
+        svgline.select("line")
             .call(d3.drag()
                 .on("drag", dragline)
                 .on("end", dragendline));
 
         function dragline(d) {
-            console.log(d3.event);
+            // d3.select(this).attr("x2", d3.event.x).attr("y2", d3.event.y);
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
 
-            d3.select(this)
-                .attr("x2", d3.event.x)
-                .attr("y2", d3.event.y);
+            var x1New = parseFloat(d3.select(this).attr("x1")) + dx;
+            var y1New = parseFloat(d3.select(this).attr("y1")) + dy;
+            var x2New = parseFloat(d3.select(this).attr("x2")) + dx;
+            var y2New = parseFloat(d3.select(this).attr("y2")) + dy;
+
+            line.attr("x1", x1New)
+                .attr("y1", y1New)
+                .attr("x2", x2New)
+                .attr("y2", y2New);
         }
 
         function dragendline(d) {
@@ -1225,89 +1226,53 @@
         }
 
         // Paracellular Rectangle
-        // TODO: Fix this, same issue in line
-        var svgpolygon = svg.append("g").data([{x: 500, y: 300}]);
-
-        var dragpolygon = svgpolygon.append("polygon")
+        svg.append("g").append("polygon")
             .attr("transform", "translate(500,300)")
             .attr("id", "channel")
-            .attr("x", function (d) {
-                return d.x;
-            })
-            .attr("y", function (d) {
-                return d.y;
-            })
             .attr("points", "40,0 80,20 80,60 40,80 0,60 0,20")
             .attr("fill", "yellow")
             .attr("stroke", "black")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
-            .attr("cursor", "move");
-
-        svgpolygon.select("path#channel")
+            .attr("cursor", "move")
             .call(d3.drag()
-                .on("drag", dragmove3));
+                .on("drag", dragploy));
 
-        function dragmove3(d) {
-            console.log("polygon: ", d3.select(this));
-            dragpolygon
-                .attr("x", d3.event.x)
-                .attr("y", d3.event.y);
+        function dragploy(d) {
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            var xNew = [], yNew = [], points = "";
+            var pointsLen = d3.select(this)._groups[0][0].points.length;
+
+            for (var i = 0; i < pointsLen; i++) {
+                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
+                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
+
+                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
+
+                // remove last white space
+                if (i != pointsLen - 1)
+                    points = points.concat(" ");
+            }
+
+            d3.select(this).attr("points", points);
+            console.log("polygon: ", d3.select(this).attr("points"));
         }
 
-        // var width = 300,
-        //     height = 100;
-        //
-        // var dragrect2 = newparacellularg.append("rect")
-        //     .attr("id", "pararectangle")
-        //     .attr("x", function (d) {
-        //         return d.x;
-        //     })
-        //     .attr("y", function (d) {
-        //         return d.y;
-        //     })
-        //     .attr("width", width)
-        //     .attr("height", height)
-        //     .attr("rx", 10)
-        //     .attr("ry", 20)
-        //     .attr("fill", "white")
-        //     .attr("stroke", "url(#basicPattern)")
-        //     .attr("stroke-width", 20)
-        //     .attr("cursor", "move")
-        //     .call(d3.drag()
-        //         .on("drag", dragmove2));
-
         // Paracellular Rectangle
-        // TODO: Fix this, same issue in line
-        var svgparacellular = svg.append("g").data([{x: 100, y: 540}]);
-
-        var dragrect2 = svgparacellular.append("svg:path")
+        svg.append("g").append("polygon")
             .attr("transform", "translate(100,540)")
             .attr("id", "paracellular")
-            .attr("x", function (d) {
-                return d.x;
-            })
-            .attr("y", function (d) {
-                return d.y;
-            })
-            .attr("d", "M0,0 L300,0 V0,100 M0,0 V0,100")
+            .attr("points", "0,0 0,100 0,0 300,0 300,100 300,0")
             .attr("fill", "white")
             .attr("stroke", "url(#basicPattern)")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 20)
-            .attr("cursor", "move");
-
-        svgparacellular.select("path#paracellular")
+            .attr("cursor", "move")
             .call(d3.drag()
-                .on("drag", dragmove2));
-
-        function dragmove2(d) {
-            console.log("paracellular: ", d3.select(this));
-            dragrect2
-                .attr("x", d3.event.x)
-                .attr("y", d3.event.y);
-        }
+                .on("drag", dragploy));
     }
 
     // Expose utility to the global object
