@@ -800,34 +800,6 @@
 
     mainUtils.showEpithelial = function (epithelialHtmlContent) {
 
-        // var g = document.getElementById("#svgVisualize"),
-        //     w = 700,
-        //     h = 700;
-        //
-        // var svg = d3.select("#svgVisualize").append("svg")
-        //     .attr("width", w)
-        //     .attr("height", h)
-        //     .append("g");
-        //
-        // // Table
-        // var table = d3.select("body").append("table");
-        // var thead = table.append("thead");
-        // var tbody = table.append("tbody");
-        //
-        // // append the header row
-        // thead.append('tr')
-        //     .append('th')
-        //     .text("Molecules and Transporters");
-        //
-        // // create a row for each object in the data
-        // var rows = tbody.append('tr')
-        //     .data(listOfItemsForEpithelial)
-        //     .enter()
-        //     .append('tr')
-        //     .text(function (d) {
-        //         return d.value;
-        //     })
-
         var g = document.getElementById("#svgVisualize"),
             w = 700,
             h = 700,
@@ -858,9 +830,7 @@
             .attr("stroke", "#6495ED")
             .attr("stroke-width", 1.5);
 
-        /**
-         * Rectangle
-         */
+        // Rectangle
         var newg = svg.append("g").data([{x: 100, y: 10}]);
 
         var dragrect = newg.append("rect")
@@ -1112,13 +1082,11 @@
                 .attr("height", height);
         }
 
-        /**
-         * Circle
-         */
-        var circleg = svg.append("g").data([{x: 20, y: 20}]);
+        // Circle
+        var circleg = svg.append("g").data([{x: 510, y: 250}]);
 
         circleg.append("circle")
-            .attr("transform", "translate(100, 450)")
+        // .attr("transform", "translate(100, 450)")
             .attr("id", "circle")
             .attr("cx", function (d) {
                 return d.x;
@@ -1138,10 +1106,10 @@
                 .attr("cy", d.y = d3.event.y);
         }
 
-        var circleg2 = svg.append("g").data([{x: 20, y: 20}]);
+        var circleg2 = svg.append("g").data([{x: 560, y: 250}]);
 
         circleg2.append("circle")
-            .attr("transform", "translate(100, 500)")
+        // .attr("transform", "translate(100, 500)")
             .attr("id", "circle")
             .attr("cx", function (d) {
                 return d.x;
@@ -1155,14 +1123,11 @@
             .attr("cursor", "move")
             .call(d3.drag().on("drag", dragcircle));
 
-        /**
-         * Text
-         * Map with "Native HTML5 Drag and Drop"
-         * https://www.html5rocks.com/en/tutorials/dnd/basics/#toc-dragging-events
-         */
+
+        // Text
         var svgtext = svg.append("g").data([{x: 500, y: 30}]);
 
-        var compartment = ["Luminal", "Serosal", "Paracellular"];
+        var compartment = ["Luminal", "Serosal", "Paracellular", "Na+", "K+", "Cl-"];
 
         compartment.forEach(function (element, index) {
             if (index > 0)
@@ -1177,7 +1142,7 @@
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
-                .attr("font-size", "30px")
+                .attr("font-size", "20px")
                 .attr("fill", "red")
                 .attr("cursor", "move")
                 .text(element);
@@ -1202,21 +1167,18 @@
             console.log("dragendtext: ", d3.select(this)._groups[0][0].id);
         }
 
-        /**
-         * Mouse over and out event
-         */
-        d3.select("rect").on("mouseover", function () {
-            d3.select(this).style("fill", "green");
-        });
+        // Mouse over and out event
+        // d3.select("rect").on("mouseover", function () {
+        //     d3.select(this).style("fill", "green");
+        // });
+        //
+        // d3.select("rect").on("mouseout", function () {
+        //     d3.select(this).style("fill", "white");
+        // });
 
-        d3.select("rect").on("mouseout", function () {
-            d3.select(this).style("fill", "white");
-        });
-
-        /**
-         * Line
-         */
-        var svgline = svg.append("g").data([{x: 500, y: 300}]);
+        // Line
+        // TODO: Fix this!!!
+        var svgline = svg.append("g");
 
         var data = [
             {x: 0, y: 0},
@@ -1233,16 +1195,119 @@
 
         svgline.append("svg:path")
             .attr("transform", "translate(500, 200)")
-            .attr("id", "Luminal")
+            .attr("id", "lineLuminal")
+            .attr("x1", 500)
+            .attr("y1", 300)
+            .attr("x2", 500)
+            .attr("y2", 320)
+            .attr("d", lineFunc(data))
+            .attr("stroke", "black")
+            .attr("stroke-width", 5)
+            .attr("cursor", "move");
+
+        svgline.select("path#lineLuminal")
+            .call(d3.drag()
+                .on("drag", dragline)
+                .on("end", dragendline));
+
+        function dragline(d) {
+            console.log(d3.event);
+
+            d3.select(this)
+                .attr("x2", d3.event.x)
+                .attr("y2", d3.event.y);
+        }
+
+        function dragendline(d) {
+            d3.select(this)
+                .classed("dragging", false);
+            console.log("dragendline: ", d3.select(this)._groups[0][0].id);
+        }
+
+        // Paracellular Rectangle
+        // TODO: Fix this, same issue in line
+        var svgpolygon = svg.append("g").data([{x: 500, y: 300}]);
+
+        var dragpolygon = svgpolygon.append("polygon")
+            .attr("transform", "translate(500,300)")
+            .attr("id", "channel")
             .attr("x", function (d) {
                 return d.x;
             })
             .attr("y", function (d) {
                 return d.y;
             })
-            .attr("d", lineFunc(data))
+            .attr("points", "40,0 80,20 80,60 40,80 0,60 0,20")
+            .attr("fill", "yellow")
             .attr("stroke", "black")
-            .attr("stroke-width", 5);
+            .attr("stroke-linecap", "round")
+            .attr("stroke-linejoin", "round")
+            .attr("cursor", "move");
+
+        svgpolygon.select("path#channel")
+            .call(d3.drag()
+                .on("drag", dragmove3));
+
+        function dragmove3(d) {
+            console.log("polygon: ", d3.select(this));
+            dragpolygon
+                .attr("x", d3.event.x)
+                .attr("y", d3.event.y);
+        }
+
+        // var width = 300,
+        //     height = 100;
+        //
+        // var dragrect2 = newparacellularg.append("rect")
+        //     .attr("id", "pararectangle")
+        //     .attr("x", function (d) {
+        //         return d.x;
+        //     })
+        //     .attr("y", function (d) {
+        //         return d.y;
+        //     })
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //     .attr("rx", 10)
+        //     .attr("ry", 20)
+        //     .attr("fill", "white")
+        //     .attr("stroke", "url(#basicPattern)")
+        //     .attr("stroke-width", 20)
+        //     .attr("cursor", "move")
+        //     .call(d3.drag()
+        //         .on("drag", dragmove2));
+
+        // Paracellular Rectangle
+        // TODO: Fix this, same issue in line
+        var svgparacellular = svg.append("g").data([{x: 100, y: 540}]);
+
+        var dragrect2 = svgparacellular.append("svg:path")
+            .attr("transform", "translate(100,540)")
+            .attr("id", "paracellular")
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .attr("d", "M0,0 L300,0 V0,100 M0,0 V0,100")
+            .attr("fill", "white")
+            .attr("stroke", "url(#basicPattern)")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-width", 20)
+            .attr("cursor", "move");
+
+        svgparacellular.select("path#paracellular")
+            .call(d3.drag()
+                .on("drag", dragmove2));
+
+        function dragmove2(d) {
+            console.log("paracellular: ", d3.select(this));
+            dragrect2
+                .attr("x", d3.event.x)
+                .attr("y", d3.event.y);
+        }
     }
 
     // Expose utility to the global object
