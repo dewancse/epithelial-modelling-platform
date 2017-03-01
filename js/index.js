@@ -1176,6 +1176,20 @@
         //     d3.select(this).style("fill", "white");
         // });
 
+        // build the arrow.
+        svg.append("svg:defs").selectAll("marker")
+            .data(["end"])      // Different link/path types can be defined here
+            .enter().append("svg:marker")    // This section adds in the arrows
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 1)
+            .attr("refY", -0.25)
+            .attr("markerWidth", 4)
+            .attr("markerHeight", 4)
+            .attr("orient", "auto")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5");
+
         // Line
         var svgline = svg.append("g").data([{x: 500, y: 200}]);
         var lineLen = 40;
@@ -1195,7 +1209,8 @@
                 return d.y;
             })
             .attr("stroke", "black")
-            .attr("stroke-width", 5)
+            .attr("stroke-width", 2)
+            .attr("marker-end", "url(#end)")
             .attr("cursor", "move");
 
         svgline.select("line")
