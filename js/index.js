@@ -1084,8 +1084,9 @@
 
         // Circle
         var circleg = svg.append("g").data([{x: 510, y: 250}]);
+        var radius = 20;
 
-        circleg.append("circle")
+        var circle1 = circleg.append("circle")
         // .attr("transform", "translate(100, 450)")
             .attr("id", "circle")
             .attr("cx", function (d) {
@@ -1094,7 +1095,7 @@
             .attr("cy", function (d) {
                 return d.y;
             })
-            .attr("r", 20)
+            .attr("r", radius)
             .attr("fill", "lightgreen")
             .attr("stroke-width", 20)
             .attr("cursor", "move")
@@ -1108,7 +1109,7 @@
 
         var circleg2 = svg.append("g").data([{x: 560, y: 250}]);
 
-        circleg2.append("circle")
+        var circle2 = circleg2.append("circle")
         // .attr("transform", "translate(100, 500)")
             .attr("id", "circle")
             .attr("cx", function (d) {
@@ -1117,7 +1118,7 @@
             .attr("cy", function (d) {
                 return d.y;
             })
-            .attr("r", 20)
+            .attr("r", radius)
             .attr("fill", "orange")
             .attr("stroke-width", 20)
             .attr("cursor", "move")
@@ -1176,9 +1177,10 @@
         //     d3.select(this).style("fill", "white");
         // });
 
-        // build the arrow.
-        svg.append("svg:defs").selectAll("marker")
-            .data(["end"])      // Different link/path types can be defined here
+        // build the start arrow.
+        var startarrow = svg.append("svg:defs")
+            .selectAll("marker")
+            .data(["start"])      // Different link/path types can be defined here
             .enter().append("svg:marker")    // This section adds in the arrows
             .attr("id", String)
             .attr("viewBox", "0 -5 10 10")
@@ -1186,6 +1188,22 @@
             .attr("refY", -0.25)
             .attr("markerWidth", 4)
             .attr("markerHeight", 4)
+            .attr("orient", "180")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5");
+
+        // build the end arrow.
+        var markerWidth = 4;
+        var markerHeight = 4;
+        var endarrow = svg.append("svg:defs").selectAll("marker")
+            .data(["end"])      // Different link/path types can be defined here
+            .enter().append("svg:marker")    // This section adds in the arrows
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 1)
+            .attr("refY", -0.25)
+            .attr("markerWidth", markerWidth)
+            .attr("markerHeight", markerHeight)
             .attr("orient", "auto")
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
@@ -1210,7 +1228,7 @@
             })
             .attr("stroke", "black")
             .attr("stroke-width", 2)
-            .attr("marker-end", "url(#end)")
+            .attr("marker-end", "url(#end)") // marker-start for start marker
             .attr("cursor", "move");
 
         svgline.select("line")
@@ -1240,7 +1258,7 @@
             console.log("dragendline: ", d3.select(this)._groups[0][0].id);
         }
 
-        // Paracellular Rectangle
+        // Polygon
         svg.append("g").append("polygon")
             .attr("transform", "translate(500,300)")
             .attr("id", "channel")
@@ -1251,9 +1269,9 @@
             .attr("stroke-linejoin", "round")
             .attr("cursor", "move")
             .call(d3.drag()
-                .on("drag", dragploy));
+                .on("drag", dragpoly));
 
-        function dragploy(d) {
+        function dragpoly(d) {
             var dx = d3.event.dx;
             var dy = d3.event.dy;
 
@@ -1266,7 +1284,6 @@
 
                 points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
 
-                // remove last white space
                 if (i != pointsLen - 1)
                     points = points.concat(" ");
             }
@@ -1287,7 +1304,111 @@
             .attr("stroke-width", 20)
             .attr("cursor", "move")
             .call(d3.drag()
-                .on("drag", dragploy));
+                .on("drag", dragpoly));
+
+        // Circle with arrow lines
+        var circlewitharrowsg = svg.append("g").data([{x: 500, y: 450}]);
+
+        var linegroups = circlewitharrowsg.append("line")
+            .attr("id", "groups1")
+            .attr("x1", function (d) {
+                return d.x;
+            })
+            .attr("y1", function (d) {
+                return d.y;
+            })
+            .attr("x2", function (d) {
+                return d.x + lineLen;
+            })
+            .attr("y2", function (d) {
+                return d.y;
+            })
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+            .attr("marker-end", "url(#end)")
+            .attr("cursor", "move")
+            .call(d3.drag().on("drag", dragcircleandline));
+
+        var linegroups2 = circlewitharrowsg.append("line")
+            .attr("id", "groups2")
+            .attr("x1", function (d) {
+                return d.x;
+            })
+            .attr("y1", function (d) {
+                return d.y + lineLen;
+            })
+            .attr("x2", function (d) {
+                return d.x + lineLen;
+            })
+            .attr("y2", function (d) {
+                return d.y + lineLen;
+            })
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+            .attr("marker-start", "url(#start)")
+            .attr("cursor", "move")
+            .call(d3.drag().on("drag", dragcircleandline));
+
+        var circlegroups = circlewitharrowsg.append("circle")
+            .attr("id", "groups3")
+            .attr("cx", function (d) {
+                return d.x + radius;
+            })
+            .attr("cy", function (d) {
+                return d.y + radius;
+            })
+            .attr("r", radius)
+            .attr("fill", "SteelBlue")
+            .attr("stroke-width", 20)
+            .attr("cursor", "move")
+            .call(d3.drag().on("drag", dragcircleandline));
+
+        // Utiliy for groups of line and circle
+        function groupcordinates(groups) {
+
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            // Circle groups
+            if (groups == "groups3") {
+                var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
+                var cyNew = parseFloat(d3.select("#" + groups + "").attr("cy")) + dy;
+
+                return [cxNew, cyNew];
+            } else { // Line groups
+
+                var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
+                var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
+                var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
+                var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
+
+                return [x1New, y1New, x2New, y2New];
+            }
+        }
+
+        function dragcircleandline(d) {
+
+            // circle line
+            var axis = groupcordinates("groups1");
+            linegroups
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
+
+            var axis = groupcordinates("groups2");
+            linegroups2
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
+
+            // Circle
+            var axis = groupcordinates("groups3");
+            circlegroups
+                .attr("cx", axis.shift())
+                .attr("cy", axis.shift());
+        }
     }
 
     // Expose utility to the global object
