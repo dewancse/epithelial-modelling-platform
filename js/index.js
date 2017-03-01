@@ -1177,8 +1177,11 @@
         //     d3.select(this).style("fill", "white");
         // });
 
+        var markerWidth = 4;
+        var markerHeight = 4;
+
         // build the start arrow.
-        var startarrow = svg.append("svg:defs")
+        svg.append("svg:defs")
             .selectAll("marker")
             .data(["start"])      // Different link/path types can be defined here
             .enter().append("svg:marker")    // This section adds in the arrows
@@ -1186,16 +1189,14 @@
             .attr("viewBox", "0 -5 10 10")
             .attr("refX", 1)
             .attr("refY", -0.25)
-            .attr("markerWidth", 4)
-            .attr("markerHeight", 4)
+            .attr("markerWidth", markerWidth)
+            .attr("markerHeight", markerHeight)
             .attr("orient", "180")
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
 
         // build the end arrow.
-        var markerWidth = 4;
-        var markerHeight = 4;
-        var endarrow = svg.append("svg:defs").selectAll("marker")
+        svg.append("svg:defs").selectAll("marker")
             .data(["end"])      // Different link/path types can be defined here
             .enter().append("svg:marker")    // This section adds in the arrows
             .attr("id", String)
@@ -1229,27 +1230,17 @@
             .attr("stroke", "black")
             .attr("stroke-width", 2)
             .attr("marker-end", "url(#end)") // marker-start for start marker
-            .attr("cursor", "move");
-
-        svgline.select("line")
+            .attr("cursor", "pointer")
             .call(d3.drag()
                 .on("drag", dragline)
                 .on("end", dragendline));
 
         function dragline(d) {
-            // d3.select(this).attr("x2", d3.event.x).attr("y2", d3.event.y);
-            var dx = d3.event.dx;
-            var dy = d3.event.dy;
-
-            var x1New = parseFloat(d3.select(this).attr("x1")) + dx;
-            var y1New = parseFloat(d3.select(this).attr("y1")) + dy;
-            var x2New = parseFloat(d3.select(this).attr("x2")) + dx;
-            var y2New = parseFloat(d3.select(this).attr("y2")) + dy;
-
-            line.attr("x1", x1New)
-                .attr("y1", y1New)
-                .attr("x2", x2New)
-                .attr("y2", y2New);
+            var axis = groupcordinates("lineLuminal");
+            line.attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
         }
 
         function dragendline(d) {
@@ -1257,6 +1248,44 @@
                 .classed("dragging", false);
             console.log("dragendline: ", d3.select(this)._groups[0][0].id);
         }
+
+        // Utility for marker direction
+        function markerDir(selecttion) {
+            var mstart = d3.select("#" + selecttion + "")
+                ._groups[0][0]
+                .getAttribute("marker-start");
+
+            var mend = d3.select("#" + selecttion + "")
+                ._groups[0][0]
+                .getAttribute("marker-end");
+
+            if (mstart == "") {
+                d3.select("#" + selecttion + "")
+                    .attr("marker-start", "url(#start)")
+                    .attr("marker-end", "");
+            }
+            else {
+                d3.select("#" + selecttion + "")
+                    .attr("marker-end", "url(#end)")
+                    .attr("marker-start", "");
+            }
+
+            if (mend == "") {
+                d3.select("#" + selecttion + "")
+                    .attr("marker-end", "url(#end)")
+                    .attr("marker-start", "");
+            }
+            else {
+                d3.select("#" + selecttion + "")
+                    .attr("marker-start", "url(#start)")
+                    .attr("marker-end", "");
+            }
+        }
+
+        // Click to change the marker direction
+        d3.select("#lineLuminal").on("click", function () {
+            markerDir("lineLuminal");
+        });
 
         // Polygon
         svg.append("g").append("polygon")
@@ -1268,8 +1297,7 @@
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
             .attr("cursor", "move")
-            .call(d3.drag()
-                .on("drag", dragpoly));
+            .call(d3.drag().on("drag", dragpoly));
 
         function dragpoly(d) {
             var dx = d3.event.dx;
@@ -1303,14 +1331,13 @@
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 20)
             .attr("cursor", "move")
-            .call(d3.drag()
-                .on("drag", dragpoly));
+            .call(d3.drag().on("drag", dragpoly));
 
         // Circle with arrow lines
         var circlewitharrowsg = svg.append("g").data([{x: 500, y: 450}]);
 
-        var linegroups = circlewitharrowsg.append("line")
-            .attr("id", "groups1")
+        var linemarkerend = circlewitharrowsg.append("line")
+            .attr("id", "linemarkerend")
             .attr("x1", function (d) {
                 return d.x;
             })
@@ -1326,11 +1353,11 @@
             .attr("stroke", "black")
             .attr("stroke-width", 2)
             .attr("marker-end", "url(#end)")
-            .attr("cursor", "move")
+            .attr("cursor", "pointer")
             .call(d3.drag().on("drag", dragcircleandline));
 
-        var linegroups2 = circlewitharrowsg.append("line")
-            .attr("id", "groups2")
+        var linemarkerstart = circlewitharrowsg.append("line")
+            .attr("id", "linemarkerstart")
             .attr("x1", function (d) {
                 return d.x;
             })
@@ -1346,11 +1373,11 @@
             .attr("stroke", "black")
             .attr("stroke-width", 2)
             .attr("marker-start", "url(#start)")
-            .attr("cursor", "move")
+            .attr("cursor", "pointer")
             .call(d3.drag().on("drag", dragcircleandline));
 
-        var circlegroups = circlewitharrowsg.append("circle")
-            .attr("id", "groups3")
+        var circlemarker = circlewitharrowsg.append("circle")
+            .attr("id", "circlemarker")
             .attr("cx", function (d) {
                 return d.x + radius;
             })
@@ -1363,14 +1390,23 @@
             .attr("cursor", "move")
             .call(d3.drag().on("drag", dragcircleandline));
 
-        // Utiliy for groups of line and circle
+        // Click to change the marker direction
+        d3.select("#linemarkerend").on("click", function () {
+            markerDir("linemarkerend");
+        });
+
+        d3.select("#linemarkerstart").on("click", function () {
+            markerDir("linemarkerstart");
+        });
+
+        // TODO: make generic for all shapes
         function groupcordinates(groups) {
 
             var dx = d3.event.dx;
             var dy = d3.event.dy;
 
             // Circle groups
-            if (groups == "groups3") {
+            if (groups == "circlemarker") {
                 var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
                 var cyNew = parseFloat(d3.select("#" + groups + "").attr("cy")) + dy;
 
@@ -1389,23 +1425,23 @@
         function dragcircleandline(d) {
 
             // circle line
-            var axis = groupcordinates("groups1");
-            linegroups
+            var axis = groupcordinates("linemarkerend");
+            linemarkerend
                 .attr("x1", axis.shift())
                 .attr("y1", axis.shift())
                 .attr("x2", axis.shift())
                 .attr("y2", axis.shift());
 
-            var axis = groupcordinates("groups2");
-            linegroups2
+            var axis = groupcordinates("linemarkerstart");
+            linemarkerstart
                 .attr("x1", axis.shift())
                 .attr("y1", axis.shift())
                 .attr("x2", axis.shift())
                 .attr("y2", axis.shift());
 
             // Circle
-            var axis = groupcordinates("groups3");
-            circlegroups
+            var axis = groupcordinates("circlemarker");
+            circlemarker
                 .attr("cx", axis.shift())
                 .attr("cy", axis.shift());
         }
