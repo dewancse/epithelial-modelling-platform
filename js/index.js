@@ -518,6 +518,12 @@
 
     // Load the view
     mainUtils.loadViewHtml = function () {
+        // Un-check the checkbox in the model page
+        for (var i = 0; i < $('table tr td label').length; i++) {
+            if ($('table tr td label')[i].firstChild.checked == true) {
+                $('table tr td label')[i].firstChild.checked = false;
+            }
+        }
 
         var cellmlModel = mainUtils.workspaceName;
 
@@ -629,11 +635,12 @@
         var modelName = "#" + cellmlModel.slice(0, indexOfCellML);
         var subject = cellmlModel.concat(modelName); // e.g. weinstein_1995.cellml#weinstein_1995
 
-        var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ' +
+        var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
             'WHERE { GRAPH ?Workspace { ' +
             'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Protein> ?Protein } . ' +
             'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Species> ?Species } . ' +
             'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Gene> ?Gene } . ' +
+            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Compartment> ?Compartment } . ' +
             'FILTER (?Model_entity = <' + subject + '>) . ' +
             '}}';
 
@@ -693,12 +700,26 @@
 
                 mainUtils.model.push(label);
             }
-            mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
+
+            if (jsonObj.head.vars[i] == "Compartment") {
+                var compartment = "";
+                for (var c = 0; c < jsonObj.results.bindings.length; c++) {
+                    if (c == 0)
+                        compartment += jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
+                    else
+                        compartment += "," + jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
+                }
+
+                mainUtils.model.push(compartment);
+            }
+            else {
+                mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
+            }
         }
 
         // 1D to 2D array
         while (mainUtils.model.length) {
-            mainUtils.model2DArr.push(mainUtils.model.splice(0, 5));
+            mainUtils.model2DArr.push(mainUtils.model.splice(0, 6)); // 5 + 1 (checkbox) header elemenet
         }
 
         var td = [];
