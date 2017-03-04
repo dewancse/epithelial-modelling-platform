@@ -88,7 +88,15 @@
         var activeItem = "#" + findActiveItem();
         switchListItemToActive(activeItem, "#listHome");
 
-        insertHtml("#main-content", "");
+        insertHtml("#main-content", "... Coming soon");
+    };
+
+    mainUtils.loadHelp = function () {
+        // Switch from current active button to home button
+        var activeItem = "#" + findActiveItem();
+        switchListItemToActive(activeItem, "#help");
+
+        insertHtml("#main-content", "...Coming soon");
     };
 
     // On page load (before images or CSS)
@@ -221,28 +229,42 @@
 
             console.log("model event: ", event);
 
-            if (event.srcElement.className == "checkbox" && event.srcElement.checked == true) {
+            // select one by one
+            if (event.srcElement.className == "attribute") {
 
-                if (document.getElementsByClassName("checkbox")[0].checked == true) {
-                    for (var i = 0; i < $('table tr').length; i++) {
-                        if (i == 0) {
-                            mainUtils.templistOfModel.push(event.srcElement);
-                        }
+                if (event.srcElement.checked) {
+                    mainUtils.templistOfModel.push(event.srcElement.value);
+                }
+                else {
+                    var pos = mainUtils.templistOfModel.indexOf(event.srcElement.value);
+                    mainUtils.templistOfModel.splice(pos, 1);
+                }
 
-                        // Assign TRUE to all table data
-                        if (i < $('table tr').length - 1)
-                            $('table tr td label')[i].firstChild.checked = true;
+                var idWithStr = event.srcElement.id;
+                var index = idWithStr.search("#");
+                var workspaceName = idWithStr.slice(0, index);
+
+                // mainUtils.workspaceName.push(workspaceName);
+                mainUtils.workspaceName = workspaceName;
+            }
+
+            // select all
+            if (event.srcElement.className == "attributeAll") {
+
+                if (event.srcElement.checked == true) {
+                    for (var i = 0; i < $('.attribute').length; i++) {
+                        $('.attribute')[i].checked = true;
+
+                        mainUtils.templistOfModel.push($('.attribute')[i].value);
                     }
                 }
                 else {
-                    mainUtils.templistOfModel.push(event.srcElement);
+                    for (var i = 0; i < $('.attribute').length; i++) {
+                        $('.attribute')[i].checked = false;
 
-                    var idWithStr = event.srcElement.id;
-                    var index = idWithStr.search("#");
-                    var workspaceName = idWithStr.slice(0, index);
-
-                    // mainUtils.workspaceName.push(workspaceName);
-                    mainUtils.workspaceName = workspaceName;
+                        var pos = mainUtils.templistOfModel.indexOf($('.attribute')[i].value);
+                        mainUtils.templistOfModel.splice(pos, 1);
+                    }
                 }
             }
         }
@@ -646,8 +668,8 @@
                 mainUtils.headId = jsonObj.head.vars[0];
                 tr.id = mainUtils.headId;
                 var label = document.createElement('label');
-                label.innerHTML = '<input id="' + mainUtils.headId + '" type="checkbox" data-action="model" value="' +
-                    mainUtils.headId + '" class="checkbox"></label>';
+                label.innerHTML = '<input id="' + mainUtils.headId + '" type="checkbox" name="attributeAll" class="attributeAll" ' +
+                    'data-action="model" value="' + mainUtils.headId + '" ></label>';
 
                 th.appendChild(label);
                 tr.appendChild(th);
@@ -666,8 +688,8 @@
             if (i == 0) {
                 var id = jsonObj.results.bindings[i].Model_entity.value;
                 var label = document.createElement('label');
-                label.innerHTML = '<input id="' + id + '" type="checkbox" data-action="model" value="' +
-                    id + '" class="checkbox"></label>';
+                label.innerHTML = '<input id="' + id + '" type="checkbox" name="attribute" class="attribute" ' +
+                    'data-action="model" value="' + id + '" ></label>';
 
                 mainUtils.model.push(label);
             }
@@ -706,78 +728,34 @@
     };
 
     mainUtils.deleteRowModelHtml = function () {
-        // TODO: Uncheck and then check does not work
-        // IF header checkbox exist, but length of pre processed
-        // list of models is greater than 1, delete header checkbox
-        if (mainUtils.templistOfModel.length > 1) {
-            for (var i = 0; i < mainUtils.templistOfModel.length; i++) {
-                if ($('table tr th label')[0].firstChild.id == mainUtils.templistOfModel[i].id) {
-                    mainUtils.templistOfModel.splice(i, 1);
-                }
-            }
-        }
-
-        console.log("mainUtils.templistOfModel: ", mainUtils.templistOfModel);
-        // Handling current instance of (un)checked status
-        for (var i = 0; i < mainUtils.templistOfModel.length; i++) {
-            // IF header checkbox is selected
-            console.log("TRUE mainUtils.templistOfModel: ", mainUtils.templistOfModel);
-            console.log("TRUE mainUtils.listOfModels: ", mainUtils.listOfModels);
-            if (mainUtils.templistOfModel[i].checked == true) {
-                if ($('table tr th label')[0].firstChild.id == mainUtils.templistOfModel[0].id) {
-
-                    console.log("$('table tr td'): ", $('table tr td label')[i].firstChild.checked);
-
-                    for (var i = 0; i < mainUtils.model2DArr.length; i++) {
-                        mainUtils.listOfModels.push(mainUtils.model2DArr[i][1]);
-                    }
-                }
-                else {
-                    mainUtils.listOfModels.push(mainUtils.templistOfModel[i].id);
-                }
-            }
-        }
-
-        console.log("mainUtils.listOfModels BEFORE: ", mainUtils.listOfModels);
-
-        var hasElement = function (id) {
-            for (var i = 0; i < $('table tr').length; i++) {
-
-                if ($('table tr')[i].id == id) {
-                    // Remove selected row
-                    $('table tr')[i].remove();
-
-                    // Remove the selected row from the model2DArr that
-                    // populated the table, see showModel function
-                    for (var i = 0; i < mainUtils.model2DArr.length; i++) {
-                        if (mainUtils.model2DArr[i][1] == id)
-                            mainUtils.model2DArr.splice(i, 1);
-                    }
-
-                    return id;
-                }
-            }
-        };
-
-        var deleted = mainUtils.listOfModels.filter(hasElement);
-
-        // Remove deleted items from the list of models
-        for (var i = 0; i < deleted.length; i++) {
-            for (var j = 0; j < mainUtils.listOfModels.length; j++) {
-                if (mainUtils.listOfModels[j] == deleted[i])
-                    mainUtils.listOfModels.splice(j, 1);
-            }
-        }
-
-        console.log("mainUtils.listOfModels AFTER: ", mainUtils.listOfModels);
-        console.log("deleted: ", deleted);
-        console.log("table: ", $('table tr'));
 
         // Un-check header checkbox if body is empty
         if ($('table tr th label')[0].firstChild.checked == true) {
-            if ($('table tr').length == 1)
-                $('table tr th label')[0].firstChild.checked = false;
+            $('table tr th label')[0].firstChild.checked = false;
         }
+
+        // Model_entity with same name will be removed
+        // regardless of the current instance of checkboxes
+        mainUtils.templistOfModel.forEach(function (element) {
+            for (var i = 0; i < $('table tr').length; i++) {
+
+                if ($('table tr')[i].id == element) {
+                    // Remove selected row
+                    $('table tr')[i].remove();
+
+                    // Remove from mainUtils.model2DArr
+                    mainUtils.model2DArr.forEach(function (elem, index) {
+                        console.log("mainUtils.model2DArr: ", elem[1], index, element);
+                        if (element == elem[1]) {
+                            mainUtils.model2DArr.splice(index, 1);
+                        }
+                    })
+                }
+            }
+        });
+
+        // Empty temp model list
+        mainUtils.templistOfModel = [];
     };
 
     mainUtils.loadEpithelialHtml = function () {
