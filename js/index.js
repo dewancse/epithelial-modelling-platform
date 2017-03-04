@@ -19,6 +19,8 @@
     // Set up a namespace for our utility
     var mainUtils = {};
 
+    mainUtils.fromEpithelialToModelState = 0;
+
     // Track models for delete operation
     mainUtils.listOfModels = [];
 
@@ -26,13 +28,9 @@
     // selection for delete operation
     mainUtils.templistOfModel = [];
 
-    // Save table rows for epithelial
-    var listOfItemsForEpithelial = [];
-
     // Add models in the loadModelHtml
     mainUtils.model = [];
     mainUtils.model2DArr = [];
-    mainUtils.headCount;
 
     // Initial declarations for a table
     var table = document.createElement("table");
@@ -182,8 +180,6 @@
                 var index = idWithStr.search(".cellml");
                 var workspaceName = idWithStr.slice(0, index);
 
-                // TODO: choose multiple checkboxes, mainUtils.workspaceName array!!
-                // TODO: Choose multiple items from the search results
                 mainUtils.workspaceName = workspaceName;
 
                 var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + workspaceName + "/" + "rawfile" +
@@ -215,13 +211,27 @@
 
             console.log("search event: ", event);
 
-            if (event.srcElement.className == "checkbox" && event.srcElement.checked == true) {
-                var idWithStr = event.srcElement.id;
-                var index = idWithStr.search("#");
-                var workspaceName = idWithStr.slice(0, index);
+            // if (event.srcElement.className == "checkbox" && event.srcElement.checked == true) {
+            //     var idWithStr = event.srcElement.id;
+            //     var index = idWithStr.search("#");
+            //     var workspaceName = idWithStr.slice(0, index);
+            //
+            //     // mainUtils.workspaceName.push(workspaceName);
+            //     mainUtils.workspaceName = workspaceName;
+            // }
 
-                // mainUtils.workspaceName.push(workspaceName);
-                mainUtils.workspaceName = workspaceName;
+            if (event.srcElement.className == "checkbox") {
+
+                if (event.srcElement.checked) {
+                    var idWithStr = event.srcElement.id;
+                    var index = idWithStr.search("#");
+                    var workspaceName = idWithStr.slice(0, index);
+
+                    mainUtils.workspaceName = workspaceName;
+                }
+                else {
+                    mainUtils.workspaceName = "";
+                }
             }
         },
 
@@ -280,6 +290,9 @@
 
     // Load search html
     mainUtils.loadSearchHtml = function () {
+
+        // state reinitialize when redirect from epithelial page
+        mainUtils.fromEpithelialToModelState = 0;
 
         if (!sessionStorage.getItem("searchListContent")) {
             $ajaxUtils.sendGetRequest(
@@ -624,8 +637,6 @@
         }
     };
 
-    // TODO: Fix updated sessionstorage when 'back to model' is clicked
-    // TODO: add columns for compartments and located in with names
     // Load the model
     mainUtils.loadModelHtml = function () {
 
@@ -644,13 +655,19 @@
             'FILTER (?Model_entity = <' + subject + '>) . ' +
             '}}';
 
-        showLoading("#main-content");
+        // showLoading("#main-content");
+        // if (!sessionStorage.getItem("loadmodelcontent")) {
         $ajaxUtils.sendGetRequest(
             modelHtml,
             function (modelHtmlContent) {
                 insertHtml("#main-content", modelHtmlContent);
 
-                $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.showModel, true);
+                if (mainUtils.fromEpithelialToModelState == 0) {
+                    $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.showModel, true);
+                } else {
+                    mainUtils.fromEpithelialToModelState = 0; // state reinitialize
+                    insertHtml("#main-content", sessionStorage.getItem('loadmodelcontent'));
+                }
             },
             false);
     };
@@ -668,7 +685,6 @@
         // Table header
         var thead = document.createElement("thead");
         var tr = document.createElement("tr");
-        mainUtils.headCount = jsonObj.head.vars.length;
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
             if (i == 0) {
                 var th = document.createElement("th");
@@ -693,6 +709,9 @@
         // Table body
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
             if (i == 0) {
+                // search list to model list with empty model
+                if (jsonObj.results.bindings.length == 0) break;
+
                 var id = jsonObj.results.bindings[i].Model_entity.value;
                 var label = document.createElement('label');
                 label.innerHTML = '<input id="' + id + '" type="checkbox" name="attribute" class="attribute" ' +
@@ -746,6 +765,19 @@
 
         table.appendChild(tbody);
         modelList.appendChild(table);
+
+        // Un-check checkbox in the model page
+        //
+        for (var i = 0; i < $('table tr td label').length; i++) {
+            if ($('table tr td label')[i].firstChild.checked == true) {
+                $('table tr td label')[i].firstChild.checked = false;
+            }
+        }
+
+        // SET main content in the local storage
+        var loadmodelcontent = document.getElementById('main-content');
+        console.log("loadmodelcontent: ", loadmodelcontent);
+        sessionStorage.setItem('loadmodelcontent', $(loadmodelcontent).html());
     };
 
     mainUtils.deleteRowModelHtml = function () {
@@ -754,6 +786,8 @@
         if ($('table tr th label')[0].firstChild.checked == true) {
             $('table tr th label')[0].firstChild.checked = false;
         }
+
+        console.log("deleteRowModelHtml: ", mainUtils.templistOfModel);
 
         // Model_entity with same name will be removed
         // regardless of the current instance of checkboxes
@@ -777,15 +811,16 @@
 
         // Empty temp model list
         mainUtils.templistOfModel = [];
+
+        // TODO: click when empty loadmodel table!! Fix this!!
     };
 
     mainUtils.loadEpithelialHtml = function () {
 
-        for (var i = 0; i < $('table tr').length; i++) {
-            listOfItemsForEpithelial.push($('table tr')[i]);
-        }
+        mainUtils.fromEpithelialToModelState = 1; // state initialize to 1
 
-        showLoading("#main-content");
+        // Empty temp model list for delete operation
+        mainUtils.templistOfModel = [];
 
         $ajaxUtils.sendGetRequest(
             epithelialHtml,
