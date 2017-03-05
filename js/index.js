@@ -211,15 +211,6 @@
 
             console.log("search event: ", event);
 
-            // if (event.srcElement.className == "checkbox" && event.srcElement.checked == true) {
-            //     var idWithStr = event.srcElement.id;
-            //     var index = idWithStr.search("#");
-            //     var workspaceName = idWithStr.slice(0, index);
-            //
-            //     // mainUtils.workspaceName.push(workspaceName);
-            //     mainUtils.workspaceName = workspaceName;
-            // }
-
             if (event.srcElement.className == "checkbox") {
 
                 if (event.srcElement.checked) {
@@ -291,7 +282,7 @@
     // Load search html
     mainUtils.loadSearchHtml = function () {
 
-        // state reinitialize when redirect from epithelial page
+        // state reinitialize when redirect from epithelial
         mainUtils.fromEpithelialToModelState = 0;
 
         if (!sessionStorage.getItem("searchListContent")) {
@@ -531,13 +522,6 @@
 
     // Load the view
     mainUtils.loadViewHtml = function () {
-        // Un-check the checkbox in the model page
-        for (var i = 0; i < $('table tr td label').length; i++) {
-            if ($('table tr td label')[i].firstChild.checked == true) {
-                $('table tr td label')[i].firstChild.checked = false;
-            }
-        }
-
         var cellmlModel = mainUtils.workspaceName;
 
         var indexOfCellML = cellmlModel.search(".cellml");
@@ -665,7 +649,8 @@
                 if (mainUtils.fromEpithelialToModelState == 0) {
                     $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.showModel, true);
                 } else {
-                    mainUtils.fromEpithelialToModelState = 0; // state reinitialize
+                    // state reinitialize, load epithelial to load model
+                    mainUtils.fromEpithelialToModelState = 0;
                     insertHtml("#main-content", sessionStorage.getItem('loadmodelcontent'));
                 }
             },
@@ -767,7 +752,7 @@
         modelList.appendChild(table);
 
         // Un-check checkbox in the model page
-        //
+        // load epithelial to model discovery to load model
         for (var i = 0; i < $('table tr td label').length; i++) {
             if ($('table tr td label')[i].firstChild.checked == true) {
                 $('table tr td label')[i].firstChild.checked = false;
@@ -776,7 +761,6 @@
 
         // SET main content in the local storage
         var loadmodelcontent = document.getElementById('main-content');
-        console.log("loadmodelcontent: ", loadmodelcontent);
         sessionStorage.setItem('loadmodelcontent', $(loadmodelcontent).html());
     };
 
@@ -787,8 +771,6 @@
             $('table tr th label')[0].firstChild.checked = false;
         }
 
-        console.log("deleteRowModelHtml: ", mainUtils.templistOfModel);
-
         // Model_entity with same name will be removed
         // regardless of the current instance of checkboxes
         mainUtils.templistOfModel.forEach(function (element) {
@@ -798,9 +780,10 @@
                     // Remove selected row
                     $('table tr')[i].remove();
 
+                    console.log("deleteRowModelHtml INSIDE: ", mainUtils.templistOfModel);
+
                     // Remove from mainUtils.model2DArr
                     mainUtils.model2DArr.forEach(function (elem, index) {
-                        console.log("mainUtils.model2DArr: ", elem[1], index, element);
                         if (element == elem[1]) {
                             mainUtils.model2DArr.splice(index, 1);
                         }
@@ -808,6 +791,8 @@
                 }
             }
         });
+
+        console.log("deleteRowModelHtml INSIDE model2DArr: ", mainUtils.model2DArr);
 
         // Empty temp model list
         mainUtils.templistOfModel = [];
@@ -818,9 +803,6 @@
     mainUtils.loadEpithelialHtml = function () {
 
         mainUtils.fromEpithelialToModelState = 1; // state initialize to 1
-
-        // Empty temp model list for delete operation
-        mainUtils.templistOfModel = [];
 
         $ajaxUtils.sendGetRequest(
             epithelialHtml,
@@ -1321,19 +1303,80 @@
             markerDir("lineLuminal");
         });
 
+        // Polygon with arrow lines
+        var polygonwitharrowsg = svg.append("g").data([{x: 490, y: 325}]);
+        var polygonlineLen = 60;
+
+        var polygonmarkerend = polygonwitharrowsg.append("line")
+            .attr("id", "polygonmarkerend")
+            .attr("x1", function (d) {
+                return d.x;
+            })
+            .attr("y1", function (d) {
+                return d.y;
+            })
+            .attr("x2", function (d) {
+                return d.x + polygonlineLen;
+            })
+            .attr("y2", function (d) {
+                return d.y;
+            })
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+            .attr("marker-end", "url(#end)")
+            .attr("cursor", "pointer")
+            .call(d3.drag().on("drag", dragpolygonandline));
+
+        // Click to change the marker direction
+        d3.select("#polygonmarkerend").on("click", function () {
+            markerDir("polygonmarkerend");
+        });
+
         // Polygon
-        svg.append("g").append("polygon")
+        var polygonmarker = svg.append("g").append("polygon")
             .attr("transform", "translate(500,300)")
             .attr("id", "channel")
-            .attr("points", "40,0 80,20 80,60 40,80 0,60 0,20")
+            // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
+            .attr("points", "10,15 30,15 40,25 30,35 10,35 0,25")
             .attr("fill", "yellow")
             .attr("stroke", "black")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
             .attr("cursor", "move")
-            .call(d3.drag().on("drag", dragpoly));
+            .call(d3.drag().on("drag", dragpolygonandline));
 
-        function dragpoly(d) {
+        function dragpolygonandline(d) {
+
+            // polygon line
+            var axis = groupcordinates("polygonmarkerend");
+            polygonmarkerend
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
+
+            // polygon
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            var xNew = [], yNew = [], points = "";
+            var pointsLen = d3.select(this)._groups[0][0].points.length;
+
+            for (var i = 0; i < pointsLen; i++) {
+                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
+                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
+
+                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
+
+                if (i != pointsLen - 1)
+                    points = points.concat(" ");
+            }
+
+            d3.select(this).attr("points", points);
+            console.log("polygon: ", d3.select(this).attr("points"));
+        }
+
+        function dragpolygon(d) {
             var dx = d3.event.dx;
             var dy = d3.event.dy;
 
@@ -1365,7 +1408,7 @@
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 20)
             .attr("cursor", "move")
-            .call(d3.drag().on("drag", dragpoly));
+            .call(d3.drag().on("drag", dragpolygon));
 
         // Circle with arrow lines
         var circlewitharrowsg = svg.append("g").data([{x: 500, y: 450}]);
