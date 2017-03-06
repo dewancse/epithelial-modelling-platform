@@ -817,7 +817,7 @@
     mainUtils.showEpithelial = function (epithelialHtmlContent) {
 
         var g = document.getElementById("#svgVisualize"),
-            w = 700,
+            w = 1200,
             h = 700,
             width = 300,
             height = 400;
@@ -1411,7 +1411,7 @@
             .call(d3.drag().on("drag", dragpolygon));
 
         // Circle with arrow lines
-        var circlewitharrowsg = svg.append("g").data([{x: 500, y: 450}]);
+        var circlewitharrowsg = svg.append("g").data([{x: 500, y: 380}]);
 
         var linemarkerend = circlewitharrowsg.append("line")
             .attr("id", "linemarkerend")
@@ -1522,6 +1522,220 @@
                 .attr("cx", axis.shift())
                 .attr("cy", axis.shift());
         }
+
+        // SVG checkbox and dragging on-off
+        var checkboxsvg = svg.append("g"),
+            checkBox1 = new d3CheckBox(),
+            checkBox2 = new d3CheckBox();
+
+        //Just for demonstration
+        var txt = checkboxsvg.append("text").attr("x", 800).attr("y", 120).text("Click checkbox and drag circle"),
+            update = function () {
+                var checked1 = checkBox1.checked(),
+                    checked2 = checkBox2.checked();
+                txt.text(checked1 + "," + checked2);
+
+                // drag enable and disable
+                if (checked1) {
+                    circledrag.call(d3.drag().on("drag", dragcircle));
+                }
+                else {
+                    circledrag.call(d3.drag().on("drag", function () {
+                        circledrag.classed("dragging", false);
+                    }));
+                }
+
+                if (checked2) {
+                    circledrag2.call(d3.drag().on("drag", dragcircle));
+                }
+                else {
+                    circledrag2.call(d3.drag().on("drag", function () {
+                        circledrag2.classed("dragging", false);
+                    }));
+                }
+            };
+
+        //Setting up check box and text
+        var textvalue1 = "weinstein_1995";
+        checkBox1.x(840).y(10).checked(false).clickEvent(update);
+        checkBox1.xtext(880).ytext(28).text("" + textvalue1 + "");
+
+        var textvalue2 = "eskandari_2005";
+        checkBox2.x(840).y(60).checked(false).clickEvent(update);
+        checkBox2.xtext(880).ytext(78).text("" + textvalue2 + "");
+
+        checkboxsvg.call(checkBox1);
+        checkboxsvg.call(checkBox2);
+
+        function d3CheckBox() {
+
+            var size = 20,
+                x = 0,
+                y = 0,
+                rx = 0,
+                ry = 0,
+                markStrokeWidth = 2,
+                boxStrokeWidth = 2,
+                checked = false,
+                clickEvent,
+                xtext = 0,
+                ytext = 0,
+                text = "Empty";
+
+            function checkBox(selection) {
+                var g = selection.append("g"),
+                    box = g.append("rect")
+                        .attr("width", size)
+                        .attr("height", size)
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("rx", rx)
+                        .attr("ry", ry)
+                        .styles({
+                            "fill-opacity": 0,
+                            "stroke-width": boxStrokeWidth,
+                            "stroke": "black"
+                        }),
+                    txt = g.append("text").attr("x", xtext).attr("y", ytext).text("" + text + "");
+
+                //Data to represent the check mark
+                var coordinates = [
+                    {x: x + (size / 8), y: y + (size / 3)},
+                    {x: x + (size / 2.2), y: (y + size) - (size / 4)},
+                    {x: (x + size) - (size / 8), y: (y + (size / 10))}
+                ];
+
+                var line = d3.line() // for v3, d3.svg.line()
+                    .x(function (d) {
+                        return d.x;
+                    })
+                    .y(function (d) {
+                        return d.y;
+                    });
+                // .interpolate("basic");
+
+                var mark = g.append("path")
+                    .attr("d", line(coordinates))
+                    .styles({
+                        "stroke-width": markStrokeWidth,
+                        "stroke": "black",
+                        "fill": "none",
+                        "opacity": (checked) ? 1 : 0
+                    });
+
+                g.on("click", function () {
+                    checked = !checked;
+                    mark.style("opacity", (checked) ? 1 : 0);
+
+                    if (clickEvent) {
+                        clickEvent();
+                    }
+
+                    d3.event.stopPropagation();
+                });
+            }
+
+            checkBox.size = function (val) {
+                size = val;
+                return checkBox;
+            }
+
+            checkBox.x = function (val) {
+                x = val;
+                return checkBox;
+            }
+
+            checkBox.y = function (val) {
+                y = val;
+                return checkBox;
+            }
+
+            checkBox.rx = function (val) {
+                rx = val;
+                return checkBox;
+            }
+
+            checkBox.ry = function (val) {
+                ry = val;
+                return checkBox;
+            }
+
+            checkBox.markStrokeWidth = function (val) {
+                markStrokeWidth = val;
+                return checkBox;
+            }
+
+            checkBox.boxStrokeWidth = function (val) {
+                boxStrokeWidth = val;
+                return checkBox;
+            }
+
+            checkBox.checked = function (val) {
+                if (val === undefined) {
+                    return checked;
+                } else {
+                    checked = val;
+                    return checkBox;
+                }
+            }
+
+            checkBox.clickEvent = function (val) {
+                clickEvent = val;
+                return checkBox;
+            }
+
+            checkBox.xtext = function (val) {
+                xtext = val;
+                return checkBox;
+            }
+
+            checkBox.ytext = function (val) {
+                ytext = val;
+                return checkBox;
+            }
+
+            checkBox.text = function (val) {
+                text = val;
+                return checkBox;
+            }
+
+            return checkBox;
+        }
+
+        // circle drag on-off based on checked event
+        var circledragonoff = svg.append("g").data([{x: 1050, y: 25}]);
+        var radius = 20;
+
+        var circledrag = circledragonoff.append("circle")
+            .attr("id", "" + textvalue1 + "")
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("r", radius)
+            .attr("fill", "lightgreen")
+            .attr("stroke-width", 20)
+            .attr("cursor", "move");
+        // .call(d3.drag().on("drag", dragcircle));
+
+        // circle 2
+        var circledragonoff2 = svg.append("g").data([{x: 1050, y: 75}]);
+
+        var circledrag2 = circledragonoff2.append("circle")
+            .attr("id", "" + textvalue2 + "")
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("r", radius)
+            .attr("fill", "orange")
+            .attr("stroke-width", 20)
+            .attr("cursor", "move");
+        // .call(d3.drag().on("drag", dragcircle));
     }
 
     // Expose utility to the global object
