@@ -36,6 +36,17 @@
     var table = document.createElement("table");
     table.className = "table";
 
+    // Testing graph library
+    var graphTest = new Graph();
+    var graphData = [[1,2,1], [2,3,1], [3,4,1]];
+
+    for (var e = 0; e < graphData.length; e++) {
+        graphTest.createEdge(graphData[e][0], graphData[e][1], graphData[e][2]);
+        graphTest.createEdge(graphData[e][1], graphData[e][0], graphData[e][2]);
+    }
+
+    console.log("Testing graph.js: ", graphTest);
+
     // Convenience function for inserting innerHTML for 'select'
     var insertHtml = function (selector, html) {
         var targetElem = document.querySelector(selector);
@@ -630,7 +641,7 @@
         var modelName = "#" + cellmlModel.slice(0, indexOfCellML);
         var subject = cellmlModel.concat(modelName); // e.g. weinstein_1995.cellml#weinstein_1995
 
-        var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
+        mainUtils.queryloadModel = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
             'WHERE { GRAPH ?Workspace { ' +
             'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Protein> ?Protein } . ' +
             'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Species> ?Species } . ' +
@@ -647,7 +658,8 @@
                 insertHtml("#main-content", modelHtmlContent);
 
                 if (mainUtils.fromEpithelialToModelState == 0) {
-                    $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.showModel, true);
+
+                    $ajaxUtils.sendPostRequest(endpoint, mainUtils.queryloadModel, mainUtils.showModel, true);
                 } else {
                     // state reinitialize, load epithelial to load model
                     mainUtils.fromEpithelialToModelState = 0;
@@ -1523,37 +1535,38 @@
                 .attr("cy", axis.shift());
         }
 
-        // SVG checkbox and dragging on-off
+        // SVG checkbox with circles dragging on-off
         var checkboxsvg = svg.append("g"),
             checkBox1 = new d3CheckBox(),
             checkBox2 = new d3CheckBox();
 
         //Just for demonstration
-        var txt = checkboxsvg.append("text").attr("x", 800).attr("y", 120).text("Click checkbox and drag circle"),
-            update = function () {
-                var checked1 = checkBox1.checked(),
-                    checked2 = checkBox2.checked();
-                txt.text(checked1 + "," + checked2);
+        var txt = checkboxsvg.append("text").attr("x", 800).attr("y", 120).text("Click checkbox and drag circle");
 
-                // drag enable and disable
-                if (checked1) {
-                    circledrag.call(d3.drag().on("drag", dragcircle));
-                }
-                else {
-                    circledrag.call(d3.drag().on("drag", function () {
-                        circledrag.classed("dragging", false);
-                    }));
-                }
+        var update = function () {
+            var checked1 = checkBox1.checked(),
+                checked2 = checkBox2.checked();
+            txt.text(checked1 + "," + checked2);
 
-                if (checked2) {
-                    circledrag2.call(d3.drag().on("drag", dragcircle));
-                }
-                else {
-                    circledrag2.call(d3.drag().on("drag", function () {
-                        circledrag2.classed("dragging", false);
-                    }));
-                }
-            };
+            // drag enable and disable
+            if (checked1) {
+                circledrag.call(d3.drag().on("drag", dragcircle));
+            }
+            else {
+                circledrag.call(d3.drag().on("drag", function () {
+                    circledrag.classed("dragging", false);
+                }));
+            }
+
+            if (checked2) {
+                circledrag2.call(d3.drag().on("drag", dragcircle));
+            }
+            else {
+                circledrag2.call(d3.drag().on("drag", function () {
+                    circledrag2.classed("dragging", false);
+                }));
+            }
+        };
 
         //Setting up check box and text
         var textvalue1 = "weinstein_1995";
@@ -1605,14 +1618,13 @@
                     {x: (x + size) - (size / 8), y: (y + (size / 10))}
                 ];
 
-                var line = d3.line() // for v3, d3.svg.line()
+                var line = d3.line()
                     .x(function (d) {
                         return d.x;
                     })
                     .y(function (d) {
                         return d.y;
                     });
-                // .interpolate("basic");
 
                 var mark = g.append("path")
                     .attr("d", line(coordinates))
