@@ -7,29 +7,6 @@
 var SparqlParser = require('../node_modules/sparqljs').Parser;
 var parser = new SparqlParser();
 
-var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
-    'WHERE {' +
-    '?Model_entity <http://purl.org/dc/terms/Protein> ?Protein.' +
-    '?Model_entity <http://purl.org/dc/terms/Species> ?Species.' +
-    '?Model_entity <http://purl.org/dc/terms/Gene> ?Gene.' +
-    '?Model_entity <http://purl.org/dc/terms/Compartment> ?Compartment.' +
-    'FILTER (?Model_entity = "weinstein_1995").' +
-    '}';
-
-var parsedQuery = parser.parse(query);
-console.log("Index.js: ", parsedQuery["where"][0].triples);
-
-// query
-var query2 = 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-    'SELECT ?sub ?obj ?obj2 ' +
-    'WHERE {' +
-    '?sub dcterms:Species ?obj.' +
-    '?sub dcterms:Gene ?obj2.' +
-    '}';
-
-var parsedQuery2 = parser.parse(query2);
-console.log("Index.js: ", parsedQuery2["where"][0].triples);
-
 (function (global) {
     'use strict';
 
@@ -41,6 +18,30 @@ console.log("Index.js: ", parsedQuery2["where"][0].triples);
     var modelHtml = "snippets/model.html";
     var searchHtml = "snippets/search.html";
     var viewHtml = "snippets/view.html";
+
+    // test query
+    var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
+        'WHERE {' +
+        '?Model_entity <http://purl.org/dc/terms/Protein> ?Protein.' +
+        '?Model_entity <http://purl.org/dc/terms/Species> ?Species.' +
+        '?Model_entity <http://purl.org/dc/terms/Gene> ?Gene.' +
+        '?Model_entity <http://purl.org/dc/terms/Compartment> ?Compartment.' +
+        'FILTER (?Model_entity = "weinstein_1995").' +
+        '}';
+
+    var parsedQuery = parser.parse(query);
+    console.log("Index.js: ", parsedQuery["where"][0].triples);
+
+    // test query
+    var query2 = 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+        'SELECT ?sub ?obj ?obj2 ' +
+        'WHERE {' +
+        '?sub dcterms:Species ?obj.' +
+        '?sub dcterms:Gene ?obj2.' +
+        '}';
+
+    var parsedQuery2 = parser.parse(query2);
+    console.log("Index.js: ", parsedQuery2["where"][0].triples);
 
     // Set up a namespace for our utility
     var mainUtils = {};
@@ -440,23 +441,37 @@ console.log("Index.js: ", parsedQuery2["where"][0].triples);
         if (event.key == 'Enter') {
 
             var searchTxt = document.getElementById("searchTxt").value;
+            var uriOPB;
 
             // TODO: avoid using regex inside SPARQL!!
             // TODO: could use PMR services (PMR text search, RICORDO, etc)
-            var re = /^.*$/g;
-
-            var searchstr = searchTxt.match(re).toString()
-                .replace(/\s+/g, " ", "i")
-                .replace(/\s*\/\s*/g, '/', "i")
-                .replace(/\s*\-\s*/g, '-', "i");
 
             // set local storage
             sessionStorage.setItem('searchTxtContent', searchTxt);
 
-            var query = 'SELECT ?Model_entity ?Biological_meaning WHERE ' +
-                '{ GRAPH ?Workspace { ?Model_entity ?Location ?Biological_meaning . ' +
-                'FILTER regex(str(?Biological_meaning), "' + searchstr + '", "i") . ' +
-                '}}';
+            // dictionary object
+            var dict = [{"key": "flux", "value": "<http://identifiers.org/opb/OPB_00593>"},
+                {"key": "concentration", "value": "<http://identifiers.org/opb/OPB_00340>"}];
+
+            if (searchTxt.indexOf("" + dict[0].key + "") != -1) {
+                uriOPB = dict[0].value;
+            }
+
+            if (searchTxt.indexOf("" + dict[1].key + "") != -1) {
+                uriOPB = dict[1].value;
+            }
+
+            console.log("key:", dict[0].key, " value:", dict[0].value);
+            console.log("key:", dict[1].key, " value:", dict[1].value);
+
+            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+                'SELECT ?Model_entity ?Biological_meaning ' +
+                'WHERE { ' +
+                '?property semsim:hasPhysicalDefinition ' + uriOPB + '. ' +
+                '?Model_entity semsim:isComputationalComponentFor ?property. ' +
+                '?Model_entity dcterms:description ?Biological_meaning.' +
+                '}';
 
             showLoading("#searchList");
 
@@ -727,7 +742,6 @@ console.log("Index.js: ", parsedQuery2["where"][0].triples);
         }
 
         links = uniqueify(links);
-        console.log("links: ", links);
 
         var nodes = {};
 
@@ -900,6 +914,9 @@ console.log("Index.js: ", parsedQuery2["where"][0].triples);
         var nodes = mainUtils.nodes;
         var links = mainUtils.links;
 
+        console.log("nodes: ", nodes);
+        console.log("links: ", links);
+
         // Create a graph
         for (var e = 0; e < mainUtils.links.length; e++) {
             graphSVG.createEdge(links[e].source.name, links[e].target.name, links[e].value.name);
@@ -929,7 +946,7 @@ console.log("Index.js: ", parsedQuery2["where"][0].triples);
             .force("link", d3.forceLink().id(function (d) {
                 return d.name;
             }))
-            .force("charge", d3.forceManyBody().strength(-200))
+            .force("charge", d3.forceManyBody().strength(-300))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force("link", d3.forceLink().distance(100).strength(0.1));
 
@@ -965,8 +982,18 @@ console.log("Index.js: ", parsedQuery2["where"][0].triples);
                 .on("end", dragended));
 
         node.append("circle")
-            .attr("r", 5)
-            .style("fill", "red");
+            .attr("r", 10)
+            .style("fill", function (d) {
+                if (d.name === "weinstein_1995.cellml#weinstein_1995") {
+                    return "red";
+                }
+            })
+            .style("r", function (d) {
+                if (d.name === "weinstein_1995.cellml#weinstein_1995") {
+                    return 15;
+                }
+            })
+
 
         // add the text
         node.append("text")
