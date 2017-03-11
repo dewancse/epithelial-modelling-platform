@@ -22,3 +22,26 @@
     stroke: #000;
     stroke-width: 2px;
 }
+
+.nodes circle {
+    pointer-events: all;
+    stroke: none;
+    stroke-width: 40px;
+}
+
+.pathlink {
+    fill: none;
+    stroke: #aaa;
+    stroke-width: 1.5px;
+}
+
+circle {
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+text {
+    fill: #000;
+    font: 12px sans-serif;
+    pointer-events: none;
+}

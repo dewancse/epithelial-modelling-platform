@@ -33,21 +33,14 @@ var query2 = 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
 var parsedQuery2 = parser.parse(query2);
 console.log("Index.js: ", parsedQuery2["where"][0].triples);
 
-function add() {
-    return parsedQuery;
-}
-
-console.log("add: ", add);
-
 (function (global) {
     'use strict';
-
-    console.log("Inside function: ", parsedQuery, parsedQuery2);
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
     var annotationHtml = "snippets/annotation.html";
     var epithelialHtml = "snippets/epithelial.html";
+    var svgmodelHtml = "snippets/svgmodel.html";
     var modelHtml = "snippets/model.html";
     var searchHtml = "snippets/search.html";
     var viewHtml = "snippets/view.html";
@@ -68,20 +61,12 @@ console.log("add: ", add);
     mainUtils.model = [];
     mainUtils.model2DArr = [];
 
+    // Testing graph library
+    var graphSVG = new Graph();
+
     // Initial declarations for a table
     var table = document.createElement("table");
     table.className = "table";
-
-    // Testing graph library
-    var graphTest = new Graph();
-    var graphData = [[1,2,1], [2,3,1], [3,4,1]];
-
-    for (var e = 0; e < graphData.length; e++) {
-        graphTest.createEdge(graphData[e][0], graphData[e][1], graphData[e][2]);
-        graphTest.createEdge(graphData[e][1], graphData[e][0], graphData[e][2]);
-    }
-
-    console.log("Testing graph.js: ", graphTest);
 
     // Convenience function for inserting innerHTML for 'select'
     var insertHtml = function (selector, html) {
@@ -677,7 +662,7 @@ console.log("add: ", add);
         var modelName = "#" + cellmlModel.slice(0, indexOfCellML);
         var subject = cellmlModel.concat(modelName); // e.g. weinstein_1995.cellml#weinstein_1995
 
-        mainUtils.queryloadModel = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
+        var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
             'WHERE { GRAPH ?Workspace { ' +
             'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Protein> ?Protein } . ' +
             'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Species> ?Species } . ' +
@@ -695,7 +680,7 @@ console.log("add: ", add);
 
                 if (mainUtils.fromEpithelialToModelState == 0) {
 
-                    $ajaxUtils.sendPostRequest(endpoint, mainUtils.queryloadModel, mainUtils.showModel, true);
+                    $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.showModel, true);
                 } else {
                     // state reinitialize, load epithelial to load model
                     mainUtils.fromEpithelialToModelState = 0;
@@ -708,7 +693,61 @@ console.log("add: ", add);
     // Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
+        console.log("showModel parsedQuery: ", parsedQuery);
         console.log("showModel: ", jsonObj);
+
+        // Mapping SPARQL.js and PMR SPARQL result
+        var links = [];
+        var subject, predicate, object;
+
+        for (var i = 0; i < jsonObj.results.bindings.length; i++) {
+            for (var j = 0; j < parsedQuery["where"][0].triples.length; j++) {
+                subject = parsedQuery["where"][0].triples[j].subject.replace(/[?]/g, '');
+                predicate = parsedQuery["where"][0].triples[j].predicate;
+                object = parsedQuery["where"][0].triples[j].object.replace(/[?]/g, '');
+
+                console.log(subject, predicate, object);
+
+                links.push({
+                    source: jsonObj.results.bindings[i][subject].value,
+                    target: jsonObj.results.bindings[i][object].value,
+                    value: predicate
+                });
+            }
+        }
+
+        console.log("links: ", links);
+
+        // Remove duplicate links
+        function uniqueify(es) {
+            var retval = [];
+            es.forEach(function (e) {
+                for (var j = 0; j < retval.length; j++) {
+                    if (retval[j].source === e.source && retval[j].target === e.target)
+                        return;
+                }
+                retval.push(e);
+            });
+            return retval;
+        }
+
+        links = uniqueify(links);
+
+        var nodes = {};
+
+        // Compute distinct nodes from the links.
+        links.forEach(function (link) {
+            link.source = nodes[link.source] ||
+                (nodes[link.source] = {name: link.source});
+
+            link.target = nodes[link.target] ||
+                (nodes[link.target] = {name: link.target});
+        });
+
+        mainUtils.nodes = nodes;
+        mainUtils.links = links;
+
+        // End of Mapping
 
         var modelList = document.getElementById("modelList");
 
@@ -847,6 +886,148 @@ console.log("add: ", add);
 
         // TODO: click when empty loadmodel table!! Fix this!!
     };
+
+    mainUtils.loadSVGModelHtml = function () {
+
+        $ajaxUtils.sendGetRequest(
+            svgmodelHtml,
+            function (svgmodelHtmlContent) {
+                insertHtml("#main-content", svgmodelHtmlContent);
+
+                $ajaxUtils.sendGetRequest(svgmodelHtml, mainUtils.showSVGModelHtml, false);
+            },
+            false);
+    }
+
+    mainUtils.showSVGModelHtml = function (svgmodelHtmlContent) {
+
+        var nodes = mainUtils.nodes;
+        var links = mainUtils.links;
+
+        // Create a graph
+        for (var e = 0; e < mainUtils.links.length; e++) {
+            graphSVG.createEdge(links[e].source.name, links[e].target.name, links[e].value.name);
+            graphSVG.createEdge(links[e].target.name, links[e].source.name, links[e].value.name);
+        }
+
+        console.log("graph.js in showSVGModelHtml : ", graphSVG);
+
+        var g = document.getElementById("#svgVisualize2"),
+            width = window.innerWidth,
+            height = window.innerHeight;
+
+        var svg = d3.select("#svgVisualize2").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+
+        function updateWindow() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            svg.attr("width", width).attr("height", height);
+        }
+
+        window.onresize = updateWindow;
+
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function (d) {
+                return d.name;
+            }))
+            .force("charge", d3.forceManyBody().strength(-200))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("link", d3.forceLink().distance(100).strength(0.1));
+
+        //build the arrow.
+        svg.append("svg:defs").selectAll("marker")
+            .data(["end"])      // Different link/path types can be defined here
+            .enter().append("svg:marker")    // This section adds in the arrows
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 15)
+            .attr("refY", -1.5)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5");
+
+        // add the links and the arrows
+        var link = svg.append("svg:g").selectAll("path")
+            .data(links)
+            .enter().append("svg:path")
+            .attr("class", "pathlink")
+            .attr("marker-end", "url(#end)");
+
+        var node = svg.append("g")
+            .attr("class", "nodes")
+            .selectAll("circle")
+            .data(d3.values(nodes))
+            .enter().append("g")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        node.append("circle")
+            .attr("r", 5)
+            .style("fill", "red");
+
+        // add the text
+        node.append("text")
+            .attr("x", 12)
+            .attr("dy", ".35em")
+            .text(function (d) {
+                return d.name;
+            });
+
+        simulation
+            .nodes(d3.values(nodes))
+            .on("tick", tick);
+
+        simulation.force("link")
+            .links(links);
+
+        // add the curvy lines
+        function tick() {
+            link.attr("d", function (d) {
+
+                // Total difference in x and y from source to target
+                var dx = d.target.x - d.source.x,
+                    dy = d.target.y - d.source.y;
+
+                // Length of path from center of source node to center of target node
+                var dr = Math.sqrt(dx * dx + dy * dy);
+
+                return "M" +
+                    d.source.x + "," +
+                    d.source.y + "A" +
+                    dr + "," + dr + " 0 0,1 " +
+                    d.target.x + "," +
+                    d.target.y;
+            });
+
+            node.attr("transform", function (d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
+        }
+
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+    }
 
     mainUtils.loadEpithelialHtml = function () {
 
