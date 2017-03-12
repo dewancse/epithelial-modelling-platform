@@ -358,7 +358,7 @@ var parser = new SparqlParser();
         console.log(speciesList);
         console.log(geneList);
         console.log(proteinList);
-        console.log("mainUtils.modelEntityLength: ", mainUtils.modelEntityLength);
+        // console.log("mainUtils.modelEntityLength: ", mainUtils.modelEntityLength);
 
         var idxSpecies = 0, idxGene = 0, idxBreak = 0;
 
@@ -474,10 +474,10 @@ var parser = new SparqlParser();
         console.log(speciesList);
         console.log(geneList);
         console.log(proteinList);
-        console.log("mainUtils.modelEntityLength: ", mainUtils.modelEntityLength);
+        // console.log("mainUtils.modelEntityLength: ", mainUtils.modelEntityLength);
 
         // Get concentration of each flux variable for each index
-        for (; modelEntityIndex < mainUtils.modelEntityLength; modelEntityIndex++) {
+        for (; modelEntityIndex < modelEntity.length; modelEntityIndex++) {
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
                 'SELECT ?Model_srcentity ?Biological_srcmeaning ?Model_snkentity ?Biological_snkmeaning ' +
@@ -526,7 +526,7 @@ var parser = new SparqlParser();
         console.log(speciesList);
         console.log(geneList);
         console.log(proteinList);
-        console.log("mainUtils.modelEntityLength: ", mainUtils.modelEntityLength);
+        // console.log("mainUtils.modelEntityLength: ", mainUtils.modelEntityLength);
 
         var searchList = document.getElementById("searchList");
 
@@ -728,7 +728,7 @@ var parser = new SparqlParser();
                                                 if (idxBreak == jsonModel.results.bindings.length) {
                                                     head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
-                                                    mainUtils.modelEntityLength = modelEntity.length;
+                                                    // mainUtils.modelEntityLength = modelEntity.length;
 
                                                     mainUtils.presearchList(
                                                         head,
