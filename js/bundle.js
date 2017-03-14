@@ -33,7 +33,6 @@ var parser = new SparqlParser();
         '}';
 
     var parsedQuery = parser.parse(query);
-    console.log("Index.js: ", parsedQuery["where"][0].triples);
 
     // test query
     var query2 = 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
@@ -44,7 +43,6 @@ var parser = new SparqlParser();
         '}';
 
     var parsedQuery2 = parser.parse(query2);
-    console.log("Index.js: ", parsedQuery2["where"][0].triples);
 
     // Set up a namespace for our utility
     var mainUtils = {};
@@ -555,8 +553,8 @@ var parser = new SparqlParser();
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
 
-            var searchTxt = document.getElementById("searchTxt").value;
-            var uriOPB;
+            var uriOPB,
+                searchTxt = document.getElementById("searchTxt").value;
 
             // TODO note: avoid using regex inside SPARQL!!
 
@@ -577,116 +575,110 @@ var parser = new SparqlParser();
                 uriOPB = dict[1].value; // value of concentration
             }
 
-            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-                'SELECT ?Model_entity ?Biological_meaning ' +
-                'WHERE { ' +
-                '?property semsim:hasPhysicalDefinition ' + uriOPB + '. ' +
-                '?Model_entity semsim:isComputationalComponentFor ?property. ' +
-                '?Model_entity dcterms:description ?Biological_meaning.' +
-                '}';
-
             showLoading("#searchList");
 
-            // Index to get model name for species, genes, and breaking condition
-            var idxSpecies = 0, idxGene = 0, idxBreak = 0;
-            var modelEntity = [], biologicalMeaning = [];
-            var speciesList = [], geneList = [], proteinList = [];
-            var head = [];
+            var id = 0; // id to keep track of each Model_entity
 
-            // Model
-            $ajaxUtils.sendPostRequest(
-                endpoint,
-                query,
-                function (jsonModel) {
-                    console.log("jsonModel in document.addEventListener: ", jsonModel);
-                    for (var id = 0; id < jsonModel.results.bindings.length; id++) {
-                        console.log("jsonModel.results.bindings[id]: ", jsonModel.results.bindings[id].Model_entity.value);
+            mainUtils.addEventListener(uriOPB);
+        }
+    });
 
-                        modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
-                        biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
+    var modelEntity = [],
+        biologicalMeaning = [],
+        speciesList = [],
+        geneList = [],
+        proteinList = [],
+        head = [],
+        id = 0;
 
+    mainUtils.addEventListener = function (uriOPB) {
+
+        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+            'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+            'SELECT ?Model_entity ?Biological_meaning ' +
+            'WHERE { ' +
+            '?property semsim:hasPhysicalDefinition ' + uriOPB + '. ' +
+            '?Model_entity semsim:isComputationalComponentFor ?property. ' +
+            '?Model_entity dcterms:description ?Biological_meaning.' +
+            '}';
+
+        // Model
+        $ajaxUtils.sendPostRequest(
+            endpoint,
+            query,
+            function (jsonModel) {
+                if (id == jsonModel.results.bindings.length) {
+                    return;
+                }
+
+                var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
+                var query = 'SELECT ?Species ' + 'WHERE { ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
+
+                // Species
+                $ajaxUtils.sendPostRequest(
+                    endpoint,
+                    query,
+                    function (jsonSpecies) {
                         var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                        var query = 'SELECT ?Species ' + 'WHERE { ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
+                        var query = 'SELECT ?Gene ' + 'WHERE { ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
 
-                        // Species
+                        // Gene
                         $ajaxUtils.sendPostRequest(
                             endpoint,
                             query,
-                            function (jsonSpecies) {
-                                if (jsonSpecies.results.bindings.length == 0)
-                                    speciesList.push("Undefined");
-                                else
-                                    speciesList.push(jsonSpecies.results.bindings[0].Species.value);
+                            function (jsonGene) {
 
-                                // ajax calls
-                                console.log("ajaxUtils.success Species: ", $ajaxUtils.success);
-                                console.log("ajaxUtils.response Species: ", JSON.parse($ajaxUtils.response));
+                                var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
+                                var query = 'SELECT ?Protein ' + 'WHERE { ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
 
-                                model = parseModelName(jsonModel.results.bindings[idxSpecies++].Model_entity.value);
-                                var query = 'SELECT ?Gene ' + 'WHERE { ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene }';
-
-                                // Gene
+                                // Protein
                                 $ajaxUtils.sendPostRequest(
                                     endpoint,
                                     query,
-                                    function (jsonGene) {
+                                    function (jsonProtein) {
+                                        // model and biological meaning
+                                        modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
+                                        biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
+
+                                        // species
+                                        if (jsonSpecies.results.bindings.length == 0)
+                                            speciesList.push("Undefined");
+                                        else
+                                            speciesList.push(jsonSpecies.results.bindings[0].Species.value);
+
+                                        // gene
                                         if (jsonGene.results.bindings.length == 0)
                                             geneList.push("Undefined");
                                         else
                                             geneList.push(jsonGene.results.bindings[0].Gene.value);
 
-                                        // ajax calls
-                                        console.log("ajaxUtils.success Gene: ", $ajaxUtils.success);
-                                        console.log("ajaxUtils.response Gene: ", JSON.parse($ajaxUtils.response));
+                                        // gene
+                                        if (jsonProtein.results.bindings.length == 0)
+                                            proteinList.push("Undefined");
+                                        else
+                                            proteinList.push(jsonProtein.results.bindings[0].Protein.value);
 
-                                        model = parseModelName(jsonModel.results.bindings[idxGene++].Model_entity.value);
-                                        var query = 'SELECT ?Protein ' + 'WHERE ' + '{ <' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein }';
+                                        head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
+                                        
+                                        console.log("modelEntity: ", modelEntity);
+                                        console.log("biologicalMeaning: ", biologicalMeaning);
+                                        console.log("speciesList: ", speciesList);
+                                        console.log("speciesList: ", geneList);
+                                        console.log("proteinList: ", proteinList);
+                                        console.log("****************************************");
 
-                                        // Protein
-                                        $ajaxUtils.sendPostRequest(
-                                            endpoint,
-                                            query,
-                                            function (jsonProtein) {
-                                                if (jsonProtein.results.bindings.length == 0)
-                                                    proteinList.push("Undefined");
-                                                else
-                                                    proteinList.push(jsonProtein.results.bindings[0].Protein.value);
-
-                                                head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
-
-                                                mainUtils.searchListAJAX(
-                                                    head,
-                                                    jsonModel.results.bindings[idxBreak].Model_entity.value,
-                                                    modelEntity,
-                                                    biologicalMeaning,
-                                                    speciesList,
-                                                    geneList,
-                                                    proteinList);
-
-                                                idxBreak++;
-
-                                                // ajax calls
-                                                console.log("ajaxUtils.success Protein: ", $ajaxUtils.success);
-                                                console.log("ajaxUtils.response Protein: ", JSON.parse($ajaxUtils.response));
-                                            },
-                                            true);
+                                        id++; // increment index of modelEntity
+                                        mainUtils.addEventListener(uriOPB);
                                     },
                                     true);
                             },
                             true);
-                    } // for loop
-
-                    // No search results found, so sent empty arrays
-                    if (!jsonModel.results.bindings.length) {
-                        console.log("No search results found in document.addEventListener: ", jsonModel.results.bindings.length);
-                        mainUtils.searchList(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
-                    }
-                },
-                true
-            );
-        } // if event.key
-    });
+                    },
+                    true);
+            },
+            true
+        );
+    }
 
     // Load the view
     mainUtils.loadViewHtml = function () {

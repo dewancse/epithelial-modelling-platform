@@ -52,9 +52,6 @@
     function handleResponse(request, responseHandler, isJsonResponse) {
         if ((request.readyState == 4) && (request.status == 200)) {
 
-            ajaxUtils.success = request.status;
-            ajaxUtils.response = request.responseText;
-
             // Default to isJsonResponse = true
             if (isJsonResponse == undefined) {
                 isJsonResponse = true;
@@ -67,8 +64,6 @@
                 responseHandler(request.responseText);
             }
         }
-
-        ajaxUtils.success = request.status;
     }
 
     // Expose utility to the global object
