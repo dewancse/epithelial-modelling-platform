@@ -259,6 +259,9 @@ var parser = new SparqlParser();
                     var workspaceName = idWithStr.slice(0, index);
 
                     mainUtils.workspaceName = workspaceName;
+
+                    // indexOfSemSimURI + 1 ==> weinstein_1995#NHE3_C_ext_Na
+                    mainUtils.modelEntityName = idWithStr.slice(36 + 1);
                 }
                 else {
                     mainUtils.workspaceName = "";
@@ -794,17 +797,13 @@ var parser = new SparqlParser();
 
         var cellmlModel = mainUtils.workspaceName;
 
-        var indexOfCellML = cellmlModel.search(".cellml");
-        var modelName = "#" + cellmlModel.slice(0, indexOfCellML);
-        var subject = cellmlModel.concat(modelName); // e.g. weinstein_1995.cellml#weinstein_1995
-
         var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
             'WHERE { GRAPH ?Workspace { ' +
-            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Protein> ?Protein } . ' +
-            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Species> ?Species } . ' +
-            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Gene> ?Gene } . ' +
-            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/Compartment> ?Compartment } . ' +
-            'FILTER (?Model_entity = <' + subject + '>) . ' +
+            'OPTIONAL { ' + '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein } . ' +
+            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/description> ?Protein } . ' +
+            'OPTIONAL { ' + '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species } . ' +
+            'OPTIONAL { ' + '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene } . ' +
+            'OPTIONAL { ' + '<' + cellmlModel + '#Compartment> <http://purl.org/dc/terms/description> ?Compartment } . ' +
             '}}';
 
         // showLoading("#main-content");
@@ -880,7 +879,6 @@ var parser = new SparqlParser();
 
         mainUtils.nodes = nodes;
         mainUtils.links = links;
-
         // End of Mapping
 
         var modelList = document.getElementById("modelList");
@@ -918,7 +916,9 @@ var parser = new SparqlParser();
                 // search list to model list with empty model
                 if (jsonObj.results.bindings.length == 0) break;
 
-                var id = jsonObj.results.bindings[i].Model_entity.value;
+                // var id = jsonObj.results.bindings[i].Model_entity.value;
+                var id = mainUtils.modelEntityName; // add model entity name instead of something#Protein
+
                 var label = document.createElement('label');
                 label.innerHTML = '<input id="' + id + '" type="checkbox" name="attribute" class="attribute" ' +
                     'data-action="model" value="' + id + '" ></label>';
@@ -938,7 +938,11 @@ var parser = new SparqlParser();
                 mainUtils.model.push(compartment);
             }
             else {
-                mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
+                if (jsonObj.head.vars[i] == "Model_entity")
+                    mainUtils.model.push(mainUtils.modelEntityName); // add model entity name instead of something#Protein
+
+                else
+                    mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
             }
         }
 
@@ -946,6 +950,8 @@ var parser = new SparqlParser();
         while (mainUtils.model.length) {
             mainUtils.model2DArr.push(mainUtils.model.splice(0, 6)); // 5 + 1 (checkbox) header elemenet
         }
+
+        console.log("mainUtils.model2DArr: ", mainUtils.model2DArr);
 
         var td = [];
         var tbody = document.createElement("tbody");
