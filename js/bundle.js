@@ -359,8 +359,6 @@ var parser = new SparqlParser();
     // TODO: make a common table platform for all functions
     // Show semantic annotation extracted from PMR
     mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
-        console.log("searchList modelEntity: ", modelEntity);
-        console.log("searchList modelEntity.length: ", modelEntity.length);
 
         var searchList = document.getElementById("searchList");
 
@@ -574,7 +572,14 @@ var parser = new SparqlParser();
 
             showLoading("#searchList");
 
-            var id = 0; // id to keep track of each Model_entity
+            modelEntity = [];
+            biologicalMeaning = [];
+            speciesList = [];
+            geneList = [];
+            proteinList = [];
+            head = [];
+
+            id = 0; // id to keep track of each Model_entity
 
             mainUtils.addEventListener(uriOPB);
         }
@@ -652,10 +657,18 @@ var parser = new SparqlParser();
                                         var len = modelEntity.length;
                                         // Get more useful information
                                         mainUtils.searchListAJAX(
-                                            modelEntity[len-1],
-                                            speciesList[len-1],
-                                            geneList[len-1],
-                                            proteinList[len-1]);
+                                            modelEntity[len - 1],
+                                            speciesList[len - 1],
+                                            geneList[len - 1],
+                                            proteinList[len - 1]);
+
+                                        mainUtils.searchList(
+                                            head,
+                                            modelEntity,
+                                            biologicalMeaning,
+                                            speciesList,
+                                            geneList,
+                                            proteinList);
 
                                         console.log("modelEntity: ", modelEntity);
                                         console.log("biologicalMeaning: ", biologicalMeaning);
