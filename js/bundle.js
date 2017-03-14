@@ -69,9 +69,6 @@ var parser = new SparqlParser();
         head = [],
         id = 0;
 
-    // Testing graph library
-    var graphSVG = new Graph();
-
     // Initial declarations for a table
     var table = document.createElement("table");
     table.className = "table";
@@ -396,10 +393,6 @@ var parser = new SparqlParser();
         thead.appendChild(tr);
         table.appendChild(thead);
 
-        // number of characters here: "http://www.bhi.washington.edu/SemSim/"
-        // will show model name not the semsim URI
-        var indexOfSemSimURI = 36;
-
         // Table body
         var tbody = document.createElement("tbody");
         for (var i = 0; i < modelEntity.length; i++) {
@@ -408,8 +401,8 @@ var parser = new SparqlParser();
             var temp = [];
             var td = [];
 
-            // indexOfSemSimURI+1 for starting from model name and ignore the semsim URI
-            temp.push(modelEntity[i].slice(indexOfSemSimURI + 1), biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
+            // Ignore the semsim URI ==> weinstein_1995#NHE3_C_ext_Na
+            temp.push(modelEntity[i].slice(36 + 1), biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
 
             for (var j = 0; j < temp.length; j++) {
                 if (j == 0) {
@@ -442,17 +435,6 @@ var parser = new SparqlParser();
         sessionStorage.setItem('searchListContent', $(maincontent).html());
     }
 
-    // Utility function to extract a model name
-    var parseModel = function (modelEntity) {
-        var indexOfCellML = modelEntity.search(".cellml");
-        var indexOfHash = modelEntity.search("#");
-        var modelName = modelEntity.slice(0, indexOfCellML);
-        var modelNameWithExt = modelEntity.slice(0, indexOfHash + 1);
-        var model = modelNameWithExt.concat(modelName);
-
-        return model;
-    }
-
     // Utility function to extract species, gene, and protein names
     var parseModelName = function (modelEntity) {
         var indexOfHash = modelEntity.search("#");
@@ -461,7 +443,7 @@ var parser = new SparqlParser();
         return modelName;
     }
 
-    // Table headers in search table
+    // Process table headers
     var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
         var head = [];
 
@@ -476,6 +458,7 @@ var parser = new SparqlParser();
     }
 
     mainUtils.searchListAJAX = function (modelEntityid, speciesListid, geneListid, proteinListid) {
+
         var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
             'PREFIX dcterms: <http://purl.org/dc/terms/>' +
             'SELECT ?Model_srcentity ?Biological_srcmeaning ?Model_snkentity ?Biological_snkmeaning ' +
@@ -500,8 +483,6 @@ var parser = new SparqlParser();
                 endpoint,
                 query,
                 function (jsonModel) {
-                    console.log("jsonModel in searchListAJAX: ", jsonModel);
-
                     var jsonModelObj = [];
 
                     // Parsing into Model_entity and Biological_meaning object
@@ -521,7 +502,6 @@ var parser = new SparqlParser();
 
                     // remove redundant objects
                     jsonModelObj = uniqueify(jsonModelObj);
-                    console.log("jsonModelObj in searchListAJAX: ", jsonModelObj);
                     // End of Parsing
 
                     for (var id = 0; id < jsonModelObj.length; id++) {
@@ -531,13 +511,6 @@ var parser = new SparqlParser();
                         geneList.push(geneListid);
                         proteinList.push(proteinListid);
                     }
-
-                    console.log("modelEntity in searchListAJAX: ", modelEntity);
-                    console.log("biologicalMeaning in searchListAJAX: ", biologicalMeaning);
-                    console.log("speciesList in searchListAJAX: ", speciesList);
-                    console.log("geneList in searchListAJAX: ", geneList);
-                    console.log("proteinList in searchListAJAX: ", proteinList);
-                    console.log("****************************************");
                 },
                 true
             );
@@ -546,7 +519,6 @@ var parser = new SparqlParser();
         mainUtils.searchListAJAXObj();
     }
 
-    // TODO: make it more efficient, use less variables
     // semantic annotation based on search items
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
@@ -582,7 +554,7 @@ var parser = new SparqlParser();
             proteinList = [];
             head = [];
 
-            id = 0; // id to keep track of each Model_entity
+            id = 0; // id to index each Model_entity
 
             mainUtils.addEventListener(uriOPB);
         }
@@ -616,6 +588,7 @@ var parser = new SparqlParser();
                     endpoint,
                     query,
                     function (jsonSpecies) {
+
                         var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
                         var query = 'SELECT ?Gene ' + 'WHERE { ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
 
@@ -633,6 +606,7 @@ var parser = new SparqlParser();
                                     endpoint,
                                     query,
                                     function (jsonProtein) {
+
                                         // model and biological meaning
                                         modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
                                         biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
@@ -649,7 +623,7 @@ var parser = new SparqlParser();
                                         else
                                             geneList.push(jsonGene.results.bindings[0].Gene.value);
 
-                                        // gene
+                                        // protein
                                         if (jsonProtein.results.bindings.length == 0)
                                             proteinList.push("Undefined");
                                         else
@@ -657,14 +631,15 @@ var parser = new SparqlParser();
 
                                         head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
-                                        var len = modelEntity.length;
                                         // Get more useful information
+                                        var len = modelEntity.length;
                                         mainUtils.searchListAJAX(
                                             modelEntity[len - 1],
                                             speciesList[len - 1],
                                             geneList[len - 1],
                                             proteinList[len - 1]);
 
+                                        // show search results
                                         mainUtils.searchList(
                                             head,
                                             modelEntity,
@@ -673,14 +648,8 @@ var parser = new SparqlParser();
                                             geneList,
                                             proteinList);
 
-                                        console.log("modelEntity: ", modelEntity);
-                                        console.log("biologicalMeaning: ", biologicalMeaning);
-                                        console.log("speciesList: ", speciesList);
-                                        console.log("speciesList: ", geneList);
-                                        console.log("proteinList: ", proteinList);
-
                                         id++; // increment index of modelEntity
-                                        mainUtils.addEventListener(uriOPB);
+                                        mainUtils.addEventListener(uriOPB); // callback
                                     },
                                     true);
                             },
@@ -693,24 +662,21 @@ var parser = new SparqlParser();
 
     // Load the view
     mainUtils.loadViewHtml = function () {
-        var cellmlModel = mainUtils.workspaceName;
 
-        var indexOfCellML = cellmlModel.search(".cellml");
-        var modelName = "#" + cellmlModel.slice(0, indexOfCellML);
-        var subject = cellmlModel.concat(modelName);
+        var cellmlModel = mainUtils.workspaceName;
 
         var query = 'SELECT ?Workspace ?Title ?Author ?Abstract ?Keyword ?Protein ?Species ?Gene ?Compartment ?Located_in ?DOI ' +
             'WHERE { GRAPH ?Workspace { ' +
-            '<' + subject + '> <http://purl.org/dc/terms/title> ?Title . ' +
-            'OPTIONAL { <' + subject + '> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
-            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Abstract> ?Abstract } . ' +
-            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Keyword> ?Keyword } . ' +
-            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Protein> ?Protein } . ' +
-            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Species> ?Species } . ' +
-            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Gene> ?Gene } . ' +
-            'OPTIONAL { <' + subject + '> <http://purl.org/dc/terms/Compartment> ?Compartment } . ' +
-            'OPTIONAL { <' + subject + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . ' +
-            'OPTIONAL { <' + subject + '> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . ' +
+            '<' + cellmlModel + '#Title> <http://purl.org/dc/terms/description> ?Title . ' +
+            'OPTIONAL { <' + cellmlModel + '#Author> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
+            'OPTIONAL { <' + cellmlModel + '#Abstract> <http://purl.org/dc/terms/description> ?Abstract } . ' +
+            'OPTIONAL { <' + cellmlModel + '#Keyword> <http://purl.org/dc/terms/description> ?Keyword } . ' +
+            'OPTIONAL { <' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein } . ' +
+            'OPTIONAL { <' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species } . ' +
+            'OPTIONAL { <' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene } . ' +
+            'OPTIONAL { <' + cellmlModel + '#Compartment> <http://purl.org/dc/terms/description> ?Compartment } . ' +
+            'OPTIONAL { <' + cellmlModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . ' +
+            'OPTIONAL { <' + cellmlModel + '#DOI> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . ' +
             '}}';
 
         showLoading("#main-content");
@@ -751,6 +717,7 @@ var parser = new SparqlParser();
 
     // Show a selected entry from the search results
     mainUtils.showView = function (jsonObj, viewHtmlContent) {
+
         var viewList = document.getElementById("viewList");
 
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
@@ -841,8 +808,6 @@ var parser = new SparqlParser();
                 predicate = parsedQuery["where"][0].triples[j].predicate;
                 object = parsedQuery["where"][0].triples[j].object.replace(/[?]/g, '');
 
-                console.log(subject, predicate, object);
-
                 links.push({
                     source: jsonObj.results.bindings[i][subject].value,
                     target: jsonObj.results.bindings[i][object].value,
@@ -916,8 +881,7 @@ var parser = new SparqlParser();
                 // search list to model list with empty model
                 if (jsonObj.results.bindings.length == 0) break;
 
-                // var id = jsonObj.results.bindings[i].Model_entity.value;
-                var id = mainUtils.modelEntityName; // add model entity name instead of something#Protein
+                var id = jsonObj.results.bindings[i].Model_entity.value;
 
                 var label = document.createElement('label');
                 label.innerHTML = '<input id="' + id + '" type="checkbox" name="attribute" class="attribute" ' +
@@ -939,10 +903,10 @@ var parser = new SparqlParser();
             }
             else {
                 if (jsonObj.head.vars[i] == "Model_entity")
-                    mainUtils.model.push(mainUtils.modelEntityName); // add model entity name instead of something#Protein
+                    mainUtils.model.push(mainUtils.modelEntityName); // replace something#Protein with modelEntityName
 
                 else
-                    mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
+                mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
             }
         }
 
@@ -1048,6 +1012,8 @@ var parser = new SparqlParser();
         console.log("links: ", links);
 
         // Create a graph
+        var graphSVG = new Graph();
+
         for (var e = 0; e < mainUtils.links.length; e++) {
             graphSVG.createEdge(links[e].source.name, links[e].target.name, links[e].value.name);
             graphSVG.createEdge(links[e].target.name, links[e].source.name, links[e].value.name);
@@ -1114,12 +1080,12 @@ var parser = new SparqlParser();
         node.append("circle")
             .attr("r", 10)
             .style("fill", function (d) {
-                if (d.name === "weinstein_1995.cellml#weinstein_1995") {
+                if (d.name === mainUtils.modelEntityName) {
                     return "red";
                 }
             })
             .style("r", function (d) {
-                if (d.name === "weinstein_1995.cellml#weinstein_1995") {
+                if (d.name === mainUtils.modelEntityName) {
                     return 15;
                 }
             })
