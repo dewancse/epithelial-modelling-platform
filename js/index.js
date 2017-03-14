@@ -57,6 +57,15 @@ var parser = new SparqlParser();
     mainUtils.model = [];
     mainUtils.model2DArr = [];
 
+    // variables to process searchList
+    var modelEntity = [],
+        biologicalMeaning = [],
+        speciesList = [],
+        geneList = [],
+        proteinList = [],
+        head = [],
+        id = 0;
+
     // Testing graph library
     var graphSVG = new Graph();
 
@@ -462,19 +471,12 @@ var parser = new SparqlParser();
         return head;
     }
 
-    mainUtils.searchListAJAX = function (head, jsonModelEntity, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
-        console.log("jsonModelEntity in searchListAJAX: ", jsonModelEntity);
-        console.log("modelEntity in searchListAJAX: ", modelEntity);
-        console.log("biologicalMeaning in searchListAJAX: ", biologicalMeaning);
-        console.log("speciesList in searchListAJAX: ", speciesList);
-        console.log("geneList in searchListAJAX: ", geneList);
-        console.log("proteinList in searchListAJAX: ", proteinList);
-
+    mainUtils.searchListAJAX = function (modelEntityid, speciesListid, geneListid, proteinListid) {
         var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
             'PREFIX dcterms: <http://purl.org/dc/terms/>' +
             'SELECT ?Model_srcentity ?Biological_srcmeaning ?Model_snkentity ?Biological_snkmeaning ' +
             'WHERE { ' +
-            '<' + jsonModelEntity + '> semsim:isComputationalComponentFor ?model_prop. ' +
+            '<' + modelEntityid + '> semsim:isComputationalComponentFor ?model_prop. ' +
             '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
             '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
             '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
@@ -488,61 +490,56 @@ var parser = new SparqlParser();
             '?Model_snkentity dcterms:description ?Biological_snkmeaning.' +
             '}'
 
-        // Model
-        $ajaxUtils.sendPostRequest(
-            endpoint,
-            query,
-            function (jsonModel) {
-                console.log("jsonModel in searchListAJAX: ", jsonModel);
+        mainUtils.searchListAJAXObj = function () {
+            // Model
+            $ajaxUtils.sendPostRequest(
+                endpoint,
+                query,
+                function (jsonModel) {
+                    console.log("jsonModel in searchListAJAX: ", jsonModel);
 
-                var jsonModel2 = [];
+                    var jsonModelObj = [];
 
-                // Parsing into Model_entity and Biological_meaning
-                for (var i = 0; i < jsonModel.results.bindings.length; i++) {
-                    jsonModel2.push({
-                        Model_entity: jsonModel.results.bindings[i].Model_srcentity.value,
-                        Biological_meaning: jsonModel.results.bindings[i].Biological_srcmeaning.value,
-                    });
-                }
+                    // Parsing into Model_entity and Biological_meaning object
+                    for (var i = 0; i < jsonModel.results.bindings.length; i++) {
+                        jsonModelObj.push({
+                            Model_entity: jsonModel.results.bindings[i].Model_srcentity.value,
+                            Biological_meaning: jsonModel.results.bindings[i].Biological_srcmeaning.value,
+                        });
+                    }
 
-                for (var i = 0; i < jsonModel.results.bindings.length; i++) {
-                    jsonModel2.push({
-                        Model_entity: jsonModel.results.bindings[i].Model_snkentity.value,
-                        Biological_meaning: jsonModel.results.bindings[i].Biological_snkmeaning.value,
-                    });
-                }
+                    for (var i = 0; i < jsonModel.results.bindings.length; i++) {
+                        jsonModelObj.push({
+                            Model_entity: jsonModel.results.bindings[i].Model_snkentity.value,
+                            Biological_meaning: jsonModel.results.bindings[i].Biological_snkmeaning.value,
+                        });
+                    }
 
-                jsonModel2 = uniqueify(jsonModel2);
-                console.log("jsonModel2 in searchListAJAX: ", jsonModel2);
-                // End of Parsing
+                    // remove redundant objects
+                    jsonModelObj = uniqueify(jsonModelObj);
+                    console.log("jsonModelObj in searchListAJAX: ", jsonModelObj);
+                    // End of Parsing
 
-                console.log("ajaxUtils.success in serachListAJAX: ", $ajaxUtils.success);
-                console.log("ajaxUtils.response in serachListAJAX: ", JSON.parse($ajaxUtils.response));
+                    for (var id = 0; id < jsonModelObj.length; id++) {
+                        modelEntity.push(jsonModelObj[id].Model_entity);
+                        biologicalMeaning.push(jsonModelObj[id].Biological_meaning);
+                        speciesList.push(speciesListid);
+                        geneList.push(geneListid);
+                        proteinList.push(proteinListid);
+                    }
 
-                for (var id = 0; id < jsonModel2.length; id++) {
-                    modelEntity.push(jsonModel2[id].Model_entity);
-                    biologicalMeaning.push(jsonModel2[id].Biological_meaning);
-                    speciesList.push("same");
-                    geneList.push("same");
-                    proteinList.push("same");
-                }
+                    console.log("modelEntity in searchListAJAX: ", modelEntity);
+                    console.log("biologicalMeaning in searchListAJAX: ", biologicalMeaning);
+                    console.log("speciesList in searchListAJAX: ", speciesList);
+                    console.log("geneList in searchListAJAX: ", geneList);
+                    console.log("proteinList in searchListAJAX: ", proteinList);
+                    console.log("****************************************");
+                },
+                true
+            );
+        }
 
-                mainUtils.searchList(
-                    head,
-                    modelEntity,
-                    biologicalMeaning,
-                    speciesList,
-                    geneList,
-                    proteinList);
-
-                // No search results found, so sent empty arrays
-                if (!jsonModel2.length) {
-                    console.log("No search results found in searchListAJAX", jsonModel2.length);
-                    mainUtils.searchList(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
-                }
-            },
-            true
-        );
+        mainUtils.searchListAJAXObj();
     }
 
     // TODO: make it more efficient, use less variables
@@ -579,14 +576,6 @@ var parser = new SparqlParser();
             mainUtils.addEventListener(uriOPB);
         }
     });
-
-    var modelEntity = [],
-        biologicalMeaning = [],
-        speciesList = [],
-        geneList = [],
-        proteinList = [],
-        head = [],
-        id = 0;
 
     mainUtils.addEventListener = function (uriOPB) {
 
@@ -656,13 +645,20 @@ var parser = new SparqlParser();
                                             proteinList.push(jsonProtein.results.bindings[0].Protein.value);
 
                                         head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
-                                        
+
+                                        var len = modelEntity.length;
+                                        // Get more useful information
+                                        mainUtils.searchListAJAX(
+                                            modelEntity[len-1],
+                                            speciesList[len-1],
+                                            geneList[len-1],
+                                            proteinList[len-1]);
+
                                         console.log("modelEntity: ", modelEntity);
                                         console.log("biologicalMeaning: ", biologicalMeaning);
                                         console.log("speciesList: ", speciesList);
                                         console.log("speciesList: ", geneList);
                                         console.log("proteinList: ", proteinList);
-                                        console.log("****************************************");
 
                                         id++; // increment index of modelEntity
                                         mainUtils.addEventListener(uriOPB);
@@ -673,8 +669,7 @@ var parser = new SparqlParser();
                     },
                     true);
             },
-            true
-        );
+            true);
     }
 
     // Load the view
