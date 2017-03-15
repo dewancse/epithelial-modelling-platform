@@ -480,20 +480,22 @@ var parser = new SparqlParser();
                 endpoint,
                 query,
                 function (jsonModel) {
+                    console.log(jsonModel);
+
                     var jsonModelObj = [];
 
                     // Parsing into Model_entity and Biological_meaning object
                     for (var i = 0; i < jsonModel.results.bindings.length; i++) {
                         jsonModelObj.push({
                             Model_entity: jsonModel.results.bindings[i].Model_srcentity.value,
-                            Biological_meaning: jsonModel.results.bindings[i].Biological_srcmeaning.value,
+                            Biological_meaning: jsonModel.results.bindings[i].Biological_srcmeaning.value
                         });
                     }
 
                     for (var i = 0; i < jsonModel.results.bindings.length; i++) {
                         jsonModelObj.push({
                             Model_entity: jsonModel.results.bindings[i].Model_snkentity.value,
-                            Biological_meaning: jsonModel.results.bindings[i].Biological_snkmeaning.value,
+                            Biological_meaning: jsonModel.results.bindings[i].Biological_snkmeaning.value
                         });
                     }
 
@@ -501,12 +503,26 @@ var parser = new SparqlParser();
                     jsonModelObj = uniqueify(jsonModelObj);
                     // End of Parsing
 
-                    for (var id = 0; id < jsonModelObj.length; id++) {
-                        modelEntity.push(jsonModelObj[id].Model_entity);
-                        biologicalMeaning.push(jsonModelObj[id].Biological_meaning);
+                    for (var m = 0; m < jsonModelObj.length; m++) {
+                        modelEntity.push(jsonModelObj[m].Model_entity);
+                        biologicalMeaning.push(jsonModelObj[m].Biological_meaning);
                         speciesList.push(speciesListid);
                         geneList.push(geneListid);
                         proteinList.push(proteinListid);
+                    }
+
+                    mainUtils.searchList(
+                        head,
+                        modelEntity,
+                        biologicalMeaning,
+                        speciesList,
+                        geneList,
+                        proteinList);
+
+                    // No search results found, so sent empty arrays
+                    if (!jsonModelObj.length) {
+                        console.log("No search results found in searchListAJAX", jsonModelObj.length);
+                        mainUtils.searchList(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
                     }
                 },
                 true
@@ -520,8 +536,8 @@ var parser = new SparqlParser();
     document.addEventListener('keydown', function (event) {
         if (event.key == 'Enter') {
 
-            var uriOPB,
-                searchTxt = document.getElementById("searchTxt").value;
+            var uriOPB, uriCHEBI, keyValue;
+            var searchTxt = document.getElementById("searchTxt").value;
 
             // TODO note: avoid using regex inside SPARQL!!
 
@@ -529,17 +545,56 @@ var parser = new SparqlParser();
             sessionStorage.setItem('searchTxtContent', searchTxt);
 
             // dictionary object
-            var dict = [
-                {"key": "flux", "value": "<http://identifiers.org/opb/OPB_00593>"},
-                {"key": "concentration", "value": "<http://identifiers.org/opb/OPB_00340>"}
+            var dictionary = [
+                {
+                    "key1": "flux", "key2": "",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
+                },
+                {
+                    "key1": "flux", "key2": "sodium",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+                },
+                {
+                    "key1": "flux", "key2": "hydrogen",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+                },
+                {
+                    "key1": "flux", "key2": "ammonium",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+                },
+                {
+                    "key1": "concentration", "key2": "",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
+                },
+                {
+                    "key1": "concentration", "key2": "sodium",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+                },
+                {
+                    "key1": "concentration", "key2": "hydrogen",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+                },
+                {
+                    "key1": "concentration", "key2": "ammonium",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+                },
             ];
 
-            if (searchTxt.indexOf("" + dict[0].key + "") != -1) {
-                uriOPB = dict[0].value; // value of flux
-            }
+            for (var i = 0; i < dictionary.length; i++) {
+                var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
+                    key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
 
-            if (searchTxt.indexOf("" + dict[1].key + "") != -1) {
-                uriOPB = dict[1].value; // value of concentration
+                if (key1 != -1 && key2 != -1) {
+                    uriOPB = dictionary[i].opb;
+                    uriCHEBI = dictionary[i].chebi;
+                    keyValue = dictionary[i].key1;
+                }
             }
 
             showLoading("#searchList");
@@ -553,26 +608,57 @@ var parser = new SparqlParser();
 
             id = 0; // id to index each Model_entity
 
-            mainUtils.addEventListener(uriOPB);
+            mainUtils.addEventListener(uriOPB, uriCHEBI, keyValue);
         }
     });
 
-    mainUtils.addEventListener = function (uriOPB) {
+    mainUtils.addEventListener = function (uriOPB, uriCHEBI, keyValue) {
 
-        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-            'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-            'SELECT ?Model_entity ?Biological_meaning ' +
-            'WHERE { ' +
-            '?property semsim:hasPhysicalDefinition ' + uriOPB + '. ' +
-            '?Model_entity semsim:isComputationalComponentFor ?property. ' +
-            '?Model_entity dcterms:description ?Biological_meaning.' +
-            '}';
+        console.log(uriOPB, uriCHEBI);
+
+        if (uriCHEBI == "") {
+            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+                'SELECT ?Model_entity ?Biological_meaning ' +
+                'WHERE { ' +
+                '?property semsim:hasPhysicalDefinition ' + uriOPB + '. ' +
+                '?Model_entity semsim:isComputationalComponentFor ?property. ' +
+                '?Model_entity dcterms:description ?Biological_meaning.' +
+                '}';
+        }
+        else {
+            if (keyValue == "flux") {
+                var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                    'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+                    'SELECT ?Model_entity ?Biological_meaning ' +
+                    'WHERE { ' +
+                    '?entity semsim:hasPhysicalDefinition ' + uriCHEBI + '. ' +
+                    '?source semsim:hasPhysicalEntityReference ?entity. ' +
+                    '?process semsim:hasSourceParticipant ?source. ' +
+                    '?property semsim:physicalPropertyOf ?process. ' +
+                    '?Model_entity semsim:isComputationalComponentFor ?property. ' +
+                    '?Model_entity dcterms:description ?Biological_meaning.' +
+                    '}'
+            }
+            else {
+                var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                    'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+                    'SELECT ?Model_entity ?Biological_meaning ' +
+                    'WHERE { ' +
+                    '?entity semsim:hasPhysicalDefinition ' + uriCHEBI + '. ' +
+                    '?property semsim:physicalPropertyOf ?entity. ' +
+                    '?Model_entity semsim:isComputationalComponentFor ?property. ' +
+                    '?Model_entity dcterms:description ?Biological_meaning.' +
+                    '}'
+            }
+        }
 
         // Model
         $ajaxUtils.sendPostRequest(
             endpoint,
             query,
             function (jsonModel) {
+                console.log(id);
                 if (id == jsonModel.results.bindings.length) {
                     return;
                 }
@@ -630,6 +716,7 @@ var parser = new SparqlParser();
 
                                         // Get more useful information
                                         var len = modelEntity.length;
+                                        console.log("modelEntity: ", modelEntity);
                                         mainUtils.searchListAJAX(
                                             modelEntity[len - 1],
                                             speciesList[len - 1],
@@ -646,7 +733,7 @@ var parser = new SparqlParser();
                                             proteinList);
 
                                         id++; // increment index of modelEntity
-                                        mainUtils.addEventListener(uriOPB); // callback
+                                        mainUtils.addEventListener(uriOPB, uriCHEBI, keyValue); // callback
                                     },
                                     true);
                             },
@@ -657,7 +744,7 @@ var parser = new SparqlParser();
             true);
     }
 
-    // Load the view
+// Load the view
     mainUtils.loadViewHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -692,7 +779,7 @@ var parser = new SparqlParser();
             true);
     };
 
-    // Create anchor tag
+// Create anchor tag
     var createAnchor = function (value) {
         var aText = document.createElement('a');
         aText.setAttribute('href', value);
@@ -701,7 +788,7 @@ var parser = new SparqlParser();
         return aText;
     };
 
-    // Find duplicate items
+// Find duplicate items
     var searchFn = function (searchItem, arrayOfItems) {
         var counter = 0;
         for (var i = 0; i < arrayOfItems.length; i++) {
@@ -712,7 +799,7 @@ var parser = new SparqlParser();
         return counter;
     };
 
-    // Show a selected entry from the search results
+// Show a selected entry from the search results
     mainUtils.showView = function (jsonObj, viewHtmlContent) {
 
         var viewList = document.getElementById("viewList");
@@ -756,7 +843,7 @@ var parser = new SparqlParser();
         }
     };
 
-    // Load the model
+// Load the model
     mainUtils.loadModelHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -789,7 +876,7 @@ var parser = new SparqlParser();
             false);
     };
 
-    // Show selected items in a table
+// Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
         console.log("showModel parsedQuery: ", parsedQuery);
@@ -903,7 +990,7 @@ var parser = new SparqlParser();
                     mainUtils.model.push(mainUtils.modelEntityName); // replace something#Protein with modelEntityName
 
                 else
-                mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
+                    mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
             }
         }
 
@@ -990,6 +1077,8 @@ var parser = new SparqlParser();
 
     mainUtils.loadSVGModelHtml = function () {
 
+        console.log("HERE I AM ************** modelEntity: ", modelEntity);
+
         $ajaxUtils.sendGetRequest(
             svgmodelHtml,
             function (svgmodelHtmlContent) {
@@ -1005,8 +1094,14 @@ var parser = new SparqlParser();
         var nodes = mainUtils.nodes;
         var links = mainUtils.links;
 
+        // replace something#Protein with modelEntityName
+        for (var i = 0; i < links.length; i++) {
+            links[i].source.name = mainUtils.modelEntityName;
+        }
+
         console.log("nodes: ", nodes);
         console.log("links: ", links);
+        console.log("mainUtils.modelEntityName: ", mainUtils.modelEntityName);
 
         // Create a graph
         var graphSVG = new Graph();
@@ -1075,18 +1170,17 @@ var parser = new SparqlParser();
                 .on("end", dragended));
 
         node.append("circle")
-            .attr("r", 10)
+            .attr("r", 15)
             .style("fill", function (d) {
-                if (d.name === mainUtils.modelEntityName) {
+                if (d.name == mainUtils.modelEntityName) {
                     return "red";
                 }
             })
             .style("r", function (d) {
-                if (d.name === mainUtils.modelEntityName) {
-                    return 15;
+                if (d.name == mainUtils.modelEntityName) {
+                    return 20;
                 }
             })
-
 
         // add the text
         node.append("text")
@@ -2083,6 +2177,7 @@ var parser = new SparqlParser();
         // .call(d3.drag().on("drag", dragcircle));
     }
 
-    // Expose utility to the global object
+// Expose utility to the global object
     global.$mainUtils = mainUtils;
-})(window);
+})
+(window);
