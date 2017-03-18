@@ -4,60 +4,31 @@
  * TODO: OPTIMIZE CODE
  * TODO: OPTIMIZE CODE
  */
-var SparqlParser = require('../node_modules/sparqljs').Parser;
-var parser = new SparqlParser();
-
 (function (global) {
     'use strict';
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
-    var annotationHtml = "snippets/annotation.html";
-    var epithelialHtml = "snippets/epithelial.html";
-    var svgmodelHtml = "snippets/svgmodel.html";
+    var viewHtml = "snippets/view.html";
     var modelHtml = "snippets/model.html";
     var searchHtml = "snippets/search.html";
-    var viewHtml = "snippets/view.html";
-
-    // test query
-    var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
-        'WHERE {' +
-        '?Model_entity <http://purl.org/dc/terms/Protein> ?Protein.' +
-        '?Model_entity <http://purl.org/dc/terms/Species> ?Species.' +
-        '?Model_entity <http://purl.org/dc/terms/Gene> ?Gene.' +
-        '?Model_entity <http://purl.org/dc/terms/Compartment> ?Compartment.' +
-        'FILTER (?Model_entity = "weinstein_1995").' +
-        '}';
-
-    var parsedQuery = parser.parse(query);
-
-    // test query
-    var query2 = 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-        'SELECT ?sub ?obj ?obj2 ' +
-        'WHERE {' +
-        '?sub dcterms:Species ?obj.' +
-        '?sub dcterms:Gene ?obj2.' +
-        '}';
-
-    var parsedQuery2 = parser.parse(query2);
+    var svgmodelHtml = "snippets/svgmodel.html";
+    var svgepithelialHtml = "snippets/svgepithelial.html";
 
     // Set up a namespace for our utility
     var mainUtils = {};
 
-    mainUtils.fromEpithelialToModelState = 0;
+    // delete operation
+    var templistOfModel = [];
 
-    // Track models for delete operation
-    mainUtils.listOfModels = [];
+    // selected models in load models
+    var model = [], model2DArray = [];
 
-    // Pre-process models before list of models
-    // selection for delete operation
-    mainUtils.templistOfModel = [];
+    var modelEntityName, modelEntityNameArray = [];
 
-    // Add models in the loadModelHtml
-    mainUtils.model = [];
-    mainUtils.model2DArr = [];
+    var links = []; // svg visualization
 
-    // variables to process searchList
+    // process AJAX call
     var modelEntity = [],
         biologicalMeaning = [],
         speciesList = [],
@@ -81,14 +52,6 @@ var parser = new SparqlParser();
         var html = "<div class='text-center'>";
         html += "<img src='images/ajax-loader.gif'></div>";
         insertHtml(selector, html);
-    };
-
-    // Return substitute of '{{propName}}'
-    // with propValue in given 'string'
-    var insertProperty = function (string, propName, propValue) {
-        var propToReplace = "{{" + propName + "}}";
-        string = string.replace(new RegExp(propToReplace, "g"), propValue);
-        return string;
     };
 
     // Find the current active menu button
@@ -136,111 +99,8 @@ var parser = new SparqlParser();
         // Place some startup code here
     });
 
-    // Load the annotation view
-    mainUtils.loadAnnotationHtml = function () {
-        // Switch from current active button to annotation button
-        var activeItem = "#" + findActiveItem();
-        switchListItemToActive(activeItem, "#listAnnotation");
-
-        var query = 'SELECT ?id WHERE { ?id  <http://biomodels.net/biology-qualifiers/isVersionOf> ' +
-            '<http://identifiers.org/go/GO:0005272> }';
-
-        showLoading("#main-content");
-
-        $ajaxUtils.sendPostRequest(
-            endpoint,
-            query,
-            function (jsonObj) {
-                $ajaxUtils.sendGetRequest(
-                    annotationHtml,
-                    function (annotationHtmlContent) {
-                        var annotationHtmlViewToIndexHtml = mainUtils.showWorkspace(jsonObj, annotationHtmlContent);
-                        insertHtml("#main-content", annotationHtmlViewToIndexHtml);
-                    },
-                    false);
-            },
-            true);
-    };
-
-    // TODO: make use of accordion
-    // Show workspaces in the annotation html
-    mainUtils.showWorkspace = function (jsonObj, annotationHtmlContent) {
-
-        var label = [];
-        var finalHtml = annotationHtmlContent;
-
-        var html = "<section class='row'>";
-
-        for (var i = 0; i < jsonObj.results.bindings.length; i++) {
-
-            // id with workspace name as a string
-            var idWithStr = jsonObj.results.bindings[i].id.value;
-            var index = idWithStr.search(".cellml");
-            var workspaceName = idWithStr.slice(0, index);
-
-            var workspaceUrl = "https://models.physiomeproject.org/workspace" + "/" + workspaceName + "/" + "@@file" +
-                "/" + "HEAD" + "/" + jsonObj.results.bindings[i].id.value;
-
-            label[i] = document.createElement("label");
-            label[i].id = idWithStr;
-            label[i].innerHTML = '<input id="' + label[i].id + '" type="checkbox" data-action="annotation" value="" ' +
-                'class="checkbox"> ';
-
-            label[i].innerHTML += '<a href=' + workspaceUrl + ' + target=_blank>' + workspaceName + " / " + idWithStr +
-                '</a></label>';
-
-            html += '<label>' + label[i].innerHTML + '</label><br>';
-        }
-
-        html += "</section>";
-
-        finalHtml = insertProperty(finalHtml, "description", html);
-
-        return finalHtml;
-    };
-
-    // Even handling for ANNOTATION, SEARCH, MODEL
+    // Event handling for SEARCH, MODEL
     var actions = {
-        annotation: function (event) {
-
-            console.log("annotation event: ", event);
-
-            if (event.srcElement.className == "checkbox" && event.srcElement.checked == true) {
-                var idWithStr = event.srcElement.id;
-                var n = idWithStr.search("#");
-                var id = idWithStr.slice(n + 1, idWithStr.length);
-
-                // id
-                var index = idWithStr.search(".cellml");
-                var workspaceName = idWithStr.slice(0, index);
-
-                mainUtils.workspaceName = workspaceName;
-
-                var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + workspaceName + "/" + "rawfile" +
-                    "/" + "HEAD" + "/" + idWithStr;
-
-                // Get variable name for a particular CellML Id
-                mainUtils.showVariableName = function (str) {
-                    var parser = new DOMParser();
-                    var xmlDoc = parser.parseFromString(str, "text/xml");
-
-                    var vHtml = event.srcElement.parentElement;
-
-                    // Look up by variable tag
-                    for (var i = 0; i < xmlDoc.getElementsByTagName("variable").length; i++) {
-                        if (xmlDoc.getElementsByTagName("variable")[i].getAttribute("cmeta:id") == id) {
-                            vHtml.innerHTML += '<hr>';
-                            vHtml.innerHTML += id + '<br>';
-                            vHtml.innerHTML += xmlDoc.getElementsByTagName("variable")[i].getAttribute("name") + '<br>';
-                            vHtml.innerHTML += '<hr>';
-                        }
-                    }
-                };
-
-                $ajaxUtils.sendGetRequest(vEndPoint, mainUtils.showVariableName, false);
-            }
-        },
-
         search: function (event) {
 
             console.log("search event: ", event);
@@ -255,7 +115,21 @@ var parser = new SparqlParser();
                     mainUtils.workspaceName = workspaceName;
 
                     // indexOfSemSimURI + 1 ==> weinstein_1995#NHE3_C_ext_Na
-                    mainUtils.modelEntityName = idWithStr.slice(36 + 1);
+                    modelEntityName = idWithStr.slice(36 + 1);
+
+                    // Temporary for display
+                    if (modelEntityName.indexOf("16032017100850239p1300") != -1 ||
+                        modelEntityName.indexOf("16032017095119913p1300") != -1) {
+
+                        var indexOfHash = modelEntityName.search("#");
+                        modelEntityName = "weinstein_1995" + modelEntityName.slice(indexOfHash);
+                    }
+
+                    if (modelEntityName.indexOf("17032017142614972p1300") != -1) {
+
+                        var indexOfHash = modelEntityName.search("#");
+                        modelEntityName = "chang_fujita_b_1999" + modelEntityName.slice(indexOfHash);
+                    }
                 }
                 else {
                     mainUtils.workspaceName = "";
@@ -271,11 +145,18 @@ var parser = new SparqlParser();
             if (event.srcElement.className == "attribute") {
 
                 if (event.srcElement.checked) {
-                    mainUtils.templistOfModel.push(event.srcElement.value);
+                    templistOfModel.push(event.srcElement.value);
+
+                    // for making visualization graph
+                    modelEntityNameArray.push(event.srcElement.value);
                 }
                 else {
-                    var pos = mainUtils.templistOfModel.indexOf(event.srcElement.value);
-                    mainUtils.templistOfModel.splice(pos, 1);
+                    var pos = templistOfModel.indexOf(event.srcElement.value);
+                    templistOfModel.splice(pos, 1);
+
+                    // for making visualization graph
+                    var pos2 = modelEntityNameArray.indexOf(event.srcElement.value);
+                    modelEntityNameArray.splice(pos2, 1);
                 }
 
                 var idWithStr = event.srcElement.id;
@@ -293,22 +174,29 @@ var parser = new SparqlParser();
                     for (var i = 0; i < $('.attribute').length; i++) {
                         $('.attribute')[i].checked = true;
 
-                        mainUtils.templistOfModel.push($('.attribute')[i].value);
+                        templistOfModel.push($('.attribute')[i].value);
+
+                        // for making visualization graph
+                        modelEntityNameArray.push($('.attribute')[i].value);
                     }
                 }
                 else {
                     for (var i = 0; i < $('.attribute').length; i++) {
                         $('.attribute')[i].checked = false;
 
-                        var pos = mainUtils.templistOfModel.indexOf($('.attribute')[i].value);
-                        mainUtils.templistOfModel.splice(pos, 1);
+                        var pos = templistOfModel.indexOf($('.attribute')[i].value);
+                        templistOfModel.splice(pos, 1);
+
+                        // for making visualization graph
+                        var pos2 = modelEntityNameArray.indexOf($('.attribute')[i].value);
+                        modelEntityNameArray.splice(pos2, 1);
                     }
                 }
             }
         }
     };
 
-    // Even invocation to ANNOTATION, SEARCH, MODEL
+    // Even invocation to SEARCH, MODEL
     document.addEventListener('click', function (event) {
         // If there's an action with the given name, call it
         if (typeof actions[event.srcElement.dataset.action] === "function") {
@@ -318,9 +206,6 @@ var parser = new SparqlParser();
 
     // Load search html
     mainUtils.loadSearchHtml = function () {
-
-        // state reinitialize when redirect from epithelial
-        mainUtils.fromEpithelialToModelState = 0;
 
         if (!sessionStorage.getItem("searchListContent")) {
             $ajaxUtils.sendGetRequest(
@@ -345,7 +230,9 @@ var parser = new SparqlParser();
         var retval = [];
         es.forEach(function (e) {
             for (var j = 0; j < retval.length; j++) {
-                if (retval[j].Model_entity === e.Model_entity && retval[j].Biological_meaning === e.Biological_meaning)
+                if (retval[j].Model_entity === e.Model_entity &&
+                    retval[j].Biological_meaning === e.Biological_meaning)
+
                     return;
             }
             retval.push(e);
@@ -398,15 +285,30 @@ var parser = new SparqlParser();
             var temp = [];
             var td = [];
 
+            // Temporary for display
+            var tempmodelEntity = modelEntity[i].slice(36 + 1);
+            if (tempmodelEntity.indexOf("16032017100850239p1300") != -1 ||
+                tempmodelEntity.indexOf("16032017095119913p1300") != -1) {
+
+                var indexOfHash = tempmodelEntity.search("#");
+                tempmodelEntity = "weinstein_1995" + tempmodelEntity.slice(indexOfHash);
+            }
+
+            if (tempmodelEntity.indexOf("17032017142614972p1300") != -1) {
+
+                var indexOfHash = tempmodelEntity.search("#");
+                tempmodelEntity = "chang_fujita_b_1999" + tempmodelEntity.slice(indexOfHash);
+            }
+
             // Ignore the semsim URI ==> weinstein_1995#NHE3_C_ext_Na
-            temp.push(modelEntity[i].slice(36 + 1), biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
+            temp.push(tempmodelEntity, biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
 
             for (var j = 0; j < temp.length; j++) {
                 if (j == 0) {
                     td[j] = document.createElement("td");
                     var label = document.createElement('label');
-                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" data-action="search" value="' +
-                        modelEntity[i] + '" class="checkbox"></label>';
+                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" ' +
+                        'data-action="search" value="' + modelEntity[i] + '" class="checkbox"></label>';
 
                     td[j].appendChild(label);
                     tr.appendChild(td[j]);
@@ -480,8 +382,6 @@ var parser = new SparqlParser();
                 endpoint,
                 query,
                 function (jsonModel) {
-                    console.log(jsonModel);
-
                     var jsonModelObj = [];
 
                     // Parsing into Model_entity and Biological_meaning object
@@ -522,14 +422,20 @@ var parser = new SparqlParser();
                     // No search results found, so sent empty arrays
                     if (!jsonModelObj.length) {
                         console.log("No search results found in searchListAJAX", jsonModelObj.length);
-                        mainUtils.searchList(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
+                        mainUtils.searchList(
+                            head,
+                            modelEntity,
+                            biologicalMeaning,
+                            speciesList,
+                            geneList,
+                            proteinList);
                     }
                 },
                 true
             );
         }
 
-        mainUtils.searchListAJAXObj();
+        mainUtils.searchListAJAXObj(); // callback
     }
 
     // semantic annotation based on search items
@@ -538,8 +444,6 @@ var parser = new SparqlParser();
 
             var uriOPB, uriCHEBI, keyValue;
             var searchTxt = document.getElementById("searchTxt").value;
-
-            // TODO note: avoid using regex inside SPARQL!!
 
             // set local storage
             sessionStorage.setItem('searchTxtContent', searchTxt);
@@ -614,8 +518,6 @@ var parser = new SparqlParser();
 
     mainUtils.addEventListener = function (uriOPB, uriCHEBI, keyValue) {
 
-        console.log(uriOPB, uriCHEBI);
-
         if (uriCHEBI == "") {
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
@@ -658,13 +560,13 @@ var parser = new SparqlParser();
             endpoint,
             query,
             function (jsonModel) {
-                console.log(id);
                 if (id == jsonModel.results.bindings.length) {
                     return;
                 }
 
                 var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                var query = 'SELECT ?Species ' + 'WHERE { ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
+                var query = 'SELECT ?Species ' + 'WHERE ' +
+                    '{ ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
 
                 // Species
                 $ajaxUtils.sendPostRequest(
@@ -673,7 +575,8 @@ var parser = new SparqlParser();
                     function (jsonSpecies) {
 
                         var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                        var query = 'SELECT ?Gene ' + 'WHERE { ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
+                        var query = 'SELECT ?Gene ' + 'WHERE ' +
+                            '{ ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
 
                         // Gene
                         $ajaxUtils.sendPostRequest(
@@ -682,7 +585,8 @@ var parser = new SparqlParser();
                             function (jsonGene) {
 
                                 var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                                var query = 'SELECT ?Protein ' + 'WHERE { ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
+                                var query = 'SELECT ?Protein ' + 'WHERE ' +
+                                    '{ ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
 
                                 // Protein
                                 $ajaxUtils.sendPostRequest(
@@ -716,7 +620,6 @@ var parser = new SparqlParser();
 
                                         // Get more useful information
                                         var len = modelEntity.length;
-                                        console.log("modelEntity: ", modelEntity);
                                         mainUtils.searchListAJAX(
                                             modelEntity[len - 1],
                                             speciesList[len - 1],
@@ -744,13 +647,13 @@ var parser = new SparqlParser();
             true);
     }
 
-// Load the view
+    // Load the view
     mainUtils.loadViewHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
 
-        var query = 'SELECT ?Workspace ?Title ?Author ?Abstract ?Keyword ?Protein ?Species ?Gene ?Compartment ?Located_in ?DOI ' +
-            'WHERE { GRAPH ?Workspace { ' +
+        var query = 'SELECT ?Workspace ?Title ?Author ?Abstract ?Keyword ?Protein ?Species ?Gene ?Compartment ' +
+            '?Located_in ?DOI WHERE { GRAPH ?Workspace { ' +
             '<' + cellmlModel + '#Title> <http://purl.org/dc/terms/description> ?Title . ' +
             'OPTIONAL { <' + cellmlModel + '#Author> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
             'OPTIONAL { <' + cellmlModel + '#Abstract> <http://purl.org/dc/terms/description> ?Abstract } . ' +
@@ -779,7 +682,7 @@ var parser = new SparqlParser();
             true);
     };
 
-// Create anchor tag
+    // Create anchor tag
     var createAnchor = function (value) {
         var aText = document.createElement('a');
         aText.setAttribute('href', value);
@@ -788,7 +691,7 @@ var parser = new SparqlParser();
         return aText;
     };
 
-// Find duplicate items
+    // Find duplicate items
     var searchFn = function (searchItem, arrayOfItems) {
         var counter = 0;
         for (var i = 0; i < arrayOfItems.length; i++) {
@@ -799,7 +702,7 @@ var parser = new SparqlParser();
         return counter;
     };
 
-// Show a selected entry from the search results
+    // Show a selected entry from search results
     mainUtils.showView = function (jsonObj, viewHtmlContent) {
 
         var viewList = document.getElementById("viewList");
@@ -822,7 +725,7 @@ var parser = new SparqlParser();
             for (var j = 0; j < jsonObj.results.bindings.length; j++) {
                 var tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
 
-                // TODO: regular expression to validate a valid URL
+                // TODO: regular expression to validate a URL
                 if (tempValue.indexOf("http") != -1) {
                     var aText = createAnchor(tempValue);
                     tempArrayOfURL.push(tempValue);
@@ -843,7 +746,7 @@ var parser = new SparqlParser();
         }
     };
 
-// Load the model
+    // Load the model
     mainUtils.loadModelHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -858,45 +761,198 @@ var parser = new SparqlParser();
             '}}';
 
         // showLoading("#main-content");
-        // if (!sessionStorage.getItem("loadmodelcontent")) {
         $ajaxUtils.sendGetRequest(
             modelHtml,
             function (modelHtmlContent) {
                 insertHtml("#main-content", modelHtmlContent);
 
-                if (mainUtils.fromEpithelialToModelState == 0) {
-
-                    $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.showModel, true);
-                } else {
-                    // state reinitialize, load epithelial to load model
-                    mainUtils.fromEpithelialToModelState = 0;
-                    insertHtml("#main-content", sessionStorage.getItem('loadmodelcontent'));
-                }
+                $ajaxUtils.sendPostRequest(endpoint, query, mainUtils.showModel, true);
             },
             false);
+
+        // Switch from current active button to models button
+        var activeItem = "#" + findActiveItem();
+        switchListItemToActive(activeItem, "#listModels");
     };
 
-// Show selected items in a table
+    // Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
-        console.log("showModel parsedQuery: ", parsedQuery);
         console.log("showModel: ", jsonObj);
 
-        // Mapping SPARQL.js and PMR SPARQL result
-        var links = [];
-        var subject, predicate, object;
+        var modelList = document.getElementById("modelList");
 
-        for (var i = 0; i < jsonObj.results.bindings.length; i++) {
-            for (var j = 0; j < parsedQuery["where"][0].triples.length; j++) {
-                subject = parsedQuery["where"][0].triples[j].subject.replace(/[?]/g, '');
-                predicate = parsedQuery["where"][0].triples[j].predicate;
-                object = parsedQuery["where"][0].triples[j].object.replace(/[?]/g, '');
+        var table = document.createElement("table");
+        table.className = "table";
 
-                links.push({
-                    source: jsonObj.results.bindings[i][subject].value,
-                    target: jsonObj.results.bindings[i][object].value,
-                    value: predicate
-                });
+        // Table header
+        var thead = document.createElement("thead");
+        var tr = document.createElement("tr");
+        for (var i = 0; i < jsonObj.head.vars.length; i++) {
+            if (i == 0) {
+                var th = document.createElement("th");
+                var label = document.createElement('label');
+                label.innerHTML = '<input id="' + jsonObj.head.vars[0] + '" type="checkbox" name="attributeAll" ' +
+                    'class="attributeAll" data-action="model" value="' + jsonObj.head.vars[0] + '" ></label>';
+
+                th.appendChild(label);
+                tr.appendChild(th);
+            }
+
+            var th = document.createElement("th");
+            th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
+            tr.appendChild(th);
+        }
+
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
+        // Table body
+        for (var i = 0; i < jsonObj.head.vars.length; i++) {
+            if (i == 0) {
+                // search list to model list with empty model
+                if (jsonObj.results.bindings.length == 0) break;
+
+                //modelEntityName <== jsonObj.results.bindings[i].Model_entity.value;
+                var label = document.createElement('label');
+                label.innerHTML = '<input id="' + modelEntityName + '" type="checkbox" name="attribute" ' +
+                    'class="attribute" data-action="model" value="' + modelEntityName + '" ></label>';
+
+                model.push(label);
+            }
+
+            if (jsonObj.head.vars[i] == "Compartment") {
+                var compartment = "";
+                for (var c = 0; c < jsonObj.results.bindings.length; c++) {
+                    if (c == 0)
+                        compartment += jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
+                    else
+                        compartment += "," + jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
+                }
+
+                model.push(compartment);
+            }
+            else {
+                if (jsonObj.head.vars[i] == "Model_entity")
+                    model.push(modelEntityName); // something#Protein ==> modelEntityName
+                else
+                    model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
+            }
+        }
+
+        // 1D to 2D array
+        while (model.length) {
+            model2DArray.push(model.splice(0, 6)); // 5 + 1 (checkbox) header elemenet
+        }
+
+        var td = [];
+        var tbody = document.createElement("tbody");
+        for (var ix = 0; ix < model2DArray.length; ix++) {
+            var tr = document.createElement("tr");
+            // +1 for adding checkbox column
+            for (var j = 0; j < jsonObj.head.vars.length + 1; j++) {
+                td[j] = document.createElement("td");
+                if (j == 0)
+                    td[j].appendChild(model2DArray[ix][j]);
+                else
+                    td[j].appendChild(document.createTextNode(model2DArray[ix][j]));
+
+                // Id for each row
+                if (j == 1)
+                    tr.setAttribute("id", model2DArray[ix][j]);
+
+                tr.appendChild(td[j]);
+            }
+
+            tbody.appendChild(tr);
+        }
+
+        table.appendChild(tbody);
+        modelList.appendChild(table);
+
+        // Un-check checkbox in the model page
+        // load epithelial to model discovery to load model
+        for (var i = 0; i < $('table tr td label').length; i++) {
+            if ($('table tr td label')[i].firstChild.checked == true) {
+                $('table tr td label')[i].firstChild.checked = false;
+            }
+        }
+    };
+
+    mainUtils.deleteRowModelHtml = function () {
+
+        // Un-check header checkbox if body is empty
+        if ($('table tr th label')[0].firstChild.checked == true) {
+            $('table tr th label')[0].firstChild.checked = false;
+        }
+
+        // Model_entity with same name will be removed
+        // regardless of the current instance of checkboxes
+        templistOfModel.forEach(function (element) {
+            for (var i = 0; i < $('table tr').length; i++) {
+
+                if ($('table tr')[i].id == element) {
+                    // Remove selected row
+                    $('table tr')[i].remove();
+
+                    // Remove from model2DArray
+                    model2DArray.forEach(function (elem, index) {
+                        if (element == elem[1]) {
+                            model2DArray.splice(index, 1);
+                        }
+                    })
+                }
+            }
+        });
+
+        // Empty temp model list
+        templistOfModel = [];
+
+        // TODO: click when empty loadmodel table!! Fix this!!
+    };
+
+    mainUtils.loadSVGModelHtml = function () {
+
+        $ajaxUtils.sendGetRequest(
+            svgmodelHtml,
+            function (svgmodelHtmlContent) {
+                insertHtml("#main-content", svgmodelHtmlContent);
+
+                $ajaxUtils.sendGetRequest(svgmodelHtml, mainUtils.showSVGModelHtml, false);
+            },
+            false);
+    }
+
+    mainUtils.showSVGModelHtml = function (svgmodelHtmlContent) {
+
+        console.log("visualization in model2DArr: ", model2DArray);
+        console.log("visualization in templistOfModel: ", templistOfModel);
+
+        // remove duplicate
+        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
+            return modelEntityNameArray.indexOf(item) == pos;
+        })
+
+        console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
+
+        for (var ix = 0; ix < modelEntityNameArray.length; ix++) {
+            for (var i = 0; i < model2DArray.length; i++) {
+                if (modelEntityNameArray[ix] == model2DArray[i][1]) {
+                    for (var j = 2; j < model2DArray[i].length; j++) {
+
+                        var name;
+                        if (j == 2) name = "Protein";
+                        if (j == 3) name = "Species";
+                        if (j == 4) name = "Gene";
+                        if (j == 5) name = "Compartment";
+
+                        links.push({
+                            source: model2DArray[i][1],
+                            target: model2DArray[i][j],
+                            name: name
+                        });
+                    }
+                }
             }
         }
 
@@ -926,237 +982,77 @@ var parser = new SparqlParser();
                 (nodes[link.target] = {name: link.target});
         });
 
-        mainUtils.nodes = nodes;
-        mainUtils.links = links;
-        // End of Mapping
-
-        var modelList = document.getElementById("modelList");
-
-        var table = document.createElement("table");
-        table.className = "table";
-
-        // Table header
-        var thead = document.createElement("thead");
-        var tr = document.createElement("tr");
-        for (var i = 0; i < jsonObj.head.vars.length; i++) {
-            if (i == 0) {
-                var th = document.createElement("th");
-                mainUtils.headId = jsonObj.head.vars[0];
-                tr.id = mainUtils.headId;
-                var label = document.createElement('label');
-                label.innerHTML = '<input id="' + mainUtils.headId + '" type="checkbox" name="attributeAll" class="attributeAll" ' +
-                    'data-action="model" value="' + mainUtils.headId + '" ></label>';
-
-                th.appendChild(label);
-                tr.appendChild(th);
-            }
-
-            var th = document.createElement("th");
-            th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
-            tr.appendChild(th);
-        }
-
-        thead.appendChild(tr);
-        table.appendChild(thead);
-
-        // Table body
-        for (var i = 0; i < jsonObj.head.vars.length; i++) {
-            if (i == 0) {
-                // search list to model list with empty model
-                if (jsonObj.results.bindings.length == 0) break;
-
-                var id = jsonObj.results.bindings[i].Model_entity.value;
-
-                var label = document.createElement('label');
-                label.innerHTML = '<input id="' + id + '" type="checkbox" name="attribute" class="attribute" ' +
-                    'data-action="model" value="' + id + '" ></label>';
-
-                mainUtils.model.push(label);
-            }
-
-            if (jsonObj.head.vars[i] == "Compartment") {
-                var compartment = "";
-                for (var c = 0; c < jsonObj.results.bindings.length; c++) {
-                    if (c == 0)
-                        compartment += jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
-                    else
-                        compartment += "," + jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
-                }
-
-                mainUtils.model.push(compartment);
-            }
-            else {
-                if (jsonObj.head.vars[i] == "Model_entity")
-                    mainUtils.model.push(mainUtils.modelEntityName); // replace something#Protein with modelEntityName
-
-                else
-                    mainUtils.model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
-            }
-        }
-
-        // 1D to 2D array
-        while (mainUtils.model.length) {
-            mainUtils.model2DArr.push(mainUtils.model.splice(0, 6)); // 5 + 1 (checkbox) header elemenet
-        }
-
-        console.log("mainUtils.model2DArr: ", mainUtils.model2DArr);
-
-        var td = [];
-        var tbody = document.createElement("tbody");
-        for (var ix = 0; ix < mainUtils.model2DArr.length; ix++) {
-            var tr = document.createElement("tr");
-            // +1 for adding checkbox column
-            for (var j = 0; j < jsonObj.head.vars.length + 1; j++) {
-                td[j] = document.createElement("td");
-                if (j == 0)
-                    td[j].appendChild(mainUtils.model2DArr[ix][j]);
-                else
-                    td[j].appendChild(document.createTextNode(mainUtils.model2DArr[ix][j]));
-
-                // Id for each row
-                if (j == 1)
-                    tr.setAttribute("id", mainUtils.model2DArr[ix][j]);
-
-                tr.appendChild(td[j]);
-            }
-
-            tbody.appendChild(tr);
-        }
-
-        table.appendChild(tbody);
-        modelList.appendChild(table);
-
-        // Un-check checkbox in the model page
-        // load epithelial to model discovery to load model
-        for (var i = 0; i < $('table tr td label').length; i++) {
-            if ($('table tr td label')[i].firstChild.checked == true) {
-                $('table tr td label')[i].firstChild.checked = false;
-            }
-        }
-
-        // SET main content in the local storage
-        var loadmodelcontent = document.getElementById('main-content');
-        sessionStorage.setItem('loadmodelcontent', $(loadmodelcontent).html());
-    };
-
-    mainUtils.deleteRowModelHtml = function () {
-
-        // Un-check header checkbox if body is empty
-        if ($('table tr th label')[0].firstChild.checked == true) {
-            $('table tr th label')[0].firstChild.checked = false;
-        }
-
-        // Model_entity with same name will be removed
-        // regardless of the current instance of checkboxes
-        mainUtils.templistOfModel.forEach(function (element) {
-            for (var i = 0; i < $('table tr').length; i++) {
-
-                if ($('table tr')[i].id == element) {
-                    // Remove selected row
-                    $('table tr')[i].remove();
-
-                    console.log("deleteRowModelHtml INSIDE: ", mainUtils.templistOfModel);
-
-                    // Remove from mainUtils.model2DArr
-                    mainUtils.model2DArr.forEach(function (elem, index) {
-                        if (element == elem[1]) {
-                            mainUtils.model2DArr.splice(index, 1);
-                        }
-                    })
-                }
-            }
-        });
-
-        console.log("deleteRowModelHtml INSIDE model2DArr: ", mainUtils.model2DArr);
-
-        // Empty temp model list
-        mainUtils.templistOfModel = [];
-
-        // TODO: click when empty loadmodel table!! Fix this!!
-    };
-
-    mainUtils.loadSVGModelHtml = function () {
-
-        console.log("HERE I AM ************** modelEntity: ", modelEntity);
-
-        $ajaxUtils.sendGetRequest(
-            svgmodelHtml,
-            function (svgmodelHtmlContent) {
-                insertHtml("#main-content", svgmodelHtmlContent);
-
-                $ajaxUtils.sendGetRequest(svgmodelHtml, mainUtils.showSVGModelHtml, false);
-            },
-            false);
-    }
-
-    mainUtils.showSVGModelHtml = function (svgmodelHtmlContent) {
-
-        var nodes = mainUtils.nodes;
-        var links = mainUtils.links;
-
-        // replace something#Protein with modelEntityName
-        for (var i = 0; i < links.length; i++) {
-            links[i].source.name = mainUtils.modelEntityName;
-        }
-
+        // Making edges ...
         console.log("nodes: ", nodes);
         console.log("links: ", links);
-        console.log("mainUtils.modelEntityName: ", mainUtils.modelEntityName);
 
-        // Create a graph
-        var graphSVG = new Graph();
-
-        for (var e = 0; e < mainUtils.links.length; e++) {
-            graphSVG.createEdge(links[e].source.name, links[e].target.name, links[e].value.name);
-            graphSVG.createEdge(links[e].target.name, links[e].source.name, links[e].value.name);
-        }
-
-        console.log("graph.js in showSVGModelHtml : ", graphSVG);
-
+        // SVG graph
         var g = document.getElementById("#svgVisualize2"),
-            width = window.innerWidth,
-            height = window.innerHeight;
+            width = 1200,
+            height = 700;
 
         var svg = d3.select("#svgVisualize2").append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
+            .attrs({
+                "width": width,
+                "height": height
+            })
+            .append("g");
 
-        function updateWindow() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            svg.attr("width", width).attr("height", height);
-        }
-
-        window.onresize = updateWindow;
+        var color = d3.scaleOrdinal(d3.schemeCategory20);
 
         var simulation = d3.forceSimulation()
             .force("link", d3.forceLink().id(function (d) {
                 return d.name;
             }))
-            .force("charge", d3.forceManyBody().strength(-300))
-            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("charge", d3.forceManyBody().strength(-100))
+            .force("center", d3.forceCenter(width / 3, height / 2))
             .force("link", d3.forceLink().distance(100).strength(0.1));
 
         //build the arrow.
         svg.append("svg:defs").selectAll("marker")
             .data(["end"])      // Different link/path types can be defined here
             .enter().append("svg:marker")    // This section adds in the arrows
-            .attr("id", String)
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 15)
-            .attr("refY", -1.5)
-            .attr("markerWidth", 6)
-            .attr("markerHeight", 6)
-            .attr("orient", "auto")
+            .attrs({
+                "id": String,
+                "viewBox": "0 -5 10 10",
+                "refX": 15,
+                "refY": -1.5,
+                "markerWidth": 4,
+                "markerHeight": 4,
+                "orient": "auto"
+            })
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
+
+        // label edges with different color
+        var edgelabels = ["Protein", "Species", "Gene", "Compartment"];
+        var py = 20;
 
         // add the links and the arrows
         var link = svg.append("svg:g").selectAll("path")
             .data(links)
             .enter().append("svg:path")
             .attr("class", "pathlink")
+            .style("stroke", function (d) {
+                for (var i = 0; i < edgelabels.length; i++) {
+                    if (d.name == edgelabels[i]) {
+                        svg.append("text")
+                            .style("font", "14px sans-serif")
+                            .attr("stroke", color(d.name))
+                            .attr("x", 10)
+                            .attr("y", py)
+                            .text(d.name);
+
+                        //increment to get distinct color
+                        color(d.name + 1);
+                        py = py + 20;
+                        edgelabels[i] = "";
+                        break;
+                    }
+                }
+
+                return color(d.name);
+            })
             .attr("marker-end", "url(#end)");
 
         var node = svg.append("g")
@@ -1170,22 +1066,26 @@ var parser = new SparqlParser();
                 .on("end", dragended));
 
         node.append("circle")
-            .attr("r", 15)
-            .style("fill", function (d) {
-                if (d.name == mainUtils.modelEntityName) {
-                    return "red";
-                }
-            })
-            .style("r", function (d) {
-                if (d.name == mainUtils.modelEntityName) {
-                    return 20;
+            .attr("r", 7)
+            .styles({
+                "fill": function (d) {
+                    if (modelEntityNameArray.indexOf(d.name) != -1) {
+                        return "red";
+                    }
+                },
+                "r": function (d) {
+                    if (modelEntityNameArray.indexOf(d.name) != -1) {
+                        return 10;
+                    }
                 }
             })
 
         // add the text
         node.append("text")
-            .attr("x", 12)
-            .attr("dy", ".35em")
+            .attrs({
+                "x": 12,
+                "dy": ".35em"
+            })
             .text(function (d) {
                 return d.name;
             });
@@ -1237,18 +1137,19 @@ var parser = new SparqlParser();
             d.fx = null;
             d.fy = null;
         }
+
+        // Empty list
+        modelEntityNameArray = [];
     }
 
     mainUtils.loadEpithelialHtml = function () {
 
-        mainUtils.fromEpithelialToModelState = 1; // state initialize to 1
-
         $ajaxUtils.sendGetRequest(
-            epithelialHtml,
+            svgepithelialHtml,
             function (epithelialHtmlContent) {
                 insertHtml("#main-content", epithelialHtmlContent);
 
-                $ajaxUtils.sendGetRequest(epithelialHtml, mainUtils.showEpithelial, false);
+                $ajaxUtils.sendGetRequest(svgepithelialHtml, mainUtils.showEpithelial, false);
             },
             false);
     }
@@ -1322,7 +1223,7 @@ var parser = new SparqlParser();
                 .on("end", ended));
 
         function ended() {
-            console.log("ended: ", d3.select(this)._groups[0][0].id);
+            // console.log("ended: ", d3.select(this)._groups[0][0].id);
             d3.select(this).classed("dragging", false);
         }
 
@@ -1370,7 +1271,7 @@ var parser = new SparqlParser();
 
         function dragmove(d) {
 
-            console.log("id: ", d3.select(this)._groups[0][0].id);
+            // console.log("id: ", d3.select(this)._groups[0][0].id);
 
             // drag move
             dragrect
@@ -1421,7 +1322,7 @@ var parser = new SparqlParser();
 
         function ldragresize(d) {
 
-            console.log("id: ", d3.select(this)._groups[0][0].id);
+            // console.log("id: ", d3.select(this)._groups[0][0].id);
 
             var oldx = d.x;
             //Max x on the right is x + width
@@ -1453,7 +1354,7 @@ var parser = new SparqlParser();
 
         function rdragresize(d) {
 
-            console.log("id: ", d3.select(this)._groups[0][0].id);
+            // console.log("id: ", d3.select(this)._groups[0][0].id);
 
             //Max x on the left is x - width
             //Max x on the right is width of screen
@@ -1480,7 +1381,7 @@ var parser = new SparqlParser();
 
         function tdragresize(d) {
 
-            console.log("id: ", d3.select(this)._groups[0][0].id);
+            // console.log("id: ", d3.select(this)._groups[0][0].id);
 
             var oldy = d.y;
             //Max x on the right is x + width
@@ -1512,7 +1413,7 @@ var parser = new SparqlParser();
 
         function bdragresize(d) {
 
-            console.log("id: ", d3.select(this)._groups[0][0].id);
+            // console.log("id: ", d3.select(this)._groups[0][0].id);
 
             //Max x on the left is x - width
             //Max x on the right is width of screen
@@ -1536,49 +1437,6 @@ var parser = new SparqlParser();
             dragright
                 .attr("height", height);
         }
-
-        // Circle
-        var circleg = svg.append("g").data([{x: 510, y: 250}]);
-        var radius = 20;
-
-        var circle1 = circleg.append("circle")
-        // .attr("transform", "translate(100, 450)")
-            .attr("id", "circle")
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            })
-            .attr("r", radius)
-            .attr("fill", "lightgreen")
-            .attr("stroke-width", 20)
-            .attr("cursor", "move")
-            .call(d3.drag().on("drag", dragcircle));
-
-        function dragcircle(d) {
-            d3.select(this)
-                .attr("cx", d.x = d3.event.x)
-                .attr("cy", d.y = d3.event.y);
-        }
-
-        var circleg2 = svg.append("g").data([{x: 560, y: 250}]);
-
-        var circle2 = circleg2.append("circle")
-        // .attr("transform", "translate(100, 500)")
-            .attr("id", "circle")
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            })
-            .attr("r", radius)
-            .attr("fill", "orange")
-            .attr("stroke-width", 20)
-            .attr("cursor", "move")
-            .call(d3.drag().on("drag", dragcircle));
-
 
         // Text
         var svgtext = svg.append("g").data([{x: 500, y: 30}]);
@@ -1620,17 +1478,8 @@ var parser = new SparqlParser();
             d3.select(this)
                 .classed("dragging", false)
                 .attr("pointer-events", "all");
-            console.log("dragendtext: ", d3.select(this)._groups[0][0].id);
+            // console.log("dragendtext: ", d3.select(this)._groups[0][0].id);
         }
-
-        // Mouse over and out event
-        // d3.select("rect").on("mouseover", function () {
-        //     d3.select(this).style("fill", "green");
-        // });
-        //
-        // d3.select("rect").on("mouseout", function () {
-        //     d3.select(this).style("fill", "white");
-        // });
 
         var markerWidth = 4;
         var markerHeight = 4;
@@ -1664,46 +1513,6 @@ var parser = new SparqlParser();
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
 
-        // Line
-        var svgline = svg.append("g").data([{x: 500, y: 200}]);
-        var lineLen = 40;
-
-        var line = svgline.append("line")
-            .attr("id", "lineLuminal")
-            .attr("x1", function (d) {
-                return d.x;
-            })
-            .attr("y1", function (d) {
-                return d.y;
-            })
-            .attr("x2", function (d) {
-                return d.x + lineLen;
-            })
-            .attr("y2", function (d) {
-                return d.y;
-            })
-            .attr("stroke", "black")
-            .attr("stroke-width", 2)
-            .attr("marker-end", "url(#end)") // marker-start for start marker
-            .attr("cursor", "pointer")
-            .call(d3.drag()
-                .on("drag", dragline)
-                .on("end", dragendline));
-
-        function dragline(d) {
-            var axis = groupcordinates("lineLuminal");
-            line.attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
-        }
-
-        function dragendline(d) {
-            d3.select(this)
-                .classed("dragging", false);
-            console.log("dragendline: ", d3.select(this)._groups[0][0].id);
-        }
-
         // Utility for marker direction
         function markerDir(selecttion) {
             var mstart = d3.select("#" + selecttion + "")
@@ -1736,11 +1545,6 @@ var parser = new SparqlParser();
                     .attr("marker-end", "");
             }
         }
-
-        // Click to change the marker direction
-        d3.select("#lineLuminal").on("click", function () {
-            markerDir("lineLuminal");
-        });
 
         // Polygon with arrow lines
         var polygonwitharrowsg = svg.append("g").data([{x: 490, y: 325}]);
@@ -1777,7 +1581,7 @@ var parser = new SparqlParser();
             .attr("id", "channel")
             // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
             .attr("points", "10,15 30,15 40,25 30,35 10,35 0,25")
-            .attr("fill", "yellow")
+            .attr("fill", "orange")
             .attr("stroke", "black")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
@@ -1812,7 +1616,7 @@ var parser = new SparqlParser();
             }
 
             d3.select(this).attr("points", points);
-            console.log("polygon: ", d3.select(this).attr("points"));
+            // console.log("polygon: ", d3.select(this).attr("points"));
         }
 
         function dragpolygon(d) {
@@ -1833,7 +1637,7 @@ var parser = new SparqlParser();
             }
 
             d3.select(this).attr("points", points);
-            console.log("polygon: ", d3.select(this).attr("points"));
+            // console.log("polygon: ", d3.select(this).attr("points"));
         }
 
         // Paracellular Rectangle
@@ -1851,6 +1655,8 @@ var parser = new SparqlParser();
 
         // Circle with arrow lines
         var circlewitharrowsg = svg.append("g").data([{x: 500, y: 380}]);
+        var lineLen = 40;
+        var radius = 20;
 
         var linemarkerend = circlewitharrowsg.append("line")
             .attr("id", "linemarkerend")
@@ -1960,6 +1766,12 @@ var parser = new SparqlParser();
             circlemarker
                 .attr("cx", axis.shift())
                 .attr("cy", axis.shift());
+        }
+
+        function dragcircle(d) {
+            d3.select(this)
+                .attr("cx", d.x = d3.event.x)
+                .attr("cy", d.y = d3.event.y);
         }
 
         // SVG checkbox with circles dragging on-off
@@ -2157,7 +1969,6 @@ var parser = new SparqlParser();
             .attr("fill", "lightgreen")
             .attr("stroke-width", 20)
             .attr("cursor", "move");
-        // .call(d3.drag().on("drag", dragcircle));
 
         // circle 2
         var circledragonoff2 = svg.append("g").data([{x: 1050, y: 75}]);
@@ -2174,10 +1985,9 @@ var parser = new SparqlParser();
             .attr("fill", "orange")
             .attr("stroke-width", 20)
             .attr("cursor", "move");
-        // .call(d3.drag().on("drag", dragcircle));
     }
 
-// Expose utility to the global object
+    // Expose utility to the global object
     global.$mainUtils = mainUtils;
 })
 (window);

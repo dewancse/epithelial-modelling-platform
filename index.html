@@ -15,8 +15,6 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/d3.min.js"></script>
     <script src="js/d3-selection-multi.v1.min.js" charset="utf-8"></script>
-    <script src="node_modules/graph.js/dist/graph.full.js"></script>
-
 </head>
 
 <body>
@@ -28,16 +26,17 @@
         </div>
     </div>
     <ul id="ulistItems" class="nav nav-tabs container">
-        <li id="listHome" role="presentation" class="active"><a href="#" onclick="$mainUtils.loadHomeHtml();">Home</a></li>
-        <li id="listAnnotation" role="presentation"><a href="#" onclick="$mainUtils.loadAnnotationHtml();">Annotation</a>
+        <li id="listHome" role="presentation" class="active">
+            <a href="#" onclick="$mainUtils.loadHomeHtml();">Home</a>
         </li>
-        <li id="listDiscovery" role="presentation"><a href="#" onclick="$mainUtils.loadSearchHtml();">Model Discovery</a>
+        <li id="listDiscovery" role="presentation">
+            <a href="#" onclick="$mainUtils.loadSearchHtml();">Model Discovery</a>
         </li>
-        <li id="svgmodel" role="presentation"><a href="#" onclick="$mainUtils.loadSVGModelHtml();">Model SVG</a>
+        <li id="listModels" role="presentation">
+            <a href="#" onclick="$mainUtils.loadModelHtml();">Load Models</a>
         </li>
-        <li id="svg" role="presentation"><a href="#" onclick="$mainUtils.loadEpithelialHtml();">SVG</a>
-        </li>
-        <li id="help" role="presentation"><a href="#" onclick="$mainUtils.loadHelp();">Help</a>
+        <li id="help" role="presentation">
+            <a href="#" onclick="$mainUtils.loadHelp();">Documentation</a>
         </li>
     </ul>
 </nav>
@@ -49,7 +48,6 @@
 
 <!-- main scripts -->
 <script src="js/ajax-utils.js"></script>
-<script src="js/bundle.js"></script>
-<!--<script src="js/index.js"></script>-->
+<script src="js/index.js"></script>
 </body>
 </html>
