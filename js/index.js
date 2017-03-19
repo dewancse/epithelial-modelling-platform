@@ -1190,7 +1190,6 @@
         var newg = svg.append("g").data([{x: 100, y: 10}]);
 
         var dragrect = newg.append("rect")
-            .attr("id", "rectangle")
             .attr("x", function (d) {
                 return d.x;
             })
@@ -1215,17 +1214,7 @@
             .attr("y", function (d) {
                 return d.y;
             })
-            .attr("height", height)
-            .attr("id", "dragleft")
-            .attr("cursor", "ew-resize")
-            .call(d3.drag()
-                .on("drag", ldragresize)
-                .on("end", ended));
-
-        function ended() {
-            // console.log("ended: ", d3.select(this)._groups[0][0].id);
-            d3.select(this).classed("dragging", false);
-        }
+            .attr("height", height);
 
         var dragright = newg.append("rect")
             .attr("x", function (d) {
@@ -1234,12 +1223,10 @@
             .attr("y", function (d) {
                 return d.y;
             })
-            .attr("id", "dragright")
             .attr("height", height)
-            .attr("cursor", "ew-resize")
+            .attr("cursor", "se-resize")
             .call(d3.drag()
-                .on("drag", rdragresize)
-                .on("end", ended));
+                .on("drag", rdragresize));
 
         var dragtop = newg.append("rect")
             .attr("x", function (d) {
@@ -1248,12 +1235,7 @@
             .attr("y", function (d) {
                 return d.y;
             })
-            .attr("id", "dragtop")
-            .attr("width", width)
-            .attr("cursor", "ns-resize")
-            .call(d3.drag()
-                .on("drag", tdragresize)
-                .on("end", ended));
+            .attr("width", width);
 
         var dragbottom = newg.append("rect")
             .attr("x", function (d) {
@@ -1262,16 +1244,12 @@
             .attr("y", function (d) {
                 return d.y + height;
             })
-            .attr("id", "dragbottom")
             .attr("width", width)
-            .attr("cursor", "ns-resize")
+            .attr("cursor", "se-resize")
             .call(d3.drag()
-                .on("drag", bdragresize)
-                .on("end", ended));
+                .on("drag", rdragresize));
 
         function dragmove(d) {
-
-            // console.log("id: ", d3.select(this)._groups[0][0].id);
 
             // drag move
             dragrect
@@ -1283,7 +1261,7 @@
             dragleft
                 .attr("x", function (d) {
                     return d.x;
-                });
+                })
             dragleft
                 .attr("y", function (d) {
                     return d.y;
@@ -1293,7 +1271,7 @@
             dragright
                 .attr("x", function (d) {
                     return d.x + width;
-                });
+                })
             dragright
                 .attr("y", function (d) {
                     return d.y;
@@ -1303,7 +1281,7 @@
             dragtop
                 .attr("x", function (d) {
                     return d.x;
-                });
+                })
             dragtop
                 .attr("y", function (d) {
                     return d.y;
@@ -1313,123 +1291,34 @@
             dragbottom
                 .attr("x", function (d) {
                     return d.x;
-                });
+                })
             dragbottom
                 .attr("y", function (d) {
                     return d.y + height;
                 });
         }
 
-        function ldragresize(d) {
-
-            // console.log("id: ", d3.select(this)._groups[0][0].id);
-
-            var oldx = d.x;
-            //Max x on the right is x + width
-            //Max x on the left is 0
-            d.x = Math.max(0, Math.min(d.x + width, d3.event.x));
-            width = width + (oldx - d.x);
-            dragleft
-                .attr("x", function (d) {
-                    return d.x;
-                });
-
-            dragrect
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("width", width);
-
-            dragtop
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("width", width);
-            dragbottom
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("width", width)
-        }
-
         function rdragresize(d) {
 
-            // console.log("id: ", d3.select(this)._groups[0][0].id);
-
-            //Max x on the left is x - width
-            //Max x on the right is width of screen
             var dragx = Math.max(d.x, Math.min(w, d.x + width + d3.event.dx));
-
-            //recalculate width
             width = dragx - d.x;
-
-            //move the right drag handle
             dragright
                 .attr("x", function (d) {
                     return dragx
                 });
-
-            //resize the drag rectangle
-            //as we are only resizing from the right, the x coordinate does not need to change
             dragrect
                 .attr("width", width);
             dragtop
                 .attr("width", width)
             dragbottom
                 .attr("width", width)
-        }
 
-        function tdragresize(d) {
-
-            // console.log("id: ", d3.select(this)._groups[0][0].id);
-
-            var oldy = d.y;
-            //Max x on the right is x + width
-            //Max x on the left is 0
-            d.y = Math.max(0, Math.min(d.y + height, d3.event.y));
-            height = height + (oldy - d.y);
-            dragtop
-                .attr("y", function (d) {
-                    return d.y;
-                });
-
-            dragrect
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("height", height);
-
-            dragleft
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("height", height);
-            dragright
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("height", height);
-        }
-
-        function bdragresize(d) {
-
-            // console.log("id: ", d3.select(this)._groups[0][0].id);
-
-            //Max x on the left is x - width
-            //Max x on the right is width of screen
             var dragy = Math.max(d.y, Math.min(h, d.y + height + d3.event.dy));
-
-            //recalculate width
             height = dragy - d.y;
-
-            //move the right drag handle
             dragbottom
                 .attr("y", function (d) {
                     return dragy
                 });
-
-            //resize the drag rectangle
-            //as we are only resizing from the right, the x coordinate does not need to change
             dragrect
                 .attr("height", height);
             dragleft
@@ -1478,7 +1367,6 @@
             d3.select(this)
                 .classed("dragging", false)
                 .attr("pointer-events", "all");
-            // console.log("dragendtext: ", d3.select(this)._groups[0][0].id);
         }
 
         var markerWidth = 4;
@@ -1616,7 +1504,6 @@
             }
 
             d3.select(this).attr("points", points);
-            // console.log("polygon: ", d3.select(this).attr("points"));
         }
 
         function dragpolygon(d) {
@@ -1643,7 +1530,6 @@
         // Paracellular Rectangle
         svg.append("g").append("polygon")
             .attr("transform", "translate(100,540)")
-            .attr("id", "paracellular")
             .attr("points", "0,0 0,100 0,0 300,0 300,100 300,0")
             .attr("fill", "white")
             .attr("stroke", "url(#basicPattern)")
