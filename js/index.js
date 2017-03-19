@@ -1156,6 +1156,21 @@
 
     mainUtils.showEpithelial = function (epithelialHtmlContent) {
 
+        // remove model name, keep only solutes
+        for (var i = 0; i < modelEntityNameArray.length; i++) {
+            var indexOfHash = modelEntityNameArray[i].search("#");
+            modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
+            console.log(indexOfHash, modelEntityNameArray[i]);
+        }
+
+        // remove duplicate
+        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
+            return modelEntityNameArray.indexOf(item) == pos;
+        })
+
+        console.log("showEpithelial in model2DArr: ", model2DArray);
+        console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
+
         var g = document.getElementById("#svgVisualize"),
             w = 1200,
             h = 700,
@@ -1660,50 +1675,57 @@
                 .attr("cy", d.y = d3.event.y);
         }
 
+        function dragcircleend(d) {
+            d3.select(this).classed("dragging", false);
+        }
+
         // SVG checkbox with circles dragging on-off
-        var checkboxsvg = svg.append("g"),
-            checkBox1 = new d3CheckBox(),
-            checkBox2 = new d3CheckBox();
+        var checkboxsvg = svg.append("g");
+
+        var checkBox = [],
+            textvalue = [],
+            checked = [],
+            ydistance = 50,
+            yinitial = 10,
+            ytextinitial = 28;
+
+        for (var i = 0; i < modelEntityNameArray.length; i++) {
+            checkBox[i] = new d3CheckBox();
+        }
 
         //Just for demonstration
-        var txt = checkboxsvg.append("text").attr("x", 800).attr("y", 120).text("Click checkbox and drag circle");
+        var txt = checkboxsvg.append("text").attr("x", 800).attr("y", 300).text("Click checkbox and drag circle");
 
         var update = function () {
-            var checked1 = checkBox1.checked(),
-                checked2 = checkBox2.checked();
-            txt.text(checked1 + "," + checked2);
 
-            // drag enable and disable
-            if (checked1) {
-                circledrag.call(d3.drag().on("drag", dragcircle));
-            }
-            else {
-                circledrag.call(d3.drag().on("drag", function () {
-                    circledrag.classed("dragging", false);
-                }));
-            }
+            for (var i = 0; i < modelEntityNameArray.length; i++) {
+                checked[i] = checkBox[i].checked();
 
-            if (checked2) {
-                circledrag2.call(d3.drag().on("drag", dragcircle));
-            }
-            else {
-                circledrag2.call(d3.drag().on("drag", function () {
-                    circledrag2.classed("dragging", false);
-                }));
+                var txt2 = "";
+                txt2 += checked[i] + ", ";
+
+                txt.text(checked[i] + " ");
+
+                // drag enable and disable
+                if (checked[i]) {
+                    circledrag[i].call(d3.drag().on("drag", dragcircle));
+                }
+                else {
+                    circledrag[i].call(d3.drag().on("drag", dragcircleend));
+                }
             }
         };
 
-        //Setting up check box and text
-        var textvalue1 = "weinstein_1995";
-        checkBox1.x(840).y(10).checked(false).clickEvent(update);
-        checkBox1.xtext(880).ytext(28).text("" + textvalue1 + "");
+        for (var i = 0; i < modelEntityNameArray.length; i++) {
+            textvalue[i] = modelEntityNameArray[i];
+            checkBox[i].x(800).y(yinitial).checked(false).clickEvent(update);
+            checkBox[i].xtext(840).ytext(ytextinitial).text("" + textvalue[i] + "");
 
-        var textvalue2 = "eskandari_2005";
-        checkBox2.x(840).y(60).checked(false).clickEvent(update);
-        checkBox2.xtext(880).ytext(78).text("" + textvalue2 + "");
+            checkboxsvg.call(checkBox[i]);
 
-        checkboxsvg.call(checkBox1);
-        checkboxsvg.call(checkBox2);
+            yinitial += ydistance;
+            ytextinitial += ydistance;
+        }
 
         function d3CheckBox() {
 
@@ -1840,37 +1862,58 @@
         }
 
         // circle drag on-off based on checked event
-        var circledragonoff = svg.append("g").data([{x: 1050, y: 25}]);
-        var radius = 20;
+        // var circledragonoff = svg.append("g").data([{x: 1050, y: 25}]);
 
-        var circledrag = circledragonoff.append("circle")
-            .attr("id", "" + textvalue1 + "")
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            })
-            .attr("r", radius)
-            .attr("fill", "lightgreen")
-            .attr("stroke-width", 20)
-            .attr("cursor", "move");
+        var circledragonoff = svg.append("g"); // .data([{x: 1050, y: 25}]);
+        var radius = 20,
+            cxvalue = 1050,
+            cyvalue = 25,
+            circledrag = [];
 
-        // circle 2
-        var circledragonoff2 = svg.append("g").data([{x: 1050, y: 75}]);
+        for (var i = 0; i < modelEntityNameArray.length; i++) {
 
-        var circledrag2 = circledragonoff2.append("circle")
-            .attr("id", "" + textvalue2 + "")
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            })
-            .attr("r", radius)
-            .attr("fill", "orange")
-            .attr("stroke-width", 20)
-            .attr("cursor", "move");
+            var circledragonoff = svg.append("g").data([{x: cxvalue, y: cyvalue}]);
+
+            circledrag[i] = circledragonoff.append("circle")
+                .attr("id", "" + textvalue[i] + "")
+                .attr("cx", function (d) {
+                    return d.x;
+                })
+                .attr("cy", function (d) {
+                    return d.y;
+                })
+                .attr("r", radius)
+                .attr("fill", "lightgreen")
+                .attr("stroke-width", 20)
+                .attr("cursor", "move");
+
+            cyvalue += ydistance;
+        }
+
+        // var circledrag = circledragonoff.append("circle")
+        // // .attr("id", "" + textvalue1 + "")
+        //     .attr("cx", cxinitial)
+        //     .attr("cy", cyinitial)
+        //     .attr("r", radius)
+        //     .attr("fill", "lightgreen")
+        //     .attr("stroke-width", 20)
+        //     .attr("cursor", "move");
+        //
+        // // circle 2
+        // var circledragonoff2 = svg.append("g").data([{x: 1050, y: 75}]);
+        //
+        // var circledrag2 = circledragonoff2.append("circle")
+        // // .attr("id", "" + textvalue2 + "")
+        //     .attr("cx", function (d) {
+        //         return d.x;
+        //     })
+        //     .attr("cy", function (d) {
+        //         return d.y;
+        //     })
+        //     .attr("r", radius)
+        //     .attr("fill", "orange")
+        //     .attr("stroke-width", 20)
+        //     .attr("cursor", "move");
     }
 
     // Expose utility to the global object
