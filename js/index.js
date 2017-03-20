@@ -24,7 +24,9 @@
     // selected models in load models
     var model = [], model2DArray = [];
 
-    var modelEntityName, modelEntityNameArray = [];
+    var modelEntityName,
+        modelEntityNameArray = [],
+        modelEntityFullNameArray = [];
 
     var links = []; // svg visualization
 
@@ -118,8 +120,7 @@
                     modelEntityName = idWithStr.slice(36 + 1);
 
                     // Temporary for display
-                    if (modelEntityName.indexOf("16032017100850239p1300") != -1 ||
-                        modelEntityName.indexOf("16032017095119913p1300") != -1) {
+                    if (modelEntityName.indexOf("16032017100850239p1300") != -1) {
 
                         var indexOfHash = modelEntityName.search("#");
                         modelEntityName = "weinstein_1995" + modelEntityName.slice(indexOfHash);
@@ -149,6 +150,7 @@
 
                     // for making visualization graph
                     modelEntityNameArray.push(event.srcElement.value);
+                    modelEntityFullNameArray.push(event.srcElement.value);
                 }
                 else {
                     var pos = templistOfModel.indexOf(event.srcElement.value);
@@ -157,6 +159,7 @@
                     // for making visualization graph
                     var pos2 = modelEntityNameArray.indexOf(event.srcElement.value);
                     modelEntityNameArray.splice(pos2, 1);
+                    modelEntityFullNameArray.splice(pos2, 1);
                 }
 
                 var idWithStr = event.srcElement.id;
@@ -178,6 +181,7 @@
 
                         // for making visualization graph
                         modelEntityNameArray.push($('.attribute')[i].value);
+                        modelEntityFullNameArray.push($('.attribute')[i].value);
                     }
                 }
                 else {
@@ -190,6 +194,7 @@
                         // for making visualization graph
                         var pos2 = modelEntityNameArray.indexOf($('.attribute')[i].value);
                         modelEntityNameArray.splice(pos2, 1);
+                        modelEntityFullNameArray.splice(pos2, 1);
                     }
                 }
             }
@@ -287,8 +292,7 @@
 
             // Temporary for display
             var tempmodelEntity = modelEntity[i].slice(36 + 1);
-            if (tempmodelEntity.indexOf("16032017100850239p1300") != -1 ||
-                tempmodelEntity.indexOf("16032017095119913p1300") != -1) {
+            if (tempmodelEntity.indexOf("16032017100850239p1300") != -1) {
 
                 var indexOfHash = tempmodelEntity.search("#");
                 tempmodelEntity = "weinstein_1995" + tempmodelEntity.slice(indexOfHash);
@@ -1142,6 +1146,24 @@
         modelEntityNameArray = [];
     }
 
+    // Load Ontology Lookup Service
+    mainUtils.loadOLS = function () {
+        //FMA:70973 Epithelial cell of proximal tubule
+        //FMA:17693 Proximal convoluted tubule
+        //FMA:17716 Proximal straight tubule
+        //FMA:84666 Apical plasma membrane
+
+        var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_17693";
+
+        $ajaxUtils.sendGetRequest(endpointOLS, mainUtils.showOLS, true);
+    };
+
+    mainUtils.showOLS = function (jsonObj) {
+        console.log("OLS: ", jsonObj);
+        console.log("OLS Label: ", jsonObj._embedded.terms[0].label);
+        console.log("OLS Synonyms: ", jsonObj._embedded.terms[0].synonyms);
+    };
+
     mainUtils.loadEpithelialHtml = function () {
 
         $ajaxUtils.sendGetRequest(
@@ -1154,22 +1176,7 @@
             false);
     }
 
-    mainUtils.showEpithelial = function (epithelialHtmlContent) {
-
-        // remove model name, keep only solutes
-        for (var i = 0; i < modelEntityNameArray.length; i++) {
-            var indexOfHash = modelEntityNameArray[i].search("#");
-            modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
-            console.log(indexOfHash, modelEntityNameArray[i]);
-        }
-
-        // remove duplicate
-        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
-            return modelEntityNameArray.indexOf(item) == pos;
-        })
-
-        console.log("showEpithelial in model2DArr: ", model2DArray);
-        console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
+    mainUtils.showsvgEpithelial = function () {
 
         var g = document.getElementById("#svgVisualize"),
             w = 1200,
@@ -1862,9 +1869,7 @@
         }
 
         // circle drag on-off based on checked event
-        // var circledragonoff = svg.append("g").data([{x: 1050, y: 25}]);
-
-        var circledragonoff = svg.append("g"); // .data([{x: 1050, y: 25}]);
+        var circledragonoff = svg.append("g");
         var radius = 20,
             cxvalue = 1050,
             cyvalue = 25,
@@ -1889,31 +1894,117 @@
 
             cyvalue += ydistance;
         }
+    }
 
-        // var circledrag = circledragonoff.append("circle")
-        // // .attr("id", "" + textvalue1 + "")
-        //     .attr("cx", cxinitial)
-        //     .attr("cy", cyinitial)
-        //     .attr("r", radius)
-        //     .attr("fill", "lightgreen")
-        //     .attr("stroke-width", 20)
-        //     .attr("cursor", "move");
-        //
-        // // circle 2
-        // var circledragonoff2 = svg.append("g").data([{x: 1050, y: 75}]);
-        //
-        // var circledrag2 = circledragonoff2.append("circle")
-        // // .attr("id", "" + textvalue2 + "")
-        //     .attr("cx", function (d) {
-        //         return d.x;
-        //     })
-        //     .attr("cy", function (d) {
-        //         return d.y;
-        //     })
-        //     .attr("r", radius)
-        //     .attr("fill", "orange")
-        //     .attr("stroke-width", 20)
-        //     .attr("cursor", "move");
+    mainUtils.showEpithelial = function (epithelialHtmlContent) {
+
+        // mainUtils.loadOLS();
+
+        // remove model name, keep only solutes
+        for (var i = 0; i < modelEntityNameArray.length; i++) {
+            var indexOfHash = modelEntityNameArray[i].search("#");
+            modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
+        }
+
+        // remove duplicate
+        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
+            return modelEntityNameArray.indexOf(item) == pos;
+        })
+
+        // Temporary for testing
+        for (var i = 0; i < modelEntityFullNameArray.length; i++) {
+            var indexOfHash = modelEntityFullNameArray[i].search("#");
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "weinstein_1995")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/16032017100850239p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "mackenzie_1996.cellml")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/mackenzie_1996" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "chang_fujita_b_1999")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/17032017142614972p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
+        }
+
+        // remove duplicate
+        modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
+            return modelEntityFullNameArray.indexOf(item) == pos;
+        })
+
+        console.log("showEpithelial in model2DArr: ", model2DArray);
+        console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
+        console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
+
+        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+            'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+            'SELECT ?source_fma ?sink_fma ' +
+            'WHERE { ' +
+            '<' + modelEntityFullNameArray[0] + '> semsim:isComputationalComponentFor ?model_prop. ' +
+            '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+            '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
+            '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
+            '?source_entity ro:part_of ?source_part_of_entity. ' +
+            '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
+            '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
+            '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
+            '?sink_entity ro:part_of ?sink_part_of_entity. ' +
+            '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
+            '}'
+
+        console.log(query);
+        var source = [], sink = [];
+        $ajaxUtils.sendPostRequest(
+            endpoint,
+            query,
+            function (jsonObj) {
+                console.log(jsonObj);
+
+                for (var i = 0; i < jsonObj.results.bindings.length; i++) {
+                    source.push(jsonObj.results.bindings[i].source_fma.value);
+                    sink.push(jsonObj.results.bindings[i].sink_fma.value);
+                }
+
+                // remove duplicate
+                source = source.filter(function (item, pos) {
+                    return source.indexOf(item) == pos;
+                })
+
+                sink = sink.filter(function (item, pos) {
+                    return sink.indexOf(item) == pos;
+                })
+
+                console.log("source: ", source);
+                console.log("sink: ", sink);
+
+                var index = source[0].search("FMA:");
+                source[0] = source[0].slice(index + 4);
+
+                var index = sink[0].search("FMA:");
+                sink[0] = sink[0].slice(index + 4);
+
+                var endpointOLSrc = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_" + source[0];
+                var endpointOLSnk = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_" + sink[0];
+
+                $ajaxUtils.sendGetRequest(
+                    endpointOLSrc,
+                    function (jsonSrc) {
+                        console.log("OLS source Label: ", jsonSrc._embedded.terms[0].label);
+                        console.log("OLS source Synonyms: ", jsonSrc._embedded.terms[0].synonyms);
+
+                        $ajaxUtils.sendGetRequest(
+                            endpointOLSnk,
+                            function (jsonSnk) {
+                                source[0] = jsonSrc._embedded.terms[0].label;
+                                sink[0] = jsonSnk._embedded.terms[0].label;
+                                console.log("OLS sink Label: ", jsonSnk._embedded.terms[0].label);
+                                console.log("OLS sink Synonyms: ", jsonSnk._embedded.terms[0].synonyms);
+
+                                console.log("After source: ", source);
+                                console.log("After sink: ", sink);
+
+                                mainUtils.showsvgEpithelial();
+                            },
+                            true);
+                    },
+                    true);
+            },
+            true);
     }
 
     // Expose utility to the global object
