@@ -1176,7 +1176,40 @@
             false);
     }
 
-    mainUtils.showsvgEpithelial = function () {
+    mainUtils.showEpithelial = function (epithelialHtmlContent) {
+
+        // mainUtils.loadOLS();
+
+        // remove model name, keep only solutes
+        for (var i = 0; i < modelEntityNameArray.length; i++) {
+            var indexOfHash = modelEntityNameArray[i].search("#");
+            modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
+        }
+
+        // remove duplicate
+        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
+            return modelEntityNameArray.indexOf(item) == pos;
+        })
+
+        // Temporary for testing
+        for (var i = 0; i < modelEntityFullNameArray.length; i++) {
+            var indexOfHash = modelEntityFullNameArray[i].search("#");
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "weinstein_1995")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/16032017100850239p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "mackenzie_1996.cellml")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/mackenzie_1996" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "chang_fujita_b_1999")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/17032017142614972p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
+        }
+
+        // remove duplicate
+        modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
+            return modelEntityFullNameArray.indexOf(item) == pos;
+        })
+
+        console.log("showEpithelial in model2DArr: ", model2DArray);
+        console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
+        console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
 
         var g = document.getElementById("#svgVisualize"),
             w = 1200,
@@ -1894,117 +1927,6 @@
 
             cyvalue += ydistance;
         }
-    }
-
-    mainUtils.showEpithelial = function (epithelialHtmlContent) {
-
-        // mainUtils.loadOLS();
-
-        // remove model name, keep only solutes
-        for (var i = 0; i < modelEntityNameArray.length; i++) {
-            var indexOfHash = modelEntityNameArray[i].search("#");
-            modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
-        }
-
-        // remove duplicate
-        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
-            return modelEntityNameArray.indexOf(item) == pos;
-        })
-
-        // Temporary for testing
-        for (var i = 0; i < modelEntityFullNameArray.length; i++) {
-            var indexOfHash = modelEntityFullNameArray[i].search("#");
-            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "weinstein_1995")
-                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/16032017100850239p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
-            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "mackenzie_1996.cellml")
-                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/mackenzie_1996" + modelEntityFullNameArray[i].slice(indexOfHash);
-            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "chang_fujita_b_1999")
-                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/17032017142614972p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
-        }
-
-        // remove duplicate
-        modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
-            return modelEntityFullNameArray.indexOf(item) == pos;
-        })
-
-        console.log("showEpithelial in model2DArr: ", model2DArray);
-        console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
-        console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
-
-        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-            'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-            'SELECT ?source_fma ?sink_fma ' +
-            'WHERE { ' +
-            '<' + modelEntityFullNameArray[0] + '> semsim:isComputationalComponentFor ?model_prop. ' +
-            '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-            '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-            '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-            '?source_entity ro:part_of ?source_part_of_entity. ' +
-            '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-            '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-            '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-            '?sink_entity ro:part_of ?sink_part_of_entity. ' +
-            '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
-            '}'
-
-        console.log(query);
-        var source = [], sink = [];
-        $ajaxUtils.sendPostRequest(
-            endpoint,
-            query,
-            function (jsonObj) {
-                console.log(jsonObj);
-
-                for (var i = 0; i < jsonObj.results.bindings.length; i++) {
-                    source.push(jsonObj.results.bindings[i].source_fma.value);
-                    sink.push(jsonObj.results.bindings[i].sink_fma.value);
-                }
-
-                // remove duplicate
-                source = source.filter(function (item, pos) {
-                    return source.indexOf(item) == pos;
-                })
-
-                sink = sink.filter(function (item, pos) {
-                    return sink.indexOf(item) == pos;
-                })
-
-                console.log("source: ", source);
-                console.log("sink: ", sink);
-
-                var index = source[0].search("FMA:");
-                source[0] = source[0].slice(index + 4);
-
-                var index = sink[0].search("FMA:");
-                sink[0] = sink[0].slice(index + 4);
-
-                var endpointOLSrc = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_" + source[0];
-                var endpointOLSnk = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_" + sink[0];
-
-                $ajaxUtils.sendGetRequest(
-                    endpointOLSrc,
-                    function (jsonSrc) {
-                        console.log("OLS source Label: ", jsonSrc._embedded.terms[0].label);
-                        console.log("OLS source Synonyms: ", jsonSrc._embedded.terms[0].synonyms);
-
-                        $ajaxUtils.sendGetRequest(
-                            endpointOLSnk,
-                            function (jsonSnk) {
-                                source[0] = jsonSrc._embedded.terms[0].label;
-                                sink[0] = jsonSnk._embedded.terms[0].label;
-                                console.log("OLS sink Label: ", jsonSnk._embedded.terms[0].label);
-                                console.log("OLS sink Synonyms: ", jsonSnk._embedded.terms[0].synonyms);
-
-                                console.log("After source: ", source);
-                                console.log("After sink: ", sink);
-
-                                mainUtils.showsvgEpithelial();
-                            },
-                            true);
-                    },
-                    true);
-            },
-            true);
     }
 
     // Expose utility to the global object
