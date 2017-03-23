@@ -1211,15 +1211,28 @@
         console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
         console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
 
+        var apicalID = "http://identifiers.org/fma/FMA:84666";
+        var serosalID = "http://identifiers.org/fma/FMA:84669";
+        var luminalID = "http://identifiers.org/fma/FMA:74550";
+        var cytosolID = "http://identifiers.org/fma/FMA:66836";
+        var paracellularID = "";
+        var interstitialID = "http://identifiers.org/fma/FMA:9673";
+
         var g = document.getElementById("#svgVisualize"),
-            w = 1200,
-            h = 700,
+            wth = 1200,
+            hth = 900,
             width = 300,
             height = 400;
 
         var svg = d3.select("#svgVisualize").append("svg")
-            .attr("width", w)
-            .attr("height", h);
+            .attr("width", wth)
+            .attr("height", hth);
+
+        var w = 800,
+            h = 900;
+
+        var newg = svg.append("g")
+            .data([{x: w / 3, y: height / 3}]);
 
         // TODO: extend this with lines and circles
         var newgdefs = svg.append("g");
@@ -1241,9 +1254,6 @@
             .attr("stroke", "#6495ED")
             .attr("stroke-width", 1.5);
 
-        // Rectangle
-        var newg = svg.append("g").data([{x: 100, y: 10}]);
-
         var dragrect = newg.append("rect")
             .attr("x", function (d) {
                 return d.x;
@@ -1257,7 +1267,7 @@
             .attr("ry", 20)
             .attr("fill", "white")
             .attr("stroke", "url(#basicPattern)")
-            .attr("stroke-width", 20)
+            .attr("stroke-width", 25)
             .attr("cursor", "move")
             .call(d3.drag()
                 .on("drag", dragmove));
@@ -1269,7 +1279,8 @@
             .attr("y", function (d) {
                 return d.y;
             })
-            .attr("height", height);
+            .attr("height", height)
+            .attr("fill-opacity", 0);
 
         var dragright = newg.append("rect")
             .attr("x", function (d) {
@@ -1279,7 +1290,8 @@
                 return d.y;
             })
             .attr("height", height)
-            .attr("cursor", "se-resize")
+            .attr("fill-opacity", 0)
+            .attr("cursor", "ew-resize")
             .call(d3.drag()
                 .on("drag", rdragresize));
 
@@ -1290,7 +1302,8 @@
             .attr("y", function (d) {
                 return d.y;
             })
-            .attr("width", width);
+            .attr("width", width)
+            .attr("fill-opacity", 0)
 
         var dragbottom = newg.append("rect")
             .attr("x", function (d) {
@@ -1300,9 +1313,329 @@
                 return d.y + height;
             })
             .attr("width", width)
-            .attr("cursor", "se-resize")
+            .attr("fill-opacity", 0)
+            .attr("cursor", "ns-resize")
+            .call(d3.drag().on("drag", rdragresize));
+
+        // Extracellular rectangle
+        var extracellular = newg.append("rect")
+            .attr("id", luminalID)
+            .attr("x", 0)
+            .attr("y", height / 3 - 20)
+            .attr("width", w / 3 - 30)
+            .attr("height", h)
+            .attr("stroke", "purple")
+            .attr("strokeWidth", "4px")
+            .attr("fill", "white");
+
+        // Intracellular rectangle
+        var intracellular = newg.append("rect")
+            .attr("id", cytosolID)
+            .attr("x", w / 3 + 30)
+            .attr("y", height / 3 + 20)
+            .attr("width", width - 60)
+            .attr("height", height - 40)
+            .attr("stroke", "blue")
+            .attr("strokeWidth", "4px")
+            .attr("fill", "white");
+
+        // Interstitial fluid rectangle
+        var interstitial = newg.append("rect")
+            .attr("id", interstitialID)
+            .attr("x", w / 3 + width + 30)
+            .attr("y", 0)
+            .attr("width", w - (w / 3 + width + 30))
+            .attr("height", h)
+            .attr("stroke", "teal")
+            .attr("strokeWidth", "4px")
+            .attr("fill", "white");
+
+        // Interstitial fluid rectangle
+        var interstitial2 = newg.append("rect")
+            .attr("id", interstitialID)
+            .attr("x", w / 3 - 10)
+            .attr("y", 0)
+            .attr("width", width + 40)
+            .attr("height", height / 3 - 30)
+            .attr("stroke", "teal")
+            .attr("strokeWidth", "4px")
+            .attr("fill", "white");
+
+        // Paracellular rectangle
+        var paracellular = newg.append("rect")
+            .attr("id", paracellularID)
+            .attr("x", w / 3 - 10)
+            .attr("y", height / 3 + height + 30)
+            .attr("width", width + 20)
+            .attr("height", height / 3)
+            .attr("stroke", "indigo")
+            .attr("strokeWidth", "4px")
+            .attr("fill", "white");
+
+        var x = document.getElementsByTagName("rect")[0].x.baseVal.value;
+        var y = document.getElementsByTagName("rect")[0].y.baseVal.value;
+
+        var lineapical = newg.append("line")
+            .attr("id", apicalID)
+            .attr("x1", function (d) {
+                return d.x;
+            })
+            .attr("y1", function (d) {
+                return d.y + 10;
+            })
+            .attr("x2", function (d) {
+                return d.x;
+            })
+            .attr("y2", function (d) {
+                return d.y + height - 10;
+            })
+            .attr("stroke", function (d) {
+                svg.append("text")
+                    .style("font", "16px sans-serif")
+                    .attr("stroke", "green")
+                    .attr("x", 10)
+                    .attr("y", 20)
+                    .text("Apical Membrane");
+
+                return "green";
+            })
+            .attr("stroke-width", 25)
+            .attr("opacity", 0.5)
+            .attr("cursor", "pointer")
+            .call(d3.drag().on("drag", dragmove));
+
+        var lineserosal = newg.append("line")
+            .attr("id", serosalID)
+            .attr("x1", function (d) {
+                return d.x + width;
+            })
+            .attr("y1", function (d) {
+                return d.y + 10;
+            })
+            .attr("x2", function (d) {
+                return d.x + width;
+            })
+            .attr("y2", function (d) {
+                return d.y + height - 10;
+            })
+            .attr("stroke", function (d) {
+                svg.append("text")
+                    .style("font", "16px sans-serif")
+                    .attr("stroke", "orange")
+                    .attr("x", 10)
+                    .attr("y", 40)
+                    .text("Basolateral Membrane");
+
+                return "orange";
+            })
+            .attr("stroke-width", 25)
+            .attr("opacity", 0.5)
+            .attr("cursor", "pointer")
+            .call(d3.drag().on("drag", dragmove));
+
+        // Paracellular Rectangle
+        newg.append("polygon")
+            .attr("transform", "translate(265,720)")
+            .attr("points", "0,0 0,100 0,0 300,0 300,100 300,0")
+            .attr("fill", "white")
+            .attr("stroke", "url(#basicPattern)")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-width", 25)
+            .attr("cursor", "move")
+            .call(d3.drag().on("drag", dragpolygon));
+
+        function dragpolygon(d) {
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            var xNew = [], yNew = [], points = "";
+            var pointsLen = d3.select(this)._groups[0][0].points.length;
+
+            for (var i = 0; i < pointsLen; i++) {
+                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
+                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
+
+                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
+
+                if (i != pointsLen - 1)
+                    points = points.concat(" ");
+            }
+
+            d3.select(this).attr("points", points);
+            // console.log("polygon: ", d3.select(this).attr("points"));
+        }
+
+        // circle drag on-off based on checked event
+        var radius = 20;
+
+        var circledrag1 = svg.append("g").data([{x: 20, y: 80}]);
+
+        var circle1 = circledrag1.append("circle")
+            .attr("id", apicalID)
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("r", radius)
+            .attr("fill", "lightgreen")
+            .attr("opacity", 0.5)
+            .attr("stroke-width", 20)
+            .attr("cursor", "move")
             .call(d3.drag()
-                .on("drag", rdragresize));
+                .on("drag", dragcircle)
+                .on("end", dragcircleend));
+
+        var circledrag2 = svg.append("g").data([{x: 65, y: 80}]);
+
+        var circle2 = circledrag2.append("circle")
+            .attr("id", serosalID)
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("r", radius)
+            .attr("fill", "orange")
+            .attr("opacity", 0.5)
+            .attr("stroke-width", 20)
+            .attr("cursor", "move")
+            .call(d3.drag()
+                .on("drag", dragcircle)
+                .on("end", dragcircleend));
+
+        var circledrag3 = svg.append("g").data([{x: 110, y: 80}]);
+
+        var circle3 = circledrag3.append("circle")
+            .attr("id", cytosolID)
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("r", radius)
+            .attr("fill", "blue")
+            .attr("opacity", 0.5)
+            .attr("stroke-width", 20)
+            .attr("cursor", "move")
+            .call(d3.drag()
+                .on("drag", dragcircle)
+                .on("end", dragcircleend));
+
+        var circledrag4 = svg.append("g").data([{x: 155, y: 80}]);
+
+        var circle4 = circledrag4.append("circle")
+            .attr("id", luminalID)
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("r", radius)
+            .attr("fill", "purple")
+            .attr("opacity", 0.5)
+            .attr("stroke-width", 20)
+            .attr("cursor", "move")
+            .call(d3.drag()
+                .on("drag", dragcircle)
+                .on("end", dragcircleend));
+
+        function dragcircle(d) {
+            d3.select(this)
+                .attr("cx", d.x = d3.event.x)
+                .attr("cy", d.y = d3.event.y);
+
+            console.log("dragcircle: ", d3.select(this));
+
+            // detect apical
+            var line_x = document.getElementsByTagName("line")[0].x1.baseVal.value;
+            var line_y1 = document.getElementsByTagName("line")[0].y1.baseVal.value;
+            var line_y2 = document.getElementsByTagName("line")[0].y2.baseVal.value;
+            var cx = d3.select(this)._groups[0][0].cx.baseVal.value;
+            var cy = d3.select(this)._groups[0][0].cy.baseVal.value;
+            var line_id = document.getElementsByTagName("line")[0].id;
+            var circle_id = d3.select(this)._groups[0][0].id;
+
+            if ((cx >= (line_x - radius) && cx <= line_x + 20 + radius) && (cy >= line_y1 && cy <= line_y2) && (line_id == circle_id)) {
+                document.getElementsByTagName("line")[0].style.setProperty("stroke", "red");
+
+                circle1
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("cx", d.x = 20)
+                    .attr("cy", d.y = 80);
+
+                console.log("d.x: ", d.x);
+                console.log("d.y: ", d.y);
+
+            }
+            else {
+                document.getElementsByTagName("line")[0].style.setProperty("stroke", "green");
+            }
+
+            // detect serosal
+            var line_xx = document.getElementsByTagName("line")[1].x1.baseVal.value;
+            var line_yy1 = document.getElementsByTagName("line")[1].y1.baseVal.value;
+            var line_yy2 = document.getElementsByTagName("line")[1].y2.baseVal.value;
+            var cxx = d3.select(this)._groups[0][0].cx.baseVal.value;
+            var cyy = d3.select(this)._groups[0][0].cy.baseVal.value;
+            var line_idd = document.getElementsByTagName("line")[1].id;
+            var circle_id = d3.select(this)._groups[0][0].id;
+
+            if ((cxx >= (line_xx - radius) && cxx <= line_xx + 20 + radius) && (cyy >= line_yy1 && cyy <= line_yy2) && (line_idd == circle_id)) {
+                document.getElementsByTagName("line")[1].style.setProperty("stroke", "red");
+
+                circle2
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("cx", d.x = 65)
+                    .attr("cy", d.y = 80);
+            }
+            else {
+                document.getElementsByTagName("line")[1].style.setProperty("stroke", "orange");
+            }
+
+            // detect extracellular
+            var rect_x = document.getElementsByTagName("rect")[5].x.baseVal.value;
+            var rect_y = document.getElementsByTagName("rect")[5].y.baseVal.value;
+            var rect_id = document.getElementsByTagName("rect")[5].id;
+            var cxp = d3.select(this)._groups[0][0].cx.baseVal.value;
+            var cyp = d3.select(this)._groups[0][0].cy.baseVal.value;
+            var circle_id = d3.select(this)._groups[0][0].id;
+
+            if ((cxp >= rect_x && cxp <= rect_x + w / 3 - 30) && (cyp >= rect_y && cyp <= rect_y + h) && (rect_id == circle_id)) {
+                document.getElementsByTagName("rect")[5].style.setProperty("stroke", "red");
+            }
+            else {
+                document.getElementsByTagName("rect")[5].style.setProperty("stroke", "purple");
+            }
+
+            // detect intracellular
+            var rect_xc = document.getElementsByTagName("rect")[6].x.baseVal.value;
+            var rect_yc = document.getElementsByTagName("rect")[6].y.baseVal.value;
+            var rect_idc = document.getElementsByTagName("rect")[6].id;
+            var cxc = d3.select(this)._groups[0][0].cx.baseVal.value;
+            var cyc = d3.select(this)._groups[0][0].cy.baseVal.value;
+            var circle_idc = d3.select(this)._groups[0][0].id;
+
+            if ((cxc >= rect_xc && cxc <= rect_xc + width - 60) && (cyc >= rect_yc && cyc <= rect_yc + height - 40) && (rect_idc == circle_idc)) {
+                document.getElementsByTagName("rect")[6].style.setProperty("stroke", "red");
+            }
+            else {
+                document.getElementsByTagName("rect")[6].style.setProperty("stroke", "blue");
+            }
+        }
+
+        function dragcircleend(d) {
+            d3.select(this).classed("dragging", false);
+        }
 
         function dragmove(d) {
 
@@ -1351,16 +1684,55 @@
                 .attr("y", function (d) {
                     return d.y + height;
                 });
+
+            // drag apical line
+            lineapical
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y + 10;
+                })
+                .attr("x2", function (d) {
+                    return d.x;
+                })
+                .attr("y2", function (d) {
+                    return d.y + height - 10;
+                })
+
+            // drag serosal line
+            lineserosal
+                .attr("x1", function (d) {
+                    return d.x + width;
+                })
+                .attr("y1", function (d) {
+                    return d.y + 10;
+                })
+                .attr("x2", function (d) {
+                    return d.x + width;
+                })
+                .attr("y2", function (d) {
+                    return d.y + height - 10;
+                })
         }
 
         function rdragresize(d) {
 
+            //Max x on the left is x - width
+            //Max x on the right is width of screen
             var dragx = Math.max(d.x, Math.min(w, d.x + width + d3.event.dx));
+
+            //recalculate width
             width = dragx - d.x;
+
+            //move the right drag handle
             dragright
                 .attr("x", function (d) {
                     return dragx
                 });
+
+            //resize the drag rectangle
+            //as we are only resizing from the right, the x coordinate does not need to change
             dragrect
                 .attr("width", width);
             dragtop
@@ -1368,28 +1740,67 @@
             dragbottom
                 .attr("width", width)
 
+            //Max x on the left is x - width
+            //Max x on the right is width of screen
             var dragy = Math.max(d.y, Math.min(h, d.y + height + d3.event.dy));
+
+            //recalculate width
             height = dragy - d.y;
+
+            //move the right drag handle
             dragbottom
                 .attr("y", function (d) {
                     return dragy
                 });
+
+            //resize the drag rectangle
+            //as we are only resizing from the right, the x coordinate does not need to change
             dragrect
                 .attr("height", height);
             dragleft
                 .attr("height", height);
             dragright
                 .attr("height", height);
+
+            // drag apical line
+            lineapical
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y + 10;
+                })
+                .attr("x2", function (d) {
+                    return d.x;
+                })
+                .attr("y2", function (d) {
+                    return d.y + height - 10;
+                })
+
+            // drag serosal line
+            lineserosal
+                .attr("x1", function (d) {
+                    return d.x + width;
+                })
+                .attr("y1", function (d) {
+                    return d.y + 10;
+                })
+                .attr("x2", function (d) {
+                    return d.x + width;
+                })
+                .attr("y2", function (d) {
+                    return d.y + height - 10;
+                })
         }
 
         // Text
-        var svgtext = svg.append("g").data([{x: 500, y: 30}]);
+        var svgtext = svg.append("g").data([{x: 850, y: 500}]);
 
         var compartment = ["Luminal", "Serosal", "Paracellular", "Na+", "K+", "Cl-"];
 
         compartment.forEach(function (element, index) {
             if (index > 0)
-                svgtext.data([{x: 500, y: 30 * (index + 1)}]);
+                svgtext.data([{x: 850, y: 470 + 30 * (index + 1)}]);
 
             svgtext.append("text")
                 .attr("id", element)
@@ -1490,7 +1901,7 @@
         }
 
         // Polygon with arrow lines
-        var polygonwitharrowsg = svg.append("g").data([{x: 490, y: 325}]);
+        var polygonwitharrowsg = svg.append("g").data([{x: 840, y: 325}]);
         var polygonlineLen = 60;
 
         var polygonmarkerend = polygonwitharrowsg.append("line")
@@ -1520,7 +1931,7 @@
 
         // Polygon
         var polygonmarker = svg.append("g").append("polygon")
-            .attr("transform", "translate(500,300)")
+            .attr("transform", "translate(850,300)")
             .attr("id", "channel")
             // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
             .attr("points", "10,15 30,15 40,25 30,35 10,35 0,25")
@@ -1582,20 +1993,8 @@
             // console.log("polygon: ", d3.select(this).attr("points"));
         }
 
-        // Paracellular Rectangle
-        svg.append("g").append("polygon")
-            .attr("transform", "translate(100,540)")
-            .attr("points", "0,0 0,100 0,0 300,0 300,100 300,0")
-            .attr("fill", "white")
-            .attr("stroke", "url(#basicPattern)")
-            .attr("stroke-linecap", "round")
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-width", 20)
-            .attr("cursor", "move")
-            .call(d3.drag().on("drag", dragpolygon));
-
         // Circle with arrow lines
-        var circlewitharrowsg = svg.append("g").data([{x: 500, y: 380}]);
+        var circlewitharrowsg = svg.append("g").data([{x: 850, y: 380}]);
         var lineLen = 40;
         var radius = 20;
 
@@ -1709,13 +2108,13 @@
                 .attr("cy", axis.shift());
         }
 
-        function dragcircle(d) {
+        function dragcirclechkbx(d) {
             d3.select(this)
                 .attr("cx", d.x = d3.event.x)
                 .attr("cy", d.y = d3.event.y);
         }
 
-        function dragcircleend(d) {
+        function dragcircleendchkbx(d) {
             d3.select(this).classed("dragging", false);
         }
 
@@ -1734,7 +2133,7 @@
         }
 
         //Just for demonstration
-        var txt = checkboxsvg.append("text").attr("x", 800).attr("y", 300).text("Click checkbox and drag circle");
+        var txt = checkboxsvg.append("text").attr("x", 850).attr("y", 300).text("Click checkbox and drag circle");
 
         var update = function () {
 
@@ -1748,18 +2147,18 @@
 
                 // drag enable and disable
                 if (checked[i]) {
-                    circledrag[i].call(d3.drag().on("drag", dragcircle));
+                    circledrag[i].call(d3.drag().on("drag", dragcirclechkbx));
                 }
                 else {
-                    circledrag[i].call(d3.drag().on("drag", dragcircleend));
+                    circledrag[i].call(d3.drag().on("drag", dragcircleendchkbx));
                 }
             }
         };
 
         for (var i = 0; i < modelEntityNameArray.length; i++) {
             textvalue[i] = modelEntityNameArray[i];
-            checkBox[i].x(800).y(yinitial).checked(false).clickEvent(update);
-            checkBox[i].xtext(840).ytext(ytextinitial).text("" + textvalue[i] + "");
+            checkBox[i].x(850).y(yinitial).checked(false).clickEvent(update);
+            checkBox[i].xtext(890).ytext(ytextinitial).text("" + textvalue[i] + "");
 
             checkboxsvg.call(checkBox[i]);
 
@@ -1904,7 +2303,7 @@
         // circle drag on-off based on checked event
         var circledragonoff = svg.append("g");
         var radius = 20,
-            cxvalue = 1050,
+            cxvalue = 1100,
             cyvalue = 25,
             circledrag = [];
 
