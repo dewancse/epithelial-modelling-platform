@@ -1196,8 +1196,11 @@
                 yrect: solutes[i].yrect,
                 width: solutes[i].width,
                 height: solutes[i].height,
+                length: solutes[i].length
             });
         }
+
+        console.log(nodes);
 
         var simulation = d3.forceSimulation()
             .force("charge", d3.forceManyBody().strength(0))
@@ -1248,7 +1251,7 @@
         }
     }
 
-    mainUtils.showsvgEpithelial = function (concentration_fma) {
+    mainUtils.showsvgEpithelial = function (concentration_fma, source_fma, sink_fma) {
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var serosalID = "http://identifiers.org/fma/FMA:84669";
         var luminalID = "http://identifiers.org/fma/FMA:74550";
@@ -1416,20 +1419,22 @@
 
             // luminal(5), cytosol(6), interstitial(7), interstitial2(8), paracellular(9)
             for (var j = 5; j <= 9; j++) {
-                if (concentration_fma[i] == document.getElementsByTagName("rect")[j].id)
+                if (concentration_fma[i].fma == document.getElementsByTagName("rect")[j].id)
                     break;
             }
 
             // compartments
-            if (concentration_fma[i] == document.getElementsByTagName("rect")[j].id) {
+            if (concentration_fma[i].fma == document.getElementsByTagName("rect")[j].id) {
                 var xrect = document.getElementsByTagName("rect")[j].x.baseVal.value;
                 var yrect = document.getElementsByTagName("rect")[j].y.baseVal.value;
                 var xwidth = document.getElementsByTagName("rect")[j].width.baseVal.value;
                 var yheight = document.getElementsByTagName("rect")[j].height.baseVal.value;
                 var svgtext = svg.append("g").data([{x: xrect + 10, y: yrect + 20}]);
 
-                var indexOfHash = modelEntityFullNameArray[i].search("#");
-                var value = modelEntityFullNameArray[i].slice(indexOfHash + 1);
+                var indexOfHash = concentration_fma[i].name.search("#");
+                var value = concentration_fma[i].name.slice(indexOfHash + 1);
+                var indexOfdot = value.indexOf('.');
+                value = value.slice(indexOfdot + 1);
 
                 solutes.push(
                     {
@@ -1438,7 +1443,8 @@
                         yrect: yrect,
                         width: xwidth,
                         height: yheight,
-                        value: value
+                        value: value,
+                        length: value.length
                     });
             }
         }
@@ -2438,71 +2444,120 @@
         console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
         console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
 
-        // var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-        //     'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-        //     'SELECT ?source_fma ?sink_fma ' +
-        //     'WHERE { ' +
-        //     '<' + modelEntityFullNameArray[0] + '> semsim:isComputationalComponentFor ?model_prop. ' +
-        //     '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-        //     '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-        //     '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-        //     '?source_entity ro:part_of ?source_part_of_entity. ' +
-        //     '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-        //     '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-        //     '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-        //     '?sink_entity ro:part_of ?sink_part_of_entity. ' +
-        //     '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
-        //     '}'
-
         var concentration_fma = [], source_fma = [], sink_fma = [];
 
-        for (var index = 0; index < modelEntityFullNameArray.length; index++) {
+        var index = 0;
+
+        mainUtils.testAJAX = function () {
+
+            if (index == modelEntityFullNameArray.length) {
+                console.log("concentration_fma: ", concentration_fma);
+                console.log("source_fma: ", source_fma);
+                console.log("sink_fma: ", sink_fma);
+
+                mainUtils.showsvgEpithelial(concentration_fma, source_fma, sink_fma);
+
+                return;
+            }
+
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                'SELECT ?concentration_fma ' +
+                'SELECT ?source_fma ?sink_fma ' +
                 'WHERE { ' +
                 '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                '?model_prop semsim:physicalPropertyOf ?source_entity. ' +
+                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+                '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
+                '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
                 '?source_entity ro:part_of ?source_part_of_entity. ' +
-                '?source_part_of_entity semsim:hasPhysicalDefinition ?concentration_fma.' +
+                '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
+                '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
+                '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
+                '?sink_entity ro:part_of ?sink_part_of_entity. ' +
+                '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
                 '}'
 
             $ajaxUtils.sendPostRequest(
                 endpoint,
                 query,
-                function (jsonObj) {
-                    console.log(jsonObj);
+                function (jsonObjFlux) {
 
-                    for (var i = 0; i < jsonObj.results.bindings.length; i++) {
-                        if (jsonObj.results.bindings[i].concentration_fma == undefined)
-                            concentration_fma.push("");
-                        else
-                            concentration_fma.push(jsonObj.results.bindings[i].concentration_fma.value);
-
-                        if (jsonObj.results.bindings[i].source_fma == undefined)
+                    for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
+                        if (jsonObjFlux.results.bindings[i].source_fma == undefined)
                             source_fma.push("");
                         else
-                            source_fma.push(jsonObj.results.bindings[i].source_fma.value);
+                            source_fma.push(
+                                {
+                                    name: modelEntityFullNameArray[index],
+                                    fma: jsonObjFlux.results.bindings[i].source_fma.value
+                                }
+                            );
 
-                        if (jsonObj.results.bindings[i].sink_fma == undefined)
+                        if (jsonObjFlux.results.bindings[i].sink_fma == undefined)
                             sink_fma.push("");
                         else
-                            sink_fma.push(jsonObj.results.bindings[i].sink_fma.value);
+                            sink_fma.push(
+                                {
+                                    name: modelEntityFullNameArray[index],
+                                    fma: jsonObjFlux.results.bindings[i].sink_fma.value
+                                }
+                            );
                     }
 
-                    if (concentration_fma.length == modelEntityFullNameArray.length) {
-                        console.log("concentration_fma: ", concentration_fma);
-                        console.log("source_fma: ", source_fma);
-                        console.log("sink_fma: ", sink_fma);
-
-                        mainUtils.showsvgEpithelial(concentration_fma);
+                    // Remove duplicate links
+                    function uniqueify(es) {
+                        var retval = [];
+                        es.forEach(function (e) {
+                            for (var j = 0; j < retval.length; j++) {
+                                if (retval[j].name === e.name && retval[j].fma === e.fma)
+                                    return;
+                            }
+                            retval.push(e);
+                        });
+                        return retval;
                     }
+
+                    source_fma = uniqueify(source_fma);
+                    sink_fma = uniqueify(sink_fma);
+
+                    var query2 = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                        'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                        'SELECT ?concentration_fma ' +
+                        'WHERE { ' +
+                        '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                        '?model_prop semsim:physicalPropertyOf ?source_entity. ' +
+                        '?source_entity ro:part_of ?source_part_of_entity. ' +
+                        '?source_part_of_entity semsim:hasPhysicalDefinition ?concentration_fma.' +
+                        '}'
+
+                    $ajaxUtils.sendPostRequest(
+                        endpoint,
+                        query2,
+                        function (jsonObjCon) {
+
+                            for (var i = 0; i < jsonObjCon.results.bindings.length; i++) {
+                                if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
+                                    concentration_fma.push("");
+                                else
+                                    concentration_fma.push(
+                                        {
+                                            name: modelEntityFullNameArray[index],
+                                            fma: jsonObjCon.results.bindings[i].concentration_fma.value
+                                        }
+                                    );
+                            }
+
+                            index++;
+                            mainUtils.testAJAX(); // callback
+                        },
+                        true);
                 },
                 true);
         }
+
+        mainUtils.testAJAX();
     }
 
-// Expose utility to the global object
+    // Expose utility to the global object
     global.$mainUtils = mainUtils;
 })
 (window);
