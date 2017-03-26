@@ -1176,46 +1176,84 @@
             false);
     }
 
-    mainUtils.showEpithelial = function (epithelialHtmlContent) {
+    mainUtils.solutesBouncing = function (newg, solutes) {
 
-        // mainUtils.loadOLS();
+        var m = 10,
+            maxSpeed = 1,
+            color = d3.scaleOrdinal(d3.schemeCategory20).domain(d3.range(m));
 
-        // remove model name, keep only solutes
-        for (var i = 0; i < modelEntityNameArray.length; i++) {
-            var indexOfHash = modelEntityNameArray[i].search("#");
-            modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
+        var nodes = [];
+
+        for (var i = 0; i < solutes.length; i++) {
+            nodes.push({
+                text: solutes[i].value,
+                color: color(Math.floor(Math.random() * m)),
+                x: solutes[i].xrect + (Math.random() * (solutes[i].width - solutes[i].xrect)),
+                y: solutes[i].yrect + (Math.random() * (solutes[i].height - solutes[i].yrect)),
+                speedX: Math.random() * maxSpeed,
+                speedY: Math.random() * maxSpeed,
+                xrect: solutes[i].xrect,
+                yrect: solutes[i].yrect,
+                width: solutes[i].width,
+                height: solutes[i].height,
+            });
         }
 
-        // remove duplicate
-        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
-            return modelEntityNameArray.indexOf(item) == pos;
-        })
+        var simulation = d3.forceSimulation()
+            .force("charge", d3.forceManyBody().strength(0))
+            .force("gravity", d3.forceManyBody().strength(0));
 
-        // Temporary for testing
-        for (var i = 0; i < modelEntityFullNameArray.length; i++) {
-            var indexOfHash = modelEntityFullNameArray[i].search("#");
-            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "weinstein_1995")
-                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/16032017100850239p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
-            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "mackenzie_1996.cellml")
-                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/mackenzie_1996" + modelEntityFullNameArray[i].slice(indexOfHash);
-            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "chang_fujita_b_1999")
-                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/17032017142614972p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
+        var text = newg.append("g").selectAll("text")
+            .data(nodes)
+            .enter().append("text")
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .style("fill", function (d) {
+                return d.color;
+            })
+            .text(function (d) {
+                return d.text;
+            });
+
+        simulation
+            .nodes(nodes)
+            .on("tick", tick);
+
+        function tick(e) {
+            simulation.alpha(0.1);
+            text
+                .each(gravity())
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                });
         }
 
-        // remove duplicate
-        modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
-            return modelEntityFullNameArray.indexOf(item) == pos;
-        })
+        function gravity() {
+            return function (d) {
+                if (d.x <= d.xrect) d.speedX = Math.abs(d.speedX);
+                if (d.x >= d.xrect + d.width) d.speedX = -1 * Math.abs(d.speedX);
+                if (d.y <= d.yrect) d.speedY = -1 * Math.abs(d.speedY);
+                if (d.y >= d.yrect + d.height) d.speedY = Math.abs(d.speedY);
 
-        console.log("showEpithelial in model2DArr: ", model2DArray);
-        console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
-        console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
+                d.x = d.x + (d.speedX);
+                d.y = d.y + (-1 * d.speedY);
+            };
+        }
+    }
 
+    mainUtils.showsvgEpithelial = function (concentration_fma) {
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var serosalID = "http://identifiers.org/fma/FMA:84669";
         var luminalID = "http://identifiers.org/fma/FMA:74550";
         var cytosolID = "http://identifiers.org/fma/FMA:66836";
-        var paracellularID = "";
+        var paracellularID = "paracellular";
         var interstitialID = "http://identifiers.org/fma/FMA:9673";
 
         var g = document.getElementById("#svgVisualize"),
@@ -1321,7 +1359,7 @@
         var extracellular = newg.append("rect")
             .attr("id", luminalID)
             .attr("x", 0)
-            .attr("y", height / 3 - 20)
+            .attr("y", 0)
             .attr("width", w / 3 - 30)
             .attr("height", h)
             .attr("stroke", "purple")
@@ -1372,6 +1410,41 @@
             .attr("strokeWidth", "4px")
             .attr("fill", "white");
 
+        var solutes = [];
+
+        for (var i = 0; i < concentration_fma.length; i++) {
+
+            // luminal(5), cytosol(6), interstitial(7), interstitial2(8), paracellular(9)
+            for (var j = 5; j <= 9; j++) {
+                if (concentration_fma[i] == document.getElementsByTagName("rect")[j].id)
+                    break;
+            }
+
+            // compartments
+            if (concentration_fma[i] == document.getElementsByTagName("rect")[j].id) {
+                var xrect = document.getElementsByTagName("rect")[j].x.baseVal.value;
+                var yrect = document.getElementsByTagName("rect")[j].y.baseVal.value;
+                var xwidth = document.getElementsByTagName("rect")[j].width.baseVal.value;
+                var yheight = document.getElementsByTagName("rect")[j].height.baseVal.value;
+                var svgtext = svg.append("g").data([{x: xrect + 10, y: yrect + 20}]);
+
+                var indexOfHash = modelEntityFullNameArray[i].search("#");
+                var value = modelEntityFullNameArray[i].slice(indexOfHash + 1);
+
+                solutes.push(
+                    {
+                        compartment: document.getElementsByTagName("rect")[j].id,
+                        xrect: xrect,
+                        yrect: yrect,
+                        width: xwidth,
+                        height: yheight,
+                        value: value
+                    });
+            }
+        }
+
+        mainUtils.solutesBouncing(newg, solutes);
+
         var x = document.getElementsByTagName("rect")[0].x.baseVal.value;
         var y = document.getElementsByTagName("rect")[0].y.baseVal.value;
 
@@ -1393,7 +1466,7 @@
                 svg.append("text")
                     .style("font", "16px sans-serif")
                     .attr("stroke", "green")
-                    .attr("x", 10)
+                    .attr("x", 850)
                     .attr("y", 20)
                     .text("Apical Membrane");
 
@@ -1422,7 +1495,7 @@
                 svg.append("text")
                     .style("font", "16px sans-serif")
                     .attr("stroke", "orange")
-                    .attr("x", 10)
+                    .attr("x", 850)
                     .attr("y", 40)
                     .text("Basolateral Membrane");
 
@@ -1469,7 +1542,7 @@
         // circle drag on-off based on checked event
         var radius = 20;
 
-        var circledrag1 = svg.append("g").data([{x: 20, y: 80}]);
+        var circledrag1 = svg.append("g").data([{x: 870, y: 80}]);
 
         var circle1 = circledrag1.append("circle")
             .attr("id", apicalID)
@@ -1488,7 +1561,7 @@
                 .on("drag", dragcircle)
                 .on("end", dragcircleend));
 
-        var circledrag2 = svg.append("g").data([{x: 65, y: 80}]);
+        var circledrag2 = svg.append("g").data([{x: 915, y: 80}]);
 
         var circle2 = circledrag2.append("circle")
             .attr("id", serosalID)
@@ -1507,7 +1580,7 @@
                 .on("drag", dragcircle)
                 .on("end", dragcircleend));
 
-        var circledrag3 = svg.append("g").data([{x: 110, y: 80}]);
+        var circledrag3 = svg.append("g").data([{x: 960, y: 80}]);
 
         var circle3 = circledrag3.append("circle")
             .attr("id", cytosolID)
@@ -1526,7 +1599,7 @@
                 .on("drag", dragcircle)
                 .on("end", dragcircleend));
 
-        var circledrag4 = svg.append("g").data([{x: 155, y: 80}]);
+        var circledrag4 = svg.append("g").data([{x: 1005, y: 80}]);
 
         var circle4 = circledrag4.append("circle")
             .attr("id", luminalID)
@@ -1552,7 +1625,7 @@
 
             console.log("dragcircle: ", d3.select(this));
 
-            // detect apical
+            // Test: detect apical membrane
             var line_x = document.getElementsByTagName("line")[0].x1.baseVal.value;
             var line_y1 = document.getElementsByTagName("line")[0].y1.baseVal.value;
             var line_y2 = document.getElementsByTagName("line")[0].y2.baseVal.value;
@@ -1568,18 +1641,17 @@
                     .transition()
                     .delay(1000)
                     .duration(1000)
-                    .attr("cx", d.x = 20)
+                    .attr("cx", d.x = 870)
                     .attr("cy", d.y = 80);
 
                 console.log("d.x: ", d.x);
                 console.log("d.y: ", d.y);
-
             }
             else {
                 document.getElementsByTagName("line")[0].style.setProperty("stroke", "green");
             }
 
-            // detect serosal
+            // Test: detect serosal membrane
             var line_xx = document.getElementsByTagName("line")[1].x1.baseVal.value;
             var line_yy1 = document.getElementsByTagName("line")[1].y1.baseVal.value;
             var line_yy2 = document.getElementsByTagName("line")[1].y2.baseVal.value;
@@ -1595,14 +1667,14 @@
                     .transition()
                     .delay(1000)
                     .duration(1000)
-                    .attr("cx", d.x = 65)
+                    .attr("cx", d.x = 915)
                     .attr("cy", d.y = 80);
             }
             else {
                 document.getElementsByTagName("line")[1].style.setProperty("stroke", "orange");
             }
 
-            // detect extracellular
+            // Test: detect extracellular membrane
             var rect_x = document.getElementsByTagName("rect")[5].x.baseVal.value;
             var rect_y = document.getElementsByTagName("rect")[5].y.baseVal.value;
             var rect_id = document.getElementsByTagName("rect")[5].id;
@@ -1617,7 +1689,7 @@
                 document.getElementsByTagName("rect")[5].style.setProperty("stroke", "purple");
             }
 
-            // detect intracellular
+            // Test: detect intracellular membrane
             var rect_xc = document.getElementsByTagName("rect")[6].x.baseVal.value;
             var rect_yc = document.getElementsByTagName("rect")[6].y.baseVal.value;
             var rect_idc = document.getElementsByTagName("rect")[6].id;
@@ -1794,13 +1866,13 @@
         }
 
         // Text
-        var svgtext = svg.append("g").data([{x: 850, y: 500}]);
+        var svgtext = svg.append("g").data([{x: 850, y: 720}]);
 
         var compartment = ["Luminal", "Serosal", "Paracellular", "Na+", "K+", "Cl-"];
 
         compartment.forEach(function (element, index) {
             if (index > 0)
-                svgtext.data([{x: 850, y: 470 + 30 * (index + 1)}]);
+                svgtext.data([{x: 850, y: 690 + 30 * (index + 1)}]);
 
             svgtext.append("text")
                 .attr("id", element)
@@ -1814,25 +1886,28 @@
                 .attr("font-size", "20px")
                 .attr("fill", "red")
                 .attr("cursor", "move")
-                .text(element);
+                .text(element)
+                .call(d3.drag()
+                    .on("drag", dragtext)
+                    .on("end", dragendtext));
         });
 
-        svgtext.selectAll("text")
-            .call(d3.drag()
-                .on("drag", dragtext)
-                .on("end", dragendtext));
-
         function dragtext(d) {
+
+            console.log("dragtext: ", d3.select(this));
+
             d3.select(this)
-                .attr("pointer-events", "none") // hide text and make visible rectangles
+            // .attr("pointer-events", "none") // hide text and make visible rectangles
                 .attr("x", d.x = d3.event.x)
                 .attr("y", d.y = d3.event.y);
         }
 
         function dragendtext(d) {
+            console.log("dragtextend: ", d3.select(this));
+
             d3.select(this)
-                .classed("dragging", false)
-                .attr("pointer-events", "all");
+                .classed("dragging", false);
+            // .attr("pointer-events", "all");
         }
 
         var markerWidth = 4;
@@ -1901,7 +1976,7 @@
         }
 
         // Polygon with arrow lines
-        var polygonwitharrowsg = svg.append("g").data([{x: 840, y: 325}]);
+        var polygonwitharrowsg = svg.append("g").data([{x: 840, y: 525}]);
         var polygonlineLen = 60;
 
         var polygonmarkerend = polygonwitharrowsg.append("line")
@@ -1931,7 +2006,7 @@
 
         // Polygon
         var polygonmarker = svg.append("g").append("polygon")
-            .attr("transform", "translate(850,300)")
+            .attr("transform", "translate(850,500)")
             .attr("id", "channel")
             // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
             .attr("points", "10,15 30,15 40,25 30,35 10,35 0,25")
@@ -1994,7 +2069,7 @@
         }
 
         // Circle with arrow lines
-        var circlewitharrowsg = svg.append("g").data([{x: 850, y: 380}]);
+        var circlewitharrowsg = svg.append("g").data([{x: 850, y: 600}]);
         var lineLen = 40;
         var radius = 20;
 
@@ -2125,15 +2200,15 @@
             textvalue = [],
             checked = [],
             ydistance = 50,
-            yinitial = 10,
-            ytextinitial = 28;
+            yinitial = 160,
+            ytextinitial = 178;
 
         for (var i = 0; i < modelEntityNameArray.length; i++) {
             checkBox[i] = new d3CheckBox();
         }
 
         //Just for demonstration
-        var txt = checkboxsvg.append("text").attr("x", 850).attr("y", 300).text("Click checkbox and drag circle");
+        var txt = checkboxsvg.append("text").attr("x", 850).attr("y", 450).text("Click checkbox and drag circle");
 
         var update = function () {
 
@@ -2304,7 +2379,7 @@
         var circledragonoff = svg.append("g");
         var radius = 20,
             cxvalue = 1100,
-            cyvalue = 25,
+            cyvalue = 175,
             circledrag = [];
 
         for (var i = 0; i < modelEntityNameArray.length; i++) {
@@ -2328,7 +2403,106 @@
         }
     }
 
-    // Expose utility to the global object
+    mainUtils.showEpithelial = function (epithelialHtmlContent) {
+
+        // mainUtils.loadOLS();
+
+        // remove model name, keep only solutes
+        for (var i = 0; i < modelEntityNameArray.length; i++) {
+            var indexOfHash = modelEntityNameArray[i].search("#");
+            modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
+        }
+
+        // remove duplicate
+        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
+            return modelEntityNameArray.indexOf(item) == pos;
+        })
+
+        // Temporary for testing
+        for (var i = 0; i < modelEntityFullNameArray.length; i++) {
+            var indexOfHash = modelEntityFullNameArray[i].search("#");
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "weinstein_1995")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/16032017100850239p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "mackenzie_1996")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/mackenzie_1996" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "chang_fujita_b_1999")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/17032017142614972p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
+        }
+
+        // remove duplicate
+        modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
+            return modelEntityFullNameArray.indexOf(item) == pos;
+        })
+
+        console.log("showEpithelial in model2DArr: ", model2DArray);
+        console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
+        console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
+
+        // var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+        //     'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+        //     'SELECT ?source_fma ?sink_fma ' +
+        //     'WHERE { ' +
+        //     '<' + modelEntityFullNameArray[0] + '> semsim:isComputationalComponentFor ?model_prop. ' +
+        //     '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+        //     '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
+        //     '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
+        //     '?source_entity ro:part_of ?source_part_of_entity. ' +
+        //     '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
+        //     '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
+        //     '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
+        //     '?sink_entity ro:part_of ?sink_part_of_entity. ' +
+        //     '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
+        //     '}'
+
+        var concentration_fma = [], source_fma = [], sink_fma = [];
+
+        for (var index = 0; index < modelEntityFullNameArray.length; index++) {
+            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                'SELECT ?concentration_fma ' +
+                'WHERE { ' +
+                '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                '?model_prop semsim:physicalPropertyOf ?source_entity. ' +
+                '?source_entity ro:part_of ?source_part_of_entity. ' +
+                '?source_part_of_entity semsim:hasPhysicalDefinition ?concentration_fma.' +
+                '}'
+
+            $ajaxUtils.sendPostRequest(
+                endpoint,
+                query,
+                function (jsonObj) {
+                    console.log(jsonObj);
+
+                    for (var i = 0; i < jsonObj.results.bindings.length; i++) {
+                        if (jsonObj.results.bindings[i].concentration_fma == undefined)
+                            concentration_fma.push("");
+                        else
+                            concentration_fma.push(jsonObj.results.bindings[i].concentration_fma.value);
+
+                        if (jsonObj.results.bindings[i].source_fma == undefined)
+                            source_fma.push("");
+                        else
+                            source_fma.push(jsonObj.results.bindings[i].source_fma.value);
+
+                        if (jsonObj.results.bindings[i].sink_fma == undefined)
+                            sink_fma.push("");
+                        else
+                            sink_fma.push(jsonObj.results.bindings[i].sink_fma.value);
+                    }
+
+                    if (concentration_fma.length == modelEntityFullNameArray.length) {
+                        console.log("concentration_fma: ", concentration_fma);
+                        console.log("source_fma: ", source_fma);
+                        console.log("sink_fma: ", sink_fma);
+
+                        mainUtils.showsvgEpithelial(concentration_fma);
+                    }
+                },
+                true);
+        }
+    }
+
+// Expose utility to the global object
     global.$mainUtils = mainUtils;
 })
 (window);

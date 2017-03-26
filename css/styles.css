@@ -40,8 +40,8 @@ circle {
     stroke-width: 1.5px;
 }
 
-text {
-    fill: #000;
-    font: 12px sans-serif;
-    pointer-events: none;
-}
+/*text {*/
+    /*fill: #000;*/
+    /*font: 12px sans-serif;*/
+    /*!*pointer-events: none;*!*/
+/*}*/
