@@ -1240,15 +1240,24 @@
 
         function gravity() {
             return function (d) {
-                if (d.x <= d.xrect) d.speedX = Math.abs(d.speedX);
-                if (d.x >= d.xrect + d.width) d.speedX = -1 * Math.abs(d.speedX);
-                if (d.y <= d.yrect) d.speedY = -1 * Math.abs(d.speedY);
+                // TODO: approximate solution, fix this later
+                if (d.x <= d.xrect) d.speedX = Math.abs(d.speedX); // each char is 6.5 unit
+                if (d.x + d.length + 6.5 * 2 >= d.xrect + d.width) d.speedX = -1 * Math.abs(d.speedX);
+                if (d.y - 6.5 * 2 <= d.yrect) d.speedY = -1 * Math.abs(d.speedY); // assuming 2 char equiv to height
                 if (d.y >= d.yrect + d.height) d.speedY = Math.abs(d.speedY);
 
                 d.x = d.x + (d.speedX);
                 d.y = d.y + (-1 * d.speedY);
             };
         }
+    }
+
+    // TODO: temp solution, fix this in svg
+    function getTextWidth(text, fontSize, fontFace) {
+        var a = document.createElement('canvas');
+        var b = a.getContext('2d');
+        b.font = fontSize + 'px ' + fontFace;
+        return b.measureText(text).width;
     }
 
     mainUtils.showsvgEpithelial = function (concentration_fma, source_fma, sink_fma) {
@@ -1444,13 +1453,14 @@
                         width: xwidth,
                         height: yheight,
                         value: value,
-                        length: value.length
+                        length: getTextWidth(value, 12) //value.length
                     });
             }
         }
 
         mainUtils.solutesBouncing(newg, solutes);
 
+        // line apical and serosal
         var x = document.getElementsByTagName("rect")[0].x.baseVal.value;
         var y = document.getElementsByTagName("rect")[0].y.baseVal.value;
 
@@ -1523,6 +1533,235 @@
             .attr("stroke-width", 25)
             .attr("cursor", "move")
             .call(d3.drag().on("drag", dragpolygon));
+
+        // solutes in apical and serosal membrane
+        // TODO: drag when flux is NBC_Current.J_Na
+        console.log("solutes in apical and serosal membrane");
+
+        // Circle and line arrow from lumen to cytosol
+        var xrect = document.getElementsByTagName("rect")[0].x.baseVal.value;
+        var yrect = document.getElementsByTagName("rect")[0].y.baseVal.value;
+
+        var markerWidth = 4,
+            markerHeight = 4,
+            lineLen = 50,
+            radius = 20,
+            xvalue = xrect - lineLen / 2, // x coordinate before epithelial rectangle
+            yvalue = yrect + 10 + 50, // initial distance 50
+            ydistance = 70,
+            circlewithlineg = [],
+            linewithlineg = [],
+            linewithlinegstart = [],
+            linewithtextg = [],
+            linewithtextgstart = [],
+            cxvalue = xrect,
+            cyvalue = yrect + 10 + 50; // initial distance 50
+
+        // Handling two directional flux - swap if source
+        // and sink have same fma stored in an index
+        for (var i = 0; i < source_fma.length; i++) {
+            if (source_fma[i].fma == sink_fma[i].fma) {
+                sink_fma[i].fma = source_fma[i + 1].fma;
+                sink_fma[i].name = source_fma[i + 1].name;
+
+                sink_fma[i + 1].fma = source_fma[i].fma;
+                sink_fma[i + 1].name = source_fma[i].name;
+            }
+        }
+
+        for (var i = 0; i < source_fma.length; i++) {
+
+            if (source_fma[i].fma == luminalID && sink_fma[i].fma == cytosolID) {
+
+                var indexOfHash = source_fma[i].name.search("#");
+                var textvalue = source_fma[i].name.slice(indexOfHash + 1);
+                var indexOfdot = textvalue.indexOf('.');
+                textvalue = textvalue.slice(indexOfdot + 1);
+                var textWidth = getTextWidth(textvalue, 12);
+
+                var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
+
+                linewithlineg[i] = lineg.append("line")
+                    .attr("id", "linewithlineg" + i)
+                    .attr("x1", function (d) {
+                        return d.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.x + lineLen;
+                    })
+                    .attr("y2", function (d) {
+                        return d.y;
+                    })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("marker-end", "url(#end)")
+                    .attr("cursor", "move")
+                    .call(d3.drag().on("drag", dragcircleline));
+
+                var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
+
+                linewithtextg[i] = linegtext.append("text")
+                    .attr("id", "linewithtextg" + i)
+                    .attr("x", function (d) {
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    })
+                    .attr("font-family", "Times New Roman")
+                    .attr("font-size", "12px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text(textvalue)
+                    .call(d3.drag().on("drag", dragcircleline));
+
+                var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
+
+                circlewithlineg[i] = linegcircle.append("circle")
+                    .attr("id", "circlewithlineg" + i)
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y + radius;
+                    })
+                    .attr("r", radius)
+                    .attr("fill", "lightgreen")
+                    .attr("stroke-width", 20)
+                    .attr("cursor", "move")
+                    .call(d3.drag().on("drag", dragcircleline));
+
+                var linegstart = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+
+                linewithlinegstart[i] = linegstart.append("line")
+                    .attr("id", "linewithlinegstart" + i)
+                    .attr("x1", function (d) {
+                        return d.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.x + lineLen;
+                    })
+                    .attr("y2", function (d) {
+                        return d.y;
+                    })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("marker-start", "url(#start)")
+                    .attr("cursor", "pointer")
+                    .call(d3.drag().on("drag", dragcircleline));
+
+                var linegtextstart = linegstart.append("g")
+                    .data([{x: xvalue - textWidth - 10 - markerWidth, y: yvalue + radius * 2 + markerHeight}]);
+
+                linewithtextgstart[i] = linegtextstart.append("text")
+                    .attr("id", "linewithtextgstart" + i)
+                    .attr("x", function (d) {
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    })
+                    .attr("font-family", "Times New Roman")
+                    .attr("font-size", "12px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text(textvalue)
+                    .call(d3.drag().on("drag", dragcircleline));
+
+                // increment y-axis of line and circle
+                yvalue += ydistance;
+                cyvalue += ydistance;
+            }
+        }
+
+        function dragcircleline(d) {
+
+            // Circle: strip all the non-digit characters (\D or [^0-9])
+            var ic = this.id.replace(/\D/g, '');
+
+            console.log("ic: ", ic);
+
+            var axis = groupcordinates2("circlewithlineg" + ic, ic);
+
+            console.log("axis: ", axis);
+
+            circlewithlineg[ic]
+                .attr("cx", axis.shift())
+                .attr("cy", axis.shift());
+
+            // Text: strip all the non-digit characters (\D or [^0-9])
+            var it = this.id.replace(/\D/g, '');
+            var axis = groupcordinates2("linewithtextg" + it, it);
+            linewithtextg[it]
+                .attr("x", axis.shift())
+                .attr("y", axis.shift());
+
+            // Text: strip all the non-digit characters (\D or [^0-9])
+            var it2 = this.id.replace(/\D/g, '');
+            var axis = groupcordinates2("linewithtextgstart" + it2, it2);
+            linewithtextgstart[it2]
+                .attr("x", axis.shift())
+                .attr("y", axis.shift());
+
+            // line: strip all the non-digit characters (\D or [^0-9])
+            var il = this.id.replace(/\D/g, '');
+            var axis = groupcordinates2("linewithlineg" + il, il);
+
+            linewithlineg[il]
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
+
+            // line2: strip all the non-digit characters (\D or [^0-9])
+            var il2 = this.id.replace(/\D/g, '');
+            var axis = groupcordinates2("linewithlinegstart" + il2, il2);
+
+            linewithlinegstart[il2]
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
+
+        }
+
+        function groupcordinates2(groups, ic) {
+
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            console.log("groups, ic: ", groups, ic);
+
+
+            if (groups == "circlewithlineg" + ic) { // circle groups
+                var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
+                var cyNew = parseFloat(d3.select("#" + groups + "").attr("cy")) + dy;
+
+                return [cxNew, cyNew];
+            }
+            else if ((groups == "linewithtextg" + ic) || (groups == "linewithtextgstart" + ic)) { // text groups
+                var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
+                var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
+
+                return [xNew, yNew];
+            }
+            else { // Line groups
+                var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
+                var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
+                var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
+                var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
+
+                return [x1New, y1New, x2New, y2New];
+            }
+        }
 
         function dragpolygon(d) {
             var dx = d3.event.dx;
