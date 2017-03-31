@@ -474,6 +474,16 @@
                     "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
                 },
                 {
+                    "key1": "flux", "key2": "chloride",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+                },
+                {
+                    "key1": "flux", "key2": "potassium",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+                },
+                {
                     "key1": "concentration", "key2": "",
                     "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
                 },
@@ -491,6 +501,16 @@
                     "key1": "concentration", "key2": "ammonium",
                     "opb": "<http://identifiers.org/opb/OPB_00340>",
                     "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+                },
+                {
+                    "key1": "concentration", "key2": "chloride",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+                },
+                {
+                    "key1": "concentration", "key2": "potassium",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
                 },
             ];
 
@@ -1153,7 +1173,8 @@
         //FMA:17716 Proximal straight tubule
         //FMA:84666 Apical plasma membrane
 
-        var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_17693";
+        // var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=http://purl.obolibrary.org/obo/FMA_17693";
+        var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=http://purl.org/sig/ont/fma/fma17693";
 
         $ajaxUtils.sendGetRequest(endpointOLS, mainUtils.showOLS, true);
     };
@@ -1161,6 +1182,15 @@
     mainUtils.showOLS = function (jsonObj) {
         console.log("OLS: ", jsonObj);
         console.log("OLS Label: ", jsonObj._embedded.terms[0].label);
+
+        // ebi EMBL
+        // console.log("OLS Synonyms: ", jsonObj._embedded.terms[0].synonyms);
+
+        // Auckland OLS
+        console.log("OLS annotation: ", jsonObj._embedded.terms[0].annotation);
+        console.log("OLS FMAID: ", jsonObj._embedded.terms[0].annotation.FMAID);
+        console.log("OLS preferred name: ", jsonObj._embedded.terms[0].annotation["preferred name"]);
+        console.log("OLS synonym: ", jsonObj._embedded.terms[0].annotation.synonym);
         console.log("OLS Synonyms: ", jsonObj._embedded.terms[0].synonyms);
     };
 
@@ -1260,7 +1290,7 @@
         return b.measureText(text).width;
     }
 
-    mainUtils.showsvgEpithelial = function (concentration_fma, source_fma, sink_fma) {
+    mainUtils.showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, finalapicalMembrane) {
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var serosalID = "http://identifiers.org/fma/FMA:84669";
         var luminalID = "http://identifiers.org/fma/FMA:74550";
@@ -1542,10 +1572,9 @@
         var xrect = document.getElementsByTagName("rect")[0].x.baseVal.value;
         var yrect = document.getElementsByTagName("rect")[0].y.baseVal.value;
 
-        var markerWidth = 4,
-            markerHeight = 4,
-            lineLen = 50,
+        var lineLen = 50,
             radius = 20,
+            lineg,
             xvalue = xrect - lineLen / 2, // x coordinate before epithelial rectangle
             yvalue = yrect + 10 + 50, // initial distance 50
             ydistance = 70,
@@ -1569,6 +1598,197 @@
             }
         }
 
+        // TODO: does not work for bi-directional arrow, Fix this
+        // SVG checkbox with drag on-off
+        var checkboxsvg = newg.append("g");
+
+        var checkBox = [],
+            textvaluechk = [],
+            checkedchk = [],
+            ydistancechk = 50,
+            yinitialchk = 160,
+            ytextinitialchk = 178;
+
+        for (var i = 0; i < source_fma.length; i++) {
+            checkBox[i] = new d3CheckBox();
+        }
+
+        // var id;
+        var update = function () {
+            for (var i = 0; i < source_fma.length; i++) {
+                checkedchk[i] = checkBox[i].checked();
+                // drag enable and disable
+                if (checkedchk[i] == true) {
+                    // var id = "linewithlineg" + i;
+                    // d3.select("#" + id + "").on("click", function () {
+                    //         markerDir(id);
+                    //     }
+                    // );
+                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
+                    linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
+                    linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
+                }
+                else {
+                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    linewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    linewithtextg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                }
+            }
+        };
+
+        for (var i = 0; i < source_fma.length; i++) {
+            var indexOfHash = source_fma[i].name.search("#");
+            textvaluechk[i] = source_fma[i].name.slice(indexOfHash + 1);
+
+            checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
+            checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk[i] + "");
+
+            checkboxsvg.call(checkBox[i]);
+
+            yinitialchk += ydistancechk;
+            ytextinitialchk += ydistancechk;
+        }
+
+        function dragcircleendchkbx(d) {
+            d3.select(this).classed("dragging", false);
+        }
+
+        function d3CheckBox() {
+
+            var size = 20,
+                x = 0,
+                y = 0,
+                rx = 0,
+                ry = 0,
+                markStrokeWidth = 2,
+                boxStrokeWidth = 2,
+                checked = false,
+                clickEvent,
+                xtext = 0,
+                ytext = 0,
+                text = "Empty";
+
+            function checkBox(selection) {
+                var g = selection.append("g"),
+                    box = g.append("rect")
+                        .attr("width", size)
+                        .attr("height", size)
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("rx", rx)
+                        .attr("ry", ry)
+                        .styles({
+                            "fill-opacity": 0,
+                            "stroke-width": boxStrokeWidth,
+                            "stroke": "black"
+                        }),
+                    txt = g.append("text").attr("x", xtext).attr("y", ytext).text("" + text + "");
+
+                //Data to represent the check mark
+                var coordinates = [
+                    {x: x + (size / 8), y: y + (size / 3)},
+                    {x: x + (size / 2.2), y: (y + size) - (size / 4)},
+                    {x: (x + size) - (size / 8), y: (y + (size / 10))}
+                ];
+
+                var line = d3.line()
+                    .x(function (d) {
+                        return d.x;
+                    })
+                    .y(function (d) {
+                        return d.y;
+                    });
+
+                var mark = g.append("path")
+                    .attr("d", line(coordinates))
+                    .styles({
+                        "stroke-width": markStrokeWidth,
+                        "stroke": "black",
+                        "fill": "none",
+                        "opacity": (checked) ? 1 : 0
+                    });
+
+                g.on("click", function () {
+                    checked = !checked;
+                    mark.style("opacity", (checked) ? 1 : 0);
+
+                    if (clickEvent) {
+                        clickEvent();
+                    }
+
+                    d3.event.stopPropagation();
+                });
+            }
+
+            checkBox.size = function (val) {
+                size = val;
+                return checkBox;
+            }
+
+            checkBox.x = function (val) {
+                x = val;
+                return checkBox;
+            }
+
+            checkBox.y = function (val) {
+                y = val;
+                return checkBox;
+            }
+
+            checkBox.rx = function (val) {
+                rx = val;
+                return checkBox;
+            }
+
+            checkBox.ry = function (val) {
+                ry = val;
+                return checkBox;
+            }
+
+            checkBox.markStrokeWidth = function (val) {
+                markStrokeWidth = val;
+                return checkBox;
+            }
+
+            checkBox.boxStrokeWidth = function (val) {
+                boxStrokeWidth = val;
+                return checkBox;
+            }
+
+            checkBox.checked = function (val) {
+                if (val === undefined) {
+                    return checked;
+                } else {
+                    checked = val;
+                    return checkBox;
+                }
+            }
+
+            checkBox.clickEvent = function (val) {
+                clickEvent = val;
+                return checkBox;
+            }
+
+            checkBox.xtext = function (val) {
+                xtext = val;
+                return checkBox;
+            }
+
+            checkBox.ytext = function (val) {
+                ytext = val;
+                return checkBox;
+            }
+
+            checkBox.text = function (val) {
+                text = val;
+                return checkBox;
+            }
+
+            return checkBox;
+        }
+
+        // End of svg checkbox
+
         for (var i = 0; i < source_fma.length; i++) {
 
             if (source_fma[i].fma == luminalID && sink_fma[i].fma == cytosolID) {
@@ -1579,7 +1799,7 @@
                 textvalue = textvalue.slice(indexOfdot + 1);
                 var textWidth = getTextWidth(textvalue, 12);
 
-                var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
+                lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
 
                 linewithlineg[i] = lineg.append("line")
                     .attr("id", "linewithlineg" + i)
@@ -1598,8 +1818,9 @@
                     .attr("stroke", "black")
                     .attr("stroke-width", 2)
                     .attr("marker-end", "url(#end)")
-                    .attr("cursor", "move")
-                    .call(d3.drag().on("drag", dragcircleline));
+                    .attr("cursor", "pointer");
+
+                // .call(d3.drag().on("drag", dragcircleline));
 
                 var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
 
@@ -1615,9 +1836,10 @@
                     .attr("font-size", "12px")
                     .attr("font-weight", "bold")
                     .attr("fill", "red")
-                    .attr("cursor", "move")
-                    .text(textvalue)
-                    .call(d3.drag().on("drag", dragcircleline));
+                    .attr("cursor", "pointer")
+                    .text(textvalue);
+
+                // .call(d3.drag().on("drag", dragcircleline));
 
                 var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
 
@@ -1632,49 +1854,50 @@
                     .attr("r", radius)
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move")
-                    .call(d3.drag().on("drag", dragcircleline));
+                    .attr("cursor", "move");
 
-                var linegstart = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+                // .call(d3.drag().on("drag", dragcircleline));
 
-                linewithlinegstart[i] = linegstart.append("line")
-                    .attr("id", "linewithlinegstart" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-start", "url(#start)")
-                    .attr("cursor", "pointer")
-                    .call(d3.drag().on("drag", dragcircleline));
-
-                var linegtextstart = linegstart.append("g")
-                    .data([{x: xvalue - textWidth - 10 - markerWidth, y: yvalue + radius * 2 + markerHeight}]);
-
-                linewithtextgstart[i] = linegtextstart.append("text")
-                    .attr("id", "linewithtextgstart" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "move")
-                    .text(textvalue)
-                    .call(d3.drag().on("drag", dragcircleline));
+                // var linegstart = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+                //
+                // linewithlinegstart[i] = linegstart.append("line")
+                //     .attr("id", "linewithlinegstart" + i)
+                //     .attr("x1", function (d) {
+                //         return d.x;
+                //     })
+                //     .attr("y1", function (d) {
+                //         return d.y;
+                //     })
+                //     .attr("x2", function (d) {
+                //         return d.x + lineLen;
+                //     })
+                //     .attr("y2", function (d) {
+                //         return d.y;
+                //     })
+                //     .attr("stroke", "black")
+                //     .attr("stroke-width", 2)
+                //     .attr("marker-start", "url(#start)")
+                //     .attr("cursor", "pointer")
+                //     .call(d3.drag().on("drag", dragcircleline));
+                //
+                // var linegtextstart = linegstart.append("g")
+                //     .data([{x: xvalue - textWidth - 10 - markerWidth, y: yvalue + radius * 2 + markerHeight}]);
+                //
+                // linewithtextgstart[i] = linegtextstart.append("text")
+                //     .attr("id", "linewithtextgstart" + i)
+                //     .attr("x", function (d) {
+                //         return d.x;
+                //     })
+                //     .attr("y", function (d) {
+                //         return d.y;
+                //     })
+                //     .attr("font-family", "Times New Roman")
+                //     .attr("font-size", "12px")
+                //     .attr("font-weight", "bold")
+                //     .attr("fill", "red")
+                //     .attr("cursor", "move")
+                //     .text(textvalue)
+                //     .call(d3.drag().on("drag", dragcircleline));
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -1686,60 +1909,48 @@
 
             // Circle: strip all the non-digit characters (\D or [^0-9])
             var ic = this.id.replace(/\D/g, '');
-
-            console.log("ic: ", ic);
-
             var axis = groupcordinates2("circlewithlineg" + ic, ic);
-
-            console.log("axis: ", axis);
-
             circlewithlineg[ic]
                 .attr("cx", axis.shift())
                 .attr("cy", axis.shift());
 
             // Text: strip all the non-digit characters (\D or [^0-9])
-            var it = this.id.replace(/\D/g, '');
-            var axis = groupcordinates2("linewithtextg" + it, it);
-            linewithtextg[it]
+            var axis = groupcordinates2("linewithtextg" + ic, ic);
+            linewithtextg[ic]
                 .attr("x", axis.shift())
                 .attr("y", axis.shift());
 
             // Text: strip all the non-digit characters (\D or [^0-9])
-            var it2 = this.id.replace(/\D/g, '');
-            var axis = groupcordinates2("linewithtextgstart" + it2, it2);
-            linewithtextgstart[it2]
-                .attr("x", axis.shift())
-                .attr("y", axis.shift());
+            // if (combineID[3] != undefined) {
+            //     var axis = groupcordinates2("linewithtextgstart" + ic, ic);
+            //     linewithtextgstart[ic]
+            //         .attr("x", axis.shift())
+            //         .attr("y", axis.shift());
+            // }
 
             // line: strip all the non-digit characters (\D or [^0-9])
-            var il = this.id.replace(/\D/g, '');
-            var axis = groupcordinates2("linewithlineg" + il, il);
-
-            linewithlineg[il]
+            var axis = groupcordinates2("linewithlineg" + ic, ic);
+            linewithlineg[ic]
                 .attr("x1", axis.shift())
                 .attr("y1", axis.shift())
                 .attr("x2", axis.shift())
                 .attr("y2", axis.shift());
 
             // line2: strip all the non-digit characters (\D or [^0-9])
-            var il2 = this.id.replace(/\D/g, '');
-            var axis = groupcordinates2("linewithlinegstart" + il2, il2);
-
-            linewithlinegstart[il2]
-                .attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
-
+            // if (combineID[4] != undefined) {
+            //     var axis = groupcordinates2("linewithlinegstart" + ic, ic);
+            //     linewithlinegstart[ic]
+            //         .attr("x1", axis.shift())
+            //         .attr("y1", axis.shift())
+            //         .attr("x2", axis.shift())
+            //         .attr("y2", axis.shift());
+            // }
         }
 
         function groupcordinates2(groups, ic) {
 
             var dx = d3.event.dx;
             var dy = d3.event.dy;
-
-            console.log("groups, ic: ", groups, ic);
-
 
             if (groups == "circlewithlineg" + ic) { // circle groups
                 var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
@@ -1784,7 +1995,7 @@
             // console.log("polygon: ", d3.select(this).attr("points"));
         }
 
-        // circle drag on-off based on checked event
+// circle drag on-off based on checked event
         var radius = 20;
 
         var circledrag1 = svg.append("g").data([{x: 870, y: 80}]);
@@ -2110,7 +2321,7 @@
                 })
         }
 
-        // Text
+// Text
         var svgtext = svg.append("g").data([{x: 850, y: 720}]);
 
         var compartment = ["Luminal", "Serosal", "Paracellular", "Na+", "K+", "Cl-"];
@@ -2158,7 +2369,7 @@
         var markerWidth = 4;
         var markerHeight = 4;
 
-        // build the start arrow.
+// build the start arrow.
         svg.append("svg:defs")
             .selectAll("marker")
             .data(["start"])      // Different link/path types can be defined here
@@ -2173,7 +2384,7 @@
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
 
-        // build the end arrow.
+// build the end arrow.
         svg.append("svg:defs").selectAll("marker")
             .data(["end"])      // Different link/path types can be defined here
             .enter().append("svg:marker")    // This section adds in the arrows
@@ -2188,33 +2399,39 @@
             .attr("d", "M0,-5L10,0L0,5");
 
         // Utility for marker direction
-        function markerDir(selecttion) {
-            var mstart = d3.select("#" + selecttion + "")
+        function markerDir(selection) {
+            console.log(selection);
+
+            if (selection == undefined) {
+                return;
+            }
+
+            var mstart = d3.select("#" + selection + "")
                 ._groups[0][0]
                 .getAttribute("marker-start");
 
-            var mend = d3.select("#" + selecttion + "")
+            var mend = d3.select("#" + selection + "")
                 ._groups[0][0]
                 .getAttribute("marker-end");
 
             if (mstart == "") {
-                d3.select("#" + selecttion + "")
+                d3.select("#" + selection + "")
                     .attr("marker-start", "url(#start)")
                     .attr("marker-end", "");
             }
             else {
-                d3.select("#" + selecttion + "")
+                d3.select("#" + selection + "")
                     .attr("marker-end", "url(#end)")
                     .attr("marker-start", "");
             }
 
             if (mend == "") {
-                d3.select("#" + selecttion + "")
+                d3.select("#" + selection + "")
                     .attr("marker-end", "url(#end)")
                     .attr("marker-start", "");
             }
             else {
-                d3.select("#" + selecttion + "")
+                d3.select("#" + selection + "")
                     .attr("marker-start", "url(#start)")
                     .attr("marker-end", "");
             }
@@ -2313,7 +2530,7 @@
             // console.log("polygon: ", d3.select(this).attr("points"));
         }
 
-        // Circle with arrow lines
+// Circle with arrow lines
         var circlewitharrowsg = svg.append("g").data([{x: 850, y: 600}]);
         var lineLen = 40;
         var radius = 20;
@@ -2372,7 +2589,7 @@
             .attr("cursor", "move")
             .call(d3.drag().on("drag", dragcircleandline));
 
-        // Click to change the marker direction
+// Click to change the marker direction
         d3.select("#linemarkerend").on("click", function () {
             markerDir("linemarkerend");
         });
@@ -2380,29 +2597,6 @@
         d3.select("#linemarkerstart").on("click", function () {
             markerDir("linemarkerstart");
         });
-
-        // TODO: make generic for all shapes
-        function groupcordinates(groups) {
-
-            var dx = d3.event.dx;
-            var dy = d3.event.dy;
-
-            // Circle groups
-            if (groups == "circlemarker") {
-                var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
-                var cyNew = parseFloat(d3.select("#" + groups + "").attr("cy")) + dy;
-
-                return [cxNew, cyNew];
-            } else { // Line groups
-
-                var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
-                var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
-                var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
-                var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
-
-                return [x1New, y1New, x2New, y2New];
-            }
-        }
 
         function dragcircleandline(d) {
 
@@ -2428,225 +2622,96 @@
                 .attr("cy", axis.shift());
         }
 
-        function dragcirclechkbx(d) {
-            d3.select(this)
-                .attr("cx", d.x = d3.event.x)
-                .attr("cy", d.y = d3.event.y);
-        }
+// TODO: make generic for all shapes
+        function groupcordinates(groups) {
 
-        function dragcircleendchkbx(d) {
-            d3.select(this).classed("dragging", false);
-        }
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
 
-        // SVG checkbox with circles dragging on-off
-        var checkboxsvg = svg.append("g");
+            // Circle groups
+            if (groups == "circlemarker") {
+                var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
+                var cyNew = parseFloat(d3.select("#" + groups + "").attr("cy")) + dy;
 
-        var checkBox = [],
-            textvalue = [],
-            checked = [],
-            ydistance = 50,
-            yinitial = 160,
-            ytextinitial = 178;
+                return [cxNew, cyNew];
+            } else { // Line groups
 
-        for (var i = 0; i < modelEntityNameArray.length; i++) {
-            checkBox[i] = new d3CheckBox();
-        }
+                var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
+                var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
+                var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
+                var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
 
-        //Just for demonstration
-        var txt = checkboxsvg.append("text").attr("x", 850).attr("y", 450).text("Click checkbox and drag circle");
-
-        var update = function () {
-
-            for (var i = 0; i < modelEntityNameArray.length; i++) {
-                checked[i] = checkBox[i].checked();
-
-                var txt2 = "";
-                txt2 += checked[i] + ", ";
-
-                txt.text(checked[i] + " ");
-
-                // drag enable and disable
-                if (checked[i]) {
-                    circledrag[i].call(d3.drag().on("drag", dragcirclechkbx));
-                }
-                else {
-                    circledrag[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                }
+                return [x1New, y1New, x2New, y2New];
             }
-        };
-
-        for (var i = 0; i < modelEntityNameArray.length; i++) {
-            textvalue[i] = modelEntityNameArray[i];
-            checkBox[i].x(850).y(yinitial).checked(false).clickEvent(update);
-            checkBox[i].xtext(890).ytext(ytextinitial).text("" + textvalue[i] + "");
-
-            checkboxsvg.call(checkBox[i]);
-
-            yinitial += ydistance;
-            ytextinitial += ydistance;
-        }
-
-        function d3CheckBox() {
-
-            var size = 20,
-                x = 0,
-                y = 0,
-                rx = 0,
-                ry = 0,
-                markStrokeWidth = 2,
-                boxStrokeWidth = 2,
-                checked = false,
-                clickEvent,
-                xtext = 0,
-                ytext = 0,
-                text = "Empty";
-
-            function checkBox(selection) {
-                var g = selection.append("g"),
-                    box = g.append("rect")
-                        .attr("width", size)
-                        .attr("height", size)
-                        .attr("x", x)
-                        .attr("y", y)
-                        .attr("rx", rx)
-                        .attr("ry", ry)
-                        .styles({
-                            "fill-opacity": 0,
-                            "stroke-width": boxStrokeWidth,
-                            "stroke": "black"
-                        }),
-                    txt = g.append("text").attr("x", xtext).attr("y", ytext).text("" + text + "");
-
-                //Data to represent the check mark
-                var coordinates = [
-                    {x: x + (size / 8), y: y + (size / 3)},
-                    {x: x + (size / 2.2), y: (y + size) - (size / 4)},
-                    {x: (x + size) - (size / 8), y: (y + (size / 10))}
-                ];
-
-                var line = d3.line()
-                    .x(function (d) {
-                        return d.x;
-                    })
-                    .y(function (d) {
-                        return d.y;
-                    });
-
-                var mark = g.append("path")
-                    .attr("d", line(coordinates))
-                    .styles({
-                        "stroke-width": markStrokeWidth,
-                        "stroke": "black",
-                        "fill": "none",
-                        "opacity": (checked) ? 1 : 0
-                    });
-
-                g.on("click", function () {
-                    checked = !checked;
-                    mark.style("opacity", (checked) ? 1 : 0);
-
-                    if (clickEvent) {
-                        clickEvent();
-                    }
-
-                    d3.event.stopPropagation();
-                });
-            }
-
-            checkBox.size = function (val) {
-                size = val;
-                return checkBox;
-            }
-
-            checkBox.x = function (val) {
-                x = val;
-                return checkBox;
-            }
-
-            checkBox.y = function (val) {
-                y = val;
-                return checkBox;
-            }
-
-            checkBox.rx = function (val) {
-                rx = val;
-                return checkBox;
-            }
-
-            checkBox.ry = function (val) {
-                ry = val;
-                return checkBox;
-            }
-
-            checkBox.markStrokeWidth = function (val) {
-                markStrokeWidth = val;
-                return checkBox;
-            }
-
-            checkBox.boxStrokeWidth = function (val) {
-                boxStrokeWidth = val;
-                return checkBox;
-            }
-
-            checkBox.checked = function (val) {
-                if (val === undefined) {
-                    return checked;
-                } else {
-                    checked = val;
-                    return checkBox;
-                }
-            }
-
-            checkBox.clickEvent = function (val) {
-                clickEvent = val;
-                return checkBox;
-            }
-
-            checkBox.xtext = function (val) {
-                xtext = val;
-                return checkBox;
-            }
-
-            checkBox.ytext = function (val) {
-                ytext = val;
-                return checkBox;
-            }
-
-            checkBox.text = function (val) {
-                text = val;
-                return checkBox;
-            }
-
-            return checkBox;
-        }
-
-        // circle drag on-off based on checked event
-        var circledragonoff = svg.append("g");
-        var radius = 20,
-            cxvalue = 1100,
-            cyvalue = 175,
-            circledrag = [];
-
-        for (var i = 0; i < modelEntityNameArray.length; i++) {
-
-            var circledragonoff = svg.append("g").data([{x: cxvalue, y: cyvalue}]);
-
-            circledrag[i] = circledragonoff.append("circle")
-                .attr("id", "" + textvalue[i] + "")
-                .attr("cx", function (d) {
-                    return d.x;
-                })
-                .attr("cy", function (d) {
-                    return d.y;
-                })
-                .attr("r", radius)
-                .attr("fill", "lightgreen")
-                .attr("stroke-width", 20)
-                .attr("cursor", "move");
-
-            cyvalue += ydistance;
         }
     }
+
+    // Testing whether two fluxes have common cotransporter
+    mainUtils.testTwoFluxCotransporterHtml = function (apicalMembrane1, apicalMembrane2) {
+
+        console.log("apicalMembrane: ", apicalMembrane1, apicalMembrane2);
+
+        var finalapicalMembrane = [];
+
+        mainUtils.apicalajax = function () {
+
+            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                'SELECT ?med_entity_uri ?med_entity_uriCl ' +
+                'WHERE { GRAPH ?Workspace { ' +
+                '<' + apicalMembrane1.source_name + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant. ' +
+                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. ' +
+                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
+                '<' + apicalMembrane2.source_name + '> semsim:isComputationalComponentFor ?model_propCl. ' +
+                '?model_propCl semsim:physicalPropertyOf ?model_procCl. ' +
+                '?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. ' +
+                '?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. ' +
+                '?med_entityCl semsim:hasPhysicalDefinition ?med_entity_uriCl.' +
+                'FILTER (?med_entity_uri = ?med_entity_uriCl) . ' +
+                '}}'
+
+            $ajaxUtils.sendPostRequest(
+                endpoint,
+                query,
+                function (jsonObj) {
+                    var tempvalues = [];
+
+                    for (var m = 0; m < jsonObj.results.bindings.length; m++) {
+                        var tmpval = jsonObj.results.bindings[m].med_entity_uri.value;
+                        if (tmpval.indexOf("http://purl.obolibrary.org/obo/PR") != -1) {
+                            tempvalues.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
+                    }
+
+                    // remove duplicate of protein ID
+                    tempvalues = tempvalues.filter(function (item, pos) {
+                        return tempvalues.indexOf(item) == pos;
+                    })
+
+                    if (tempvalues.length != 0) {
+                        finalapicalMembrane.push(
+                            {
+                                source_text: apicalMembrane1.source_text,
+                                source_fma: apicalMembrane1.source_fma,
+                                sink_text: apicalMembrane1.sink_text,
+                                sink_fma: apicalMembrane1.sink_fma,
+                                source_text2: apicalMembrane2.source_text,
+                                source_fma2: apicalMembrane2.source_fma,
+                                sink_text2: apicalMembrane2.sink_text,
+                                sink_fma2: apicalMembrane2.sink_fma
+                            });
+                    }
+
+                    console.log("finalapicalMembrane: ", finalapicalMembrane);
+                },
+                true
+            );
+        }
+
+        mainUtils.apicalajax();
+    };
 
     mainUtils.showEpithelial = function (epithelialHtmlContent) {
 
@@ -2674,27 +2739,126 @@
                 modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/17032017142614972p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
         }
 
-        // remove duplicate
-        modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
-            return modelEntityFullNameArray.indexOf(item) == pos;
-        })
+        // // remove duplicate
+        // modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
+        //     return modelEntityFullNameArray.indexOf(item) == pos;
+        // })
 
         console.log("showEpithelial in model2DArr: ", model2DArray);
         console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
         console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
 
         var concentration_fma = [], source_fma = [], sink_fma = [];
+        var source_fma2 = [], sink_fma2 = [];
 
-        var index = 0;
+        var apicalMembrane = [], basolateralMembrane = [];
+
+        var index = 0, counter = 0;
+        var finalapicalMembrane = [];
 
         mainUtils.testAJAX = function () {
 
             if (index == modelEntityFullNameArray.length) {
                 console.log("concentration_fma: ", concentration_fma);
-                console.log("source_fma: ", source_fma);
-                console.log("sink_fma: ", sink_fma);
+                console.log("source_fma: ", source_fma2);
+                console.log("sink_fma: ", sink_fma2);
 
-                mainUtils.showsvgEpithelial(concentration_fma, source_fma, sink_fma);
+                // Exceptional case when only one flux
+                if (apicalMembrane.length == 1) {
+                    finalapicalMembrane.push(
+                        {
+                            source_text: apicalMembrane[0].source_text,
+                            source_fma: apicalMembrane[0].source_fma,
+                            sink_text: apicalMembrane[0].sink_text,
+                            sink_fma: apicalMembrane[0].sink_fma,
+                            source_text2: undefined,
+                            source_fma2: undefined,
+                            sink_text2: undefined,
+                            sink_fma2: undefined
+                        });
+
+                    console.log("finalapicalMembrane: ", finalapicalMembrane);
+                    mainUtils.showsvgEpithelial(
+                        concentration_fma,
+                        source_fma,
+                        sink_fma,
+                        finalapicalMembrane);
+                }
+
+                for (var i = 0; i < apicalMembrane.length; i++) {
+                    for (var j = i + 1; j < apicalMembrane.length; j++) {
+                        // mainUtils.testTwoFluxCotransporterHtml(apicalMembrane[i], apicalMembrane[j]);
+
+                        console.log("apicalMembrane: ", apicalMembrane[i], apicalMembrane[j]);
+
+                        mainUtils.apicalajax = function (apicalMembrane1, apicalMembrane2) {
+
+                            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                                'SELECT ?med_entity_uri ?med_entity_uriCl ' +
+                                'WHERE { GRAPH ?Workspace { ' +
+                                '<' + apicalMembrane1.source_name + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+                                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant. ' +
+                                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. ' +
+                                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
+                                '<' + apicalMembrane2.source_name + '> semsim:isComputationalComponentFor ?model_propCl. ' +
+                                '?model_propCl semsim:physicalPropertyOf ?model_procCl. ' +
+                                '?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. ' +
+                                '?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. ' +
+                                '?med_entityCl semsim:hasPhysicalDefinition ?med_entity_uriCl.' +
+                                'FILTER (?med_entity_uri = ?med_entity_uriCl) . ' +
+                                '}}'
+
+                            $ajaxUtils.sendPostRequest(
+                                endpoint,
+                                query,
+                                function (jsonObj) {
+                                    var tempvalues = [];
+
+                                    for (var m = 0; m < jsonObj.results.bindings.length; m++) {
+                                        var tmpval = jsonObj.results.bindings[m].med_entity_uri.value;
+                                        if (tmpval.indexOf("http://purl.obolibrary.org/obo/PR") != -1) {
+                                            tempvalues.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                                        }
+                                    }
+
+                                    // remove duplicate of protein ID
+                                    tempvalues = tempvalues.filter(function (item, pos) {
+                                        return tempvalues.indexOf(item) == pos;
+                                    })
+
+                                    if (tempvalues.length != 0) {
+                                        finalapicalMembrane.push(
+                                            {
+                                                source_text: apicalMembrane1.source_text,
+                                                source_fma: apicalMembrane1.source_fma,
+                                                sink_text: apicalMembrane1.sink_text,
+                                                sink_fma: apicalMembrane1.sink_fma,
+                                                source_text2: apicalMembrane2.source_text,
+                                                source_fma2: apicalMembrane2.source_fma,
+                                                sink_text2: apicalMembrane2.sink_text,
+                                                sink_fma2: apicalMembrane2.sink_fma
+                                            });
+                                    }
+
+                                    counter++;
+                                    if (counter == apicalMembrane.length) {
+                                        console.log("finalapicalMembrane: ", finalapicalMembrane);
+                                        mainUtils.showsvgEpithelial(
+                                            concentration_fma,
+                                            source_fma,
+                                            sink_fma,
+                                            finalapicalMembrane);
+                                    }
+                                },
+                                true
+                            );
+                        }
+
+                        mainUtils.apicalajax(apicalMembrane[i], apicalMembrane[j]);
+                    }
+                }
 
                 return;
             }
@@ -2786,6 +2950,39 @@
                             }
 
                             index++;
+
+                            if (source_fma.length != 0) {
+                                // keep only name of solutes
+                                var indexOfHash = source_fma[0].name.search("#");
+                                var srctext = source_fma[0].name.slice(indexOfHash + 1);
+                                var indexOfdot = srctext.indexOf('.');
+                                srctext = srctext.slice(indexOfdot + 1);
+
+                                var indexOfHash = sink_fma[0].name.search("#");
+                                var snktext = sink_fma[0].name.slice(indexOfHash + 1);
+                                var indexOfdot = snktext.indexOf('.');
+                                snktext = snktext.slice(indexOfdot + 1);
+
+                                apicalMembrane.push({
+                                    source_text: srctext,
+                                    source_fma: source_fma[0].fma,
+                                    source_name: source_fma[0].name,
+                                    sink_text: snktext,
+                                    sink_fma: sink_fma[0].fma,
+                                    sink_name: sink_fma[0].name
+                                });
+
+                                // console.log("source_text: ", srctext);
+                                // console.log("source_fma: ", source_fma[0].fma);
+                                // console.log("sink_text: ", snktext);
+                                // console.log("sink_fma: ", sink_fma[0].fma);
+
+                                source_fma2.push(source_fma[0]);
+                                sink_fma2.push(sink_fma[0]);
+
+                                source_fma = [];
+                                sink_fma = [];
+                            }
                             mainUtils.testAJAX(); // callback
                         },
                         true);
@@ -2796,7 +2993,7 @@
         mainUtils.testAJAX();
     }
 
-    // Expose utility to the global object
+// Expose utility to the global object
     global.$mainUtils = mainUtils;
 })
 (window);
