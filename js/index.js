@@ -203,6 +203,8 @@
 
     // Even invocation to SEARCH, MODEL
     document.addEventListener('click', function (event) {
+
+        console.log("event: ", event);
         // If there's an action with the given name, call it
         if (typeof actions[event.srcElement.dataset.action] === "function") {
             actions[event.srcElement.dataset.action].call(this, event);
@@ -261,7 +263,7 @@
         searchList.innerHTML = "";
 
         var table = document.createElement("table");
-        table.className = "table";
+        table.className = "table table-hover table-condensed"; //table-bordered table-striped
 
         // Table header
         var thead = document.createElement("thead");
@@ -807,7 +809,7 @@
         var modelList = document.getElementById("modelList");
 
         var table = document.createElement("table");
-        table.className = "table";
+        table.className = "table table-hover table-condensed"; //table-bordered table-striped
 
         // Table header
         var thead = document.createElement("thead");
@@ -1291,11 +1293,17 @@
     }
 
     mainUtils.showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, finalapicalMembrane) {
+
+        console.log("concentration_fma: ", concentration_fma);
+        console.log("source_fma: ", source_fma);
+        console.log("sink_fma: ", sink_fma);
+        console.log("finalapicalMembrane: ", finalapicalMembrane);
+
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var serosalID = "http://identifiers.org/fma/FMA:84669";
         var luminalID = "http://identifiers.org/fma/FMA:74550";
         var cytosolID = "http://identifiers.org/fma/FMA:66836";
-        var paracellularID = "paracellular";
+        var paracellularID = "http://identifiers.org/fma/FMA:67394";
         var interstitialID = "http://identifiers.org/fma/FMA:9673";
 
         var g = document.getElementById("#svgVisualize"),
@@ -1580,23 +1588,11 @@
             ydistance = 70,
             circlewithlineg = [],
             linewithlineg = [],
-            linewithlinegstart = [],
+            linewithlineg2 = [],
             linewithtextg = [],
-            linewithtextgstart = [],
+            linewithtextg2 = [],
             cxvalue = xrect,
             cyvalue = yrect + 10 + 50; // initial distance 50
-
-        // Handling two directional flux - swap if source
-        // and sink have same fma stored in an index
-        for (var i = 0; i < source_fma.length; i++) {
-            if (source_fma[i].fma == sink_fma[i].fma) {
-                sink_fma[i].fma = source_fma[i + 1].fma;
-                sink_fma[i].name = source_fma[i + 1].name;
-
-                sink_fma[i + 1].fma = source_fma[i].fma;
-                sink_fma[i + 1].name = source_fma[i].name;
-            }
-        }
 
         // TODO: does not work for bi-directional arrow, Fix this
         // SVG checkbox with drag on-off
@@ -1607,38 +1603,37 @@
             checkedchk = [],
             ydistancechk = 50,
             yinitialchk = 160,
-            ytextinitialchk = 178;
+            ytextinitialchk = 178,
+            markerWidth = 4,
+            markerHeight = 4;
 
-        for (var i = 0; i < source_fma.length; i++) {
+        for (var i = 0; i < finalapicalMembrane.length; i++) {
             checkBox[i] = new d3CheckBox();
         }
 
-        // var id;
         var update = function () {
-            for (var i = 0; i < source_fma.length; i++) {
+            for (var i = 0; i < finalapicalMembrane.length; i++) {
                 checkedchk[i] = checkBox[i].checked();
                 // drag enable and disable
                 if (checkedchk[i] == true) {
-                    // var id = "linewithlineg" + i;
-                    // d3.select("#" + id + "").on("click", function () {
-                    //         markerDir(id);
-                    //     }
-                    // );
-                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
                     linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
                     linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
+                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
+                    linewithlineg2[i].call(d3.drag().on("drag", dragcircleline));
+                    linewithtextg2[i].call(d3.drag().on("drag", dragcircleline));
                 }
                 else {
-                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
                     linewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
                     linewithtextg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    linewithlineg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    linewithtextg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
                 }
             }
         };
 
-        for (var i = 0; i < source_fma.length; i++) {
-            var indexOfHash = source_fma[i].name.search("#");
-            textvaluechk[i] = source_fma[i].name.slice(indexOfHash + 1);
+        for (var i = 0; i < finalapicalMembrane.length; i++) {
+            textvaluechk[i] = finalapicalMembrane[i].source_text + " " + finalapicalMembrane[i].source_text2;
 
             checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
             checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk[i] + "");
@@ -1789,15 +1784,12 @@
 
         // End of svg checkbox
 
-        for (var i = 0; i < source_fma.length; i++) {
-
-            if (source_fma[i].fma == luminalID && sink_fma[i].fma == cytosolID) {
-
-                var indexOfHash = source_fma[i].name.search("#");
-                var textvalue = source_fma[i].name.slice(indexOfHash + 1);
-                var indexOfdot = textvalue.indexOf('.');
-                textvalue = textvalue.slice(indexOfdot + 1);
+        for (var i = 0; i < finalapicalMembrane.length; i++) {
+            if (finalapicalMembrane[i].source_fma == luminalID && finalapicalMembrane[i].sink_fma == cytosolID) {
+                var textvalue = finalapicalMembrane[i].source_text;
                 var textWidth = getTextWidth(textvalue, 12);
+                var textvalue2 = finalapicalMembrane[i].source_text2;
+                var textWidth2 = getTextWidth(textvalue2, 12);
 
                 lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
 
@@ -1820,8 +1812,6 @@
                     .attr("marker-end", "url(#end)")
                     .attr("cursor", "pointer");
 
-                // .call(d3.drag().on("drag", dragcircleline));
-
                 var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
 
                 linewithtextg[i] = linegtext.append("text")
@@ -1839,8 +1829,6 @@
                     .attr("cursor", "pointer")
                     .text(textvalue);
 
-                // .call(d3.drag().on("drag", dragcircleline));
-
                 var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
 
                 circlewithlineg[i] = linegcircle.append("circle")
@@ -1856,54 +1844,86 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                // .call(d3.drag().on("drag", dragcircleline));
+                var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
 
-                // var linegstart = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
-                //
-                // linewithlinegstart[i] = linegstart.append("line")
-                //     .attr("id", "linewithlinegstart" + i)
-                //     .attr("x1", function (d) {
-                //         return d.x;
-                //     })
-                //     .attr("y1", function (d) {
-                //         return d.y;
-                //     })
-                //     .attr("x2", function (d) {
-                //         return d.x + lineLen;
-                //     })
-                //     .attr("y2", function (d) {
-                //         return d.y;
-                //     })
-                //     .attr("stroke", "black")
-                //     .attr("stroke-width", 2)
-                //     .attr("marker-start", "url(#start)")
-                //     .attr("cursor", "pointer")
-                //     .call(d3.drag().on("drag", dragcircleline));
-                //
-                // var linegtextstart = linegstart.append("g")
-                //     .data([{x: xvalue - textWidth - 10 - markerWidth, y: yvalue + radius * 2 + markerHeight}]);
-                //
-                // linewithtextgstart[i] = linegtextstart.append("text")
-                //     .attr("id", "linewithtextgstart" + i)
-                //     .attr("x", function (d) {
-                //         return d.x;
-                //     })
-                //     .attr("y", function (d) {
-                //         return d.y;
-                //     })
-                //     .attr("font-family", "Times New Roman")
-                //     .attr("font-size", "12px")
-                //     .attr("font-weight", "bold")
-                //     .attr("fill", "red")
-                //     .attr("cursor", "move")
-                //     .text(textvalue)
-                //     .call(d3.drag().on("drag", dragcircleline));
+                linewithlineg2[i] = lineg2.append("line")
+                    .attr("id", "linewithlineg2" + i)
+                    .attr("x1", function (d) {
+                        return d.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.x + lineLen;
+                    })
+                    .attr("y2", function (d) {
+                        return d.y;
+                    })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("marker-end", "url(#end)")
+                    .attr("cursor", "pointer");
+
+                var linegtext2 = lineg2.append("g")
+                    .data([{x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight}]);
+
+                linewithtextg2[i] = linegtext2.append("text")
+                    .attr("id", "linewithtextg2" + i)
+                    .attr("x", function (d) {
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    })
+                    .attr("font-family", "Times New Roman")
+                    .attr("font-size", "12px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "red")
+                    .attr("cursor", "pointer")
+                    .text(textvalue2);
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
                 cyvalue += ydistance;
             }
         }
+
+        // Change marker direction and text position
+        mainUtils.state = 0;
+        document.addEventListener('click', function (event) {
+            if (event.srcElement.localName == "line" && event.srcElement.nodeName == "line") {
+
+                // marker direction
+                var id = event.srcElement.id;
+                markerDir(id);
+
+                // text position
+                var idText = event.srcElement.nextSibling.firstChild.id;
+                var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
+                var textWidth = getTextWidth(textContent, 12);
+                if (mainUtils.state == 0) {
+                    d3.select("#" + idText + "")
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
+                        .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                    mainUtils.state = 1;
+                }
+                else {
+                    d3.select("#" + idText + "")
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
+                        .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                    mainUtils.state = 0;
+                }
+            }
+        })
 
         function dragcircleline(d) {
 
@@ -1921,12 +1941,10 @@
                 .attr("y", axis.shift());
 
             // Text: strip all the non-digit characters (\D or [^0-9])
-            // if (combineID[3] != undefined) {
-            //     var axis = groupcordinates2("linewithtextgstart" + ic, ic);
-            //     linewithtextgstart[ic]
-            //         .attr("x", axis.shift())
-            //         .attr("y", axis.shift());
-            // }
+            var axis = groupcordinates2("linewithtextg2" + ic, ic);
+            linewithtextg2[ic]
+                .attr("x", axis.shift())
+                .attr("y", axis.shift());
 
             // line: strip all the non-digit characters (\D or [^0-9])
             var axis = groupcordinates2("linewithlineg" + ic, ic);
@@ -1937,14 +1955,12 @@
                 .attr("y2", axis.shift());
 
             // line2: strip all the non-digit characters (\D or [^0-9])
-            // if (combineID[4] != undefined) {
-            //     var axis = groupcordinates2("linewithlinegstart" + ic, ic);
-            //     linewithlinegstart[ic]
-            //         .attr("x1", axis.shift())
-            //         .attr("y1", axis.shift())
-            //         .attr("x2", axis.shift())
-            //         .attr("y2", axis.shift());
-            // }
+            var axis = groupcordinates2("linewithlineg2" + ic, ic);
+            linewithlineg2[ic]
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
         }
 
         function groupcordinates2(groups, ic) {
@@ -1958,7 +1974,7 @@
 
                 return [cxNew, cyNew];
             }
-            else if ((groups == "linewithtextg" + ic) || (groups == "linewithtextgstart" + ic)) { // text groups
+            else if ((groups == "linewithtextg" + ic) || (groups == "linewithtextg2" + ic)) { // text groups
                 var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
                 var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
 
@@ -2400,11 +2416,7 @@
 
         // Utility for marker direction
         function markerDir(selection) {
-            console.log(selection);
-
-            if (selection == undefined) {
-                return;
-            }
+            console.log("selection: ", selection);
 
             var mstart = d3.select("#" + selection + "")
                 ._groups[0][0]
@@ -2413,6 +2425,9 @@
             var mend = d3.select("#" + selection + "")
                 ._groups[0][0]
                 .getAttribute("marker-end");
+
+            console.log("mstart: ", mstart);
+            console.log("mend: ", mend);
 
             if (mstart == "") {
                 d3.select("#" + selection + "")
@@ -2438,7 +2453,7 @@
         }
 
         // Polygon with arrow lines
-        var polygonwitharrowsg = svg.append("g").data([{x: 840, y: 525}]);
+        var polygonwitharrowsg = svg.append("g").data([{x: 850, y: 530}]);
         var polygonlineLen = 60;
 
         var polygonmarkerend = polygonwitharrowsg.append("line")
@@ -2471,8 +2486,8 @@
             .attr("transform", "translate(850,500)")
             .attr("id", "channel")
             // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
-            .attr("points", "10,15 30,15 40,25 30,35 10,35 0,25")
-            .attr("fill", "orange")
+            .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+            .attr("fill", "yellow")
             .attr("stroke", "black")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
@@ -2646,73 +2661,6 @@
         }
     }
 
-    // Testing whether two fluxes have common cotransporter
-    mainUtils.testTwoFluxCotransporterHtml = function (apicalMembrane1, apicalMembrane2) {
-
-        console.log("apicalMembrane: ", apicalMembrane1, apicalMembrane2);
-
-        var finalapicalMembrane = [];
-
-        mainUtils.apicalajax = function () {
-
-            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                'SELECT ?med_entity_uri ?med_entity_uriCl ' +
-                'WHERE { GRAPH ?Workspace { ' +
-                '<' + apicalMembrane1.source_name + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant. ' +
-                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. ' +
-                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-                '<' + apicalMembrane2.source_name + '> semsim:isComputationalComponentFor ?model_propCl. ' +
-                '?model_propCl semsim:physicalPropertyOf ?model_procCl. ' +
-                '?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. ' +
-                '?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. ' +
-                '?med_entityCl semsim:hasPhysicalDefinition ?med_entity_uriCl.' +
-                'FILTER (?med_entity_uri = ?med_entity_uriCl) . ' +
-                '}}'
-
-            $ajaxUtils.sendPostRequest(
-                endpoint,
-                query,
-                function (jsonObj) {
-                    var tempvalues = [];
-
-                    for (var m = 0; m < jsonObj.results.bindings.length; m++) {
-                        var tmpval = jsonObj.results.bindings[m].med_entity_uri.value;
-                        if (tmpval.indexOf("http://purl.obolibrary.org/obo/PR") != -1) {
-                            tempvalues.push(jsonObj.results.bindings[m].med_entity_uri.value);
-                        }
-                    }
-
-                    // remove duplicate of protein ID
-                    tempvalues = tempvalues.filter(function (item, pos) {
-                        return tempvalues.indexOf(item) == pos;
-                    })
-
-                    if (tempvalues.length != 0) {
-                        finalapicalMembrane.push(
-                            {
-                                source_text: apicalMembrane1.source_text,
-                                source_fma: apicalMembrane1.source_fma,
-                                sink_text: apicalMembrane1.sink_text,
-                                sink_fma: apicalMembrane1.sink_fma,
-                                source_text2: apicalMembrane2.source_text,
-                                source_fma2: apicalMembrane2.source_fma,
-                                sink_text2: apicalMembrane2.sink_text,
-                                sink_fma2: apicalMembrane2.sink_fma
-                            });
-                    }
-
-                    console.log("finalapicalMembrane: ", finalapicalMembrane);
-                },
-                true
-            );
-        }
-
-        mainUtils.apicalajax();
-    };
-
     mainUtils.showEpithelial = function (epithelialHtmlContent) {
 
         // mainUtils.loadOLS();
@@ -2759,10 +2707,6 @@
         mainUtils.testAJAX = function () {
 
             if (index == modelEntityFullNameArray.length) {
-                console.log("concentration_fma: ", concentration_fma);
-                console.log("source_fma: ", source_fma2);
-                console.log("sink_fma: ", sink_fma2);
-
                 // Exceptional case when only one flux
                 if (apicalMembrane.length == 1) {
                     finalapicalMembrane.push(
@@ -2777,20 +2721,15 @@
                             sink_fma2: undefined
                         });
 
-                    console.log("finalapicalMembrane: ", finalapicalMembrane);
                     mainUtils.showsvgEpithelial(
                         concentration_fma,
-                        source_fma,
-                        sink_fma,
+                        source_fma2,
+                        sink_fma2,
                         finalapicalMembrane);
                 }
 
                 for (var i = 0; i < apicalMembrane.length; i++) {
                     for (var j = i + 1; j < apicalMembrane.length; j++) {
-                        // mainUtils.testTwoFluxCotransporterHtml(apicalMembrane[i], apicalMembrane[j]);
-
-                        console.log("apicalMembrane: ", apicalMembrane[i], apicalMembrane[j]);
-
                         mainUtils.apicalajax = function (apicalMembrane1, apicalMembrane2) {
 
                             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
@@ -2844,11 +2783,10 @@
 
                                     counter++;
                                     if (counter == apicalMembrane.length) {
-                                        console.log("finalapicalMembrane: ", finalapicalMembrane);
                                         mainUtils.showsvgEpithelial(
                                             concentration_fma,
-                                            source_fma,
-                                            sink_fma,
+                                            source_fma2,
+                                            sink_fma2,
                                             finalapicalMembrane);
                                     }
                                 },
@@ -2971,11 +2909,6 @@
                                     sink_fma: sink_fma[0].fma,
                                     sink_name: sink_fma[0].name
                                 });
-
-                                // console.log("source_text: ", srctext);
-                                // console.log("source_fma: ", source_fma[0].fma);
-                                // console.log("sink_text: ", snktext);
-                                // console.log("sink_fma: ", sink_fma[0].fma);
 
                                 source_fma2.push(source_fma[0]);
                                 sink_fma2.push(sink_fma[0]);
