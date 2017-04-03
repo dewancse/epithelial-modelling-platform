@@ -1476,7 +1476,6 @@
                 var yrect = document.getElementsByTagName("rect")[j].y.baseVal.value;
                 var xwidth = document.getElementsByTagName("rect")[j].width.baseVal.value;
                 var yheight = document.getElementsByTagName("rect")[j].height.baseVal.value;
-                var svgtext = svg.append("g").data([{x: xrect + 10, y: yrect + 20}]);
 
                 var indexOfHash = concentration_fma[i].name.search("#");
                 var value = concentration_fma[i].name.slice(indexOfHash + 1);
@@ -1571,6 +1570,27 @@
             .attr("stroke-width", 25)
             .attr("cursor", "move")
             .call(d3.drag().on("drag", dragpolygon));
+
+        function dragpolygon(d) {
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            var xNew = [], yNew = [], points = "";
+            var pointsLen = d3.select(this)._groups[0][0].points.length;
+
+            for (var i = 0; i < pointsLen; i++) {
+                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
+                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
+
+                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
+
+                if (i != pointsLen - 1)
+                    points = points.concat(" ");
+            }
+
+            d3.select(this).attr("points", points);
+            // console.log("polygon: ", d3.select(this).attr("points"));
+        }
 
         // solutes in apical and serosal membrane
         // TODO: drag when flux is NBC_Current.J_Na
@@ -1990,28 +2010,7 @@
             }
         }
 
-        function dragpolygon(d) {
-            var dx = d3.event.dx;
-            var dy = d3.event.dy;
-
-            var xNew = [], yNew = [], points = "";
-            var pointsLen = d3.select(this)._groups[0][0].points.length;
-
-            for (var i = 0; i < pointsLen; i++) {
-                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
-                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
-
-                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
-
-                if (i != pointsLen - 1)
-                    points = points.concat(" ");
-            }
-
-            d3.select(this).attr("points", points);
-            // console.log("polygon: ", d3.select(this).attr("points"));
-        }
-
-// circle drag on-off based on checked event
+        // circle drag on-off based on checked event
         var radius = 20;
 
         var circledrag1 = svg.append("g").data([{x: 870, y: 80}]);
@@ -2337,55 +2336,10 @@
                 })
         }
 
-// Text
-        var svgtext = svg.append("g").data([{x: 850, y: 720}]);
-
-        var compartment = ["Luminal", "Serosal", "Paracellular", "Na+", "K+", "Cl-"];
-
-        compartment.forEach(function (element, index) {
-            if (index > 0)
-                svgtext.data([{x: 850, y: 690 + 30 * (index + 1)}]);
-
-            svgtext.append("text")
-                .attr("id", element)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-family", "Times New Roman")
-                .attr("font-size", "20px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(element)
-                .call(d3.drag()
-                    .on("drag", dragtext)
-                    .on("end", dragendtext));
-        });
-
-        function dragtext(d) {
-
-            console.log("dragtext: ", d3.select(this));
-
-            d3.select(this)
-            // .attr("pointer-events", "none") // hide text and make visible rectangles
-                .attr("x", d.x = d3.event.x)
-                .attr("y", d.y = d3.event.y);
-        }
-
-        function dragendtext(d) {
-            console.log("dragtextend: ", d3.select(this));
-
-            d3.select(this)
-                .classed("dragging", false);
-            // .attr("pointer-events", "all");
-        }
-
         var markerWidth = 4;
         var markerHeight = 4;
 
-// build the start arrow.
+        // build the start arrow.
         svg.append("svg:defs")
             .selectAll("marker")
             .data(["start"])      // Different link/path types can be defined here
@@ -2400,7 +2354,7 @@
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
 
-// build the end arrow.
+        // build the end arrow.
         svg.append("svg:defs").selectAll("marker")
             .data(["end"])      // Different link/path types can be defined here
             .enter().append("svg:marker")    // This section adds in the arrows
@@ -2413,44 +2367,6 @@
             .attr("orient", "auto")
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
-
-        // Utility for marker direction
-        function markerDir(selection) {
-            console.log("selection: ", selection);
-
-            var mstart = d3.select("#" + selection + "")
-                ._groups[0][0]
-                .getAttribute("marker-start");
-
-            var mend = d3.select("#" + selection + "")
-                ._groups[0][0]
-                .getAttribute("marker-end");
-
-            console.log("mstart: ", mstart);
-            console.log("mend: ", mend);
-
-            if (mstart == "") {
-                d3.select("#" + selection + "")
-                    .attr("marker-start", "url(#start)")
-                    .attr("marker-end", "");
-            }
-            else {
-                d3.select("#" + selection + "")
-                    .attr("marker-end", "url(#end)")
-                    .attr("marker-start", "");
-            }
-
-            if (mend == "") {
-                d3.select("#" + selection + "")
-                    .attr("marker-end", "url(#end)")
-                    .attr("marker-start", "");
-            }
-            else {
-                d3.select("#" + selection + "")
-                    .attr("marker-start", "url(#start)")
-                    .attr("marker-end", "");
-            }
-        }
 
         // Polygon with arrow lines
         var polygonwitharrowsg = svg.append("g").data([{x: 850, y: 530}]);
@@ -2476,11 +2392,6 @@
             .attr("cursor", "pointer")
             .call(d3.drag().on("drag", dragpolygonandline));
 
-        // Click to change the marker direction
-        d3.select("#polygonmarkerend").on("click", function () {
-            markerDir("polygonmarkerend");
-        });
-
         // Polygon
         var polygonmarker = svg.append("g").append("polygon")
             .attr("transform", "translate(850,500)")
@@ -2488,21 +2399,44 @@
             // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
             .attr("fill", "yellow")
+            .attr("text-anchor", "Hello")
             .attr("stroke", "black")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
             .attr("cursor", "move")
             .call(d3.drag().on("drag", dragpolygonandline));
 
+        var polygontextg = svg.append("g").data([{x: 870, y: 535}]);
+
+        var polygontext = polygontextg.append("text")
+            .attr("id", "polygontext")
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .attr("font-size", "12px")
+            .attr("fill", "red")
+            .attr("cursor", "move")
+            .text("Na+")
+            .call(d3.drag().on("drag", dragpolygonandline));
+
         function dragpolygonandline(d) {
 
-            // polygon line
+            // line
             var axis = groupcordinates("polygonmarkerend");
             polygonmarkerend
                 .attr("x1", axis.shift())
                 .attr("y1", axis.shift())
                 .attr("x2", axis.shift())
                 .attr("y2", axis.shift());
+
+            // text
+            var axis = groupcordinates("polygontext");
+            polygontext
+                .attr("x", axis.shift())
+                .attr("y", axis.shift())
 
             // polygon
             var dx = d3.event.dx;
@@ -2524,139 +2458,61 @@
             d3.select(this).attr("points", points);
         }
 
-        function dragpolygon(d) {
-            var dx = d3.event.dx;
-            var dy = d3.event.dy;
-
-            var xNew = [], yNew = [], points = "";
-            var pointsLen = d3.select(this)._groups[0][0].points.length;
-
-            for (var i = 0; i < pointsLen; i++) {
-                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
-                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
-
-                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
-
-                if (i != pointsLen - 1)
-                    points = points.concat(" ");
-            }
-
-            d3.select(this).attr("points", points);
-            // console.log("polygon: ", d3.select(this).attr("points"));
-        }
-
-// Circle with arrow lines
-        var circlewitharrowsg = svg.append("g").data([{x: 850, y: 600}]);
-        var lineLen = 40;
-        var radius = 20;
-
-        var linemarkerend = circlewitharrowsg.append("line")
-            .attr("id", "linemarkerend")
-            .attr("x1", function (d) {
-                return d.x;
-            })
-            .attr("y1", function (d) {
-                return d.y;
-            })
-            .attr("x2", function (d) {
-                return d.x + lineLen;
-            })
-            .attr("y2", function (d) {
-                return d.y;
-            })
-            .attr("stroke", "black")
-            .attr("stroke-width", 2)
-            .attr("marker-end", "url(#end)")
-            .attr("cursor", "pointer")
-            .call(d3.drag().on("drag", dragcircleandline));
-
-        var linemarkerstart = circlewitharrowsg.append("line")
-            .attr("id", "linemarkerstart")
-            .attr("x1", function (d) {
-                return d.x;
-            })
-            .attr("y1", function (d) {
-                return d.y + lineLen;
-            })
-            .attr("x2", function (d) {
-                return d.x + lineLen;
-            })
-            .attr("y2", function (d) {
-                return d.y + lineLen;
-            })
-            .attr("stroke", "black")
-            .attr("stroke-width", 2)
-            .attr("marker-start", "url(#start)")
-            .attr("cursor", "pointer")
-            .call(d3.drag().on("drag", dragcircleandline));
-
-        var circlemarker = circlewitharrowsg.append("circle")
-            .attr("id", "circlemarker")
-            .attr("cx", function (d) {
-                return d.x + radius;
-            })
-            .attr("cy", function (d) {
-                return d.y + radius;
-            })
-            .attr("r", radius)
-            .attr("fill", "SteelBlue")
-            .attr("stroke-width", 20)
-            .attr("cursor", "move")
-            .call(d3.drag().on("drag", dragcircleandline));
-
-// Click to change the marker direction
-        d3.select("#linemarkerend").on("click", function () {
-            markerDir("linemarkerend");
-        });
-
-        d3.select("#linemarkerstart").on("click", function () {
-            markerDir("linemarkerstart");
-        });
-
-        function dragcircleandline(d) {
-
-            // circle line
-            var axis = groupcordinates("linemarkerend");
-            linemarkerend
-                .attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
-
-            var axis = groupcordinates("linemarkerstart");
-            linemarkerstart
-                .attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
-
-            // Circle
-            var axis = groupcordinates("circlemarker");
-            circlemarker
-                .attr("cx", axis.shift())
-                .attr("cy", axis.shift());
-        }
-
-// TODO: make generic for all shapes
+        // TODO: make generic for all shapes
         function groupcordinates(groups) {
 
             var dx = d3.event.dx;
             var dy = d3.event.dy;
 
             // Circle groups
-            if (groups == "circlemarker") {
-                var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
-                var cyNew = parseFloat(d3.select("#" + groups + "").attr("cy")) + dy;
+            if (groups == "polygontext") {
+                var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
+                var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
 
-                return [cxNew, cyNew];
-            } else { // Line groups
-
+                return [xNew, yNew];
+            }
+            else { // Line groups
                 var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
                 var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
                 var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
                 var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
 
                 return [x1New, y1New, x2New, y2New];
+            }
+        }
+
+        // Utility for marker direction
+        function markerDir(selection) {
+            console.log("selection: ", selection);
+
+            var mstart = d3.select("#" + selection + "")
+                ._groups[0][0]
+                .getAttribute("marker-start");
+
+            var mend = d3.select("#" + selection + "")
+                ._groups[0][0]
+                .getAttribute("marker-end");
+
+            if (mstart == "") {
+                d3.select("#" + selection + "")
+                    .attr("marker-start", "url(#start)")
+                    .attr("marker-end", "");
+            }
+            else {
+                d3.select("#" + selection + "")
+                    .attr("marker-end", "url(#end)")
+                    .attr("marker-start", "");
+            }
+
+            if (mend == "") {
+                d3.select("#" + selection + "")
+                    .attr("marker-end", "url(#end)")
+                    .attr("marker-start", "");
+            }
+            else {
+                d3.select("#" + selection + "")
+                    .attr("marker-start", "url(#start)")
+                    .attr("marker-end", "");
             }
         }
     }
@@ -2715,10 +2571,10 @@
                             source_fma: apicalMembrane[0].source_fma,
                             sink_text: apicalMembrane[0].sink_text,
                             sink_fma: apicalMembrane[0].sink_fma,
-                            source_text2: undefined,
-                            source_fma2: undefined,
-                            sink_text2: undefined,
-                            sink_fma2: undefined
+                            source_text2: "",
+                            source_fma2: "",
+                            sink_text2: "",
+                            sink_fma2: ""
                         });
 
                     mainUtils.showsvgEpithelial(
