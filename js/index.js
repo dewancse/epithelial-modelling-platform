@@ -1303,6 +1303,7 @@
 
         var tempapical = [];
         var tempBasolateral = [];
+        var paracellularMembrane = [];
 
         // Extract apical fluxes
         for (var i = 0; i < apicalMembrane.length; i++) {
@@ -1359,7 +1360,7 @@
         }
 
         for (var i = 0; i < membrane.length; i++) {
-            if (membrane[i].source_fma == luminalID) {
+            if (membrane[i].source_fma == luminalID && membrane[i].sink_fma == cytosolID) {
                 apicalMembrane.push(
                     {
                         source_text: membrane[i].source_text,
@@ -1373,7 +1374,7 @@
                     });
             }
 
-            if (membrane[i].source_fma == interstitialID) {
+            if (membrane[i].source_fma == interstitialID && membrane[i].sink_fma == cytosolID) {
                 basolateralMembrane.push(
                     {
                         source_text: membrane[i].source_text,
@@ -1386,6 +1387,20 @@
                         sink_fma2: "channel"
                     });
             }
+
+            if (membrane[i].source_fma == luminalID && membrane[i].sink_fma == interstitialID) {
+                paracellularMembrane.push(
+                    {
+                        source_text: membrane[i].source_text,
+                        source_fma: membrane[i].source_fma,
+                        sink_text: membrane[i].sink_text,
+                        sink_fma: membrane[i].sink_fma,
+                        source_text2: "diffusive channel",
+                        source_fma2: "diffusive channel",
+                        sink_text2: "diffusive channel",
+                        sink_fma2: "diffusive channel"
+                    });
+            }
         }
 
         console.log("concentration_fma: ", concentration_fma);
@@ -1393,6 +1408,7 @@
         console.log("sink_fma: ", sink_fma);
         console.log("apicalMembrane: ", apicalMembrane);
         console.log("basolateralMembrane: ", basolateralMembrane);
+        console.log("paracellularMembrane: ", paracellularMembrane);
 
         var g = document.getElementById("#svgVisualize"),
             wth = 1200,
@@ -1500,8 +1516,18 @@
             .attr("y", 0)
             .attr("width", w / 3 - 30)
             .attr("height", h)
-            .attr("stroke", "purple")
-            .attr("strokeWidth", "4px")
+            .attr("stroke", function (d) {
+                svg.append("text")
+                    .style("font", "16px sans-serif")
+                    .attr("stroke", "purple")
+                    .attr("opacity", 0.5)
+                    .attr("x", 850)
+                    .attr("y", 70)
+                    .text("Luminal Compartment");
+
+                return "purple";
+            })
+            .attr("strokeWidth", "6px")
             .attr("fill", "white");
 
         // Intracellular rectangle
@@ -1511,8 +1537,18 @@
             .attr("y", height / 3 + 20)
             .attr("width", width - 60)
             .attr("height", height - 40)
-            .attr("stroke", "blue")
-            .attr("strokeWidth", "4px")
+            .attr("stroke", function (d) {
+                svg.append("text")
+                    .style("font", "16px sans-serif")
+                    .attr("stroke", "blue")
+                    .attr("opacity", 0.5)
+                    .attr("x", 850)
+                    .attr("y", 95)
+                    .text("Cytosol Compartment");
+
+                return "blue";
+            })
+            .attr("strokeWidth", "6px")
             .attr("fill", "white");
 
         // Interstitial fluid rectangle
@@ -1522,8 +1558,18 @@
             .attr("y", 0)
             .attr("width", w - (w / 3 + width + 30))
             .attr("height", h)
-            .attr("stroke", "teal")
-            .attr("strokeWidth", "4px")
+            .attr("stroke", function (d) {
+                svg.append("text")
+                    .style("font", "16px sans-serif")
+                    .attr("stroke", "teal")
+                    .attr("opacity", 0.5)
+                    .attr("x", 850)
+                    .attr("y", 120)
+                    .text("Interstitial Fluid");
+
+                return "teal";
+            })
+            .attr("strokeWidth", "6px")
             .attr("fill", "white");
 
         // Interstitial fluid rectangle
@@ -1534,7 +1580,7 @@
             .attr("width", width + 40)
             .attr("height", height / 3 - 30)
             .attr("stroke", "teal")
-            .attr("strokeWidth", "4px")
+            .attr("strokeWidth", "6px")
             .attr("fill", "white");
 
         // Paracellular rectangle
@@ -1544,8 +1590,18 @@
             .attr("y", height / 3 + height + 30)
             .attr("width", width + 20)
             .attr("height", height / 3)
-            .attr("stroke", "indigo")
-            .attr("strokeWidth", "4px")
+            .attr("stroke", function (d) {
+                svg.append("text")
+                    .style("font", "16px sans-serif")
+                    .attr("stroke", "indigo")
+                    .attr("opacity", 0.5)
+                    .attr("x", 850)
+                    .attr("y", 145)
+                    .text("Paracellular Pathway");
+
+                return "indigo";
+            })
+            .attr("strokeWidth", "6px")
             .attr("fill", "white");
 
         var solutes = [];
@@ -1637,7 +1693,7 @@
                     .style("font", "16px sans-serif")
                     .attr("stroke", "orange")
                     .attr("x", 850)
-                    .attr("y", 40)
+                    .attr("y", 45)
                     .text("Basolateral Membrane");
 
                 return "orange";
@@ -1690,7 +1746,7 @@
 
         var lineLen = 50, radius = 20,
             polygonlineLen = 60,
-            lineg, linegb, polygong, polygongb,
+            lineg, linegb, linegc, polygong, polygongb,
             xvalue = xrect - lineLen / 2, // x coordinate before epithelial rectangle
             yvalue = yrect + 10 + 50, // initial distance 50
             yvalueb = yrect + 10 + 50, // initial distance 50
@@ -1701,6 +1757,7 @@
             linewithlineg2 = [], linewithtextg = [], linewithtextg2 = [],
             circlewithlinegb = [], linewithlinegb = [],
             linewithlineg2b = [], linewithtextgb = [], linewithtextg2b = [],
+            linewithlinegc = [], linewithtextgc = [],
             cxvalue = xrect,
             cyvalue = yrect + 10 + 50, // initial distance 50
             cyvalueb = yrect + 10 + 50; // initial distance 50
@@ -1711,8 +1768,8 @@
 
         var checkBox = [], checkBoxb = [], checkBoxc = [],
             checkedchk = [], checkedchkb = [], checkedchkc = [],
-            ydistancechk = 50, yinitialchk = 160,
-            ytextinitialchk = 178,
+            ydistancechk = 50, yinitialchk = 165,
+            ytextinitialchk = 180,
             markerWidth = 4, markerHeight = 4;
 
         for (var i = 0; i < apicalMembrane.length; i++) {
@@ -1721,6 +1778,10 @@
 
         for (var i = 0; i < basolateralMembrane.length; i++) {
             checkBoxb[i] = new d3CheckBox();
+        }
+
+        for (var i = 0; i < paracellularMembrane.length; i++) {
+            checkBoxc[i] = new d3CheckBox();
         }
 
         var update = function () {
@@ -1791,6 +1852,19 @@
                     }
                 }
             }
+
+            for (var i = 0; i < paracellularMembrane.length; i++) {
+                checkedchkc[i] = checkBoxc[i].checked();
+                // drag enable and disable
+                if (checkedchkc[i] == true) {
+                    linewithlinegc[i].call(d3.drag().on("drag", dragtextandline));
+                    linewithtextgc[i].call(d3.drag().on("drag", dragtextandline));
+                }
+                else {
+                    linewithlinegc[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    linewithtextgc[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                }
+            }
         };
 
         for (var i = 0; i < apicalMembrane.length; i++) {
@@ -1812,6 +1886,18 @@
             checkBoxb[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechkb + "");
 
             checkboxsvg.call(checkBoxb[i]);
+
+            yinitialchk += ydistancechk;
+            ytextinitialchk += ydistancechk;
+        }
+
+        for (var i = 0; i < paracellularMembrane.length; i++) {
+            var textvaluechkc = paracellularMembrane[i].source_text + " " + paracellularMembrane[i].source_text2;
+
+            checkBoxc[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
+            checkBoxc[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechkc + "");
+
+            checkboxsvg.call(checkBoxc[i]);
 
             yinitialchk += ydistancechk;
             ytextinitialchk += ydistancechk;
@@ -2853,6 +2939,58 @@
             }
         }
 
+        // Paracellular membrane
+        var xprect = document.getElementsByTagName("rect")[9].x.baseVal.value;
+        var yprect = document.getElementsByTagName("rect")[9].y.baseVal.value;
+        var xpvalue = xprect + 10;
+        var ypvalue = yprect + 25;
+        var ypdistance = 35;
+        for (var i = 0; i < paracellularMembrane.length; i++) {
+            var textvalue = paracellularMembrane[i].source_text;
+            var src_fma = paracellularMembrane[i].source_fma;
+            var snk_fma = paracellularMembrane[i].sink_fma;
+            var textWidth = getTextWidth(textvalue, 12);
+            var pcellLen = 100;
+
+            linegc = newg.append("g").data([{x: xpvalue, y: ypvalue + 5}]);
+            linewithtextgc[i] = linegc.append("text")
+                .attr("id", "linewithtextgc" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-family", "Times New Roman")
+                .attr("font-size", "12px")
+                .attr("font-weight", "bold")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
+
+            var linetextg = linegc.append("g").data([{x: xpvalue + textWidth + 10, y: ypvalue}]);
+            linewithlinegc[i] = linetextg.append("line")
+                .attr("id", "linewithlinegc" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + pcellLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "move");
+
+            ypvalue += ypdistance;
+        }
+
         // Change marker direction and text position
         mainUtils.state = 0;
         document.addEventListener('click', function (event) {
@@ -2888,6 +3026,47 @@
                 }
             }
         })
+
+        function dragtextandline(d) {
+
+            // line: strip all the non-digit characters (\D or [^0-9])
+            var ic = this.id.replace(/\D/g, '');
+            var axis = groupcordinatesc("linewithlinegc" + ic, ic);
+            linewithlinegc[ic]
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
+
+            // text
+            var axis = groupcordinatesc("linewithtextgc" + ic, ic);
+            linewithtextgc[ic]
+                .attr("x", axis.shift())
+                .attr("y", axis.shift())
+
+        }
+
+        function groupcordinatesc(groups, ic) {
+
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            // text groups
+            if (groups == "linewithtextgc" + ic) {
+                var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
+                var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
+
+                return [xNew, yNew];
+            }
+            else { // Line groups
+                var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
+                var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
+                var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
+                var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
+
+                return [x1New, y1New, x2New, y2New];
+            }
+        }
 
         function dragpolygonandline(d) {
 
@@ -3137,170 +3316,10 @@
             }
         }
 
-        // circle drag on-off based on checked event
-        var radius = 20;
-
-        var circledrag1 = svg.append("g").data([{x: 870, y: 80}]);
-
-        var circle1 = circledrag1.append("circle")
-            .attr("id", apicalID)
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            })
-            .attr("r", radius)
-            .attr("fill", "lightgreen")
-            .attr("opacity", 0.5)
-            .attr("stroke-width", 20)
-            .attr("cursor", "move")
-            .call(d3.drag()
-                .on("drag", dragcircle)
-                .on("end", dragcircleend));
-
-        var circledrag2 = svg.append("g").data([{x: 915, y: 80}]);
-
-        var circle2 = circledrag2.append("circle")
-            .attr("id", basolateralID)
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            })
-            .attr("r", radius)
-            .attr("fill", "orange")
-            .attr("opacity", 0.5)
-            .attr("stroke-width", 20)
-            .attr("cursor", "move")
-            .call(d3.drag()
-                .on("drag", dragcircle)
-                .on("end", dragcircleend));
-
-        var circledrag3 = svg.append("g").data([{x: 960, y: 80}]);
-
-        var circle3 = circledrag3.append("circle")
-            .attr("id", cytosolID)
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            })
-            .attr("r", radius)
-            .attr("fill", "blue")
-            .attr("opacity", 0.5)
-            .attr("stroke-width", 20)
-            .attr("cursor", "move")
-            .call(d3.drag()
-                .on("drag", dragcircle)
-                .on("end", dragcircleend));
-
-        var circledrag4 = svg.append("g").data([{x: 1005, y: 80}]);
-
-        var circle4 = circledrag4.append("circle")
-            .attr("id", luminalID)
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            })
-            .attr("r", radius)
-            .attr("fill", "purple")
-            .attr("opacity", 0.5)
-            .attr("stroke-width", 20)
-            .attr("cursor", "move")
-            .call(d3.drag()
-                .on("drag", dragcircle)
-                .on("end", dragcircleend));
-
         function dragcircle(d) {
             d3.select(this)
                 .attr("cx", d.x = d3.event.x)
                 .attr("cy", d.y = d3.event.y);
-
-            console.log("dragcircle: ", d3.select(this));
-
-            // Test: detect apical membrane
-            var line_x = document.getElementsByTagName("line")[0].x1.baseVal.value;
-            var line_y1 = document.getElementsByTagName("line")[0].y1.baseVal.value;
-            var line_y2 = document.getElementsByTagName("line")[0].y2.baseVal.value;
-            var cx = d3.select(this)._groups[0][0].cx.baseVal.value;
-            var cy = d3.select(this)._groups[0][0].cy.baseVal.value;
-            var line_id = document.getElementsByTagName("line")[0].id;
-            var circle_id = d3.select(this)._groups[0][0].id;
-
-            if ((cx >= (line_x - radius) && cx <= line_x + 20 + radius) && (cy >= line_y1 && cy <= line_y2) && (line_id == circle_id)) {
-                document.getElementsByTagName("line")[0].style.setProperty("stroke", "red");
-
-                circle1
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("cx", d.x = 870)
-                    .attr("cy", d.y = 80);
-
-                console.log("d.x: ", d.x);
-                console.log("d.y: ", d.y);
-            }
-            else {
-                document.getElementsByTagName("line")[0].style.setProperty("stroke", "green");
-            }
-
-            // Test: detect basolateral membrane
-            var line_xx = document.getElementsByTagName("line")[1].x1.baseVal.value;
-            var line_yy1 = document.getElementsByTagName("line")[1].y1.baseVal.value;
-            var line_yy2 = document.getElementsByTagName("line")[1].y2.baseVal.value;
-            var cxx = d3.select(this)._groups[0][0].cx.baseVal.value;
-            var cyy = d3.select(this)._groups[0][0].cy.baseVal.value;
-            var line_idd = document.getElementsByTagName("line")[1].id;
-            var circle_id = d3.select(this)._groups[0][0].id;
-
-            if ((cxx >= (line_xx - radius) && cxx <= line_xx + 20 + radius) && (cyy >= line_yy1 && cyy <= line_yy2) && (line_idd == circle_id)) {
-                document.getElementsByTagName("line")[1].style.setProperty("stroke", "red");
-
-                circle2
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("cx", d.x = 915)
-                    .attr("cy", d.y = 80);
-            }
-            else {
-                document.getElementsByTagName("line")[1].style.setProperty("stroke", "orange");
-            }
-
-            // Test: detect extracellular membrane
-            var rect_x = document.getElementsByTagName("rect")[5].x.baseVal.value;
-            var rect_y = document.getElementsByTagName("rect")[5].y.baseVal.value;
-            var rect_id = document.getElementsByTagName("rect")[5].id;
-            var cxp = d3.select(this)._groups[0][0].cx.baseVal.value;
-            var cyp = d3.select(this)._groups[0][0].cy.baseVal.value;
-            var circle_id = d3.select(this)._groups[0][0].id;
-
-            if ((cxp >= rect_x && cxp <= rect_x + w / 3 - 30) && (cyp >= rect_y && cyp <= rect_y + h) && (rect_id == circle_id)) {
-                document.getElementsByTagName("rect")[5].style.setProperty("stroke", "red");
-            }
-            else {
-                document.getElementsByTagName("rect")[5].style.setProperty("stroke", "purple");
-            }
-
-            // Test: detect intracellular membrane
-            var rect_xc = document.getElementsByTagName("rect")[6].x.baseVal.value;
-            var rect_yc = document.getElementsByTagName("rect")[6].y.baseVal.value;
-            var rect_idc = document.getElementsByTagName("rect")[6].id;
-            var cxc = d3.select(this)._groups[0][0].cx.baseVal.value;
-            var cyc = d3.select(this)._groups[0][0].cy.baseVal.value;
-            var circle_idc = d3.select(this)._groups[0][0].id;
-
-            if ((cxc >= rect_xc && cxc <= rect_xc + width - 60) && (cyc >= rect_yc && cyc <= rect_yc + height - 40) && (rect_idc == circle_idc)) {
-                document.getElementsByTagName("rect")[6].style.setProperty("stroke", "red");
-            }
-            else {
-                document.getElementsByTagName("rect")[6].style.setProperty("stroke", "blue");
-            }
         }
 
         function dragcircleend(d) {
@@ -3495,119 +3514,6 @@
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
 
-        // // Polygon with arrow lines
-        // var polygonwitharrowsg = svg.append("g").data([{x: 850, y: 530}]);
-        // var polygonlineLen = 60;
-        //
-        // var polygonmarkerend = polygonwitharrowsg.append("line")
-        //     .attr("id", "polygonmarkerend")
-        //     .attr("x1", function (d) {
-        //         return d.x;
-        //     })
-        //     .attr("y1", function (d) {
-        //         return d.y;
-        //     })
-        //     .attr("x2", function (d) {
-        //         return d.x + polygonlineLen;
-        //     })
-        //     .attr("y2", function (d) {
-        //         return d.y;
-        //     })
-        //     .attr("stroke", "black")
-        //     .attr("stroke-width", 2)
-        //     .attr("marker-end", "url(#end)")
-        //     .attr("cursor", "pointer")
-        //     .call(d3.drag().on("drag", dragpolygonandline));
-        //
-        // // Polygon
-        // var polygonmarker = svg.append("g").append("polygon")
-        //     .attr("transform", "translate(850,500)")
-        //     .attr("id", "channel")
-        //     // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
-        //     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-        //     .attr("fill", "yellow")
-        //     .attr("text-anchor", "Hello")
-        //     .attr("stroke", "black")
-        //     .attr("stroke-linecap", "round")
-        //     .attr("stroke-linejoin", "round")
-        //     .attr("cursor", "move")
-        //     .call(d3.drag().on("drag", dragpolygonandline));
-        //
-        // var polygontextg = svg.append("g").data([{x: 870, y: 535}]);
-        //
-        // var polygontext = polygontextg.append("text")
-        //     .attr("id", "polygontext")
-        //     .attr("x", function (d) {
-        //         return d.x;
-        //     })
-        //     .attr("y", function (d) {
-        //         return d.y;
-        //     })
-        //     .attr("font-size", "12px")
-        //     .attr("fill", "red")
-        //     .attr("cursor", "move")
-        //     .text("Na+")
-        //     .call(d3.drag().on("drag", dragpolygonandline));
-
-        // function dragpolygonandline(d) {
-        //
-        //     // line
-        //     var axis = groupcordinates("polygonmarkerend");
-        //     polygonmarkerend
-        //         .attr("x1", axis.shift())
-        //         .attr("y1", axis.shift())
-        //         .attr("x2", axis.shift())
-        //         .attr("y2", axis.shift());
-        //
-        //     // text
-        //     var axis = groupcordinates("polygontext");
-        //     polygontext
-        //         .attr("x", axis.shift())
-        //         .attr("y", axis.shift())
-        //
-        //     // polygon
-        //     var dx = d3.event.dx;
-        //     var dy = d3.event.dy;
-        //
-        //     var xNew = [], yNew = [], points = "";
-        //     var pointsLen = d3.select(this)._groups[0][0].points.length;
-        //
-        //     for (var i = 0; i < pointsLen; i++) {
-        //         xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
-        //         yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
-        //
-        //         points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
-        //
-        //         if (i != pointsLen - 1)
-        //             points = points.concat(" ");
-        //     }
-        //
-        //     d3.select(this).attr("points", points);
-        // }
-        //
-        // // TODO: make generic for all shapes
-        // function groupcordinates(groups) {
-        //
-        //     var dx = d3.event.dx;
-        //     var dy = d3.event.dy;
-        //
-        //     // Circle groups
-        //     if (groups == "polygontext") {
-        //         var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
-        //         var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
-        //
-        //         return [xNew, yNew];
-        //     }
-        //     else { // Line groups
-        //         var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
-        //         var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
-        //         var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
-        //         var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
-        //
-        //         return [x1New, y1New, x2New, y2New];
-        //     }
-        // }
-
         // Utility for marker direction
         function markerDir(selection) {
             console.log("selection: ", selection);
@@ -3644,7 +3550,7 @@
         }
     }
 
-// Utility to calculate number of iterations
+    // Utility to calculate number of iterations
     function iteration(length) {
         var sum = 0;
         for (var i = 0; i < length; i++) {
