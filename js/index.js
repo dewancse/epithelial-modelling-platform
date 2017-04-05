@@ -1292,13 +1292,7 @@
         return b.measureText(text).width;
     }
 
-    mainUtils.showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane) {
-
-        console.log("concentration_fma: ", concentration_fma);
-        console.log("source_fma: ", source_fma);
-        console.log("sink_fma: ", sink_fma);
-        console.log("apicalMembrane: ", apicalMembrane);
-        console.log("basolateralMembrane: ", basolateralMembrane);
+    mainUtils.showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var basolateralID = "http://identifiers.org/fma/FMA:84669";
@@ -1306,6 +1300,99 @@
         var cytosolID = "http://identifiers.org/fma/FMA:66836";
         var paracellularID = "http://identifiers.org/fma/FMA:67394";
         var interstitialID = "http://identifiers.org/fma/FMA:9673";
+
+        var tempapical = [];
+        var tempBasolateral = [];
+
+        // Extract apical fluxes
+        for (var i = 0; i < apicalMembrane.length; i++) {
+            tempapical.push({
+                srctext: apicalMembrane[i].source_text,
+                srcfma: apicalMembrane[i].source_fma,
+                snkfma: apicalMembrane[i].sink_fma
+            });
+
+            tempapical.push({
+                srctext: apicalMembrane[i].source_text2,
+                srcfma: apicalMembrane[i].source_fma2,
+                snkfma: apicalMembrane[i].sink_fma2
+            });
+        }
+
+        // Extract basolateral fluxes
+        for (var i = 0; i < basolateralMembrane.length; i++) {
+            tempBasolateral.push({
+                srctext: basolateralMembrane[i].source_text,
+                srcfma: basolateralMembrane[i].source_fma,
+                snkfma: basolateralMembrane[i].sink_fma
+            });
+
+            tempBasolateral.push({
+                srctext: basolateralMembrane[i].source_text2,
+                srcfma: basolateralMembrane[i].source_fma2,
+                snkfma: basolateralMembrane[i].sink_fma2
+            });
+        }
+
+        // remove fluxes in apical membrane
+        for (var i = 0; i < tempapical.length; i++) {
+            for (var j = 0; j < membrane.length; j++) {
+                if (tempapical[i].srctext == membrane[j].source_text &&
+                    tempapical[i].srcfma == membrane[j].source_fma &&
+                    tempapical[i].snkfma == membrane[j].sink_fma) {
+
+                    membrane.splice(j, 1);
+                }
+            }
+        }
+
+        // remove fluxes in basolateral membrane
+        for (var i = 0; i < tempBasolateral.length; i++) {
+            for (var j = 0; j < membrane.length; j++) {
+                if (tempBasolateral[i].srctext == membrane[j].source_text &&
+                    tempBasolateral[i].srcfma == membrane[j].source_fma &&
+                    tempBasolateral[i].snkfma == membrane[j].sink_fma) {
+
+                    membrane.splice(j, 1);
+                }
+            }
+        }
+
+        for (var i = 0; i < membrane.length; i++) {
+            if (membrane[i].source_fma == luminalID) {
+                apicalMembrane.push(
+                    {
+                        source_text: membrane[i].source_text,
+                        source_fma: membrane[i].source_fma,
+                        sink_text: membrane[i].sink_text,
+                        sink_fma: membrane[i].sink_fma,
+                        source_text2: "channel",
+                        source_fma2: "channel",
+                        sink_text2: "channel",
+                        sink_fma2: "channel"
+                    });
+            }
+
+            if (membrane[i].source_fma == interstitialID) {
+                basolateralMembrane.push(
+                    {
+                        source_text: membrane[i].source_text,
+                        source_fma: membrane[i].source_fma,
+                        sink_text: membrane[i].sink_text,
+                        sink_fma: membrane[i].sink_fma,
+                        source_text2: "channel",
+                        source_fma2: "channel",
+                        sink_text2: "channel",
+                        sink_fma2: "channel"
+                    });
+            }
+        }
+
+        console.log("concentration_fma: ", concentration_fma);
+        console.log("source_fma: ", source_fma);
+        console.log("sink_fma: ", sink_fma);
+        console.log("apicalMembrane: ", apicalMembrane);
+        console.log("basolateralMembrane: ", basolateralMembrane);
 
         var g = document.getElementById("#svgVisualize"),
             wth = 1200,
@@ -1601,13 +1688,15 @@
         var xrect = document.getElementsByTagName("rect")[0].x.baseVal.value;
         var yrect = document.getElementsByTagName("rect")[0].y.baseVal.value;
 
-        var lineLen = 50,
-            radius = 20,
-            lineg, linegb,
+        var lineLen = 50, radius = 20,
+            polygonlineLen = 60,
+            lineg, linegb, polygong, polygongb,
             xvalue = xrect - lineLen / 2, // x coordinate before epithelial rectangle
             yvalue = yrect + 10 + 50, // initial distance 50
             yvalueb = yrect + 10 + 50, // initial distance 50
             ydistance = 70, ydistanceb = 70,
+            polygonlineg = [], polygon = [], polygontext = [],
+            polygonlinegb = [], polygonb = [], polygontextb = [],
             circlewithlineg = [], linewithlineg = [],
             linewithlineg2 = [], linewithtextg = [], linewithtextg2 = [],
             circlewithlinegb = [], linewithlinegb = [],
@@ -1620,64 +1709,95 @@
         // SVG checkbox with drag on-off
         var checkboxsvg = newg.append("g");
 
-        var checkBox = [],
-            textvaluechk = [],
-            checkedchk = [],
-            ydistancechk = 50,
-            yinitialchk = 160,
+        var checkBox = [], checkBoxb = [], checkBoxc = [],
+            checkedchk = [], checkedchkb = [], checkedchkc = [],
+            ydistancechk = 50, yinitialchk = 160,
             ytextinitialchk = 178,
-            markerWidth = 4,
-            markerHeight = 4;
+            markerWidth = 4, markerHeight = 4;
 
         for (var i = 0; i < apicalMembrane.length; i++) {
             checkBox[i] = new d3CheckBox();
         }
 
+        for (var i = 0; i < basolateralMembrane.length; i++) {
+            checkBoxb[i] = new d3CheckBox();
+        }
+
         var update = function () {
             for (var i = 0; i < apicalMembrane.length; i++) {
-                checkedchk[i] = checkBox[i].checked();
-                // drag enable and disable
-                if (checkedchk[i] == true) {
-                    linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
-                    linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
-                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
-                    linewithlineg2[i].call(d3.drag().on("drag", dragcircleline));
-                    linewithtextg2[i].call(d3.drag().on("drag", dragcircleline));
-                }
-                else {
-                    linewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithtextg[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithlineg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithtextg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                if (apicalMembrane[i].source_text2 != "channel") {
+                    checkedchk[i] = checkBox[i].checked();
+                    // drag enable and disable
+                    if (checkedchk[i] == true) {
+                        linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
+                        linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
+                        circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
+                        linewithlineg2[i].call(d3.drag().on("drag", dragcircleline));
+                        linewithtextg2[i].call(d3.drag().on("drag", dragcircleline));
+                    }
+                    else {
+                        linewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        linewithtextg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        circlewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        linewithlineg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        linewithtextg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    }
+                } else {
+                    checkedchk[i] = checkBox[i].checked();
+                    // drag enable and disable
+                    if (checkedchk[i] == true) {
+                        polygonlineg[i].call(d3.drag().on("drag", dragpolygonandline));
+                        polygontext[i].call(d3.drag().on("drag", dragpolygonandline));
+                        polygon[i].call(d3.drag().on("drag", dragpolygonandline));
+                    }
+                    else {
+                        polygonlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        polygontext[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        polygon[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    }
                 }
             }
 
             for (var i = 0; i < basolateralMembrane.length; i++) {
-                checkedchk[i] = checkBox[i].checked();
-                // drag enable and disable
-                if (checkedchk[i] == true) {
-                    linewithlinegb[i].call(d3.drag().on("drag", dragcirclelineb));
-                    linewithtextgb[i].call(d3.drag().on("drag", dragcirclelineb));
-                    circlewithlinegb[i].call(d3.drag().on("drag", dragcirclelineb));
-                    linewithlineg2b[i].call(d3.drag().on("drag", dragcirclelineb));
-                    linewithtextg2b[i].call(d3.drag().on("drag", dragcirclelineb));
-                }
-                else {
-                    linewithlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithtextgb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    circlewithlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithlineg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithtextg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                if (basolateralMembrane[i].source_text2 != "channel") {
+                    checkedchkb[i] = checkBoxb[i].checked();
+                    // drag enable and disable
+                    if (checkedchkb[i] == true) {
+                        linewithlinegb[i].call(d3.drag().on("drag", dragcirclelineb));
+                        linewithtextgb[i].call(d3.drag().on("drag", dragcirclelineb));
+                        circlewithlinegb[i].call(d3.drag().on("drag", dragcirclelineb));
+                        linewithlineg2b[i].call(d3.drag().on("drag", dragcirclelineb));
+                        linewithtextg2b[i].call(d3.drag().on("drag", dragcirclelineb));
+                    }
+                    else {
+                        linewithlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        linewithtextgb[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        circlewithlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        linewithlineg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        linewithtextg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    }
+                } else {
+                    checkedchk[i] = checkBox[i].checked();
+                    // drag enable and disable
+                    if (checkedchk[i] == true) {
+                        polygonlineg[i].call(d3.drag().on("drag", dragpolygonandlineb));
+                        polygontext[i].call(d3.drag().on("drag", dragpolygonandlineb));
+                        polygon[i].call(d3.drag().on("drag", dragpolygonandlineb));
+                    }
+                    else {
+                        polygonlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        polygontext[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        polygon[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    }
                 }
             }
         };
 
         for (var i = 0; i < apicalMembrane.length; i++) {
-            textvaluechk[i] = apicalMembrane[i].source_text + " " + apicalMembrane[i].source_text2;
+            var textvaluechk = apicalMembrane[i].source_text + " " + apicalMembrane[i].source_text2;
 
             checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
-            checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk[i] + "");
+            checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
 
             checkboxsvg.call(checkBox[i]);
 
@@ -1686,12 +1806,12 @@
         }
 
         for (var i = 0; i < basolateralMembrane.length; i++) {
-            textvaluechk[i] = basolateralMembrane[i].source_text + " " + basolateralMembrane[i].source_text2;
+            var textvaluechkb = basolateralMembrane[i].source_text + " " + basolateralMembrane[i].source_text2;
 
-            checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
-            checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk[i] + "");
+            checkBoxb[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
+            checkBoxb[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechkb + "");
 
-            checkboxsvg.call(checkBox[i]);
+            checkboxsvg.call(checkBoxb[i]);
 
             yinitialchk += ydistancechk;
             ytextinitialchk += ydistancechk;
@@ -2226,6 +2346,63 @@
                 yvalue += ydistance;
                 cyvalue += ydistance;
             }
+
+            // case 5
+            if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+                polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+                polygonlineg[i] = polygong.append("line")
+                    .attr("id", "polygonlineg" + i)
+                    .attr("x1", function (d) {
+                        return d.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.x + polygonlineLen;
+                    })
+                    .attr("y2", function (d) {
+                        return d.y;
+                    })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("marker-end", "url(#end)")
+                    .attr("cursor", "pointer");
+
+                // Polygon
+                polygon[i] = polygong.append("g").append("polygon")
+                    .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
+                    .attr("id", "polygon" + i)
+                    .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                    .attr("fill", "yellow")
+                    .attr("stroke", "black")
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("cursor", "move");
+
+                var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+
+                var txt = textvalue.substr(5); // temp solution
+                if (txt == "Cl") txt = txt + "-";
+                else txt = txt + "+";
+
+                polygontext[i] = polygontextg.append("text")
+                    .attr("id", "polygontext" + i)
+                    .attr("x", function (d) {
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text(txt);
+
+                // increment y-axis of line and circle
+                yvalue += ydistance;
+                cyvalue += ydistance;
+            }
         }
 
         // Basolateral membrane
@@ -2617,6 +2794,63 @@
                 yvalueb += ydistanceb;
                 cyvalueb += ydistanceb;
             }
+
+            // case 5
+            if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+                polygongb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+                polygonlinegb[i] = polygongb.append("line")
+                    .attr("id", "polygonlinegb" + i)
+                    .attr("x1", function (d) {
+                        return d.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.x + polygonlineLen;
+                    })
+                    .attr("y2", function (d) {
+                        return d.y;
+                    })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("marker-start", "url(#start)")
+                    .attr("cursor", "pointer");
+
+                // Polygon
+                polygonb[i] = polygongb.append("g").append("polygon")
+                    .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
+                    .attr("id", "polygonb" + i)
+                    .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                    .attr("fill", "yellow")
+                    .attr("stroke", "black")
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("cursor", "move");
+
+                var polygontextgb = polygongb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
+
+                var txt = textvalue.substr(5); // temp solution
+                if (txt == "Cl") txt = txt + "-";
+                else txt = txt + "+";
+
+                polygontextb[i] = polygontextgb.append("text")
+                    .attr("id", "polygontextb" + i)
+                    .attr("x", function (d) {
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text(txt);
+
+                // increment y-axis of line and circle
+                yvalueb += ydistanceb;
+                cyvalueb += ydistanceb;
+            }
         }
 
         // Change marker direction and text position
@@ -2654,6 +2888,124 @@
                 }
             }
         })
+
+        function dragpolygonandline(d) {
+
+            // Circle: strip all the non-digit characters (\D or [^0-9])
+            var ic = this.id.replace(/\D/g, '');
+            var axis = groupcordinates("polygonlineg" + ic, ic);
+            polygonlineg[ic]
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
+
+            // text
+            var axis = groupcordinates("polygontext" + ic, ic);
+            polygontext[ic]
+                .attr("x", axis.shift())
+                .attr("y", axis.shift())
+
+            // polygon
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            var xNew = [], yNew = [], points = "";
+            var pointsLen = d3.select(this)._groups[0][0].points.length;
+
+            for (var i = 0; i < pointsLen; i++) {
+                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
+                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
+
+                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
+
+                if (i != pointsLen - 1)
+                    points = points.concat(" ");
+            }
+
+            d3.select(this).attr("points", points);
+        }
+
+        function groupcordinates(groups, ic) {
+
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            // Circle groups
+            if (groups == "polygontext" + ic) {
+                var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
+                var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
+
+                return [xNew, yNew];
+            }
+            else { // Line groups
+                var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
+                var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
+                var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
+                var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
+
+                return [x1New, y1New, x2New, y2New];
+            }
+        }
+
+        function dragpolygonandlineb(d) {
+
+            // Circle: strip all the non-digit characters (\D or [^0-9])
+            var ic = this.id.replace(/\D/g, '');
+            var axis = groupcordinatesb("polygonlinegb" + ic, ic);
+            polygonlinegb[ic]
+                .attr("x1", axis.shift())
+                .attr("y1", axis.shift())
+                .attr("x2", axis.shift())
+                .attr("y2", axis.shift());
+
+            // text
+            var axis = groupcordinatesb("polygontextb" + ic, ic);
+            polygontextb[ic]
+                .attr("x", axis.shift())
+                .attr("y", axis.shift())
+
+            // polygon
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            var xNew = [], yNew = [], points = "";
+            var pointsLen = d3.select(this)._groups[0][0].points.length;
+
+            for (var i = 0; i < pointsLen; i++) {
+                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
+                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
+
+                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
+
+                if (i != pointsLen - 1)
+                    points = points.concat(" ");
+            }
+
+            d3.select(this).attr("points", points);
+        }
+
+        function groupcordinatesb(groups, ic) {
+
+            var dx = d3.event.dx;
+            var dy = d3.event.dy;
+
+            // Circle groups
+            if (groups == "polygontextb" + ic) {
+                var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
+                var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
+
+                return [xNew, yNew];
+            }
+            else { // Line groups
+                var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
+                var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
+                var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
+                var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
+
+                return [x1New, y1New, x2New, y2New];
+            }
+        }
 
         function dragcircleline(d) {
 
@@ -3143,118 +3495,118 @@
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5");
 
-        // Polygon with arrow lines
-        var polygonwitharrowsg = svg.append("g").data([{x: 850, y: 530}]);
-        var polygonlineLen = 60;
+        // // Polygon with arrow lines
+        // var polygonwitharrowsg = svg.append("g").data([{x: 850, y: 530}]);
+        // var polygonlineLen = 60;
+        //
+        // var polygonmarkerend = polygonwitharrowsg.append("line")
+        //     .attr("id", "polygonmarkerend")
+        //     .attr("x1", function (d) {
+        //         return d.x;
+        //     })
+        //     .attr("y1", function (d) {
+        //         return d.y;
+        //     })
+        //     .attr("x2", function (d) {
+        //         return d.x + polygonlineLen;
+        //     })
+        //     .attr("y2", function (d) {
+        //         return d.y;
+        //     })
+        //     .attr("stroke", "black")
+        //     .attr("stroke-width", 2)
+        //     .attr("marker-end", "url(#end)")
+        //     .attr("cursor", "pointer")
+        //     .call(d3.drag().on("drag", dragpolygonandline));
+        //
+        // // Polygon
+        // var polygonmarker = svg.append("g").append("polygon")
+        //     .attr("transform", "translate(850,500)")
+        //     .attr("id", "channel")
+        //     // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
+        //     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+        //     .attr("fill", "yellow")
+        //     .attr("text-anchor", "Hello")
+        //     .attr("stroke", "black")
+        //     .attr("stroke-linecap", "round")
+        //     .attr("stroke-linejoin", "round")
+        //     .attr("cursor", "move")
+        //     .call(d3.drag().on("drag", dragpolygonandline));
+        //
+        // var polygontextg = svg.append("g").data([{x: 870, y: 535}]);
+        //
+        // var polygontext = polygontextg.append("text")
+        //     .attr("id", "polygontext")
+        //     .attr("x", function (d) {
+        //         return d.x;
+        //     })
+        //     .attr("y", function (d) {
+        //         return d.y;
+        //     })
+        //     .attr("font-size", "12px")
+        //     .attr("fill", "red")
+        //     .attr("cursor", "move")
+        //     .text("Na+")
+        //     .call(d3.drag().on("drag", dragpolygonandline));
 
-        var polygonmarkerend = polygonwitharrowsg.append("line")
-            .attr("id", "polygonmarkerend")
-            .attr("x1", function (d) {
-                return d.x;
-            })
-            .attr("y1", function (d) {
-                return d.y;
-            })
-            .attr("x2", function (d) {
-                return d.x + polygonlineLen;
-            })
-            .attr("y2", function (d) {
-                return d.y;
-            })
-            .attr("stroke", "black")
-            .attr("stroke-width", 2)
-            .attr("marker-end", "url(#end)")
-            .attr("cursor", "pointer")
-            .call(d3.drag().on("drag", dragpolygonandline));
-
-        // Polygon
-        var polygonmarker = svg.append("g").append("polygon")
-            .attr("transform", "translate(850,500)")
-            .attr("id", "channel")
-            // .attr("points", "10,10 30,10 40,25 30,40 10,40 0,25")
-            .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-            .attr("fill", "yellow")
-            .attr("text-anchor", "Hello")
-            .attr("stroke", "black")
-            .attr("stroke-linecap", "round")
-            .attr("stroke-linejoin", "round")
-            .attr("cursor", "move")
-            .call(d3.drag().on("drag", dragpolygonandline));
-
-        var polygontextg = svg.append("g").data([{x: 870, y: 535}]);
-
-        var polygontext = polygontextg.append("text")
-            .attr("id", "polygontext")
-            .attr("x", function (d) {
-                return d.x;
-            })
-            .attr("y", function (d) {
-                return d.y;
-            })
-            .attr("font-size", "12px")
-            .attr("fill", "red")
-            .attr("cursor", "move")
-            .text("Na+")
-            .call(d3.drag().on("drag", dragpolygonandline));
-
-        function dragpolygonandline(d) {
-
-            // line
-            var axis = groupcordinates("polygonmarkerend");
-            polygonmarkerend
-                .attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
-
-            // text
-            var axis = groupcordinates("polygontext");
-            polygontext
-                .attr("x", axis.shift())
-                .attr("y", axis.shift())
-
-            // polygon
-            var dx = d3.event.dx;
-            var dy = d3.event.dy;
-
-            var xNew = [], yNew = [], points = "";
-            var pointsLen = d3.select(this)._groups[0][0].points.length;
-
-            for (var i = 0; i < pointsLen; i++) {
-                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
-                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
-
-                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
-
-                if (i != pointsLen - 1)
-                    points = points.concat(" ");
-            }
-
-            d3.select(this).attr("points", points);
-        }
-
-        // TODO: make generic for all shapes
-        function groupcordinates(groups) {
-
-            var dx = d3.event.dx;
-            var dy = d3.event.dy;
-
-            // Circle groups
-            if (groups == "polygontext") {
-                var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
-                var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
-
-                return [xNew, yNew];
-            }
-            else { // Line groups
-                var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
-                var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
-                var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
-                var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
-
-                return [x1New, y1New, x2New, y2New];
-            }
-        }
+        // function dragpolygonandline(d) {
+        //
+        //     // line
+        //     var axis = groupcordinates("polygonmarkerend");
+        //     polygonmarkerend
+        //         .attr("x1", axis.shift())
+        //         .attr("y1", axis.shift())
+        //         .attr("x2", axis.shift())
+        //         .attr("y2", axis.shift());
+        //
+        //     // text
+        //     var axis = groupcordinates("polygontext");
+        //     polygontext
+        //         .attr("x", axis.shift())
+        //         .attr("y", axis.shift())
+        //
+        //     // polygon
+        //     var dx = d3.event.dx;
+        //     var dy = d3.event.dy;
+        //
+        //     var xNew = [], yNew = [], points = "";
+        //     var pointsLen = d3.select(this)._groups[0][0].points.length;
+        //
+        //     for (var i = 0; i < pointsLen; i++) {
+        //         xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
+        //         yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
+        //
+        //         points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
+        //
+        //         if (i != pointsLen - 1)
+        //             points = points.concat(" ");
+        //     }
+        //
+        //     d3.select(this).attr("points", points);
+        // }
+        //
+        // // TODO: make generic for all shapes
+        // function groupcordinates(groups) {
+        //
+        //     var dx = d3.event.dx;
+        //     var dy = d3.event.dy;
+        //
+        //     // Circle groups
+        //     if (groups == "polygontext") {
+        //         var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
+        //         var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
+        //
+        //         return [xNew, yNew];
+        //     }
+        //     else { // Line groups
+        //         var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
+        //         var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
+        //         var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
+        //         var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
+        //
+        //         return [x1New, y1New, x2New, y2New];
+        //     }
+        // }
 
         // Utility for marker direction
         function markerDir(selection) {
@@ -3353,6 +3705,7 @@
 
                 // Exceptional case when only one flux
                 if (membrane.length == 1) {
+                    // TODO: check also for basolateral membrane
                     apicalMembrane.push(
                         {
                             source_text: membrane[0].source_text,
@@ -3469,7 +3822,8 @@
                                             source_fma2,
                                             sink_fma2,
                                             apicalMembrane,
-                                            basolateralMembrane);
+                                            basolateralMembrane,
+                                            membrane);
                                     }
                                 },
                                 true
