@@ -1300,6 +1300,9 @@
         var cytosolID = "http://identifiers.org/fma/FMA:66836";
         var paracellularID = "http://identifiers.org/fma/FMA:67394";
         var interstitialID = "http://identifiers.org/fma/FMA:9673";
+        var Nachannel = "http://purl.obolibrary.org/obo/PR_000014527";
+        var Clchannel = "http://purl.obolibrary.org/obo/PR_Q06393";
+        var Kchannel = "http://purl.obolibrary.org/obo/PR_P15387";
 
         var tempapical = [];
         var tempBasolateral = [];
@@ -1360,7 +1363,8 @@
         }
 
         for (var i = 0; i < membrane.length; i++) {
-            if (membrane[i].source_fma == luminalID && membrane[i].sink_fma == cytosolID) {
+            if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == Nachannel ||
+                membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
                 apicalMembrane.push(
                     {
                         source_text: membrane[i].source_text,
@@ -1372,9 +1376,15 @@
                         sink_text2: "channel",
                         sink_fma2: "channel"
                     });
+
+                membrane[i].source_text2 = "channel";
+                membrane[i].source_fma2 = "channel";
+                membrane[i].sink_text2 = "channel";
+                membrane[i].sink_fma2 = "channel";
             }
 
-            if (membrane[i].source_fma == interstitialID && membrane[i].sink_fma == cytosolID) {
+            if (membrane[i].med_fma == basolateralID && (membrane[i].med_pr == Nachannel ||
+                membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
                 basolateralMembrane.push(
                     {
                         source_text: membrane[i].source_text,
@@ -1386,6 +1396,11 @@
                         sink_text2: "channel",
                         sink_fma2: "channel"
                     });
+
+                membrane[i].source_text2 = "channel";
+                membrane[i].source_fma2 = "channel";
+                membrane[i].sink_text2 = "channel";
+                membrane[i].sink_fma2 = "channel";
             }
 
             if (membrane[i].source_fma == luminalID && membrane[i].sink_fma == interstitialID) {
@@ -1400,9 +1415,48 @@
                         sink_text2: "diffusive channel",
                         sink_fma2: "diffusive channel"
                     });
+
+                membrane[i].source_text2 = "diffusive channel";
+                membrane[i].source_fma2 = "diffusive channel";
+                membrane[i].sink_text2 = "diffusive channel";
+                membrane[i].sink_fma2 = "diffusive channel";
             }
         }
 
+        // single flux
+        for (var i = 0; i < membrane.length; i++) {
+            if (membrane[i].med_fma == apicalID && membrane[i].source_text2 != "channel" &&
+                membrane[i].source_text2 != "diffusive channel") {
+                apicalMembrane.push(
+                    {
+                        source_text: membrane[i].source_text,
+                        source_fma: membrane[i].source_fma,
+                        sink_text: membrane[i].sink_text,
+                        sink_fma: membrane[i].sink_fma,
+                        source_text2: "single flux",
+                        source_fma2: membrane[i].source_fma,
+                        sink_text2: "single flux",
+                        sink_fma2: membrane[i].sink_fma
+                    });
+            }
+
+            if (membrane[i].med_fma == basolateralID && membrane[i].source_text2 != "channel" &&
+                membrane[i].source_text2 != "diffusive channel") {
+                basolateralMembrane.push(
+                    {
+                        source_text: membrane[i].source_text,
+                        source_fma: membrane[i].source_fma,
+                        sink_text: membrane[i].sink_text,
+                        sink_fma: membrane[i].sink_fma,
+                        source_text2: "single flux",
+                        source_fma2: membrane[i].source_fma,
+                        sink_text2: "single flux",
+                        sink_fma2: membrane[i].sink_fma
+                    });
+            }
+        }
+
+        console.log("membrane: ", membrane);
         console.log("concentration_fma: ", concentration_fma);
         console.log("source_fma: ", source_fma);
         console.log("sink_fma: ", sink_fma);
@@ -1793,15 +1847,21 @@
                         linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
                         linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
                         circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
-                        linewithlineg2[i].call(d3.drag().on("drag", dragcircleline));
-                        linewithtextg2[i].call(d3.drag().on("drag", dragcircleline));
+
+                        if (linewithlineg2[i] != undefined && linewithtextg2[i] != undefined) {
+                            linewithlineg2[i].call(d3.drag().on("drag", dragcircleline));
+                            linewithtextg2[i].call(d3.drag().on("drag", dragcircleline));
+                        }
                     }
                     else {
                         linewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
                         linewithtextg[i].call(d3.drag().on("drag", dragcircleendchkbx));
                         circlewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                        linewithlineg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                        linewithtextg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
+
+                        if (linewithlineg2[i] != undefined && linewithtextg2[i] != undefined) {
+                            linewithlineg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                            linewithtextg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        }
                     }
                 } else {
                     checkedchk[i] = checkBox[i].checked();
@@ -1827,28 +1887,34 @@
                         linewithlinegb[i].call(d3.drag().on("drag", dragcirclelineb));
                         linewithtextgb[i].call(d3.drag().on("drag", dragcirclelineb));
                         circlewithlinegb[i].call(d3.drag().on("drag", dragcirclelineb));
-                        linewithlineg2b[i].call(d3.drag().on("drag", dragcirclelineb));
-                        linewithtextg2b[i].call(d3.drag().on("drag", dragcirclelineb));
+
+                        if (linewithlineg2b[i] != undefined && linewithtextg2b[i] != undefined) {
+                            linewithlineg2b[i].call(d3.drag().on("drag", dragcirclelineb));
+                            linewithtextg2b[i].call(d3.drag().on("drag", dragcirclelineb));
+                        }
                     }
                     else {
                         linewithlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
                         linewithtextgb[i].call(d3.drag().on("drag", dragcircleendchkbx));
                         circlewithlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                        linewithlineg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                        linewithtextg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
+
+                        if (linewithlineg2b[i] != undefined && linewithtextg2b[i] != undefined) {
+                            linewithlineg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                            linewithtextg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        }
                     }
                 } else {
-                    checkedchk[i] = checkBox[i].checked();
+                    checkedchkb[i] = checkBoxb[i].checked();
                     // drag enable and disable
-                    if (checkedchk[i] == true) {
-                        polygonlineg[i].call(d3.drag().on("drag", dragpolygonandlineb));
-                        polygontext[i].call(d3.drag().on("drag", dragpolygonandlineb));
-                        polygon[i].call(d3.drag().on("drag", dragpolygonandlineb));
+                    if (checkedchkb[i] == true) {
+                        polygonlinegb[i].call(d3.drag().on("drag", dragpolygonandlineb));
+                        polygontextb[i].call(d3.drag().on("drag", dragpolygonandlineb));
+                        polygonb[i].call(d3.drag().on("drag", dragpolygonandlineb));
                     }
                     else {
-                        polygonlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                        polygontext[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                        polygon[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        polygonlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        polygontextb[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                        polygonb[i].call(d3.drag().on("drag", dragcircleendchkbx));
                     }
                 }
             }
@@ -2105,43 +2171,45 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
-                linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-end", "url(#end)")
-                    .attr("cursor", "pointer");
+                if (textvalue2 != "single flux") {
+                    var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+                    linewithlineg2[i] = lineg2.append("line")
+                        .attr("id", "linewithlineg2" + i)
+                        .attr("x1", function (d) {
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#end)")
+                        .attr("cursor", "pointer");
 
-                var linegtext2 = lineg2.append("g").data([{
-                    x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
-                }]);
-                linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "pointer")
-                    .text(textvalue2);
+                    var linegtext2 = lineg2.append("g").data([{
+                        x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
+                    }]);
+                    linewithtextg2[i] = linegtext2.append("text")
+                        .attr("id", "linewithtextg2" + i)
+                        .attr("x", function (d) {
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .attr("cursor", "pointer")
+                        .text(textvalue2);
+                }
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -2200,43 +2268,45 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
-                linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-start", "url(#start)")
-                    .attr("cursor", "pointer");
+                if (textvalue2 != "single flux") {
+                    var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+                    linewithlineg2[i] = lineg2.append("line")
+                        .attr("id", "linewithlineg2" + i)
+                        .attr("x1", function (d) {
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-start", "url(#start)")
+                        .attr("cursor", "pointer");
 
-                var linegtext2 = lineg2.append("g").data([{
-                    x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
-                }]);
-                linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "pointer")
-                    .text(textvalue2);
+                    var linegtext2 = lineg2.append("g").data([{
+                        x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
+                    }]);
+                    linewithtextg2[i] = linegtext2.append("text")
+                        .attr("id", "linewithtextg2" + i)
+                        .attr("x", function (d) {
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .attr("cursor", "pointer")
+                        .text(textvalue2);
+                }
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -2295,43 +2365,45 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
-                linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-start", "url(#start)")
-                    .attr("cursor", "pointer");
+                if (textvalue2 != "single flux") {
+                    var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+                    linewithlineg2[i] = lineg2.append("line")
+                        .attr("id", "linewithlineg2" + i)
+                        .attr("x1", function (d) {
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-start", "url(#start)")
+                        .attr("cursor", "pointer");
 
-                var linegtext2 = lineg2.append("g").data([{
-                    x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
-                }]);
-                linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "pointer")
-                    .text(textvalue2);
+                    var linegtext2 = lineg2.append("g").data([{
+                        x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
+                    }]);
+                    linewithtextg2[i] = linegtext2.append("text")
+                        .attr("id", "linewithtextg2" + i)
+                        .attr("x", function (d) {
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .attr("cursor", "pointer")
+                        .text(textvalue2);
+                }
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -2390,43 +2462,45 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
-                linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-end", "url(#end)")
-                    .attr("cursor", "pointer");
+                if (textvalue2 != "single flux") {
+                    var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+                    linewithlineg2[i] = lineg2.append("line")
+                        .attr("id", "linewithlineg2" + i)
+                        .attr("x1", function (d) {
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#end)")
+                        .attr("cursor", "pointer");
 
-                var linegtext2 = lineg2.append("g").data([{
-                    x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
-                }]);
-                linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "pointer")
-                    .text(textvalue2);
+                    var linegtext2 = lineg2.append("g").data([{
+                        x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
+                    }]);
+                    linewithtextg2[i] = linegtext2.append("text")
+                        .attr("id", "linewithtextg2" + i)
+                        .attr("x", function (d) {
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .attr("cursor", "pointer")
+                        .text(textvalue2);
+                }
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -2553,43 +2627,45 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
-                linewithlineg2b[i] = lineg2b.append("line")
-                    .attr("id", "linewithlineg2b" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-end", "url(#end)")
-                    .attr("cursor", "pointer");
+                if (textvalue2 != "single flux") {
+                    var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+                    linewithlineg2b[i] = lineg2b.append("line")
+                        .attr("id", "linewithlineg2b" + i)
+                        .attr("x1", function (d) {
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#end)")
+                        .attr("cursor", "pointer");
 
-                var linegtext2b = lineg2b.append("g").data([{
-                    x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
-                }]);
-                linewithtextg2b[i] = linegtext2b.append("text")
-                    .attr("id", "linewithtextg2b" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "pointer")
-                    .text(textvalue2);
+                    var linegtext2b = lineg2b.append("g").data([{
+                        x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
+                    }]);
+                    linewithtextg2b[i] = linegtext2b.append("text")
+                        .attr("id", "linewithtextg2b" + i)
+                        .attr("x", function (d) {
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .attr("cursor", "pointer")
+                        .text(textvalue2);
+                }
 
                 // increment y-axis of line and circle
                 yvalueb += ydistanceb;
@@ -2648,43 +2724,45 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
-                linewithlineg2b[i] = lineg2b.append("line")
-                    .attr("id", "linewithlineg2b" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-start", "url(#start)")
-                    .attr("cursor", "pointer");
+                if (textvalue2 != "single flux") {
+                    var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+                    linewithlineg2b[i] = lineg2b.append("line")
+                        .attr("id", "linewithlineg2b" + i)
+                        .attr("x1", function (d) {
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-start", "url(#start)")
+                        .attr("cursor", "pointer");
 
-                var linegtext2b = lineg2b.append("g").data([{
-                    x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
-                }]);
-                linewithtextg2b[i] = linegtext2b.append("text")
-                    .attr("id", "linewithtextg2b" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "pointer")
-                    .text(textvalue2);
+                    var linegtext2b = lineg2b.append("g").data([{
+                        x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
+                    }]);
+                    linewithtextg2b[i] = linegtext2b.append("text")
+                        .attr("id", "linewithtextg2b" + i)
+                        .attr("x", function (d) {
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .attr("cursor", "pointer")
+                        .text(textvalue2);
+                }
 
                 // increment y-axis of line and circle
                 yvalueb += ydistanceb;
@@ -2743,43 +2821,45 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
-                linewithlineg2b[i] = lineg2b.append("line")
-                    .attr("id", "linewithlineg2b" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-start", "url(#start)")
-                    .attr("cursor", "pointer");
+                if (textvalue2 != "single flux") {
+                    var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+                    linewithlineg2b[i] = lineg2b.append("line")
+                        .attr("id", "linewithlineg2b" + i)
+                        .attr("x1", function (d) {
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-start", "url(#start)")
+                        .attr("cursor", "pointer");
 
-                var linegtext2b = lineg2b.append("g").data([{
-                    x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
-                }]);
-                linewithtextg2b[i] = linegtext2b.append("text")
-                    .attr("id", "linewithtextg2b" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "pointer")
-                    .text(textvalue2);
+                    var linegtext2b = lineg2b.append("g").data([{
+                        x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
+                    }]);
+                    linewithtextg2b[i] = linegtext2b.append("text")
+                        .attr("id", "linewithtextg2b" + i)
+                        .attr("x", function (d) {
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .attr("cursor", "pointer")
+                        .text(textvalue2);
+                }
 
                 // increment y-axis of line and circle
                 yvalueb += ydistanceb;
@@ -2838,43 +2918,45 @@
                     .attr("stroke-width", 20)
                     .attr("cursor", "move");
 
-                var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
-                linewithlineg2b[i] = lineg2b.append("line")
-                    .attr("id", "linewithlineg2b" + i)
-                    .attr("x1", function (d) {
-                        return d.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.x + lineLen;
-                    })
-                    .attr("y2", function (d) {
-                        return d.y;
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 2)
-                    .attr("marker-end", "url(#end)")
-                    .attr("cursor", "pointer");
+                if (textvalue2 != "single flux") {
+                    var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+                    linewithlineg2b[i] = lineg2b.append("line")
+                        .attr("id", "linewithlineg2b" + i)
+                        .attr("x1", function (d) {
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#end)")
+                        .attr("cursor", "pointer");
 
-                var linegtext2b = lineg2b.append("g").data([{
-                    x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
-                }]);
-                linewithtextg2b[i] = linegtext2b.append("text")
-                    .attr("id", "linewithtextg2b" + i)
-                    .attr("x", function (d) {
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    })
-                    .attr("font-family", "Times New Roman")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "red")
-                    .attr("cursor", "pointer")
-                    .text(textvalue2);
+                    var linegtext2b = lineg2b.append("g").data([{
+                        x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
+                    }]);
+                    linewithtextg2b[i] = linegtext2b.append("text")
+                        .attr("id", "linewithtextg2b" + i)
+                        .attr("x", function (d) {
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .attr("cursor", "pointer")
+                        .text(textvalue2);
+                }
 
                 // increment y-axis of line and circle
                 yvalueb += ydistanceb;
@@ -3201,11 +3283,13 @@
                 .attr("x", axis.shift())
                 .attr("y", axis.shift());
 
-            // Text: strip all the non-digit characters (\D or [^0-9])
-            var axis = groupcordinates2("linewithtextg2" + ic, ic);
-            linewithtextg2[ic]
-                .attr("x", axis.shift())
-                .attr("y", axis.shift());
+            if (linewithtextg2[ic] != undefined) {
+                // Text: strip all the non-digit characters (\D or [^0-9])
+                var axis = groupcordinates2("linewithtextg2" + ic, ic);
+                linewithtextg2[ic]
+                    .attr("x", axis.shift())
+                    .attr("y", axis.shift());
+            }
 
             // line: strip all the non-digit characters (\D or [^0-9])
             var axis = groupcordinates2("linewithlineg" + ic, ic);
@@ -3215,13 +3299,15 @@
                 .attr("x2", axis.shift())
                 .attr("y2", axis.shift());
 
-            // line2: strip all the non-digit characters (\D or [^0-9])
-            var axis = groupcordinates2("linewithlineg2" + ic, ic);
-            linewithlineg2[ic]
-                .attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
+            if (linewithlineg2[ic] != undefined) {
+                // line2: strip all the non-digit characters (\D or [^0-9])
+                var axis = groupcordinates2("linewithlineg2" + ic, ic);
+                linewithlineg2[ic]
+                    .attr("x1", axis.shift())
+                    .attr("y1", axis.shift())
+                    .attr("x2", axis.shift())
+                    .attr("y2", axis.shift());
+            }
         }
 
         function dragcirclelineb(d) {
@@ -3239,11 +3325,13 @@
                 .attr("x", axis.shift())
                 .attr("y", axis.shift());
 
-            // Text: strip all the non-digit characters (\D or [^0-9])
-            var axis = groupcordinates2b("linewithtextg2b" + ic, ic);
-            linewithtextg2b[ic]
-                .attr("x", axis.shift())
-                .attr("y", axis.shift());
+            if (linewithtextg2b[ic] != undefined) {
+                // Text: strip all the non-digit characters (\D or [^0-9])
+                var axis = groupcordinates2b("linewithtextg2b" + ic, ic);
+                linewithtextg2b[ic]
+                    .attr("x", axis.shift())
+                    .attr("y", axis.shift());
+            }
 
             // line: strip all the non-digit characters (\D or [^0-9])
             var axis = groupcordinates2b("linewithlinegb" + ic, ic);
@@ -3253,13 +3341,15 @@
                 .attr("x2", axis.shift())
                 .attr("y2", axis.shift());
 
-            // line2: strip all the non-digit characters (\D or [^0-9])
-            var axis = groupcordinates2b("linewithlineg2b" + ic, ic);
-            linewithlineg2b[ic]
-                .attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
+            if (linewithlineg2b[ic] != undefined) {
+                // line2: strip all the non-digit characters (\D or [^0-9])
+                var axis = groupcordinates2b("linewithlineg2b" + ic, ic);
+                linewithlineg2b[ic]
+                    .attr("x1", axis.shift())
+                    .attr("y1", axis.shift())
+                    .attr("x2", axis.shift())
+                    .attr("y2", axis.shift());
+            }
         }
 
         function groupcordinates2(groups, ic) {
@@ -3595,12 +3685,14 @@
         console.log("showEpithelial in modelEntityNameArray: ", modelEntityNameArray);
         console.log("showEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
 
-        var concentration_fma = [], source_fma = [], sink_fma = [];
+        var concentration_fma = [], source_fma = [], sink_fma = [], med_fma = [], med_pr = [];
         var source_fma2 = [], sink_fma2 = [];
 
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var basolateralID = "http://identifiers.org/fma/FMA:84669";
         var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
+        var luminalID = "http://identifiers.org/fma/FMA:74550";
+        var interstitialID = "http://identifiers.org/fma/FMA:9673";
 
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
@@ -3608,29 +3700,6 @@
         mainUtils.testAJAX = function () {
 
             if (index == modelEntityFullNameArray.length) {
-
-                // Exceptional case when only one flux
-                if (membrane.length == 1) {
-                    // TODO: check also for basolateral membrane
-                    apicalMembrane.push(
-                        {
-                            source_text: membrane[0].source_text,
-                            source_fma: membrane[0].source_fma,
-                            sink_text: membrane[0].sink_text,
-                            sink_fma: membrane[0].sink_fma,
-                            source_text2: "",
-                            source_fma2: "",
-                            sink_text2: "",
-                            sink_fma2: ""
-                        });
-
-                    mainUtils.showsvgEpithelial(
-                        concentration_fma,
-                        source_fma2,
-                        sink_fma2,
-                        apicalMembrane);
-                }
-
                 for (var i = 0; i < membrane.length; i++) {
                     for (var j = i + 1; j < membrane.length; j++) {
                         mainUtils.apicalajax = function (membrane1, membrane2) {
@@ -3722,6 +3791,7 @@
                                     }
 
                                     counter++;
+
                                     if (counter == iteration(membrane.length)) {
                                         mainUtils.showsvgEpithelial(
                                             concentration_fma,
@@ -3745,7 +3815,7 @@
 
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                'SELECT ?source_fma ?sink_fma ' +
+                'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
                 'WHERE { ' +
                 '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
                 '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
@@ -3757,6 +3827,9 @@
                 '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
                 '?sink_entity ro:part_of ?sink_part_of_entity. ' +
                 '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
+                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
+                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
+                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
                 '}'
 
             $ajaxUtils.sendPostRequest(
@@ -3784,6 +3857,28 @@
                                     fma: jsonObjFlux.results.bindings[i].sink_fma.value
                                 }
                             );
+
+                        if (jsonObjFlux.results.bindings[i].med_entity_uri == undefined) {
+                            med_pr.push("");
+                            med_fma.push("");
+                        }
+                        else {
+                            var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
+                            if (temp.indexOf(partOfProteinUri) != -1) {
+                                med_pr.push({
+                                    name: modelEntityFullNameArray[index],
+                                    fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
+                                });
+                            }
+                            else {
+                                med_fma.push(
+                                    {
+                                        name: modelEntityFullNameArray[index],
+                                        fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
+                                    }
+                                );
+                            }
+                        }
                     }
 
                     // Remove duplicate links
@@ -3801,6 +3896,8 @@
 
                     source_fma = uniqueify(source_fma);
                     sink_fma = uniqueify(sink_fma);
+                    med_pr = uniqueify(med_pr);
+                    med_fma = uniqueify(med_fma);
 
                     var query2 = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                         'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
@@ -3843,20 +3940,45 @@
                                 var indexOfdot = snktext.indexOf('.');
                                 snktext = snktext.slice(indexOfdot + 1);
 
-                                membrane.push({
-                                    source_text: srctext,
-                                    source_fma: source_fma[0].fma,
-                                    source_name: source_fma[0].name,
-                                    sink_text: snktext,
-                                    sink_fma: sink_fma[0].fma,
-                                    sink_name: sink_fma[0].name
-                                });
+                                var indexOfHash = med_fma[0].name.search("#");
+                                var medfmatext = med_fma[0].name.slice(indexOfHash + 1);
+                                var indexOfdot = medfmatext.indexOf('.');
+                                medfmatext = medfmatext.slice(indexOfdot + 1);
+
+                                if (source_fma[0].fma == luminalID && sink_fma[0].fma == interstitialID) {
+                                    membrane.push({
+                                        source_text: srctext,
+                                        source_fma: source_fma[0].fma,
+                                        source_name: source_fma[0].name,
+                                        sink_text: snktext,
+                                        sink_fma: sink_fma[0].fma,
+                                        sink_name: sink_fma[0].name,
+                                        med_text: "diffusive flux",
+                                        med_fma: "diffusive flux",
+                                        med_pr: "diffusive flux"
+                                    });
+                                }
+                                else {
+                                    membrane.push({
+                                        source_text: srctext,
+                                        source_fma: source_fma[0].fma,
+                                        source_name: source_fma[0].name,
+                                        sink_text: snktext,
+                                        sink_fma: sink_fma[0].fma,
+                                        sink_name: sink_fma[0].name,
+                                        med_text: medfmatext,
+                                        med_fma: med_fma[0].fma,
+                                        med_pr: med_pr[0].fma
+                                    });
+                                }
 
                                 source_fma2.push(source_fma[0]);
                                 sink_fma2.push(sink_fma[0]);
 
                                 source_fma = [];
                                 sink_fma = [];
+                                med_fma = [];
+                                med_pr = [];
                             }
                             mainUtils.testAJAX(); // callback
                         },
