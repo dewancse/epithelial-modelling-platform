@@ -131,6 +131,29 @@
                         var indexOfHash = modelEntityName.search("#");
                         modelEntityName = "chang_fujita_b_1999" + modelEntityName.slice(indexOfHash);
                     }
+
+                    if (modelEntityName.indexOf("21042017112802526p1200") != -1) {
+
+                        var indexOfHash = modelEntityName.search("#");
+                        modelEntityName = "wilkins_sneyd_1998" + modelEntityName.slice(indexOfHash);
+                    }
+
+                    if (modelEntityName.indexOf("23042017142938531p1200") != -1) {
+
+                        var indexOfHash = modelEntityName.search("#");
+                        modelEntityName = "warren_2010" + modelEntityName.slice(indexOfHash);
+                    }
+                    if (modelEntityName.indexOf("20042017200857265p1200") != -1) {
+
+                        var indexOfHash = modelEntityName.search("#");
+                        modelEntityName = "sneyd_1995" + modelEntityName.slice(indexOfHash);
+                    }
+
+                    if (modelEntityName.indexOf("22042017214418158p1200") != -1) {
+
+                        var indexOfHash = modelEntityName.search("#");
+                        modelEntityName = "bindschadler_sneyd_2001" + modelEntityName.slice(indexOfHash);
+                    }
                 }
                 else {
                     mainUtils.workspaceName = "";
@@ -201,7 +224,7 @@
         }
     };
 
-    // Even invocation to SEARCH, MODEL
+    // Event invocation to SEARCH, MODEL
     document.addEventListener('click', function (event) {
 
         console.log("event: ", event);
@@ -306,6 +329,30 @@
                 tempmodelEntity = "chang_fujita_b_1999" + tempmodelEntity.slice(indexOfHash);
             }
 
+            if (tempmodelEntity.indexOf("21042017112802526p1200") != -1) {
+
+                var indexOfHash = tempmodelEntity.search("#");
+                tempmodelEntity = "wilkins_sneyd_1998" + tempmodelEntity.slice(indexOfHash);
+            }
+
+            if (tempmodelEntity.indexOf("23042017142938531p1200") != -1) {
+
+                var indexOfHash = tempmodelEntity.search("#");
+                tempmodelEntity = "warren_2010" + tempmodelEntity.slice(indexOfHash);
+            }
+
+            if (tempmodelEntity.indexOf("20042017200857265p1200") != -1) {
+
+                var indexOfHash = tempmodelEntity.search("#");
+                tempmodelEntity = "sneyd_1995" + tempmodelEntity.slice(indexOfHash);
+            }
+
+            if (tempmodelEntity.indexOf("22042017214418158p1200") != -1) {
+
+                var indexOfHash = tempmodelEntity.search("#");
+                tempmodelEntity = "bindschadler_sneyd_2001" + tempmodelEntity.slice(indexOfHash);
+            }
+
             // Ignore the semsim URI ==> weinstein_1995#NHE3_C_ext_Na
             temp.push(tempmodelEntity, biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
 
@@ -407,7 +454,6 @@
 
                     // remove redundant objects
                     jsonModelObj = uniqueify(jsonModelObj);
-                    // End of Parsing
 
                     for (var m = 0; m < jsonModelObj.length; m++) {
                         modelEntity.push(jsonModelObj[m].Model_entity);
@@ -486,6 +532,21 @@
                     "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
                 },
                 {
+                    "key1": "flux", "key2": "calcium",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+                },
+                {
+                    "key1": "flux", "key2": "IP3",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+                },
+                {
+                    "key1": "flux", "key2": "ATP",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+                },
+                {
                     "key1": "concentration", "key2": "",
                     "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
                 },
@@ -513,6 +574,21 @@
                     "key1": "concentration", "key2": "potassium",
                     "opb": "<http://identifiers.org/opb/OPB_00340>",
                     "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+                },
+                {
+                    "key1": "concentration", "key2": "calcium",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+                },
+                {
+                    "key1": "concentration", "key2": "IP3",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+                },
+                {
+                    "key1": "concentration", "key2": "ATP",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
                 },
             ];
 
@@ -1480,7 +1556,6 @@
         var newg = svg.append("g")
             .data([{x: w / 3, y: height / 3}]);
 
-        // TODO: extend this with lines and circles
         var newgdefs = svg.append("g");
         newgdefs.append("defs")
             .append("pattern")
@@ -1492,11 +1567,6 @@
             .attr("cx", "0")
             .attr("cy", "0")
             .attr("r", "1.5")
-            // .append("line")
-            // .attr("x1", "0")
-            // .attr("y1", "0")
-            // .attr("x2", "4")
-            // .attr("y2", "0")
             .attr("stroke", "#6495ED")
             .attr("stroke-width", 1.5);
 
@@ -1513,55 +1583,7 @@
             .attr("ry", 20)
             .attr("fill", "white")
             .attr("stroke", "url(#basicPattern)")
-            .attr("stroke-width", 25)
-            .attr("cursor", "move")
-            .call(d3.drag()
-                .on("drag", dragmove));
-
-        var dragleft = newg.append("rect")
-            .attr("x", function (d) {
-                return d.x;
-            })
-            .attr("y", function (d) {
-                return d.y;
-            })
-            .attr("height", height)
-            .attr("fill-opacity", 0);
-
-        var dragright = newg.append("rect")
-            .attr("x", function (d) {
-                return d.x + width;
-            })
-            .attr("y", function (d) {
-                return d.y;
-            })
-            .attr("height", height)
-            .attr("fill-opacity", 0)
-            .attr("cursor", "ew-resize")
-            .call(d3.drag()
-                .on("drag", rdragresize));
-
-        var dragtop = newg.append("rect")
-            .attr("x", function (d) {
-                return d.x;
-            })
-            .attr("y", function (d) {
-                return d.y;
-            })
-            .attr("width", width)
-            .attr("fill-opacity", 0)
-
-        var dragbottom = newg.append("rect")
-            .attr("x", function (d) {
-                return d.x;
-            })
-            .attr("y", function (d) {
-                return d.y + height;
-            })
-            .attr("width", width)
-            .attr("fill-opacity", 0)
-            .attr("cursor", "ns-resize")
-            .call(d3.drag().on("drag", rdragresize));
+            .attr("stroke-width", 25);
 
         // Extracellular rectangle
         var extracellular = newg.append("rect")
@@ -1724,9 +1746,7 @@
                 return "green";
             })
             .attr("stroke-width", 25)
-            .attr("opacity", 0.5)
-            .attr("cursor", "pointer")
-            .call(d3.drag().on("drag", dragmove));
+            .attr("opacity", 0.5);
 
         var linebasolateral = newg.append("line")
             .attr("id", basolateralID)
@@ -1753,9 +1773,7 @@
                 return "orange";
             })
             .attr("stroke-width", 25)
-            .attr("opacity", 0.5)
-            .attr("cursor", "pointer")
-            .call(d3.drag().on("drag", dragmove));
+            .attr("opacity", 0.5);
 
         // Paracellular Rectangle
         newg.append("polygon")
@@ -1765,34 +1783,7 @@
             .attr("stroke", "url(#basicPattern)")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
-            .attr("stroke-width", 25)
-            .attr("cursor", "move")
-            .call(d3.drag().on("drag", dragpolygon));
-
-        function dragpolygon(d) {
-            var dx = d3.event.dx;
-            var dy = d3.event.dy;
-
-            var xNew = [], yNew = [], points = "";
-            var pointsLen = d3.select(this)._groups[0][0].points.length;
-
-            for (var i = 0; i < pointsLen; i++) {
-                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
-                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
-
-                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
-
-                if (i != pointsLen - 1)
-                    points = points.concat(" ");
-            }
-
-            d3.select(this).attr("points", points);
-            // console.log("polygon: ", d3.select(this).attr("points"));
-        }
-
-        // solutes in apical and basolateral membrane
-        // TODO: drag when flux is NBC_Current.J_Na
-        console.log("solutes in apical and basolateral membrane");
+            .attr("stroke-width", 25);
 
         // Circle and line arrow from lumen to cytosol
         var xrect = document.getElementsByTagName("rect")[0].x.baseVal.value;
@@ -3021,9 +3012,10 @@
             }
         }
 
+        console.log(document.getElementsByTagName("rect"));
         // Paracellular membrane
-        var xprect = document.getElementsByTagName("rect")[9].x.baseVal.value;
-        var yprect = document.getElementsByTagName("rect")[9].y.baseVal.value;
+        var xprect = document.getElementsByTagName("rect")[5].x.baseVal.value;
+        var yprect = document.getElementsByTagName("rect")[5].y.baseVal.value;
         var xpvalue = xprect + 10;
         var ypvalue = yprect + 25;
         var ypdistance = 35;
@@ -3416,162 +3408,6 @@
             d3.select(this).classed("dragging", false);
         }
 
-        function dragmove(d) {
-
-            // drag move
-            dragrect
-                .attr("x", d.x = Math.max(0, Math.min(w - width, d3.event.x)));
-            dragrect
-                .attr("y", d.y = Math.max(0, Math.min(h - height, d3.event.y)));
-
-            // drag left
-            dragleft
-                .attr("x", function (d) {
-                    return d.x;
-                })
-            dragleft
-                .attr("y", function (d) {
-                    return d.y;
-                });
-
-            // drag right
-            dragright
-                .attr("x", function (d) {
-                    return d.x + width;
-                })
-            dragright
-                .attr("y", function (d) {
-                    return d.y;
-                });
-
-            // drag top
-            dragtop
-                .attr("x", function (d) {
-                    return d.x;
-                })
-            dragtop
-                .attr("y", function (d) {
-                    return d.y;
-                });
-
-            // drag bottom
-            dragbottom
-                .attr("x", function (d) {
-                    return d.x;
-                })
-            dragbottom
-                .attr("y", function (d) {
-                    return d.y + height;
-                });
-
-            // drag apical line
-            lineapical
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y + 10;
-                })
-                .attr("x2", function (d) {
-                    return d.x;
-                })
-                .attr("y2", function (d) {
-                    return d.y + height - 10;
-                })
-
-            // drag basolateral line
-            linebasolateral
-                .attr("x1", function (d) {
-                    return d.x + width;
-                })
-                .attr("y1", function (d) {
-                    return d.y + 10;
-                })
-                .attr("x2", function (d) {
-                    return d.x + width;
-                })
-                .attr("y2", function (d) {
-                    return d.y + height - 10;
-                })
-        }
-
-        function rdragresize(d) {
-
-            //Max x on the left is x - width
-            //Max x on the right is width of screen
-            var dragx = Math.max(d.x, Math.min(w, d.x + width + d3.event.dx));
-
-            //recalculate width
-            width = dragx - d.x;
-
-            //move the right drag handle
-            dragright
-                .attr("x", function (d) {
-                    return dragx
-                });
-
-            //resize the drag rectangle
-            //as we are only resizing from the right, the x coordinate does not need to change
-            dragrect
-                .attr("width", width);
-            dragtop
-                .attr("width", width)
-            dragbottom
-                .attr("width", width)
-
-            //Max x on the left is x - width
-            //Max x on the right is width of screen
-            var dragy = Math.max(d.y, Math.min(h, d.y + height + d3.event.dy));
-
-            //recalculate width
-            height = dragy - d.y;
-
-            //move the right drag handle
-            dragbottom
-                .attr("y", function (d) {
-                    return dragy
-                });
-
-            //resize the drag rectangle
-            //as we are only resizing from the right, the x coordinate does not need to change
-            dragrect
-                .attr("height", height);
-            dragleft
-                .attr("height", height);
-            dragright
-                .attr("height", height);
-
-            // drag apical line
-            lineapical
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y + 10;
-                })
-                .attr("x2", function (d) {
-                    return d.x;
-                })
-                .attr("y2", function (d) {
-                    return d.y + height - 10;
-                })
-
-            // drag basolateral line
-            linebasolateral
-                .attr("x1", function (d) {
-                    return d.x + width;
-                })
-                .attr("y1", function (d) {
-                    return d.y + 10;
-                })
-                .attr("x2", function (d) {
-                    return d.x + width;
-                })
-                .attr("y2", function (d) {
-                    return d.y + height - 10;
-                })
-        }
-
         var markerWidth = 4;
         var markerHeight = 4;
 
@@ -3674,6 +3510,14 @@
                 modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/mackenzie_1996" + modelEntityFullNameArray[i].slice(indexOfHash);
             if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "chang_fujita_b_1999")
                 modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/17032017142614972p1300" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "wilkins_sneyd_1998")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/21042017112802526p1200" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "warren_2010")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/23042017142938531p1200" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "sneyd_1995")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/20042017200857265p1200" + modelEntityFullNameArray[i].slice(indexOfHash);
+            if (modelEntityFullNameArray[i].slice(0, indexOfHash) == "bindschadler_sneyd_2001")
+                modelEntityFullNameArray[i] = "http://www.bhi.washington.edu/SemSim/22042017214418158p1200" + modelEntityFullNameArray[i].slice(indexOfHash);
         }
 
         // // remove duplicate
