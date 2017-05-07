@@ -1383,12 +1383,14 @@
         var wallOfSmoothER = "http://identifiers.org/fma/FMA:80352";
         var wallOfRoughER = "http://identifiers.org/fma/FMA:80353";
         var IP3receptor = "http://identifiers.org/chebi/CHEBI:131186";
+        var celljunctionID = "http://identifiers.org/fma/FMA:67394"; // paracellularID same??
 
         var tempapical = [];
         var tempBasolateral = [];
         var paracellularMembrane = [];
         var wallOfSmoothERMembrane = [];
         var wallOfRoughERMembrane = [];
+        var celljunction = [];
 
         // Extract apical fluxes
         for (var i = 0; i < apicalMembrane.length; i++) {
@@ -1446,8 +1448,8 @@
 
         // TODO: Hard coded for Nachannel, Clchannel, and Kchannel
         for (var i = 0; i < membrane.length; i++) {
-            if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == Nachannel ||
-                membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
+            if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == IP3receptor ||
+                membrane[i].med_pr == Nachannel || membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
                 apicalMembrane.push(
                     {
                         source_text: membrane[i].source_text,
@@ -1539,8 +1541,27 @@
             }
         }
 
-        // flux through IP3 and wall of smooth/rough ER
+        // flux through IP3, wall of smooth/rough ER, and gap junction
         for (var i = 0; i < membrane.length; i++) {
+
+            if (membrane[i].med_fma == celljunctionID) {
+                celljunction.push(
+                    {
+                        source_text: membrane[i].source_text,
+                        source_fma: membrane[i].source_fma,
+                        sink_text: membrane[i].sink_text,
+                        sink_fma: membrane[i].sink_fma,
+                        source_text2: "Gap Junction",
+                        source_fma2: "Gap Junction",
+                        sink_text2: "Gap Junction",
+                        sink_fma2: "Gap Junction"
+                    });
+
+                membrane[i].source_text2 = "Gap Junction";
+                membrane[i].source_fma2 = "Gap Junction";
+                membrane[i].sink_text2 = "Gap Junction";
+                membrane[i].sink_fma2 = "Gap Junction";
+            }
 
             if (membrane[i].med_fma == wallOfSmoothER && membrane[i].med_pr == IP3receptor) {
                 wallOfSmoothERMembrane.push(
@@ -1763,13 +1784,13 @@
             .attr("stroke", function (d) {
                 svg.append("text")
                     .style("font", "16px sans-serif")
-                    .attr("stroke", "indigo")
+                    .attr("stroke", "violet")
                     .attr("opacity", 0.5)
                     .attr("x", 850)
                     .attr("y", 145)
                     .text("Paracellular Pathway");
 
-                return "indigo";
+                return "violet";
             })
             .attr("strokeWidth", "6px")
             .attr("fill", "white");
@@ -1869,6 +1890,33 @@
             .attr("stroke-width", 25)
             .attr("opacity", 0.5);
 
+        var linecelljunction = newg.append("line")
+            .attr("id", celljunctionID)
+            .attr("x1", function (d) {
+                return d.x + 20;
+            })
+            .attr("y1", function (d) {
+                return d.y + height;
+            })
+            .attr("x2", function (d) {
+                return d.x + width - 20;
+            })
+            .attr("y2", function (d) {
+                return d.y + height;
+            })
+            .attr("stroke", function (d) {
+                svg.append("text")
+                    .style("font", "16px sans-serif")
+                    .attr("stroke", "indigo")
+                    .attr("x", 850)
+                    .attr("y", 170)
+                    .text("Cell junction");
+
+                return "indigo";
+            })
+            .attr("stroke-width", 25)
+            .attr("opacity", 0.5);
+
         // Paracellular Rectangle
         newg.append("polygon")
             .attr("transform", "translate(265,720)")
@@ -1880,87 +1928,133 @@
             .attr("stroke-width", 25);
 
         // Endoplasmic Reticulum (ER)
-        newg.append("rect")
-            .attr("id", ER)
-            .attr("x", w / 3 + 30 + 30)
-            .attr("y", height / 3 + 20 + 200)
-            .attr("width", width - 60 - 70) // 170
-            .attr("height", height - 40 - 240) // 120
-            .attr("rx", 10)
-            .attr("ry", 20)
-            .attr("stroke", function (d) {
-                svg.append("text")
-                    .style("font", "16px sans-serif")
-                    .attr("stroke", "#6495ED")
-                    .attr("opacity", 0.5)
-                    .attr("x", 850)
-                    .attr("y", 170)
-                    .text("Endoplasmic Reticulum");
+        var xER, yER, widthER, heightER;
+        var calciumcircle = [], calciumcircletext = [];
+        if (wallOfSmoothERMembrane.length != 0 || wallOfRoughERMembrane.length != 0) {
+            newg.append("rect")
+                .attr("id", ER)
+                .attr("x", w / 3 + 30 + 30)
+                .attr("y", height / 3 + 20 + 200)
+                .attr("width", width - 60 - 70) // 170
+                .attr("height", height - 40 - 240) // 120
+                .attr("rx", 10)
+                .attr("ry", 20)
+                .attr("stroke", function (d) {
+                    svg.append("text")
+                        .style("font", "16px sans-serif")
+                        .attr("stroke", "#6495ED")
+                        .attr("x", 850)
+                        .attr("y", 195)
+                        .text("Endoplasmic Reticulum");
 
-                return "#6495ED";
-            })
-            .attr("fill", "white")
-            .attr("strokeWidth", "6px");
+                    return "#6495ED";
+                })
+                .attr("fill", "white")
+                .attr("strokeWidth", "6px");
 
-        // line: wall of smooth and rough ER
-        var xER = document.getElementsByTagName("rect")[6].x.baseVal.value;
-        var yER = document.getElementsByTagName("rect")[6].y.baseVal.value;
-        var widthER = document.getElementsByTagName("rect")[6].width.baseVal.value;
-        var heightER = document.getElementsByTagName("rect")[6].height.baseVal.value;
+            // line: wall of smooth and rough ER
+            xER = document.getElementsByTagName("rect")[6].x.baseVal.value;
+            yER = document.getElementsByTagName("rect")[6].y.baseVal.value;
+            widthER = document.getElementsByTagName("rect")[6].width.baseVal.value;
+            heightER = document.getElementsByTagName("rect")[6].height.baseVal.value;
 
-        var linesmoothER = newg.append("line")
-            .attr("id", wallOfSmoothER)
-            .attr("x1", function (d) {
-                return xER + 10;
-            })
-            .attr("y1", function (d) {
-                return yER;
-            })
-            .attr("x2", function (d) {
-                return xER + widthER - 10;
-            })
-            .attr("y2", function (d) {
-                return yER;
-            })
-            .attr("stroke", function (d) {
-                svg.append("text")
-                    .style("font", "16px sans-serif")
-                    .attr("stroke", "maroon")
-                    .attr("x", 850)
-                    .attr("y", 195)
-                    .text("Wall of smooth ER Membrane");
+            // Ca2+ circle
+            var xci = 0, yci = 0;
+            for (var ci = 0; ci < 4; ci++) {
 
-                return "maroon";
-            })
-            .attr("stroke-width", 10)
-            .attr("opacity", 0.5);
+                if (ci % 2 == 0) {
+                    xci += 50;
+                    yci = 50;
+                }
+                else {
+                    xci = xci;
+                    yci += 40;
+                }
 
-        var lineroughER = newg.append("line")
-            .attr("id", wallOfRoughER)
-            .attr("x1", function (d) {
-                return xER + widthER;
-            })
-            .attr("y1", function (d) {
-                return yER + 10;
-            })
-            .attr("x2", function (d) {
-                return xER + widthER;
-            })
-            .attr("y2", function (d) {
-                return yER + heightER - 10;
-            })
-            .attr("stroke", function (d) {
-                svg.append("text")
-                    .style("font", "16px sans-serif")
-                    .attr("stroke", "navy")
-                    .attr("x", 850)
-                    .attr("y", 220)
-                    .text("Wall of rough ER Membrane");
+                var calciumcircleg = newg.append("g").data([{x: xER + xci, y: yER + yci}]);
+                calciumcircle[i] = calciumcircleg.append("circle")
+                    .attr("id", "calciumcircle" + i)
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    })
+                    .attr("r", 10)
+                    .attr("fill", "yellow")
+                    .attr("stroke-width", 20)
+                    .attr("cursor", "move");
 
-                return "navy";
-            })
-            .attr("stroke-width", 10)
-            .attr("opacity", 0.5);
+                calciumcircletext[i] = calciumcircleg.append("text")
+                    .attr("id", "calciumcircletext" + i)
+                    .attr("x", function (d) {
+                        return d.x - 8;
+                    })
+                    .attr("y", function (d) {
+                        return d.y + 4;
+                    })
+                    .attr("font-size", "8px")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text("Ca2+");
+            }
+
+            // line of wall of smooth ER (Top ER membrane)
+            var linesmoothER = newg.append("line")
+                .attr("id", wallOfSmoothER)
+                .attr("x1", function (d) {
+                    return xER + 10;
+                })
+                .attr("y1", function (d) {
+                    return yER;
+                })
+                .attr("x2", function (d) {
+                    return xER + widthER - 10;
+                })
+                .attr("y2", function (d) {
+                    return yER;
+                })
+                .attr("stroke", function (d) {
+                    svg.append("text")
+                        .style("font", "16px sans-serif")
+                        .attr("stroke", "maroon")
+                        .attr("x", 850)
+                        .attr("y", 220)
+                        .text("Wall of smooth ER Membrane");
+
+                    return "maroon";
+                })
+                .attr("stroke-width", 10)
+                .attr("opacity", 0.5);
+
+            // line of wall of rough ER (Right ER membrane)
+            var lineroughER = newg.append("line")
+                .attr("id", wallOfRoughER)
+                .attr("x1", function (d) {
+                    return xER + widthER;
+                })
+                .attr("y1", function (d) {
+                    return yER + 10;
+                })
+                .attr("x2", function (d) {
+                    return xER + widthER;
+                })
+                .attr("y2", function (d) {
+                    return yER + heightER - 10;
+                })
+                .attr("stroke", function (d) {
+                    svg.append("text")
+                        .style("font", "16px sans-serif")
+                        .attr("stroke", "navy")
+                        .attr("x", 850)
+                        .attr("y", 245)
+                        .text("Wall of rough ER Membrane");
+
+                    return "navy";
+                })
+                .attr("stroke-width", 10)
+                .attr("opacity", 0.5);
+        }
 
         // Circle and line arrow from lumen to cytosol
         var xrect = document.getElementsByTagName("rect")[0].x.baseVal.value;
@@ -1977,7 +2071,7 @@
             ydistance = 70, ydistanceb = 70, xdistancewser = 40, ydistancewrer = 40,
             polygonlineg = [], polygon = [], polygontext = [], polygonlinegwser = [], polygonlinegwrer = [],
             polygonlinegb = [], polygonb = [], polygontextb = [], polygontextwser = [], polygontextwrer = [],
-            circlewithlineg = [], linewithlineg = [],
+            circlewithlineg = [], linewithlineg = [], circletextwser = [], circletextwrer = [],
             linewithlineg2 = [], linewithtextg = [], linewithtextg2 = [],
             linewithlinegwser = [], linewithlineg2wser = [],
             linewithtextgwser = [], linewithtextg2wser = [], circlewithlinegwser = [],
@@ -1986,11 +2080,10 @@
             circlewithlinegb = [], linewithlinegb = [],
             linewithlineg2b = [], linewithtextgb = [], linewithtextg2b = [],
             linewithlinegc = [], linewithtextgc = [],
-            cxvalue = xrect,
-            cxvaluewser = xER + 10 + 20,
-            cyvaluewser = yER,
-            cxvaluewrer = xER,
-            cyvaluewrer = yER + 10 + 20,
+            polygongctoc = [], polygonlinegctoc = [], polygontextctoc = [],
+            xvaluectoc = x + 10 + 20, yvaluectoc = y - lineLen / 2,
+            cxvaluectoc = x + 10 + 30, xdistancectoc = 40, cxvalue = xrect, cxvaluewser = xER + 10 + 20,
+            cyvaluewser = yER, cxvaluewrer = xER, cyvaluewrer = yER + 10 + 20,
             cyvalue = yrect + 10 + 50, // initial distance 50
             cyvalueb = yrect + 10 + 50; // initial distance 50
 
@@ -2294,6 +2387,72 @@
         }
 
         // End of svg checkbox
+
+        // Gap Junction
+        for (var i = 0; i < celljunction.length; i++) {
+            var textvalue = celljunction[i].source_text;
+            var textvalue2 = celljunction[i].source_text2;
+            var src_fma = celljunction[i].source_fma;
+            var src_fma2 = celljunction[i].source_fma2;
+            var snk_fma = celljunction[i].sink_fma;
+            var snk_fma2 = celljunction[i].sink_fma2;
+            var textWidth = getTextWidth(textvalue, 12);
+
+            // TODO: cytosol to cytosol OR cytosol to paracellular!!
+            if ((src_fma == cytosolID && snk_fma == cytosolID) && (src_fma2 == "Gap Junction" && snk_fma2 == "Gap Junction")) {
+                polygongctoc = newg.append("g").data([{x: xvaluectoc + 120, y: (yvaluectoc - 5 + height)}]);
+                polygonlinegctoc[i] = polygongctoc.append("line")
+                    .attr("id", "polygonlinegctoc" + i)
+                    .attr("x1", function (d) {
+                        return d.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.x;
+                    })
+                    .attr("y2", function (d) {
+                        return d.y + polygonlineLen;
+                    })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("marker-end", "url(#end)")
+                    .attr("cursor", "pointer");
+
+                // Polygon
+                polygon[i] = polygongctoc.append("g").append("polygon")
+                    .attr("transform", "translate(" + (xvaluectoc + 30 + 120) + "," + (yvaluectoc - 5 + height) + ")rotate(90)")
+                    .attr("id", "polygon" + i)
+                    .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                    .attr("fill", "yellow")
+                    .attr("stroke", "black")
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("cursor", "move");
+
+                var polygontextg = polygongctoc.append("g").data([{
+                    x: xvaluectoc - 15 + 120,
+                    y: yvaluectoc - 15 + height
+                }]);
+                polygontextctoc[i] = polygontextg.append("text")
+                    .attr("id", "polygontextctoc" + i)
+                    .attr("x", function (d) {
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    })
+                    .attr("font-size", "8px")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text(textvalue);
+
+                // increment x-axis of line and circle
+                xvaluectoc += xdistancectoc;
+                cxvaluectoc += xdistancectoc;
+            }
+        }
 
         // Wall of smooth ER membrane
         for (var i = 0; i < wallOfSmoothERMembrane.length; i++) {
@@ -2859,7 +3018,6 @@
                     .attr("cursor", "move");
 
                 var polygontextg = polygongwser.append("g").data([{x: xvaluewser - 15, y: yvaluewser - 15}]);
-
                 polygontextwser[i] = polygontextg.append("text")
                     .attr("id", "polygontextwser" + i)
                     .attr("x", function (d) {
@@ -2876,6 +3034,34 @@
                 // increment x-axis of line and circle
                 xvaluewser += xdistancewser;
                 cxvaluewser += xdistancewser;
+
+                // circle for IP3 receptor
+                var linegcirclewser = polygongwser.append("g").data([{x: xvaluewser - 55, y: yvaluewser + 10}]);
+                circlewithlinegwser[i] = linegcirclewser.append("circle")
+                    .attr("id", "circlewithlinegwser" + i)
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    })
+                    .attr("r", 10)
+                    .attr("fill", "lightgreen")
+                    .attr("stroke-width", 20)
+                    .attr("cursor", "move");
+
+                circletextwser[i] = linegcirclewser.append("text")
+                    .attr("id", "circletextwser" + i)
+                    .attr("x", function (d) {
+                        return d.x - 8;
+                    })
+                    .attr("y", function (d) {
+                        return d.y + 4;
+                    })
+                    .attr("font-size", "10px")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text("IP3");
             }
 
             // case 8
@@ -2932,6 +3118,34 @@
                 // increment x-axis of line and circle
                 xvaluewser += xdistancewser;
                 cxvaluewser += xdistancewser;
+
+                // circle for IP3 receptor
+                var linegcirclewser = polygongwser.append("g").data([{x: xvaluewser - 50, y: yvaluewser + 15}]);
+                circlewithlinegwser[i] = linegcirclewser.append("circle")
+                    .attr("id", "circlewithlinegwser" + i)
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    })
+                    .attr("r", 10)
+                    .attr("fill", "lightgreen")
+                    .attr("stroke-width", 20)
+                    .attr("cursor", "move");
+
+                circletextwser[i] = linegcirclewser.append("text")
+                    .attr("id", "circletextwser" + i)
+                    .attr("x", function (d) {
+                        return d.x - 8;
+                    })
+                    .attr("y", function (d) {
+                        return d.y + 4;
+                    })
+                    .attr("font-size", "10px")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text("IP3");
             }
         }
 
@@ -3531,6 +3745,37 @@
                 // increment x-axis of line and circle
                 yvaluewrer += ydistancewrer;
                 cyvaluewrer += ydistancewrer;
+
+                // circle for IP3 receptor
+                var linegcirclewrer = polygongwrer.append("g").data([{
+                    x: xvaluewrer + 30 + widthER,
+                    y: yvaluewrer - 55
+                }]);
+                circlewithlinegwrer[i] = linegcirclewrer.append("circle")
+                    .attr("id", "circlewithlinegwrer" + i)
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    })
+                    .attr("r", 10)
+                    .attr("fill", "lightgreen")
+                    .attr("stroke-width", 20)
+                    .attr("cursor", "move");
+
+                circletextwrer[i] = linegcirclewrer.append("text")
+                    .attr("id", "circletextwrer" + i)
+                    .attr("x", function (d) {
+                        return d.x - 8;
+                    })
+                    .attr("y", function (d) {
+                        return d.y + 4;
+                    })
+                    .attr("font-size", "10px")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text("IP3");
             }
 
             // case 8
@@ -3587,6 +3832,37 @@
                 // increment x-axis of line and circle
                 yvaluewrer += ydistancewrer;
                 cyvaluewrer += ydistancewrer;
+
+                // circle for IP3 receptor
+                var linegcirclewrer = polygongwrer.append("g").data([{
+                    x: xvaluewrer + 30 + widthER,
+                    y: yvaluewrer - 55
+                }]);
+                circlewithlinegwrer[i] = linegcirclewrer.append("circle")
+                    .attr("id", "circlewithlinegwrer" + i)
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    })
+                    .attr("r", 10)
+                    .attr("fill", "lightgreen")
+                    .attr("stroke-width", 20)
+                    .attr("cursor", "move");
+
+                circletextwrer[i] = linegcirclewrer.append("text")
+                    .attr("id", "circletextwrer" + i)
+                    .attr("x", function (d) {
+                        return d.x - 8;
+                    })
+                    .attr("y", function (d) {
+                        return d.y + 4;
+                    })
+                    .attr("font-size", "10px")
+                    .attr("fill", "red")
+                    .attr("cursor", "move")
+                    .text("IP3");
             }
         }
 
@@ -5035,6 +5311,7 @@
         var luminalID = "http://identifiers.org/fma/FMA:74550";
         var interstitialID = "http://identifiers.org/fma/FMA:9673";
         var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
+        var IP3receptor = "http://identifiers.org/chebi/CHEBI:131186";
 
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
@@ -5326,7 +5603,7 @@
                                             sink_name: sink_fma[0].name,
                                             med_text: medfmatext,
                                             med_fma: med_fma[0].fma,
-                                            med_pr: "undefined"
+                                            med_pr: undefined
                                         });
                                     }
                                     else {
