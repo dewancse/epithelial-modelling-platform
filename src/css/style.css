@@ -1,0 +1,40 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+#header {
+    font-size: medium;
+}
+
+.navbtn {
+    width: 250px;
+}
+
+.graph {
+    padding: 10px;
+    border: 1px solid #e3e3e3;
+}
+
+.active {
+    stroke: #000;
+    stroke-width: 2px;
+}
+
+.nodes circle {
+    pointer-events: all;
+    stroke: none;
+    stroke-width: 40px;
+}
+
+.pathlink {
+    fill: none;
+    stroke: #aaa;
+    stroke-width: 2px;
+}
+
+circle {
+    stroke: #6495ED;
+    stroke-width: 1.5px;
+}

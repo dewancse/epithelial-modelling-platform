@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>epithelial-model-platform</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!--bringing in the dependencies-->
+    <script src="./libs/jquery.min.js"></script>
+    <script src="./libs/jquery-ui.js"></script>
+    <script src="./libs/bootstrap.min.js"></script>
+    <script src="./libs/d3.min.js"></script>
+    <script src="./libs/d3-selection-multi.v1.min.js" charset="utf-8"></script>
+    <script src="./libs/ajax-utils.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <a id="header" class="navbar-brand">Epithelial Model Platform</a>
+        </div>
+    </div>
+    <ul id="ulistItems" class="nav nav-tabs container">
+        <li id="listHome" role="presentation" class="active">
+            <a href="#">Home</a>
+        </li>
+        <li id="listDiscovery" role="presentation">
+            <a href="#">Model Discovery</a>
+        </li>
+        <li id="listModels" role="presentation">
+            <a href="#">Load Models</a>
+        </li>
+        <li id="help" role="presentation">
+            <a href="#">Documentation</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="row">
+    <div id="main-content" class="container"></div>
+</div>
+
+<!-- home scripts -->
+<script src="bundle.js"></script>
+</body>
+</html>
