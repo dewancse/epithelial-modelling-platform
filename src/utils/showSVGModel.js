@@ -1,30 +1,13 @@
 /**
- * Created by dsar941 on 5/8/2017.
+ * Created by dsar941 on 5/11/2017.
  */
-var svgmodelHtml = require("../index.js").svgmodelHtml;
-var insertHtml = require("../utils/misc.js").insertHtml;
-var templistOfModel = require("../utils/actions.js").templistOfModel;
-var modelEntityNameArray = require("../utils/actions.js").modelEntityNameArray;
-var model2DArray = require("./models").model2DArray;
+var uniqueifySVG = require("../utils/misc.js").uniqueifySVG;
 
-var links = []; // svg visualization
+var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
 
-var loadSVGModelHtml = function () {
-
-    $ajaxUtils.sendGetRequest(
-        svgmodelHtml,
-        function (svgmodelHtmlContent) {
-            insertHtml("#home-content", svgmodelHtmlContent);
-
-            $ajaxUtils.sendGetRequest(svgmodelHtml, showSVGModelHtml, false);
-        },
-        false);
-}
-
-var showSVGModelHtml = function (svgmodelHtmlContent) {
-
-    console.log("visualization in model2DArr: ", model2DArray);
-    console.log("visualization in templistOfModel: ", templistOfModel);
+    console.log("showSVGModelHtml links: ", links);
+    console.log("showSVGModelHtml model2DArray: ", model2DArray);
+    console.log("showSVGModelHtml modelEntityNameArray: ", modelEntityNameArray);
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -54,20 +37,7 @@ var showSVGModelHtml = function (svgmodelHtmlContent) {
         }
     }
 
-    // Remove duplicate links
-    function uniqueify(es) {
-        var retval = [];
-        es.forEach(function (e) {
-            for (var j = 0; j < retval.length; j++) {
-                if (retval[j].source === e.source && retval[j].target === e.target)
-                    return;
-            }
-            retval.push(e);
-        });
-        return retval;
-    }
-
-    links = uniqueify(links);
+    links = uniqueifySVG(links);
 
     var nodes = {};
 
@@ -240,4 +210,4 @@ var showSVGModelHtml = function (svgmodelHtmlContent) {
     modelEntityNameArray = [];
 }
 
-exports.loadSVGModelHtml = loadSVGModelHtml;
+exports.showSVGModelHtml = showSVGModelHtml;

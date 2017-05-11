@@ -1,45 +1,113 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
+// extract species, gene, and protein names
+var parseModelName = function (modelEntity) {
+    var indexOfHash = modelEntity.search("#");
+    var modelName = modelEntity.slice(0, indexOfHash);
 
-// Convenience function for inserting innerHTML for 'select'
-var insertHtml = function (selector, html) {
-    var targetElem = document.querySelector(selector);
-    targetElem.innerHTML = html;
+    return modelName;
+}
+
+// process table headers
+var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
+    var head = [];
+
+    for (var i = 0; i < jsonModel.head.vars.length; i++)
+        head.push(jsonModel.head.vars[i]);
+
+    head.push(jsonSpecies.head.vars[0]);
+    head.push(jsonGene.head.vars[0]);
+    head.push(jsonProtein.head.vars[0]);
+
+    return head;
+}
+
+// remove duplicate model entity and biological meaning
+function uniqueifyModelEntity(es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j].Model_entity === e.Model_entity &&
+                retval[j].Biological_meaning === e.Biological_meaning)
+
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
+// Remove duplicate fma
+function uniqueifyEpithelial(es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j].name === e.name && retval[j].fma === e.fma)
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
+// Remove duplicate links
+function uniqueifySVG(es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j].source === e.source && retval[j].target === e.target)
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
+// Create anchor tag
+var createAnchor = function (value) {
+    var aText = document.createElement('a');
+    aText.setAttribute('href', value);
+    aText.setAttribute('target', "_blank");
+    aText.innerHTML = value;
+    return aText;
 };
 
-// Show loading icon inside element identified by 'selector'.
-var showLoading = function (selector) {
-    var html = "<div class='text-center'>";
-    html += "<images src='images/ajax-loader.gif'></div>";
-    insertHtml(selector, html);
-};
-
-// Find the current active menu button
-var findActiveItem = function () {
-    var classes = document.querySelector("#ulistItems");
-    for (var i = 0; i < classes.getElementsByTagName("li").length; i++) {
-        if (classes.getElementsByTagName("li")[i].className === "active")
-            return classes.getElementsByTagName("li")[i].id;
+// Find duplicate items
+var searchFn = function (searchItem, arrayOfItems) {
+    var counter = 0;
+    for (var i = 0; i < arrayOfItems.length; i++) {
+        if (arrayOfItems[i] == searchItem)
+            counter++;
     }
+
+    return counter;
 };
 
-// Remove the class 'active' from source to target button
-var switchListItemToActive = function (source, target) {
-    // Remove 'active' from source button
-    var classes = document.querySelector(source).className;
-    classes = classes.replace(new RegExp("active", "g"), "");
-    document.querySelector(source).className = classes;
+// TODO: temp solution, fix this in svg
+function getTextWidth(text, fontSize, fontFace) {
+    var a = document.createElement('canvas');
+    var b = a.getContext('2d');
+    b.font = fontSize + 'px ' + fontFace;
+    return b.measureText(text).width;
+}
 
-    // Add 'active' to target button if not already there
-    classes = document.querySelector(target).className;
-    if (classes.indexOf("active") === -1) {
-        classes += "active";
-        document.querySelector(target).className = classes;
+// Utility to calculate number of iterations
+function iteration(length) {
+    var sum = 0;
+    for (var i = 0; i < length; i++) {
+        sum = sum + (length - i - 1);
     }
-};
 
-exports.findActiveItem = findActiveItem;
-exports.switchListItemToActive = switchListItemToActive;
-exports.insertHtml = insertHtml;
-exports.showLoading = showLoading;
+    return sum;
+}
+
+exports.parseModelName = parseModelName;
+exports.headTitle = headTitle;
+exports.uniqueifyModelEntity = uniqueifyModelEntity;
+exports.uniqueifyEpithelial = uniqueifyEpithelial;
+exports.uniqueifySVG = uniqueifySVG;
+exports.createAnchor = createAnchor;
+exports.searchFn = searchFn;
+exports.getTextWidth = getTextWidth;
+exports.iteration = iteration;

@@ -1,7 +1,8 @@
 /**
- * Created by dsar941 on 5/8/2017.
+ * Created by dsar941 on 5/11/2017.
  */
 var solutesBouncing = require("./solutesBouncing.js").solutesBouncing;
+var getTextWidth = require("../utils/misc.js").getTextWidth;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
@@ -279,6 +280,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     // Note: otherwise member array should have both directional fluxes (i.e., cotransporter)
+
     console.log("membrane: ", membrane);
     console.log("concentration_fma: ", concentration_fma);
     console.log("source_fma: ", source_fma);

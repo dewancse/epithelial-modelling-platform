@@ -15,7 +15,6 @@
     <script src="./libs/bootstrap.min.js"></script>
     <script src="./libs/d3.min.js"></script>
     <script src="./libs/d3-selection-multi.v1.min.js" charset="utf-8"></script>
-    <script src="./libs/ajax-utils.js"></script>
 </head>
 
 <body>
@@ -28,16 +27,16 @@
     </div>
     <ul id="ulistItems" class="nav nav-tabs container">
         <li id="listHome" role="presentation" class="active">
-            <a href="#">Home</a>
+            <a href="#" onclick="$mainUtils.loadHomeHtml();">Home</a>
         </li>
         <li id="listDiscovery" role="presentation">
-            <a href="#">Model Discovery</a>
+            <a href="#" onclick="$mainUtils.loadSearchHtml();">Model Discovery</a>
         </li>
         <li id="listModels" role="presentation">
-            <a href="#">Load Models</a>
+            <a href="#" onclick="$mainUtils.loadModelHtml();">Load Models</a>
         </li>
         <li id="help" role="presentation">
-            <a href="#">Documentation</a>
+            <a href="#" onclick="$mainUtils.loadHelp();">Documentation</a>
         </li>
     </ul>
 </nav>

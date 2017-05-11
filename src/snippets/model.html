@@ -1,15 +1,15 @@
 <div class="container-fluid">
     <button id="viewBtn" type="view" class="btn btn-default btn-sm">
-        <a href="#">View</a>
+        <a href="#" onclick="$mainUtils.loadViewHtml();">View</a>
     </button>
     <button id="confirmBtn" type="confirm" class="btn btn-default btn-sm">
-        <a href="#">Confirm</a>
+        <a href="#" onclick="$mainUtils.loadEpithelialHtml();">Confirm</a>
     </button>
     <button id="deleteBtn" type="delete" class="btn btn-default btn-sm">
-        <a href="#">Delete</a>
+        <a href="#" onclick="$mainUtils.deleteRowModelHtml();">Delete</a>
     </button>
     <button id="visualizationBtn" type="visualization" class="btn btn-default btn-sm">
-        <a href="#">visualization</a>
+        <a href="#" onclick="$mainUtils.loadSVGModelHtml();">visualization</a>
     </button>
 </div>
 <div id="modelList" class="container"></div>
