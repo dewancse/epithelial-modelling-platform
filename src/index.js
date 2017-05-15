@@ -786,7 +786,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         switchListItemToActive(activeItem, "#listModels");
     };
 
-    // TODO: move this in utils directory
+    // TODO: move to utils directory
     // Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
@@ -891,7 +891,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    // TODO: move this in utils directory
+    // TODO: move to utils directory
     mainUtils.deleteRowModelHtml = function () {
 
         // Un-check header checkbox if body is empty
@@ -997,6 +997,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var interstitialID = "http://identifiers.org/fma/FMA:9673";
         var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
         var IP3receptor = "http://identifiers.org/chebi/CHEBI:131186";
+        var leakID = "http://identifiers.org/go/GO:0022840";
 
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
@@ -1181,7 +1182,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         }
                         else {
                             var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
-                            if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
+                            if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1 ||
+                                temp.indexOf(leakID) != -1) {
                                 med_pr.push({
                                     name: modelEntityFullNameArray[index],
                                     fma: jsonObjFlux.results.bindings[i].med_entity_uri.value

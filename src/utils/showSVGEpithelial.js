@@ -15,11 +15,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var Nachannel = "http://purl.obolibrary.org/obo/PR_000014527";
     var Clchannel = "http://purl.obolibrary.org/obo/PR_Q06393";
     var Kchannel = "http://purl.obolibrary.org/obo/PR_P15387";
+    var Cachannel = "http://purl.obolibrary.org/obo/PR_P22002"; // ??
     var ER = "http://identifiers.org/fma/FMA:63842";
     var wallOfSmoothER = "http://identifiers.org/fma/FMA:80352";
     var wallOfRoughER = "http://identifiers.org/fma/FMA:80353";
     var IP3receptor = "http://identifiers.org/chebi/CHEBI:131186";
     var celljunctionID = "http://identifiers.org/fma/FMA:67394"; // paracellularID same??
+    var leakID = "http://identifiers.org/go/GO:0022840"; // Calcium leak??
 
     var tempapical = [];
     var tempBasolateral = [];
@@ -82,9 +84,28 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    // TODO: Hard coded for Nachannel, Clchannel, and Kchannel
+    // TODO: Hard coded for Nachannel, Clchannel, Kchannel, IP3 receptor
     for (var i = 0; i < membrane.length; i++) {
-        if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == IP3receptor ||
+        if (membrane[i].med_fma == apicalID && membrane[i].med_pr == leakID) {
+            apicalMembrane.push(
+                {
+                    source_text: membrane[i].source_text,
+                    source_fma: membrane[i].source_fma,
+                    sink_text: membrane[i].sink_text,
+                    sink_fma: membrane[i].sink_fma,
+                    source_text2: "leak",
+                    source_fma2: "leak",
+                    sink_text2: "leak",
+                    sink_fma2: "leak"
+                });
+
+            membrane[i].source_text2 = "leak";
+            membrane[i].source_fma2 = "leak";
+            membrane[i].sink_text2 = "leak";
+            membrane[i].sink_fma2 = "leak";
+        }
+
+        if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == IP3receptor || membrane[i].med_pr == Cachannel ||
             membrane[i].med_pr == Nachannel || membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
             apicalMembrane.push(
                 {
@@ -104,8 +125,27 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             membrane[i].sink_fma2 = "channel";
         }
 
-        if (membrane[i].med_fma == basolateralID && (membrane[i].med_pr == Nachannel ||
-            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
+        if (membrane[i].med_fma == basolateralID && membrane[i].med_pr == leakID) {
+            basolateralMembrane.push(
+                {
+                    source_text: membrane[i].source_text,
+                    source_fma: membrane[i].source_fma,
+                    sink_text: membrane[i].sink_text,
+                    sink_fma: membrane[i].sink_fma,
+                    source_text2: "leak",
+                    source_fma2: "leak",
+                    sink_text2: "leak",
+                    sink_fma2: "leak"
+                });
+
+            membrane[i].source_text2 = "leak";
+            membrane[i].source_fma2 = "leak";
+            membrane[i].sink_text2 = "leak";
+            membrane[i].sink_fma2 = "leak";
+        }
+
+        if (membrane[i].med_fma == basolateralID && (membrane[i].med_pr == IP3receptor || membrane[i].med_pr == Cachannel ||
+            membrane[i].med_pr == Nachannel || membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
             basolateralMembrane.push(
                 {
                     source_text: membrane[i].source_text,
@@ -147,7 +187,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     // single flux
     for (var i = 0; i < membrane.length; i++) {
         if (membrane[i].med_fma == apicalID && membrane[i].source_text2 != "channel" &&
-            membrane[i].source_text2 != "diffusive channel") {
+            membrane[i].source_text2 != "diffusive channel" && membrane[i].source_text2 != "leak") {
             apicalMembrane.push(
                 {
                     source_text: membrane[i].source_text,
@@ -162,7 +202,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
 
         if (membrane[i].med_fma == basolateralID && membrane[i].source_text2 != "channel" &&
-            membrane[i].source_text2 != "diffusive channel") {
+            membrane[i].source_text2 != "diffusive channel" && membrane[i].source_text2 != "leak") {
             basolateralMembrane.push(
                 {
                     source_text: membrane[i].source_text,
@@ -218,6 +258,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             membrane[i].sink_fma2 = "IP3 flux";
         }
 
+        if (membrane[i].med_fma == wallOfSmoothER && membrane[i].med_pr == leakID) {
+            wallOfSmoothERMembrane.push(
+                {
+                    source_text: membrane[i].source_text,
+                    source_fma: membrane[i].source_fma,
+                    sink_text: membrane[i].sink_text,
+                    sink_fma: membrane[i].sink_fma,
+                    source_text2: "leak",
+                    source_fma2: "leak",
+                    sink_text2: "leak",
+                    sink_fma2: "leak"
+                });
+
+            membrane[i].source_text2 = "leak";
+            membrane[i].source_fma2 = "leak";
+            membrane[i].sink_text2 = "leak";
+            membrane[i].sink_fma2 = "leak";
+        }
+
         if (membrane[i].med_fma == wallOfRoughER && membrane[i].med_pr == IP3receptor) {
             wallOfRoughERMembrane.push(
                 {
@@ -236,11 +295,30 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             membrane[i].sink_text2 = "IP3 flux";
             membrane[i].sink_fma2 = "IP3 flux";
         }
+
+        if (membrane[i].med_fma == wallOfRoughER && membrane[i].med_pr == leakID) {
+            wallOfRoughERMembrane.push(
+                {
+                    source_text: membrane[i].source_text,
+                    source_fma: membrane[i].source_fma,
+                    sink_text: membrane[i].sink_text,
+                    sink_fma: membrane[i].sink_fma,
+                    source_text2: "leak",
+                    source_fma2: "leak",
+                    sink_text2: "leak",
+                    sink_fma2: "leak"
+                });
+
+            membrane[i].source_text2 = "leak";
+            membrane[i].source_fma2 = "leak";
+            membrane[i].sink_text2 = "leak";
+            membrane[i].sink_fma2 = "leak";
+        }
     }
 
     // flux through wall of smooth/rough ER
     for (var i = 0; i < membrane.length; i++) {
-        if (membrane[i].med_fma == wallOfSmoothER && membrane[i].med_pr != IP3receptor) {
+        if (membrane[i].med_fma == wallOfSmoothER && membrane[i].med_pr != IP3receptor && membrane[i].med_pr != leakID) {
             wallOfSmoothERMembrane.push(
                 {
                     source_text: membrane[i].source_text,
@@ -259,7 +337,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             membrane[i].sink_fma2 = "single flux";
         }
 
-        if (membrane[i].med_fma == wallOfRoughER && membrane[i].med_pr != IP3receptor) {
+        if (membrane[i].med_fma == wallOfRoughER && membrane[i].med_pr != IP3receptor && membrane[i].med_pr != leakID) {
             wallOfRoughERMembrane.push(
                 {
                     source_text: membrane[i].source_text,
@@ -698,7 +776,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var lineLen = 50, radius = 20, radiuswser = 15, lineLenwser = 40,
         polygonlineLen = 60,
-        lineg, linegb, linegc, linegwser, linegwrer, polygong, polygongb, polygongwser, polygongwrer,
+        lineg, linegb, linegc, linegwser, linegwrer, polygong, polygongb, polygongwser,
+        polygongwrer, leakgwser, leakgwrer, leakg, leakgb,
         xvalue = xrect - lineLen / 2, // x coordinate before epithelial rectangle
         yvalue = yrect + 10 + 50, // initial distance 50
         yvalueb = yrect + 10 + 50, // initial distance 50
@@ -706,6 +785,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         xvaluewrer = xER - lineLenwser / 2, yvaluewrer = yER + 10 + 20,
         ydistance = 70, ydistanceb = 70, xdistancewser = 40, ydistancewrer = 40,
         polygonlineg = [], polygon = [], polygontext = [], polygonlinegwser = [], polygonlinegwrer = [],
+        leaktextwser = [], leaktextwrer = [], leaklinegwser = [], leaklinegwrer = [],
+        leaklineg = [], leaktext = [], leaklinegb = [], leaktextb = [],
         polygonlinegb = [], polygonb = [], polygontextb = [], polygontextwser = [], polygontextwrer = [],
         circlewithlineg = [], linewithlineg = [], circletextwser = [], circletextwrer = [],
         linewithlineg2 = [], linewithtextg = [], linewithtextg2 = [],
@@ -1783,6 +1864,92 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "move")
                 .text("IP3");
         }
+
+        // case 9
+        if ((src_fma == ER && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+            leakgwser = newg.append("g").data([{x: xvaluewser, y: (yvaluewser - 5)}]);
+            leaklinegwser[i] = leakgwser.append("line")
+                .attr("id", "leaklinegwser" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x;
+                })
+                .attr("y2", function (d) {
+                    return d.y + polygonlineLen;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-start", "url(#starttop)")
+                .attr("cursor", "pointer");
+
+            var leaktextg = leakgwser.append("g").data([{x: xvaluewser - 15, y: yvaluewser - 15}]);
+            leaktextwser[i] = leaktextg.append("text")
+                .attr("id", "leaktextwser" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "8px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
+
+            // increment x-axis of line and circle
+            xvaluewser += xdistancewser;
+            cxvaluewser += xdistancewser;
+        }
+
+        // case 10
+        if ((src_fma == cytosolID && snk_fma == ER) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+            leakgwser = newg.append("g").data([{x: xvaluewser, y: (yvaluewser - 5)}]);
+            leaklinegwser[i] = leakgwser.append("line")
+                .attr("id", "leaklinegwser" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x;
+                })
+                .attr("y2", function (d) {
+                    return d.y + polygonlineLen;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "pointer");
+
+            var leaktextg = polygongwser.append("g").data([{
+                x: xvaluewser - 15,
+                y: yvaluewser + polygonlineLen + 15
+            }]);
+
+            leaktextwser[i] = leaktextg.append("text")
+                .attr("id", "leaktextwser" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "8px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
+
+            // increment x-axis of line and circle
+            xvaluewser += xdistancewser;
+            cxvaluewser += xdistancewser;
+        }
     }
 
     // Wall of rough ER membrane
@@ -2500,6 +2667,96 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "move")
                 .text("IP3");
         }
+
+        // case 9
+        if ((src_fma == ER && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+            leakgwrer = newg.append("g").data([{x: xvaluewrer - 10 + widthER, y: (yvaluewrer)}]);
+            leaklinegwrer[i] = leakgwrer.append("line")
+                .attr("id", "leaklinegwrer" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "pointer");
+
+            var leaktextg = leakgwrer.append("g").data([{
+                x: xvaluewrer + polygonlineLen + widthER,
+                y: yvaluewrer + 5
+            }]);
+
+            leaktextwrer[i] = leaktextg.append("text")
+                .attr("id", "leaktextwrer" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "8px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
+
+            // increment x-axis of line and circle
+            yvaluewrer += ydistancewrer;
+            cyvaluewrer += ydistancewrer;
+        }
+
+        // case 10
+        if ((src_fma == cytosolID && snk_fma == ER) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+            leakgwrer = newg.append("g").data([{x: xvaluewrer - 10 + widthER, y: (yvaluewrer)}]);
+            leaklinegwrer[i] = leakgwrer.append("line")
+                .attr("id", "leaklinegwrer" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-start", "url(#start)")
+                .attr("cursor", "pointer");
+
+            var leaktextg = leakgwrer.append("g").data([{
+                x: xvaluewrer - 10 - polygonlineLen + widthER,
+                y: yvaluewrer + 5
+            }]);
+
+            leaktextwrer[i] = leaktextg.append("text")
+                .attr("id", "leaktextwrer" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "8px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
+
+            // increment x-axis of line and circle
+            yvaluewrer += ydistancewrer;
+            cyvaluewrer += ydistancewrer;
+        }
     }
 
     // Apical membrane
@@ -2956,6 +3213,147 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             yvalue += ydistance;
             cyvalue += ydistance;
         }
+
+        // case 6
+        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+            polygonlineg[i] = polygong.append("line")
+                .attr("id", "polygonlineg" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-start", "url(#start)")
+                .attr("cursor", "pointer");
+
+            // Polygon
+            polygon[i] = polygong.append("g").append("polygon")
+                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
+                .attr("id", "polygon" + i)
+                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                .attr("fill", "yellow")
+                .attr("stroke", "black")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-linejoin", "round")
+                .attr("cursor", "move");
+
+            var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+
+            var txt = textvalue.substr(5); // temp solution
+            if (txt == "Cl") txt = txt + "-";
+            else txt = txt + "+";
+
+            polygontext[i] = polygontextg.append("text")
+                .attr("id", "polygontext" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(txt);
+
+            // increment y-axis of line and circle
+            yvalue += ydistance;
+            cyvalue += ydistance;
+        }
+
+        // case 7
+        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+            leakg = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+            leaklineg[i] = leakg.append("line")
+                .attr("id", "leaklineg" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "pointer");
+
+            var leaktextg = leakg.append("g").data([{x: xvalue - polygonlineLen / 2 - 10, y: yvalue + 5}]);
+
+            leaktext[i] = leaktextg.append("text")
+                .attr("id", "leaktext" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
+
+            // increment y-axis of line and circle
+            yvalue += ydistance;
+            cyvalue += ydistance;
+        }
+
+        // case 8
+        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+            leakg = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+            leaklineg[i] = leakg.append("line")
+                .attr("id", "leaklineg" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-start", "url(#start)")
+                .attr("cursor", "pointer");
+
+            var leaktextg = leakg.append("g").data([{x: xvalue + polygonlineLen / 2 + 10, y: yvalue + 5}]);
+
+            leaktext[i] = leaktextg.append("text")
+                .attr("id", "leaktext" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
+
+            // increment y-axis of line and circle
+            yvalue += ydistance;
+            cyvalue += ydistance;
+        }
     }
 
     // Basolateral membrane
@@ -3407,6 +3805,147 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("fill", "red")
                 .attr("cursor", "move")
                 .text(txt);
+
+            // increment y-axis of line and circle
+            yvalueb += ydistanceb;
+            cyvalueb += ydistanceb;
+        }
+
+        // case 6
+        if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            polygongb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+            polygonlinegb[i] = polygongb.append("line")
+                .attr("id", "polygonlinegb" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "pointer");
+
+            // Polygon
+            polygonb[i] = polygongb.append("g").append("polygon")
+                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
+                .attr("id", "polygonb" + i)
+                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                .attr("fill", "yellow")
+                .attr("stroke", "black")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-linejoin", "round")
+                .attr("cursor", "move");
+
+            var polygontextgb = polygongb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
+
+            var txt = textvalue.substr(5); // temp solution
+            if (txt == "Cl") txt = txt + "-";
+            else txt = txt + "+";
+
+            polygontextb[i] = polygontextgb.append("text")
+                .attr("id", "polygontextb" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(txt);
+
+            // increment y-axis of line and circle
+            yvalueb += ydistanceb;
+            cyvalueb += ydistanceb;
+        }
+
+        // case 7
+        if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+            leakgb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+            leaklinegb[i] = leakgb.append("line")
+                .attr("id", "leaklinegb" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-start", "url(#start)")
+                .attr("cursor", "pointer");
+
+            var leaktextgb = leakgb.append("g").data([{x: xvalue + polygonlineLen / 2 + 10 + width, y: yvalueb + 5}]);
+
+            leaktextb[i] = leaktextgb.append("text")
+                .attr("id", "leaktextb" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
+
+            // increment y-axis of line and circle
+            yvalueb += ydistanceb;
+            cyvalueb += ydistanceb;
+        }
+
+        // case 8
+        if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+            leakgb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+            leaklinegb[i] = leakgb.append("line")
+                .attr("id", "leaklinegb" + i)
+                .attr("x1", function (d) {
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "pointer");
+
+            var leaktextgb = leakgb.append("g").data([{x: xvalue - polygonlineLen / 2 - 10 + width, y: yvalueb + 5}]);
+
+            leaktextb[i] = leaktextgb.append("text")
+                .attr("id", "leaktextb" + i)
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(textvalue);
 
             // increment y-axis of line and circle
             yvalueb += ydistanceb;
