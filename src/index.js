@@ -1000,7 +1000,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
 
-        // making cotransporter from the RDF graph using SPRQL
+        // making cotransporter from the RDF graph using SPARQL
         mainUtils.makecotransporter = function (membrane1, membrane2) {
             // query for finding fluxes to make a cotransporter
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
@@ -1101,9 +1101,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                             membrane);
                     }
                 },
-                true
-            );
-        }
+                true);
+        };
 
         mainUtils.srcDescMediatorOfFluxes = function () {
 
