@@ -2,6 +2,7 @@
  * Created by dsar941 on 9/8/2016.
  */
 var parseModelName = require("./utils/misc.js").parseModelName;
+var parserFmaNameText = require("./utils/misc.js").parserFmaNameText;
 var headTitle = require("./utils/misc.js").headTitle;
 var uniqueifyModelEntity = require("./utils/misc.js").uniqueifyModelEntity;
 var uniqueifyEpithelial = require("./utils/misc.js").uniqueifyEpithelial;
@@ -777,7 +778,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             function (modelHtmlContent) {
                 insertHtml("#main-content", modelHtmlContent);
 
-                sendPostRequest(endpoint, query, mainUtils.showModel, true);
+                sendPostRequest(endpoint, query, showModel, true);
             },
             false);
 
@@ -788,7 +789,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     // TODO: move to utils directory
     // Show selected items in a table
-    mainUtils.showModel = function (jsonObj) {
+    var showModel = function (jsonObj) {
 
         console.log("showModel: ", jsonObj);
 
@@ -993,16 +994,14 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var basolateralID = "http://identifiers.org/fma/FMA:84669";
         var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
-        var luminalID = "http://identifiers.org/fma/FMA:74550";
-        var interstitialID = "http://identifiers.org/fma/FMA:9673";
         var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
-        var IP3receptor = "http://identifiers.org/chebi/CHEBI:131186";
         var leakID = "http://identifiers.org/go/GO:0022840";
 
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
 
-        mainUtils.apicalajax = function (membrane1, membrane2) {
+        // making cotransporter from the RDF graph using SPRQL
+        mainUtils.makecotransporter = function (membrane1, membrane2) {
             // query for finding fluxes to make a cotransporter
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
@@ -1106,7 +1105,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             );
         }
 
-        mainUtils.testAJAX = function () {
+        mainUtils.srcDescMediatorOfFluxes = function () {
 
             if (index == modelEntityFullNameArray.length) {
 
@@ -1123,7 +1122,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 else {
                     for (var i = 0; i < membrane.length; i++) {
                         for (var j = i + 1; j < membrane.length; j++) {
-                            mainUtils.apicalajax(membrane[i], membrane[j]);
+                            mainUtils.makecotransporter(membrane[i], membrane[j]);
                         }
                     }
                 }
@@ -1156,6 +1155,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 function (jsonObjFlux) {
 
                     for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
+
                         if (jsonObjFlux.results.bindings[i].source_fma == undefined)
                             source_fma.push("");
                         else
@@ -1200,6 +1200,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         }
                     }
 
+                    // remove duplicate fma
                     source_fma = uniqueifyEpithelial(source_fma);
                     sink_fma = uniqueifyEpithelial(sink_fma);
                     med_pr = uniqueifyEpithelial(med_pr);
@@ -1235,23 +1236,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                             index++;
 
                             if (source_fma.length != 0) {
-                                // keep only name of solutes
-                                var indexOfHash = source_fma[0].name.search("#");
-                                var srctext = source_fma[0].name.slice(indexOfHash + 1);
-                                var indexOfdot = srctext.indexOf('.');
-                                srctext = srctext.slice(indexOfdot + 1);
 
-                                var indexOfHash = sink_fma[0].name.search("#");
-                                var snktext = sink_fma[0].name.slice(indexOfHash + 1);
-                                var indexOfdot = snktext.indexOf('.');
-                                snktext = snktext.slice(indexOfdot + 1);
+                                var srctext = parserFmaNameText(source_fma[0]);
+                                var snktext = parserFmaNameText(sink_fma[0]);
+                                var medfmatext = parserFmaNameText(med_fma[0]);
 
-                                var indexOfHash = med_fma[0].name.search("#");
-                                var medfmatext = med_fma[0].name.slice(indexOfHash + 1);
-                                var indexOfdot = medfmatext.indexOf('.');
-                                medfmatext = medfmatext.slice(indexOfdot + 1);
-
-                                if (source_fma[0].fma == luminalID && sink_fma[0].fma == interstitialID) {
+                                if (med_pr[0] == undefined) { // temp solution
                                     membrane.push({
                                         source_text: srctext,
                                         source_fma: source_fma[0].fma,
@@ -1259,38 +1249,23 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                         sink_text: snktext,
                                         sink_fma: sink_fma[0].fma,
                                         sink_name: sink_fma[0].name,
-                                        med_text: "diffusive flux",
-                                        med_fma: "diffusive flux",
-                                        med_pr: "diffusive flux"
+                                        med_text: medfmatext,
+                                        med_fma: med_fma[0].fma,
+                                        med_pr: undefined
                                     });
                                 }
                                 else {
-                                    if (med_pr[0] == undefined) { // temp solution
-                                        membrane.push({
-                                            source_text: srctext,
-                                            source_fma: source_fma[0].fma,
-                                            source_name: source_fma[0].name,
-                                            sink_text: snktext,
-                                            sink_fma: sink_fma[0].fma,
-                                            sink_name: sink_fma[0].name,
-                                            med_text: medfmatext,
-                                            med_fma: med_fma[0].fma,
-                                            med_pr: undefined
-                                        });
-                                    }
-                                    else {
-                                        membrane.push({
-                                            source_text: srctext,
-                                            source_fma: source_fma[0].fma,
-                                            source_name: source_fma[0].name,
-                                            sink_text: snktext,
-                                            sink_fma: sink_fma[0].fma,
-                                            sink_name: sink_fma[0].name,
-                                            med_text: medfmatext,
-                                            med_fma: med_fma[0].fma,
-                                            med_pr: med_pr[0].fma
-                                        });
-                                    }
+                                    membrane.push({
+                                        source_text: srctext,
+                                        source_fma: source_fma[0].fma,
+                                        source_name: source_fma[0].name,
+                                        sink_text: snktext,
+                                        sink_fma: sink_fma[0].fma,
+                                        sink_name: sink_fma[0].name,
+                                        med_text: medfmatext,
+                                        med_fma: med_fma[0].fma,
+                                        med_pr: med_pr[0].fma
+                                    });
                                 }
 
                                 source_fma2.push(source_fma[0]);
@@ -1301,14 +1276,14 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                 med_fma = [];
                                 med_pr = [];
                             }
-                            mainUtils.testAJAX(); // callback
+                            mainUtils.srcDescMediatorOfFluxes(); // callback
                         },
                         true);
                 },
                 true);
         }
 
-        mainUtils.testAJAX();
+        mainUtils.srcDescMediatorOfFluxes();
     };
 
     // Expose utility to the global object

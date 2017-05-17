@@ -1,6 +1,15 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
+// parse text from the epithelial name
+function parserFmaNameText(fma) {
+    var indexOfHash = fma.name.search("#");
+    var srctext = fma.name.slice(indexOfHash + 1);
+    var indexOfdot = srctext.indexOf('.');
+
+    return srctext.slice(indexOfdot + 1);
+}
+
 // extract species, gene, and protein names
 var parseModelName = function (modelEntity) {
     var indexOfHash = modelEntity.search("#");
@@ -103,6 +112,7 @@ function iteration(length) {
 }
 
 exports.parseModelName = parseModelName;
+exports.parserFmaNameText = parserFmaNameText;
 exports.headTitle = headTitle;
 exports.uniqueifyModelEntity = uniqueifyModelEntity;
 exports.uniqueifyEpithelial = uniqueifyEpithelial;
