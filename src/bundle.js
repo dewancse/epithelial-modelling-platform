@@ -94,7 +94,8 @@ var parseModelName = function (modelEntity) {
 var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
     var head = [];
 
-    for (var i = 0; i < jsonModel.head.vars.length; i++)
+    // Getting first 2 head title, not i < jsonModel.head.vars.length
+    for (var i = 0; i < 2; i++)
         head.push(jsonModel.head.vars[i]);
 
     head.push(jsonSpecies.head.vars[0]);
@@ -105,12 +106,26 @@ var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
 }
 
 // remove duplicate model entity and biological meaning
+function uniqueifySrcSnkMed(es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j] === e)
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
+// remove duplicate model entity and biological meaning
 function uniqueifyModelEntity(es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
             if (retval[j].Model_entity === e.Model_entity &&
-                retval[j].Biological_meaning === e.Biological_meaning)
+                retval[j].Biological_meaning === e.Biological_meaning &&
+                retval[j].fma === e.fma)
 
                 return;
         }
@@ -186,6 +201,7 @@ function iteration(length) {
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
 exports.headTitle = headTitle;
+exports.uniqueifySrcSnkMed = uniqueifySrcSnkMed;
 exports.uniqueifyModelEntity = uniqueifyModelEntity;
 exports.uniqueifyEpithelial = uniqueifyEpithelial;
 exports.uniqueifySVG = uniqueifySVG;
@@ -277,6 +293,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var apicalID = "http://identifiers.org/fma/FMA:84666";
     var basolateralID = "http://identifiers.org/fma/FMA:84669";
+    var paracellularID = "http://identifiers.org/fma/FMA:67394";
     var luminalID = "http://identifiers.org/fma/FMA:74550";
     var cytosolID = "http://identifiers.org/fma/FMA:66836";
     var paracellularID = "http://identifiers.org/fma/FMA:67394";
@@ -293,41 +310,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var leakID = "http://identifiers.org/go/GO:0022840"; // Calcium leak??
     var ATPID = "http://identifiers.org/chebi/CHEBI:15422";
     var p2y2ID = "http://identifiers.org/chebi/CHEBI:53142";
-
-    // var paracellularMembrane = [];
-    // var wallOfSmoothERMembrane = [];
-    // var wallOfRoughERMembrane = [];
-    // var celljunction = [];
-    //
-    // // remove apical fluxes from membrane array
-    // for (var i = 0; i < apicalMembrane.length; i++) {
-    //     for (var j = 0; j < membrane.length; j++) {
-    //         if ((apicalMembrane[i].source_text == membrane[j].source_text &&
-    //             apicalMembrane[i].source_fma == membrane[j].source_fma &&
-    //             apicalMembrane[i].sink_fma == membrane[j].sink_fma) ||
-    //             (apicalMembrane[i].source_text2 == membrane[j].source_text &&
-    //             apicalMembrane[i].source_fma2 == membrane[j].source_fma &&
-    //             apicalMembrane[i].sink_fma2 == membrane[j].sink_fma)) {
-    //
-    //             membrane.splice(j, 1);
-    //         }
-    //     }
-    // }
-    //
-    // // remove basolateral fluxes from membrane array
-    // for (var i = 0; i < basolateralMembrane.length; i++) {
-    //     for (var j = 0; j < membrane.length; j++) {
-    //         if ((basolateralMembrane[i].source_text == membrane[j].source_text &&
-    //             basolateralMembrane[i].source_fma == membrane[j].source_fma &&
-    //             basolateralMembrane[i].sink_fma == membrane[j].sink_fma) ||
-    //             (basolateralMembrane[i].source_text2 == membrane[j].source_text &&
-    //             basolateralMembrane[i].source_fma2 == membrane[j].source_fma &&
-    //             basolateralMembrane[i].sink_fma2 == membrane[j].sink_fma)) {
-    //
-    //             membrane.splice(j, 1);
-    //         }
-    //     }
-    // }
 
     var tempapical = [];
     var tempBasolateral = [];
@@ -5587,6 +5569,7 @@ var parserFmaNameText = __webpack_require__(0).parserFmaNameText;
 var headTitle = __webpack_require__(0).headTitle;
 var uniqueifyModelEntity = __webpack_require__(0).uniqueifyModelEntity;
 var uniqueifyEpithelial = __webpack_require__(0).uniqueifyEpithelial;
+var uniqueifySrcSnkMed = __webpack_require__(0).uniqueifySrcSnkMed;
 var iteration = __webpack_require__(0).iteration;
 var showView = __webpack_require__(4).showView;
 var showSVGModelHtml = __webpack_require__(3).showSVGModelHtml;
@@ -5628,12 +5611,15 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         speciesList = [],
         geneList = [],
         proteinList = [],
+        sourcefmaList = [],
+        sinkfmaList = [],
+        meduriList = [],
+        totalList = [],
+        fmaList = [],
         head = [],
         id = 0;
 
-    // Initial declaration of a table
-    var table = document.createElement("table");
-    table.className = "table";
+    var str = [];
 
     // Convenience function for inserting innerHTML for 'select'
     var insertHtml = function (selector, html) {
@@ -5649,7 +5635,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     };
 
     // Find the current active menu button
-    var findActiveItem = function () {
+    var activeMenu = function () {
         var classes = document.querySelector("#ulistItems");
         for (var i = 0; i < classes.getElementsByTagName("li").length; i++) {
             if (classes.getElementsByTagName("li")[i].className === "active")
@@ -5658,7 +5644,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     };
 
     // Remove the class 'active' from source to target button
-    var switchListItemToActive = function (source, target) {
+    var switchMenuToActive = function (source, target) {
         // Remove 'active' from source button
         var classes = document.querySelector(source).className;
         classes = classes.replace(new RegExp("active", "g"), "");
@@ -5674,16 +5660,16 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
     mainUtils.loadHomeHtml = function () {
         // Switch from current active button to home button
-        var activeItem = "#" + findActiveItem();
-        switchListItemToActive(activeItem, "#listHome");
+        var activeItem = "#" + activeMenu();
+        switchMenuToActive(activeItem, "#listHome");
 
         insertHtml("#main-content", "... Home Page !!!");
     };
 
     mainUtils.loadHelp = function () {
         // Switch from current active button to home button
-        var activeItem = "#" + findActiveItem();
-        switchListItemToActive(activeItem, "#help");
+        var activeItem = "#" + activeMenu();
+        switchMenuToActive(activeItem, "#help");
 
         insertHtml("#main-content", "... Help Page !!!");
     };
@@ -5833,8 +5819,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
 
         // Switch from current active button to discovery button
-        var activeItem = "#" + findActiveItem();
-        switchListItemToActive(activeItem, "#listDiscovery");
+        var activeItem = "#" + activeMenu();
+        switchMenuToActive(activeItem, "#listDiscovery");
     };
 
     // Event invocation to SEARCH, MODEL
@@ -5967,15 +5953,20 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             speciesList = [];
             geneList = [];
             proteinList = [];
+            sourcefmaList = [];
+            sinkfmaList = [];
+            meduriList = [];
+            totalList = [];
+            fmaList = [];
             head = [];
 
             id = 0; // id to index each Model_entity
 
-            mainUtils.addEventListener(uriOPB, uriCHEBI, keyValue);
+            mainUtils.ontologyQuery(uriOPB, uriCHEBI, keyValue);
         }
-    });
+    })
 
-    mainUtils.addEventListener = function (uriOPB, uriCHEBI, keyValue) {
+    mainUtils.ontologyQuery = function (uriOPB, uriCHEBI, keyValue) {
 
         if (uriCHEBI == "") {
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
@@ -6019,83 +6010,136 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             endpoint,
             query,
             function (jsonModel) {
+
                 if (id == jsonModel.results.bindings.length) {
                     return;
                 }
 
-                var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                var query = 'SELECT ?Species ' + 'WHERE ' +
-                    '{ ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
+                // source fma, sink fma and mediator
+                var model = jsonModel.results.bindings[id].Model_entity.value;
+                var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                    'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                    'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
+                    'WHERE { ' +
+                    '<' + model + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                    '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+                    '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
+                    '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
+                    '?source_entity ro:part_of ?source_part_of_entity. ' +
+                    '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
+                    '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
+                    '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
+                    '?sink_entity ro:part_of ?sink_part_of_entity. ' +
+                    '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
+                    '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
+                    '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
+                    '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
+                    '}'
 
-                // Species
                 sendPostRequest(
                     endpoint,
                     query,
-                    function (jsonSpecies) {
+                    function (jsonObjFlux) {
 
                         var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                        var query = 'SELECT ?Gene ' + 'WHERE ' +
-                            '{ ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
+                        var query = 'SELECT ?Species ' + 'WHERE ' +
+                            '{ ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
 
-                        // Gene
+                        // Species
                         sendPostRequest(
                             endpoint,
                             query,
-                            function (jsonGene) {
+                            function (jsonSpecies) {
 
                                 var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                                var query = 'SELECT ?Protein ' + 'WHERE ' +
-                                    '{ ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
+                                var query = 'SELECT ?Gene ' + 'WHERE ' +
+                                    '{ ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
 
-                                // Protein
+                                // Gene
                                 sendPostRequest(
                                     endpoint,
                                     query,
-                                    function (jsonProtein) {
+                                    function (jsonGene) {
 
-                                        // model and biological meaning
-                                        modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
-                                        biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
+                                        var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
+                                        var query = 'SELECT ?Protein ' + 'WHERE ' +
+                                            '{ ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
 
-                                        // species
-                                        if (jsonSpecies.results.bindings.length == 0)
-                                            speciesList.push("Undefined");
-                                        else
-                                            speciesList.push(jsonSpecies.results.bindings[0].Species.value);
+                                        // Protein
+                                        sendPostRequest(
+                                            endpoint,
+                                            query,
+                                            function (jsonProtein) {
 
-                                        // gene
-                                        if (jsonGene.results.bindings.length == 0)
-                                            geneList.push("Undefined");
-                                        else
-                                            geneList.push(jsonGene.results.bindings[0].Gene.value);
+                                                // model and biological meaning
+                                                modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
+                                                biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
 
-                                        // protein
-                                        if (jsonProtein.results.bindings.length == 0)
-                                            proteinList.push("Undefined");
-                                        else
-                                            proteinList.push(jsonProtein.results.bindings[0].Protein.value);
+                                                // reinitialize flux instances
+                                                sourcefmaList = [];
+                                                sinkfmaList = [];
+                                                meduriList = [];
 
-                                        head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
+                                                // source fma, sink fma and mediator
+                                                for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
 
-                                        // Get more useful information
-                                        var len = modelEntity.length;
-                                        mainUtils.searchListAJAX(
-                                            modelEntity[len - 1],
-                                            speciesList[len - 1],
-                                            geneList[len - 1],
-                                            proteinList[len - 1]);
+                                                    if (jsonObjFlux.results.bindings[i].source_fma == undefined)
+                                                        sourcefmaList.push("");
+                                                    else
+                                                        sourcefmaList.push(jsonObjFlux.results.bindings[i].source_fma.value);
 
-                                        // show search results
-                                        mainUtils.searchList(
-                                            head,
-                                            modelEntity,
-                                            biologicalMeaning,
-                                            speciesList,
-                                            geneList,
-                                            proteinList);
+                                                    if (jsonObjFlux.results.bindings[i].sink_fma == undefined)
+                                                        sinkfmaList.push("");
+                                                    else
+                                                        sinkfmaList.push(jsonObjFlux.results.bindings[i].sink_fma.value);
 
-                                        id++; // increment index of modelEntity
-                                        mainUtils.addEventListener(uriOPB, uriCHEBI, keyValue); // callback
+                                                    if (jsonObjFlux.results.bindings[i].med_entity_uri == undefined)
+                                                        meduriList.push("");
+                                                    else
+                                                        meduriList.push(jsonObjFlux.results.bindings[i].med_entity_uri.value);
+                                                }
+
+                                                // remove duplicate
+                                                sourcefmaList = uniqueifySrcSnkMed(sourcefmaList);
+                                                sinkfmaList = uniqueifySrcSnkMed(sinkfmaList);
+                                                meduriList = uniqueifySrcSnkMed(meduriList);
+
+                                                totalList.push(sourcefmaList + "," + sinkfmaList + "," + meduriList);
+
+                                                // species
+                                                if (jsonSpecies.results.bindings.length == 0)
+                                                    speciesList.push("Undefined");
+                                                else
+                                                    speciesList.push(jsonSpecies.results.bindings[0].Species.value);
+
+                                                // gene
+                                                if (jsonGene.results.bindings.length == 0)
+                                                    geneList.push("Undefined");
+                                                else
+                                                    geneList.push(jsonGene.results.bindings[0].Gene.value);
+
+                                                // protein
+                                                if (jsonProtein.results.bindings.length == 0)
+                                                    proteinList.push("Undefined");
+                                                else
+                                                    proteinList.push(jsonProtein.results.bindings[0].Protein.value);
+
+                                                head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
+
+                                                // Get more useful information
+                                                var len = modelEntity.length;
+                                                mainUtils.searchListAJAX(
+                                                    modelEntity[len - 1],
+                                                    speciesList[len - 1],
+                                                    geneList[len - 1],
+                                                    proteinList[len - 1],
+                                                    totalList,
+                                                    id);
+
+                                                id++; // increment index of modelEntity
+                                                mainUtils.ontologyQuery(uriOPB, uriCHEBI, keyValue); // callback
+                                            },
+                                            true);
                                     },
                                     true);
                             },
@@ -6106,9 +6150,120 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             true);
     }
 
+    mainUtils.searchListAJAX = function (modelEntityid, speciesListid, geneListid, proteinListid, totalList, id) {
+
+        // query for flux or flux of solutes
+        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+            'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+            'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+            'SELECT ?Model_srcentity ?Biological_srcmeaning ?source_fma ?Model_snkentity ?Biological_snkmeaning ?sink_fma ' +
+            'WHERE { ' +
+            '<' + modelEntityid + '> semsim:isComputationalComponentFor ?model_prop. ' +
+            '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+            '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
+            '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
+            '?source_prop semsim:physicalPropertyOf ?source_entity. ' +
+            '?Model_srcentity semsim:isComputationalComponentFor ?source_prop. ' +
+            '?Model_srcentity dcterms:description ?Biological_srcmeaning. ' +
+            '?source_entity ro:part_of ?source_entity_fma. ' +
+            '?source_entity_fma semsim:hasPhysicalDefinition ?source_fma. ' +
+            '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
+            '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
+            '?sink_prop semsim:physicalPropertyOf ?sink_entity. ' +
+            '?Model_snkentity semsim:isComputationalComponentFor ?sink_prop. ' +
+            '?Model_snkentity dcterms:description ?Biological_snkmeaning. ' +
+            '?sink_entity ro:part_of ?sink_entity_fma. ' +
+            '?sink_entity_fma semsim:hasPhysicalDefinition ?sink_fma. ' +
+            '}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonModel) {
+
+                var jsonModelObj = [];
+
+                // Parsing into Model_entity and Biological_meaning object
+                for (var i = 0; i < jsonModel.results.bindings.length; i++) {
+                    jsonModelObj.push({
+                        Model_entity: jsonModel.results.bindings[i].Model_srcentity.value,
+                        Biological_meaning: jsonModel.results.bindings[i].Biological_srcmeaning.value,
+                        fma: jsonModel.results.bindings[i].source_fma.value
+                    });
+                }
+
+                for (var i = 0; i < jsonModel.results.bindings.length; i++) {
+                    jsonModelObj.push({
+                        Model_entity: jsonModel.results.bindings[i].Model_snkentity.value,
+                        Biological_meaning: jsonModel.results.bindings[i].Biological_snkmeaning.value,
+                        fma: jsonModel.results.bindings[i].sink_fma.value
+                    });
+                }
+
+                // remove redundant objects
+                jsonModelObj = uniqueifyModelEntity(jsonModelObj);
+
+                for (var m = 0; m < jsonModelObj.length; m++) {
+                    modelEntity.push(jsonModelObj[m].Model_entity);
+                    biologicalMeaning.push(jsonModelObj[m].Biological_meaning);
+                    speciesList.push(speciesListid);
+                    geneList.push(geneListid);
+                    proteinList.push(proteinListid);
+                    totalList.push(jsonModelObj[m].fma);
+                }
+
+                // concentration block
+                if (jsonModelObj.length == 0) {
+                    // query for concentration or concentration of solutes
+                    var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                        'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+                        'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                        'SELECT ?biologicalMeaning ?fma ' +
+                        'WHERE { ' +
+                        '<' + modelEntityid + '> dcterms:description ?biologicalMeaning. ' +
+                        '<' + modelEntityid + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                        '?model_prop semsim:physicalPropertyOf ?entity. ' +
+                        '?entity ro:part_of ?entity_fma. ' +
+                        '?entity_fma semsim:hasPhysicalDefinition ?fma. ' +
+                        '}'
+
+                    sendPostRequest(
+                        endpoint,
+                        query,
+                        function (jsonModelCon) {
+
+                            totalList[id] = jsonModelCon.results.bindings[0].fma.value;
+
+                            mainUtils.searchList(
+                                head,
+                                modelEntity,
+                                biologicalMeaning,
+                                speciesList,
+                                geneList,
+                                proteinList,
+                                totalList);
+                        },
+                        true);
+                }
+                else { // flux block
+
+                    mainUtils.searchList(
+                        head,
+                        modelEntity,
+                        biologicalMeaning,
+                        speciesList,
+                        geneList,
+                        proteinList,
+                        totalList);
+                }
+            },
+            true
+        );
+    }
+
     // TODO: make a common table platform for all functions
     // Show semantic annotation extracted from PMR
-    mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
+    mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, totalList) {
 
         var searchList = document.getElementById("searchList");
 
@@ -6145,7 +6300,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         // Table body
         var tbody = document.createElement("tbody");
-        for (var i = 0; i < modelEntity.length; i++) {
+        for (var i = 0; i < totalList.length; i++) {
             var tr = document.createElement("tr");
 
             var temp = [];
@@ -6196,16 +6351,24 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 if (j == 0) {
                     td[j] = document.createElement("td");
                     var label = document.createElement('label');
-                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" ' +
-                        'data-action="search" value="' + modelEntity[i] + '" class="checkbox"></label>';
+                    label.innerHTML = '<input id="' + totalList[i] + '" type="checkbox" ' +
+                        'data-action="search" value="' + totalList[i] + '" class="checkbox"></label>';
 
                     td[j].appendChild(label);
                     tr.appendChild(td[j]);
                 }
 
-                td[j] = document.createElement("td");
-                td[j].appendChild(document.createTextNode(temp[j]));
-                tr.appendChild(td[j]);
+                if (j == 1) {
+                    td[j] = document.createElement("td");
+                    td[j].id = totalList[i];
+                    td[j].appendChild(document.createTextNode(temp[j]));
+                    tr.appendChild(td[j]);
+                }
+                else {
+                    td[j] = document.createElement("td");
+                    td[j].appendChild(document.createTextNode(temp[j]));
+                    tr.appendChild(td[j]);
+                }
             }
 
             tbody.appendChild(tr);
@@ -6214,6 +6377,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         table.appendChild(tbody);
         searchList.appendChild(table);
 
+        console.log("table: ", table);
+
         // Fill in the search attribute value
         var searchTxt = document.getElementById("searchTxt");
         searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
@@ -6221,87 +6386,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         // SET main content in the local storage
         var maincontent = document.getElementById('main-content');
         sessionStorage.setItem('searchListContent', $(maincontent).html());
-    }
-
-    mainUtils.searchListAJAX = function (modelEntityid, speciesListid, geneListid, proteinListid) {
-
-        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-            'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-            'SELECT ?Model_srcentity ?Biological_srcmeaning ?Model_snkentity ?Biological_snkmeaning ' +
-            'WHERE { ' +
-            '<' + modelEntityid + '> semsim:isComputationalComponentFor ?model_prop. ' +
-            '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-            '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-            '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-            '?source_prop semsim:physicalPropertyOf ?source_entity. ' +
-            '?Model_srcentity semsim:isComputationalComponentFor ?source_prop. ' +
-            '?Model_srcentity dcterms:description ?Biological_srcmeaning. ' +
-            '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-            '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-            '?sink_prop semsim:physicalPropertyOf ?sink_entity. ' +
-            '?Model_snkentity semsim:isComputationalComponentFor ?sink_prop. ' +
-            '?Model_snkentity dcterms:description ?Biological_snkmeaning.' +
-            '}'
-
-        mainUtils.searchListAJAXObj = function () {
-            // Model
-            sendPostRequest(
-                endpoint,
-                query,
-                function (jsonModel) {
-                    var jsonModelObj = [];
-
-                    // Parsing into Model_entity and Biological_meaning object
-                    for (var i = 0; i < jsonModel.results.bindings.length; i++) {
-                        jsonModelObj.push({
-                            Model_entity: jsonModel.results.bindings[i].Model_srcentity.value,
-                            Biological_meaning: jsonModel.results.bindings[i].Biological_srcmeaning.value
-                        });
-                    }
-
-                    for (var i = 0; i < jsonModel.results.bindings.length; i++) {
-                        jsonModelObj.push({
-                            Model_entity: jsonModel.results.bindings[i].Model_snkentity.value,
-                            Biological_meaning: jsonModel.results.bindings[i].Biological_snkmeaning.value
-                        });
-                    }
-
-                    // remove redundant objects
-                    jsonModelObj = uniqueifyModelEntity(jsonModelObj);
-
-                    for (var m = 0; m < jsonModelObj.length; m++) {
-                        modelEntity.push(jsonModelObj[m].Model_entity);
-                        biologicalMeaning.push(jsonModelObj[m].Biological_meaning);
-                        speciesList.push(speciesListid);
-                        geneList.push(geneListid);
-                        proteinList.push(proteinListid);
-                    }
-
-                    mainUtils.searchList(
-                        head,
-                        modelEntity,
-                        biologicalMeaning,
-                        speciesList,
-                        geneList,
-                        proteinList);
-
-                    // No search results found, so sent empty arrays
-                    if (!jsonModelObj.length) {
-                        console.log("No search results found in searchListAJAX", jsonModelObj.length);
-                        mainUtils.searchList(
-                            head,
-                            modelEntity,
-                            biologicalMeaning,
-                            speciesList,
-                            geneList,
-                            proteinList);
-                    }
-                },
-                true
-            );
-        }
-
-        mainUtils.searchListAJAXObj(); // callback
     }
 
     // Load the view
@@ -6359,18 +6443,18 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             function (modelHtmlContent) {
                 insertHtml("#main-content", modelHtmlContent);
 
-                sendPostRequest(endpoint, query, showModel, true);
+                sendPostRequest(endpoint, query, mainUtils.showModel, true);
             },
             false);
 
         // Switch from current active button to models button
-        var activeItem = "#" + findActiveItem();
-        switchListItemToActive(activeItem, "#listModels");
+        var activeItem = "#" + activeMenu();
+        switchMenuToActive(activeItem, "#listModels");
     };
 
     // TODO: move to utils directory
     // Show selected items in a table
-    var showModel = function (jsonObj) {
+    mainUtils.showModel = function (jsonObj) {
 
         console.log("showModel: ", jsonObj);
 
@@ -6471,6 +6555,116 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 $('table tr td label')[i].firstChild.checked = false;
             }
         }
+    };
+
+    // Toggle table column in Model discovery
+    mainUtils.toggleColHtml = function () {
+
+        if (event.srcElement.checked == false) {
+            var id = event.srcElement.id;
+
+            console.log("id: ", id);
+
+            $('td:nth-child(' + id + '),th:nth-child(' + id + ')').hide();
+        }
+
+        if (event.srcElement.checked == true) {
+            var id = event.srcElement.id;
+
+            console.log("id: ", id);
+
+            $('td:nth-child(' + id + '),th:nth-child(' + id + ')').show();
+        }
+    };
+
+    // Toggle table column in Load model
+    mainUtils.toggleColModelHtml = function () {
+
+        if (event.srcElement.checked == false) {
+            var id = event.srcElement.id;
+
+            console.log("id: ", id);
+
+            $('td:nth-child(' + id + '),th:nth-child(' + id + ')').hide();
+        }
+
+        if (event.srcElement.checked == true) {
+            var id = event.srcElement.id;
+
+            console.log("id: ", id);
+
+            $('td:nth-child(' + id + '),th:nth-child(' + id + ')').show();
+        }
+    };
+
+    mainUtils.compare = function (str, tempstr) {
+
+        for (var i = 0; i < str.length; i++) {
+            for (var j = 0; j < tempstr.length; j++) {
+                if (str[i] == tempstr[j]) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // Filter search results
+    mainUtils.filterSearchHtml = function () {
+
+        var tempstr = [];
+
+        if (event.srcElement.checked == true) {
+
+            var id = event.srcElement.id;
+            for (var i = 1; i < $('table tr').length; i++) {
+
+                tempstr = $('table tr')[i].childNodes[2].id.split(',');
+
+                // id repository
+                str.push(id);
+                str = uniqueifySrcSnkMed(str);
+
+                // check whether str is in tempstr!!!
+                if (mainUtils.compare(str, tempstr) == true) {
+                    $('table tr')[i].hidden = false;
+                }
+                else {
+                    $('table tr')[i].hidden = true;
+                }
+            }
+        }
+
+        if (event.srcElement.checked == false) {
+
+            var tempstr = [];
+            var id = event.srcElement.id;
+
+            str = uniqueifySrcSnkMed(str); // remove duplicate
+            str.splice(str.indexOf(id), 1); // delete id
+
+            if (str.length != 0) {
+                for (var i = 1; i < $('table tr').length; i++) {
+
+                    tempstr = $('table tr')[i].childNodes[2].id.split(',');
+
+                    // check whether str is in tempstr
+                    if (tempstr.indexOf(id) != -1 && tempstr.length == 1) {
+                        $('table tr')[i].hidden = true;
+                    }
+                    else {
+                        $('table tr')[i].hidden = false;
+                    }
+                }
+            }
+            else { // if empty then show all
+                for (var i = 1; i < $('table tr').length; i++) {
+                    $('table tr')[i].hidden = false;
+                }
+            }
+        }
+
     };
 
     // TODO: move to utils directory

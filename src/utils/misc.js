@@ -22,7 +22,8 @@ var parseModelName = function (modelEntity) {
 var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
     var head = [];
 
-    for (var i = 0; i < jsonModel.head.vars.length; i++)
+    // Getting first 2 head title, not i < jsonModel.head.vars.length
+    for (var i = 0; i < 2; i++)
         head.push(jsonModel.head.vars[i]);
 
     head.push(jsonSpecies.head.vars[0]);
@@ -32,13 +33,40 @@ var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
     return head;
 }
 
+function compare(str, tempstr) {
+
+    for (var i = 0; i < str.length; i++) {
+        for (var j = 0; j < tempstr.length; j++) {
+            if (str[i] == tempstr[j]) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// remove duplicate model entity and biological meaning
+function uniqueifySrcSnkMed(es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j] === e)
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
 // remove duplicate model entity and biological meaning
 function uniqueifyModelEntity(es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
             if (retval[j].Model_entity === e.Model_entity &&
-                retval[j].Biological_meaning === e.Biological_meaning)
+                retval[j].Biological_meaning === e.Biological_meaning &&
+                retval[j].fma === e.fma)
 
                 return;
         }
@@ -114,6 +142,7 @@ function iteration(length) {
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
 exports.headTitle = headTitle;
+exports.uniqueifySrcSnkMed = uniqueifySrcSnkMed;
 exports.uniqueifyModelEntity = uniqueifyModelEntity;
 exports.uniqueifyEpithelial = uniqueifyEpithelial;
 exports.uniqueifySVG = uniqueifySVG;
@@ -121,3 +150,4 @@ exports.createAnchor = createAnchor;
 exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
 exports.iteration = iteration;
+exports.compare = compare;

@@ -8,6 +8,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var apicalID = "http://identifiers.org/fma/FMA:84666";
     var basolateralID = "http://identifiers.org/fma/FMA:84669";
+    var paracellularID = "http://identifiers.org/fma/FMA:67394";
     var luminalID = "http://identifiers.org/fma/FMA:74550";
     var cytosolID = "http://identifiers.org/fma/FMA:66836";
     var paracellularID = "http://identifiers.org/fma/FMA:67394";
