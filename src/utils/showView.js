@@ -7,6 +7,8 @@ var searchFn = require("../utils/misc.js").searchFn;
 // Show a selected entry from search results
 var showView = function (jsonObj, viewHtmlContent) {
 
+    console.log("jsonObj: ", jsonObj);
+
     var viewList = document.getElementById("viewList");
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {

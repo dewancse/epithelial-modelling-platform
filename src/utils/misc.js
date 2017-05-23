@@ -2,7 +2,7 @@
  * Created by Dewan Sarwar on 5/8/2017.
  */
 // parse text from the epithelial name
-function parserFmaNameText(fma) {
+var parserFmaNameText = function (fma) {
     var indexOfHash = fma.name.search("#");
     var srctext = fma.name.slice(indexOfHash + 1);
     var indexOfdot = srctext.indexOf('.');

@@ -789,8 +789,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 if (j == 0) {
                     td[j] = document.createElement("td");
                     var label = document.createElement('label');
-                    label.innerHTML = '<input id="' + totalList[i] + '" type="checkbox" ' +
-                        'data-action="search" value="' + totalList[i] + '" class="checkbox"></label>';
+                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" ' +
+                        'data-action="search" value="' + modelEntity[i] + '" class="checkbox"></label>';
 
                     td[j].appendChild(label);
                     tr.appendChild(td[j]);
@@ -1438,7 +1438,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                 var srctext = parserFmaNameText(source_fma[0]);
                                 var snktext = parserFmaNameText(sink_fma[0]);
-                                var medfmatext = parserFmaNameText(med_fma[0]);
+                                if (med_fma[0] != undefined)
+                                    var medfmatext = parserFmaNameText(med_fma[0]);
 
                                 if (med_pr[0] == undefined) { // temp solution
                                     membrane.push({

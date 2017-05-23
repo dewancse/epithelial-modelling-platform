@@ -74,7 +74,7 @@
  * Created by Dewan Sarwar on 5/8/2017.
  */
 // parse text from the epithelial name
-function parserFmaNameText(fma) {
+var parserFmaNameText = function (fma) {
     var indexOfHash = fma.name.search("#");
     var srctext = fma.name.slice(indexOfHash + 1);
     var indexOfdot = srctext.indexOf('.');
@@ -103,6 +103,19 @@ var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
     head.push(jsonProtein.head.vars[0]);
 
     return head;
+}
+
+function compare(str, tempstr) {
+
+    for (var i = 0; i < str.length; i++) {
+        for (var j = 0; j < tempstr.length; j++) {
+            if (str[i] == tempstr[j]) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 // remove duplicate model entity and biological meaning
@@ -209,6 +222,7 @@ exports.createAnchor = createAnchor;
 exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
 exports.iteration = iteration;
+exports.compare = compare;
 
 /***/ }),
 /* 1 */
@@ -5514,6 +5528,8 @@ var searchFn = __webpack_require__(0).searchFn;
 // Show a selected entry from search results
 var showView = function (jsonObj, viewHtmlContent) {
 
+    console.log("jsonObj: ", jsonObj);
+
     var viewList = document.getElementById("viewList");
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
@@ -5567,6 +5583,7 @@ exports.showView = showView;
 var parseModelName = __webpack_require__(0).parseModelName;
 var parserFmaNameText = __webpack_require__(0).parserFmaNameText;
 var headTitle = __webpack_require__(0).headTitle;
+var compare = __webpack_require__(0).compare;
 var uniqueifyModelEntity = __webpack_require__(0).uniqueifyModelEntity;
 var uniqueifyEpithelial = __webpack_require__(0).uniqueifyEpithelial;
 var uniqueifySrcSnkMed = __webpack_require__(0).uniqueifySrcSnkMed;
@@ -6351,8 +6368,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 if (j == 0) {
                     td[j] = document.createElement("td");
                     var label = document.createElement('label');
-                    label.innerHTML = '<input id="' + totalList[i] + '" type="checkbox" ' +
-                        'data-action="search" value="' + totalList[i] + '" class="checkbox"></label>';
+                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" ' +
+                        'data-action="search" value="' + modelEntity[i] + '" class="checkbox"></label>';
 
                     td[j].appendChild(label);
                     tr.appendChild(td[j]);
@@ -6597,19 +6614,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
     };
 
-    mainUtils.compare = function (str, tempstr) {
-
-        for (var i = 0; i < str.length; i++) {
-            for (var j = 0; j < tempstr.length; j++) {
-                if (str[i] == tempstr[j]) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     // Filter search results
     mainUtils.filterSearchHtml = function () {
 
@@ -6627,7 +6631,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 str = uniqueifySrcSnkMed(str);
 
                 // check whether str is in tempstr!!!
-                if (mainUtils.compare(str, tempstr) == true) {
+                if (compare(str, tempstr) == true) {
                     $('table tr')[i].hidden = false;
                 }
                 else {
@@ -7013,7 +7017,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                 var srctext = parserFmaNameText(source_fma[0]);
                                 var snktext = parserFmaNameText(sink_fma[0]);
-                                var medfmatext = parserFmaNameText(med_fma[0]);
+                                if (med_fma[0] != undefined)
+                                    var medfmatext = parserFmaNameText(med_fma[0]);
 
                                 if (med_pr[0] == undefined) { // temp solution
                                     membrane.push({
