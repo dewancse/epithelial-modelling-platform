@@ -1438,8 +1438,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                 var srctext = parserFmaNameText(source_fma[0]);
                                 var snktext = parserFmaNameText(sink_fma[0]);
-                                if (med_fma[0] != undefined)
-                                    var medfmatext = parserFmaNameText(med_fma[0]);
+                                var medfmatext = parserFmaNameText(med_fma[0]);
 
                                 if (med_pr[0] == undefined) { // temp solution
                                     membrane.push({

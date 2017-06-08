@@ -302,6 +302,7 @@ exports.sendPostRequest = sendPostRequest;
  */
 var solutesBouncing = __webpack_require__(6).solutesBouncing;
 var getTextWidth = __webpack_require__(0).getTextWidth;
+var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
@@ -310,7 +311,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var paracellularID = "http://identifiers.org/fma/FMA:67394";
     var luminalID = "http://identifiers.org/fma/FMA:74550";
     var cytosolID = "http://identifiers.org/fma/FMA:66836";
-    var paracellularID = "http://identifiers.org/fma/FMA:67394";
     var interstitialID = "http://identifiers.org/fma/FMA:9673";
     var Nachannel = "http://purl.obolibrary.org/obo/PR_000014527";
     var Clchannel = "http://purl.obolibrary.org/obo/PR_Q06393";
@@ -331,6 +331,103 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var wallOfSmoothERMembrane = [];
     var wallOfRoughERMembrane = [];
     var celljunction = [];
+
+    // Code for drag and pop up .....
+    var apicalCircle = "http://identifiers.org/fma/FMA:84666";
+    var basolateralMembraneID = "http://identifiers.org/fma/FMA:84669";
+
+    var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+
+    var tempBas = [], tempBas2 = [], tempBasID = [], idBaso = 0;
+    var typeOfModel, counter = 0, id = 0;
+    var tempSpecies = "", tempGene = "";
+    var relatedModel = [], relatedModel2 = [], relatedModelID = [], idProtein = 0, cModel;
+    var proteinVar, loc, dx, dy;
+
+    var counter = 0;
+    var icGlobal;
+
+    var tempJSON = [
+        {
+            "key": "Model: ",
+            "value": "Chang_fujita"
+        },
+        {
+            "key": "Biological_meaning: ",
+            "value": "Flux of sodium from luminal to cytosol compartment through Na-Cl cotransporter, K-Cl cotransporter, and apical membrane"
+        },
+        {
+            "key": "Species",
+            "value": "RAT"
+        },
+        {
+            "key": "Gene",
+            "value": "SlAC5"
+        },
+        {
+            "key": "Protein",
+            "value": "Sodium Hydrogen 3 Antiporter"
+        }
+    ];
+
+    var kidney = [
+        {
+            "key": "http://identifiers.org/fma/FMA:84666",
+            "value": "apical plasma membrane"
+        },
+        {
+            "key": "http://identifiers.org/fma/FMA:70973",
+            "value": "epithelial cell of proximal tubule"
+        },
+        {
+            "key": "http://identifiers.org/fma/FMA:17693",
+            "value": "proximal convoluted tubule"
+        },
+        {
+            "key": "http://identifiers.org/fma/FMA:66836",
+            "value": "Portion of cytosol"
+        },
+        {
+            "key": "http://identifiers.org/fma/FMA:84669",
+            "value": "basolateralMembrane plasma membrane"
+        },
+        {
+            "key": "http://identifiers.org/fma/FMA:17716",
+            "value": "Proximal straight tubule"
+        }
+    ];
+
+    var organ = [
+        {
+            "key": [
+                {
+                    "key": "http://identifiers.org/fma/FMA:84666",
+                    "value": "apical plasma membrane"
+                },
+                {
+                    "key": "http://identifiers.org/fma/FMA:70973",
+                    "value": "epithelial cell of proximal tubule"
+                },
+                {
+                    "key": "http://identifiers.org/fma/FMA:17693",
+                    "value": "proximal convoluted tubule"
+                },
+                {
+                    "key": "http://identifiers.org/fma/FMA:66836",
+                    "value": "Portion of cytosol"
+                },
+                {
+                    "key": "http://identifiers.org/fma/FMA:84669",
+                    "value": "basolateralMembrane plasma membrane"
+                },
+                {
+                    "key": "http://identifiers.org/fma/FMA:17716",
+                    "value": "Proximal straight tubule"
+                }],
+
+            "value": "Kidney"
+        }
+    ];
 
     // Extract apical fluxes
     for (var i = 0; i < apicalMembrane.length; i++) {
@@ -957,6 +1054,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .attr("stroke-width", 25)
         .attr("opacity", 0.5);
 
+    // example-svg: variable was linebasolateralMembrane
+    // and id was basolateralMembraneID
     var linebasolateral = newg.append("line")
         .attr("id", basolateralID)
         .attr("x1", function (d) {
@@ -1488,6 +1587,551 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     // End of svg checkbox
+
+    // Moved code from the standalone program
+    // remove duplicate model entity and biological meaning
+    function uniqueify(es) {
+        var retval = [];
+        es.forEach(function (e) {
+            for (var j = 0; j < retval.length; j++) {
+                if (retval[j] === e)
+                    return;
+            }
+            retval.push(e);
+        });
+        return retval;
+    }
+
+    // TODO: Fix this
+    // function dragcircleline(d) {
+    //
+    //     var cthis = this;
+    //     var axis = groupcordinates(d3.select(this)._groups[0][0].id, cthis);
+    //
+    //     circlewithlineg
+    //         .attr("cx", axis.shift())
+    //         .attr("cy", axis.shift());
+    //
+    //     // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
+    //     var lineb_x = document.getElementsByTagName("line")[1].x1.baseVal.value;
+    //     var lineb_y1 = document.getElementsByTagName("line")[1].y1.baseVal.value;
+    //     var lineb_y2 = document.getElementsByTagName("line")[1].y2.baseVal.value;
+    //     var cx = d3.select(cthis)._groups[0][0].cx.baseVal.value;
+    //     var cy = d3.select(cthis)._groups[0][0].cy.baseVal.value;
+    //     var lineb_id = document.getElementsByTagName("line")[1].id;
+    //     var circle_id = d3.select(cthis)._groups[0][0].id;
+    //
+    //     if ((cx >= (lineb_x - radius) && cx <= lineb_x + 20 + radius) &&
+    //         (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+    //
+    //         document.getElementsByTagName("line")[1].style.setProperty("stroke", "red");
+    //
+    //         // assign d.x and d.y
+    //         dx = d.x, dy = d.y;
+    //
+    //         if (counter == 0) {
+    //
+    //             counter = 1;
+    //
+    //             var m = new Modal({
+    //                 id: 'myModal',
+    //                 header: 'Recommender System',
+    //                 footer: 'My footer',
+    //                 footerCloseButton: 'Close',
+    //                 footerSaveButton: 'Save'
+    //             });
+    //
+    //             m.getBody().html('<div id="modalBody"></div>');
+    //
+    //             m.show();
+    //
+    //             $('#myModal').on('shown.bs.modal', function () {
+    //
+    //                 var query = 'SELECT ?cellmlmodel ?Protein ' +
+    //                     'WHERE { GRAPH ?g { ' +
+    //                     '?cellmlmodel <http://purl.org/dc/terms/description> ?Protein . ' +
+    //                     'FILTER (str(?Protein) = "Sodium/hydrogen exchanger 3") . ' +
+    //                     '}}'
+    //
+    //                 // query 1 - get model name
+    //                 sendPostRequest(
+    //                     endpoint,
+    //                     query,
+    //                     function (jsonModel) {
+    //
+    //                         // parsing
+    //                         cModel = jsonModel.results.bindings[0].cellmlmodel.value;
+    //                         var indexOfHash = cModel.search("#");
+    //                         cModel = cModel.slice(0, indexOfHash);
+    //
+    //                         var query = 'SELECT ?located_in ' +
+    //                             'WHERE { GRAPH ?g { ' +
+    //                             '<' + cModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
+    //                             '}}'
+    //
+    //                         // query 2 - get location of that model
+    //                         sendPostRequest(
+    //                             endpoint,
+    //                             query,
+    //                             function (jsonLocatedin) {
+    //
+    //                                 loc = "";
+    //                                 // get locations of an organ
+    //                                 for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+    //                                     for (var j = 0; j < kidney.length; j++) {
+    //                                         if (kidney[j].key == jsonLocatedin.results.bindings[i].located_in.value) {
+    //                                             loc += kidney[j].value;
+    //
+    //                                             break;
+    //                                         }
+    //                                     }
+    //
+    //                                     if (i == jsonLocatedin.results.bindings.length - 1)
+    //                                         loc += ".";
+    //                                     else
+    //                                         loc += ", ";
+    //                                 }
+    //
+    //                                 proteinVar = jsonModel.results.bindings[0].Protein.value;
+    //
+    //                                 // get type of model
+    //                                 for (var i = 0; i < organ.length; i++) {
+    //                                     for (var j = 0; j < organ[i].key.length; j++) {
+    //                                         for (var k = 0; k < kidney.length; k++) {
+    //                                             if (kidney[k].key == organ[i].key[j].key)
+    //                                                 counter++;
+    //                                         }
+    //                                     }
+    //
+    //                                     if (i == organ.length - 1 && counter == organ[i].key.length) {
+    //                                         typeOfModel = organ[i].value;
+    //                                     }
+    //                                 }
+    //
+    //                                 var query = 'SELECT ?cellmlmodel ?located_in ' +
+    //                                     'WHERE { GRAPH ?g { ' +
+    //                                     '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
+    //                                     '}}'
+    //
+    //                                 sendPostRequest(
+    //                                     endpoint,
+    //                                     query,
+    //                                     function (jsonRelatedModel) {
+    //
+    //                                         for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
+    //                                             for (var j = 0; j < kidney.length; j++) {
+    //                                                 if (jsonRelatedModel.results.bindings[i].located_in.value == kidney[j].key) {
+    //
+    //                                                     // parsing
+    //                                                     var kModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
+    //                                                     var indexOfHash = kModel.search("#");
+    //                                                     kModel = kModel.slice(0, indexOfHash);
+    //
+    //                                                     relatedModel.push(kModel);
+    //
+    //                                                     break;
+    //                                                 }
+    //                                             }
+    //                                         }
+    //
+    //                                         relatedModel = uniqueify(relatedModel);
+    //
+    //                                         findProtein(relatedModel, jsonModel);
+    //
+    //                                     }, true);
+    //                             }, true);
+    //                     }, true);
+    //             });
+    //
+    //             jQuery(window).trigger('resize');
+    //         }
+    //     }
+    // }
+
+    var findSpeciesGene = function (cModel, jsonModel) {
+
+        var query = 'SELECT ?Species ' +
+            'WHERE { GRAPH ?g { ' +
+            '<' + cModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonSpecies) {
+
+                var query = 'SELECT ?Gene ' +
+                    'WHERE { GRAPH ?g { ' +
+                    '<' + cModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
+                    '}}'
+
+                sendPostRequest(
+                    endpoint,
+                    query,
+                    function (jsonGene) {
+
+                        var label = document.createElement('label');
+                        label.innerHTML = '<br><input id="' + cModel + '#Species" type="checkbox" ' +
+                            'value="' + jsonSpecies.results.bindings[0].Species.value + '"> ' +
+                            '' + jsonSpecies.results.bindings[0].Species.value + '</label>';
+
+                        tempSpecies += label.innerHTML;
+
+                        label.innerHTML = '<br><input id="' + cModel + '#Gene" type="checkbox" ' +
+                            'value="' + jsonGene.results.bindings[0].Gene.value + '"> ' +
+                            '' + jsonGene.results.bindings[0].Gene.value + '</label>';
+
+                        tempGene += label.innerHTML;
+
+                        id++;
+
+                        if (id == jsonModel.results.bindings.length) {
+                            basolateralMembrane();
+                            return;
+                        }
+
+                        // parsing
+                        var tModel = jsonModel.results.bindings[id].cellmlmodel.value;
+                        var indexOfHash = tModel.search("#");
+                        tModel = tModel.slice(0, indexOfHash);
+
+                        findSpeciesGene(tModel, jsonModel);
+
+                    }, true);
+            }, true);
+    }
+
+    var findProtein = function (relatedModel, jsonModel) {
+        var query = 'SELECT ?Protein ' +
+            'WHERE { GRAPH ?g { ' +
+            '<' + relatedModel[idProtein] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonProtein) {
+
+                if (jsonProtein.results.bindings[0] != undefined) {
+                    relatedModel2.push(jsonProtein.results.bindings[0].Protein.value);
+                    relatedModelID.push(relatedModel[idProtein]);
+                }
+
+                idProtein++;
+
+                if (idProtein == relatedModel.length) {
+                    findSpeciesGene(cModel, jsonModel);
+                    return;
+                }
+
+                findProtein(relatedModel, jsonModel);
+
+            }, true);
+    }
+
+    var basolateralMembrane = function () {
+        var query = 'SELECT ?cellmlmodel ?located_in ' +
+            'WHERE { GRAPH ?g { ' +
+            '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
+            'FILTER (str(?located_in) = "http://identifiers.org/fma/FMA:84669"). ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonbasolateralMembrane) {
+
+                for (var i = 0; i < jsonbasolateralMembrane.results.bindings.length; i++) {
+                    for (var j = 0; j < kidney.length; j++) {
+                        if (jsonbasolateralMembrane.results.bindings[i].located_in.value == kidney[j].key) {
+
+                            // parsing
+                            var kModel = jsonbasolateralMembrane.results.bindings[i].cellmlmodel.value;
+                            var indexOfHash = kModel.search("#");
+                            kModel = kModel.slice(0, indexOfHash);
+
+                            tempBas.push(kModel);
+
+                            break;
+                        }
+                    }
+                }
+
+                tempBas = uniqueify(tempBas);
+
+                basolateralMembrane2();
+
+            }, true);
+    }
+
+    var basolateralMembrane2 = function () {
+        var query = 'SELECT ?Protein ' +
+            'WHERE { GRAPH ?g { ' +
+            '<' + tempBas[idBaso] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonProtein) {
+
+                if (jsonProtein.results.bindings[0] != undefined) {
+                    tempBas2.push(jsonProtein.results.bindings[0].Protein.value);
+                    tempBasID.push(tempBas[idBaso]);
+                }
+
+                idBaso++;
+
+                if (idBaso == tempBas.length) {
+
+                    var msg = "<p><b>Would you like to move ... ?</b><\p>";
+                    var msg2 = "<p><b>" + proteinVar + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
+                        "<b>" + loc + "</b><\p>";
+
+                    // TODO: make similar URI thing on model, biological, species, gene, and protein
+                    var model = "<p><b>Model: </b>" + tempJSON[0].value + "</p>";
+                    var biological = "<p><b>Biological Meaning: </b>" + tempJSON[1].value + "</p>";
+                    var species = "<p><b>Species: </b>" + tempJSON[2].value + "</p>";
+                    var gene = "<p><b>Gene: </b>" + tempJSON[3].value + "</p>";
+                    var protein = "<p><b>Protein: </b>" + tempJSON[4].value + "</p>";
+
+                    // interesting .. !!!
+                    var otherSpecies = "<p><b>Other species of <b>" + proteinVar + "</b>: </b>" + tempSpecies + "</p>";
+                    var otherGene = "<p><b>Other gene of <b>" + proteinVar + "</b>: </b>" + tempGene + "</p>";
+
+                    var otherKidney = "<p><b>Other kidney models in PMR: </b>";
+                    for (var i = 0; i < relatedModel2.length; i++) {
+
+                        if (proteinVar == relatedModel2[i])
+                            continue;
+
+                        var label = document.createElement('label');
+                        label.innerHTML = '<br><input id="' + relatedModelID[i] + '#Protein" type="checkbox" ' +
+                            'value="' + relatedModel2[i] + '"> ' + relatedModel2[i] + '</label>';
+
+                        otherKidney += label.innerHTML;
+                    }
+
+                    var basolateralMembraneTransporter = "<p><b>basolateralMembrane transporters might be of interest: </b>";
+                    for (var i = 0; i < tempBas2.length; i++) {
+
+                        var label = document.createElement('label');
+                        label.innerHTML = '<br><input id="' + tempBasID[i] + '#Protein" type="checkbox" ' +
+                            'value="' + tempBas2[i] + '"> ' + tempBas2[i] + '</label>';
+
+                        basolateralMembraneTransporter += label.innerHTML;
+                    }
+
+
+                    $('#modalBody')
+                        .append(msg)
+                        .append(msg2)
+                        .append(model)
+                        .append(biological)
+                        .append(species)
+                        .append(gene)
+                        .append(protein);
+
+                    var msg3 = "<br><p><b>Recommendations or suggestions .... </b><\p>";
+
+                    $('#modalBody')
+                        .append(msg3)
+                        .append(otherSpecies)
+                        .append(otherGene)
+                        .append(otherKidney)
+                        .append(basolateralMembraneTransporter);
+
+                    return;
+                }
+
+                basolateralMembrane2();
+
+            }, true);
+    }
+
+    var Modal = function (options) {
+        var $this = this;
+
+        options = options ? options : {};
+        $this.options = {};
+        $this.options.header = options.header !== undefined ? options.header : false;
+        $this.options.footer = options.footer !== undefined ? options.footer : false;
+        $this.options.closeButton = options.closeButton !== undefined ? options.closeButton : true;
+        $this.options.footerCloseButton = options.footerCloseButton !== undefined ? options.footerCloseButton : false;
+        $this.options.footerSaveButton = options.footerSaveButton !== undefined ? options.footerSaveButton : false;
+        $this.options.id = options.id !== undefined ? options.id : "myModal";
+
+        /**
+         * Append modal window html to body
+         */
+        $this.createModal = function () {
+            $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
+            $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
+            var win = $('.modal-content', $this.selector);
+
+            if ($this.options.header) {
+                win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
+
+                if ($this.options.closeButton) {
+                    win.find('.modal-header').prepend('<button type="button" class="close" data-dismiss="modal">&times;</button>');
+                }
+            }
+
+            win.append('<div class="modal-body"></div>');
+            if ($this.options.footer) {
+                win.append('<div class="modal-footer"></div>');
+
+                if ($this.options.footerCloseButton) {
+                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                }
+
+                if ($this.options.footerSaveButton) {
+                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                }
+            }
+
+            console.log("win: ", win);
+
+            $($this.selector).on('hidden.bs.modal', function (e) {
+
+                $($this.selector).remove();
+
+                circlewithlineg[icGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("cx", dx)
+                    .attr("cy", dy);
+
+                // lineBasolateralMembrane
+                linebasolateral
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .style("stroke", "orange");
+            });
+
+            // save button clicked!!
+            win[0].lastElementChild.children[1].onclick = function (event) {
+
+                // checkbox!!
+                for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
+                    if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
+
+                        console.log("Species clicked!!");
+
+                        console.log(win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
+                        console.log(win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                    }
+                    else {
+                        console.log("Not clicked!!");
+                    }
+                }
+
+                // checkbox!!
+                for (var i = 0; i < win[0].children[1].children[0].children[13].getElementsByTagName("input").length; i++) {
+                    if (win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked) {
+
+                        console.log("Gene clicked!!");
+
+                        console.log(win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
+                        console.log(win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
+                    }
+                    else {
+                        console.log("Not clicked!!");
+                    }
+                }
+
+                // checkbox!!
+                for (var i = 0; i < win[0].children[1].children[0].children[14].getElementsByTagName("input").length; i++) {
+                    if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
+
+                        console.log("other Kidney clicked!!");
+
+                        console.log(win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
+                        console.log(win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
+                    }
+                    else {
+                        console.log("Not clicked!!");
+                    }
+                }
+
+                // checkbox!!
+                for (var i = 0; i < win[0].children[1].children[0].children[15].getElementsByTagName("input").length; i++) {
+                    if (win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].checked) {
+                        console.log(win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].checked);
+                        console.log(win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].id);
+                    }
+                    else {
+                        console.log("Not clicked!!");
+                    }
+                }
+
+                console.log("save clicked!");
+            }
+        };
+
+        /**
+         * Set header text. It makes sense only if the options.header is logical true.
+         * @param {String} html New header text.
+         */
+        $this.setHeader = function (html) {
+            $this.window.find('.modal-title').html(html);
+        };
+
+        /**
+         * Set body HTML.
+         * @param {String} html New body HTML
+         */
+        $this.setBody = function (html) {
+            $this.window.find('.modal-body').html(html);
+        };
+
+        /**
+         * Set footer HTML.
+         * @param {String} html New footer HTML
+         */
+        $this.setFooter = function (html) {
+            $this.window.find('.modal-footer').html(html);
+        };
+
+        /**
+         * Return window body element.
+         * @returns {jQuery} The body element
+         */
+        $this.getBody = function () {
+            return $this.window.find('.modal-body');
+        };
+
+        /**
+         * Show modal window
+         */
+        $this.show = function () {
+            $this.window.modal('show');
+        };
+
+        /**
+         * Hide modal window
+         */
+        $this.hide = function () {
+            $this.window.modal('hide');
+        };
+
+        /**
+         * Toggle modal window
+         */
+        $this.toggle = function () {
+            $this.window.modal('toggle');
+        };
+
+        $this.selector = "#" + $this.options.id;
+        if (!$($this.selector).length) {
+            $this.createModal();
+        }
+
+        $this.window = $($this.selector);
+        $this.setHeader($this.options.header);
+    };
 
     // Gap Junction
     for (var i = 0; i < celljunction.length; i++) {
@@ -5060,8 +5704,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     function dragcircleline(d) {
 
+        var cthis = this;
+
         // Circle: strip all the non-digit characters (\D or [^0-9])
         var ic = this.id.replace(/\D/g, '');
+        icGlobal = ic;
 
         var axis = groupcordinates("circlewithlineg" + ic, ic);
         circlewithlineg[ic]
@@ -5098,6 +5745,141 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("y1", axis.shift())
                 .attr("x2", axis.shift())
                 .attr("y2", axis.shift());
+        }
+
+        // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
+        var lineb_x = document.getElementsByTagName("line")[1].x1.baseVal.value;
+        var lineb_y1 = document.getElementsByTagName("line")[1].y1.baseVal.value;
+        var lineb_y2 = document.getElementsByTagName("line")[1].y2.baseVal.value;
+        var cx = d3.select(cthis)._groups[0][0].cx.baseVal.value;
+        var cy = d3.select(cthis)._groups[0][0].cy.baseVal.value;
+        var lineb_id = document.getElementsByTagName("line")[1].id;
+        var circle_id = d3.select(cthis)._groups[0][0].id;
+
+        if ((cx >= (lineb_x - radius) && cx <= lineb_x + 20 + radius) &&
+            (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+
+            document.getElementsByTagName("line")[1].style.setProperty("stroke", "red");
+
+            // assign d.x and d.y
+            dx = d.x, dy = d.y;
+
+            if (counter == 0) {
+
+                counter = 1;
+
+                var m = new Modal({
+                    id: 'myModal',
+                    header: 'Recommender System',
+                    footer: 'My footer',
+                    footerCloseButton: 'Close',
+                    footerSaveButton: 'Save'
+                });
+
+                m.getBody().html('<div id="modalBody"></div>');
+
+                m.show();
+
+                $('#myModal').on('shown.bs.modal', function () {
+
+                    var query = 'SELECT ?cellmlmodel ?Protein ' +
+                        'WHERE { GRAPH ?g { ' +
+                        '?cellmlmodel <http://purl.org/dc/terms/description> ?Protein . ' +
+                        'FILTER (str(?Protein) = "Sodium/hydrogen exchanger 3") . ' +
+                        '}}'
+
+                    // query 1 - get model name
+                    sendPostRequest(
+                        endpoint,
+                        query,
+                        function (jsonModel) {
+
+                            // parsing
+                            cModel = jsonModel.results.bindings[0].cellmlmodel.value;
+                            var indexOfHash = cModel.search("#");
+                            cModel = cModel.slice(0, indexOfHash);
+
+                            var query = 'SELECT ?located_in ' +
+                                'WHERE { GRAPH ?g { ' +
+                                '<' + cModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
+                                '}}'
+
+                            // query 2 - get location of that model
+                            sendPostRequest(
+                                endpoint,
+                                query,
+                                function (jsonLocatedin) {
+
+                                    loc = "";
+                                    // get locations of an organ
+                                    for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                                        for (var j = 0; j < kidney.length; j++) {
+                                            if (kidney[j].key == jsonLocatedin.results.bindings[i].located_in.value) {
+                                                loc += kidney[j].value;
+
+                                                break;
+                                            }
+                                        }
+
+                                        if (i == jsonLocatedin.results.bindings.length - 1)
+                                            loc += ".";
+                                        else
+                                            loc += ", ";
+                                    }
+
+                                    proteinVar = jsonModel.results.bindings[0].Protein.value;
+
+                                    // get type of model
+                                    for (var i = 0; i < organ.length; i++) {
+                                        for (var j = 0; j < organ[i].key.length; j++) {
+                                            for (var k = 0; k < kidney.length; k++) {
+                                                if (kidney[k].key == organ[i].key[j].key)
+                                                    counter++;
+                                            }
+                                        }
+
+                                        if (i == organ.length - 1 && counter == organ[i].key.length) {
+                                            typeOfModel = organ[i].value;
+                                        }
+                                    }
+
+                                    var query = 'SELECT ?cellmlmodel ?located_in ' +
+                                        'WHERE { GRAPH ?g { ' +
+                                        '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
+                                        '}}'
+
+                                    sendPostRequest(
+                                        endpoint,
+                                        query,
+                                        function (jsonRelatedModel) {
+
+                                            for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
+                                                for (var j = 0; j < kidney.length; j++) {
+                                                    if (jsonRelatedModel.results.bindings[i].located_in.value == kidney[j].key) {
+
+                                                        // parsing
+                                                        var kModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
+                                                        var indexOfHash = kModel.search("#");
+                                                        kModel = kModel.slice(0, indexOfHash);
+
+                                                        relatedModel.push(kModel);
+
+                                                        break;
+                                                    }
+                                                }
+                                            }
+
+                                            relatedModel = uniqueify(relatedModel);
+
+                                            findProtein(relatedModel, jsonModel);
+
+                                        }, true);
+                                }, true);
+                        }, true);
+                });
+
+                jQuery(window).trigger('resize');
+            }
         }
     }
 
@@ -7017,8 +7799,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                 var srctext = parserFmaNameText(source_fma[0]);
                                 var snktext = parserFmaNameText(sink_fma[0]);
-                                if (med_fma[0] != undefined)
-                                    var medfmatext = parserFmaNameText(med_fma[0]);
+                                var medfmatext = parserFmaNameText(med_fma[0]);
 
                                 if (med_pr[0] == undefined) { // temp solution
                                     membrane.push({
