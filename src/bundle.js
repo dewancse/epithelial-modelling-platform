@@ -1757,7 +1757,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                     // interesting .. !!!
                     var otherSpecies = "<p><b>Other species of <b>" + proteinVar + "</b>: </b>" + tempSpecies + "</p>";
-                    var otherGene = "<p><b>Other gene of <b>" + proteinVar + "</b>: </b>" + tempGene + "</p>";
+                    var otherGene = "<p><b>Other genes of <b>" + proteinVar + "</b>: </b>" + tempGene + "</p>";
 
                     var otherKidney = "<p><b>Other kidney models in PMR: </b>";
                     for (var i = 0; i < relatedModel2.length; i++) {
@@ -1772,7 +1772,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         otherKidney += label.innerHTML;
                     }
 
-                    var basolateralMembraneTransporter = "<p><b>basolateralMembrane transporters might be of interest: </b>";
+                    var basolateralMembraneTransporter = "<p><b>Basolateral membrane transporters might be of interest: </b>";
                     for (var i = 0; i < tempBas2.length; i++) {
 
                         var label = document.createElement('label');
@@ -1792,7 +1792,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .append(gene)
                         .append(protein);
 
-                    var msg3 = "<br><p><b>Recommendations or suggestions .... </b><\p>";
+                    var msg3 = "<br><p><b>Recommendations or suggestions:</b><\p>";
 
                     $('#modalBody')
                         .append(msg3)
