@@ -75,6 +75,7 @@
  */
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
+
     var indexOfHash = fma.name.search("#");
     var srctext = fma.name.slice(indexOfHash + 1);
     var indexOfdot = srctext.indexOf('.');
@@ -306,6 +307,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
+    console.log("before membrane: ", membrane);
+
     var apicalID = "http://identifiers.org/fma/FMA:84666";
     var basolateralID = "http://identifiers.org/fma/FMA:84669";
     var paracellularID = "http://identifiers.org/fma/FMA:67394";
@@ -332,6 +335,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var wallOfRoughERMembrane = [];
     var celljunction = [];
 
+    var myjsonModel;
+
     // Code for drag and pop up .....
     var apicalCircle = "http://identifiers.org/fma/FMA:84666";
     var basolateralMembraneID = "http://identifiers.org/fma/FMA:84669";
@@ -343,8 +348,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var tempSpecies = "", tempGene = "";
     var relatedModel = [], relatedModel2 = [], relatedModelID = [], idProtein = 0, cModel;
     var proteinVar, loc, dx, dy;
+    var dx1line, dy1line, dx2line, dy2line, dx1line2, dy1line2, dx2line2, dy2line2;
+    var dxtext, dytext, dxtext2, dytext2;
 
-    var counter = 0;
+    var counterbr = 0;
     var icGlobal;
 
     var tempJSON = [
@@ -1588,7 +1595,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // End of svg checkbox
 
-    // Moved code from the standalone program
     // remove duplicate model entity and biological meaning
     function uniqueify(es) {
         var retval = [];
@@ -1601,152 +1607,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         });
         return retval;
     }
-
-    // TODO: Fix this
-    // function dragcircleline(d) {
-    //
-    //     var cthis = this;
-    //     var axis = groupcordinates(d3.select(this)._groups[0][0].id, cthis);
-    //
-    //     circlewithlineg
-    //         .attr("cx", axis.shift())
-    //         .attr("cy", axis.shift());
-    //
-    //     // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
-    //     var lineb_x = document.getElementsByTagName("line")[1].x1.baseVal.value;
-    //     var lineb_y1 = document.getElementsByTagName("line")[1].y1.baseVal.value;
-    //     var lineb_y2 = document.getElementsByTagName("line")[1].y2.baseVal.value;
-    //     var cx = d3.select(cthis)._groups[0][0].cx.baseVal.value;
-    //     var cy = d3.select(cthis)._groups[0][0].cy.baseVal.value;
-    //     var lineb_id = document.getElementsByTagName("line")[1].id;
-    //     var circle_id = d3.select(cthis)._groups[0][0].id;
-    //
-    //     if ((cx >= (lineb_x - radius) && cx <= lineb_x + 20 + radius) &&
-    //         (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
-    //
-    //         document.getElementsByTagName("line")[1].style.setProperty("stroke", "red");
-    //
-    //         // assign d.x and d.y
-    //         dx = d.x, dy = d.y;
-    //
-    //         if (counter == 0) {
-    //
-    //             counter = 1;
-    //
-    //             var m = new Modal({
-    //                 id: 'myModal',
-    //                 header: 'Recommender System',
-    //                 footer: 'My footer',
-    //                 footerCloseButton: 'Close',
-    //                 footerSaveButton: 'Save'
-    //             });
-    //
-    //             m.getBody().html('<div id="modalBody"></div>');
-    //
-    //             m.show();
-    //
-    //             $('#myModal').on('shown.bs.modal', function () {
-    //
-    //                 var query = 'SELECT ?cellmlmodel ?Protein ' +
-    //                     'WHERE { GRAPH ?g { ' +
-    //                     '?cellmlmodel <http://purl.org/dc/terms/description> ?Protein . ' +
-    //                     'FILTER (str(?Protein) = "Sodium/hydrogen exchanger 3") . ' +
-    //                     '}}'
-    //
-    //                 // query 1 - get model name
-    //                 sendPostRequest(
-    //                     endpoint,
-    //                     query,
-    //                     function (jsonModel) {
-    //
-    //                         // parsing
-    //                         cModel = jsonModel.results.bindings[0].cellmlmodel.value;
-    //                         var indexOfHash = cModel.search("#");
-    //                         cModel = cModel.slice(0, indexOfHash);
-    //
-    //                         var query = 'SELECT ?located_in ' +
-    //                             'WHERE { GRAPH ?g { ' +
-    //                             '<' + cModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
-    //                             '}}'
-    //
-    //                         // query 2 - get location of that model
-    //                         sendPostRequest(
-    //                             endpoint,
-    //                             query,
-    //                             function (jsonLocatedin) {
-    //
-    //                                 loc = "";
-    //                                 // get locations of an organ
-    //                                 for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-    //                                     for (var j = 0; j < kidney.length; j++) {
-    //                                         if (kidney[j].key == jsonLocatedin.results.bindings[i].located_in.value) {
-    //                                             loc += kidney[j].value;
-    //
-    //                                             break;
-    //                                         }
-    //                                     }
-    //
-    //                                     if (i == jsonLocatedin.results.bindings.length - 1)
-    //                                         loc += ".";
-    //                                     else
-    //                                         loc += ", ";
-    //                                 }
-    //
-    //                                 proteinVar = jsonModel.results.bindings[0].Protein.value;
-    //
-    //                                 // get type of model
-    //                                 for (var i = 0; i < organ.length; i++) {
-    //                                     for (var j = 0; j < organ[i].key.length; j++) {
-    //                                         for (var k = 0; k < kidney.length; k++) {
-    //                                             if (kidney[k].key == organ[i].key[j].key)
-    //                                                 counter++;
-    //                                         }
-    //                                     }
-    //
-    //                                     if (i == organ.length - 1 && counter == organ[i].key.length) {
-    //                                         typeOfModel = organ[i].value;
-    //                                     }
-    //                                 }
-    //
-    //                                 var query = 'SELECT ?cellmlmodel ?located_in ' +
-    //                                     'WHERE { GRAPH ?g { ' +
-    //                                     '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
-    //                                     '}}'
-    //
-    //                                 sendPostRequest(
-    //                                     endpoint,
-    //                                     query,
-    //                                     function (jsonRelatedModel) {
-    //
-    //                                         for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
-    //                                             for (var j = 0; j < kidney.length; j++) {
-    //                                                 if (jsonRelatedModel.results.bindings[i].located_in.value == kidney[j].key) {
-    //
-    //                                                     // parsing
-    //                                                     var kModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
-    //                                                     var indexOfHash = kModel.search("#");
-    //                                                     kModel = kModel.slice(0, indexOfHash);
-    //
-    //                                                     relatedModel.push(kModel);
-    //
-    //                                                     break;
-    //                                                 }
-    //                                             }
-    //                                         }
-    //
-    //                                         relatedModel = uniqueify(relatedModel);
-    //
-    //                                         findProtein(relatedModel, jsonModel);
-    //
-    //                                     }, true);
-    //                             }, true);
-    //                     }, true);
-    //             });
-    //
-    //             jQuery(window).trigger('resize');
-    //         }
-    //     }
-    // }
 
     var findSpeciesGene = function (cModel, jsonModel) {
 
@@ -1992,10 +1852,33 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             console.log("win: ", win);
 
-            $($this.selector).on('hidden.bs.modal', function (e) {
+            // close button clicked!!
+            win[0].lastElementChild.children[0].onclick = function (event) {
 
-                $($this.selector).remove();
+                // TODO: Assign dx1line, etc vaiables to all the apical, basolateral membranes, etc
+                // decrement y-axis of line and circle
+                yvalue -= ydistance;
+                cyvalue -= ydistance;
 
+                // line 1
+                linewithlineg[icGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x1", dx1line)
+                    .attr("y1", dy1line)
+                    .attr("x2", dx2line)
+                    .attr("y2", dy2line);
+
+                // text 1
+                linewithtextg[icGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x", dxtext)
+                    .attr("y", dytext);
+
+                // circle
                 circlewithlineg[icGlobal]
                     .transition()
                     .delay(1000)
@@ -2003,16 +1886,38 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("cx", dx)
                     .attr("cy", dy);
 
-                // lineBasolateralMembrane
+                if (linewithlineg2[icGlobal] != undefined) {
+                    // line 2
+                    linewithlineg2[icGlobal]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x1", dx1line2)
+                        .attr("y1", dy1line2)
+                        .attr("x2", dx2line2)
+                        .attr("y2", dy2line2);
+
+                    // text 2
+                    linewithtextg2[icGlobal]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", dxtext2)
+                        .attr("y", dytext2);
+                }
+
+                // move back line from Basolateral to Apical Membrane
                 linebasolateral
                     .transition()
                     .delay(1000)
                     .duration(1000)
                     .style("stroke", "orange");
-            });
+            }
 
             // save button clicked!!
             win[0].lastElementChild.children[1].onclick = function (event) {
+
+                console.log("save clicked!");
 
                 // checkbox!!
                 for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
@@ -2020,11 +1925,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                         console.log("Species clicked!!");
 
-                        console.log(win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
-                        console.log(win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
-                    }
-                    else {
-                        console.log("Not clicked!!");
+                        console.log("checked: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
+                        console.log("id: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
                     }
                 }
 
@@ -2034,11 +1936,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                         console.log("Gene clicked!!");
 
-                        console.log(win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
-                        console.log(win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
-                    }
-                    else {
-                        console.log("Not clicked!!");
+                        console.log("checked: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
+                        console.log("id: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
                     }
                 }
 
@@ -2047,27 +1946,27 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
 
                         console.log("other Kidney clicked!!");
+                        console.log("other Kidney clicked event: ", event);
 
-                        console.log(win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
-                        console.log(win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
-                    }
-                    else {
-                        console.log("Not clicked!!");
+                        console.log("checked: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
+                        console.log("id: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
                     }
                 }
 
                 // checkbox!!
                 for (var i = 0; i < win[0].children[1].children[0].children[15].getElementsByTagName("input").length; i++) {
                     if (win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].checked) {
-                        console.log(win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].checked);
-                        console.log(win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].id);
-                    }
-                    else {
-                        console.log("Not clicked!!");
+                        console.log("checked: ", win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].checked);
+                        console.log("id: ", win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].id);
                     }
                 }
 
-                console.log("save clicked!");
+                // lineBasolateralMembrane
+                linebasolateral
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .style("stroke", "orange");
             }
         };
 
@@ -3803,15 +3702,19 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             linewithlineg[i] = lineg.append("line")
                 .attr("id", "linewithlineg" + i)
                 .attr("x1", function (d) {
+                    dx1line = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
+                    dy1line = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
+                    dx2line = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
+                    dy2line = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -3823,9 +3726,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             linewithtextg[i] = linegtext.append("text")
                 .attr("id", "linewithtextg" + i)
                 .attr("x", function (d) {
+                    dxtext = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
+                    dytext = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -3839,9 +3744,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", "circlewithlineg" + i)
                 .attr("cx", function (d) {
+                    dx = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
+                    dy = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -3854,15 +3761,19 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 linewithlineg2[i] = lineg2.append("line")
                     .attr("id", "linewithlineg2" + i)
                     .attr("x1", function (d) {
+                        dx1line2 = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
+                        dy1line2 = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
+                        dx2line2 = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
+                        dy2line2 = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
@@ -3876,9 +3787,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 linewithtextg2[i] = linegtext2.append("text")
                     .attr("id", "linewithtextg2" + i)
                     .attr("x", function (d) {
+                        dxtext2 = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
+                        dytext2 = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -5761,12 +5674,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             document.getElementsByTagName("line")[1].style.setProperty("stroke", "red");
 
-            // assign d.x and d.y
-            dx = d.x, dy = d.y;
+            if (counterbr == 0) {
 
-            if (counter == 0) {
-
-                counter = 1;
+                counterbr = 1;
 
                 var m = new Modal({
                     id: 'myModal',
@@ -5785,14 +5695,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     var query = 'SELECT ?cellmlmodel ?Protein ' +
                         'WHERE { GRAPH ?g { ' +
                         '?cellmlmodel <http://purl.org/dc/terms/description> ?Protein . ' +
-                        'FILTER (str(?Protein) = "Sodium/hydrogen exchanger 3") . ' +
+                        'FILTER (str(?Protein) = "Sodium/hydrogen exchanger 3") . ' + // "Numerical Model"
                         '}}'
 
-                    // query 1 - get model name
+                    // query 1 - cellml model name
                     sendPostRequest(
                         endpoint,
                         query,
                         function (jsonModel) {
+
+                            console.log("jsonModel: ", jsonModel);
+                            myjsonModel = jsonModel;
 
                             // parsing
                             cModel = jsonModel.results.bindings[0].cellmlmodel.value;
@@ -5804,7 +5717,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 '<' + cModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
                                 '}}'
 
-                            // query 2 - get location of that model
+                            // query 2 - location of that cellml model
                             sendPostRequest(
                                 endpoint,
                                 query,
@@ -5843,6 +5756,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         }
                                     }
 
+                                    // query - 3 related cellml model
                                     var query = 'SELECT ?cellmlmodel ?located_in ' +
                                         'WHERE { GRAPH ?g { ' +
                                         '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
@@ -6077,7 +5991,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 }
 
 exports.showsvgEpithelial = showsvgEpithelial;
-
 
 /***/ }),
 /* 3 */
@@ -7175,8 +7088,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         table.appendChild(tbody);
         searchList.appendChild(table);
-
-        console.log("table: ", table);
 
         // Fill in the search attribute value
         var searchTxt = document.getElementById("searchTxt");

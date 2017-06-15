@@ -815,8 +815,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         table.appendChild(tbody);
         searchList.appendChild(table);
 
-        console.log("table: ", table);
-
         // Fill in the search attribute value
         var searchTxt = document.getElementById("searchTxt");
         searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
