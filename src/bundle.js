@@ -307,8 +307,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
-    console.log("before membrane: ", membrane);
-
     var apicalID = "http://identifiers.org/fma/FMA:84666";
     var basolateralID = "http://identifiers.org/fma/FMA:84669";
     var paracellularID = "http://identifiers.org/fma/FMA:67394";
@@ -1847,8 +1845,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
                 }
             }
-
-            console.log("win: ", win);
 
             // close button clicked!!
             win[0].lastElementChild.children[0].onclick = function (event) {
@@ -5693,7 +5689,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     var query = 'SELECT ?cellmlmodel ?Protein ' +
                         'WHERE { GRAPH ?g { ' +
                         '?cellmlmodel <http://purl.org/dc/terms/description> ?Protein . ' +
-                        'FILTER (str(?Protein) = "Sodium/hydrogen exchanger 3") . ' + // "Numerical Model"
+                        'FILTER (str(?Protein) = "Numerical Model") . ' + // "Sodium/hydrogen exchanger 3"
                         '}}'
 
                     // query 1 - cellml model name
