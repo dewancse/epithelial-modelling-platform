@@ -335,8 +335,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var wallOfRoughERMembrane = [];
     var celljunction = [];
 
-    var myjsonModel;
-
     // Code for drag and pop up .....
     var apicalCircle = "http://identifiers.org/fma/FMA:84666";
     var basolateralMembraneID = "http://identifiers.org/fma/FMA:84669";
@@ -1298,8 +1296,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var checkBox = [], checkBoxb = [], checkBoxc = [], checkBoxwser = [], checkBoxwrer = [],
         checkedchk = [], checkedchkb = [], checkedchkc = [],
-        ydistancechk = 50, yinitialchk = 165,
-        ytextinitialchk = 180,
+        ydistancechk = 50, yinitialchk = 185,
+        ytextinitialchk = 200,
         markerWidth = 4, markerHeight = 4;
 
     for (var i = 0; i < wallOfSmoothERMembrane.length; i++) {
@@ -5705,7 +5703,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         function (jsonModel) {
 
                             console.log("jsonModel: ", jsonModel);
-                            myjsonModel = jsonModel;
 
                             // parsing
                             cModel = jsonModel.results.bindings[0].cellmlmodel.value;

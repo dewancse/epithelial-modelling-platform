@@ -1,0 +1,16 @@
+language: JavaScript
+sudo: false
+dist: trusty
+JavaScript:
+  - "1.7"
+install:
+  - npm install d3
+  - npm install jquery
+  - npm install jquery-ui-dist
+  - npm install bootstrap
+  - npm install d3-selection-multi
+  - npm install mocha
+  - npm install chai
+  - npm install mocha-phantomjs
+script:
+  - mocha-phantomjs index.html
