@@ -1342,7 +1342,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         id++;
 
                         if (id == jsonModel.results.bindings.length) {
-                            basolateralMembrane();
+                            basoMembrane();
                             return;
                         }
 
@@ -1385,7 +1385,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }, true);
     }
 
-    var basolateralMembrane = function () {
+    var basoMembrane = function () {
         var query = 'SELECT ?cellmlmodel ?located_in ' +
             'WHERE { GRAPH ?g { ' +
             '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
@@ -1415,12 +1415,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 tempBas = uniqueify(tempBas);
 
-                basolateralMembrane2();
+                basoMembrane2();
 
             }, true);
     }
 
-    var basolateralMembrane2 = function () {
+    var basoMembrane2 = function () {
         var query = 'SELECT ?Protein ' +
             'WHERE { GRAPH ?g { ' +
             '<' + tempBas[idBaso] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
@@ -1500,7 +1500,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     return;
                 }
 
-                basolateralMembrane2();
+                basoMembrane2();
 
             }, true);
     }
