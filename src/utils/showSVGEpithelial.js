@@ -43,9 +43,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var typeOfModel, counter = 0, id = 0;
     var tempSpecies = "", tempGene = "";
     var relatedModel = [], relatedModel2 = [], relatedModelID = [], idProtein = 0, cModel;
-    var proteinVar, loc, dx, dy;
+    var proteinVar, loc;
+    var dx, dy, dxtext, dytext, dxtext2, dytext2;
     var dx1line, dy1line, dx2line, dy2line, dx1line2, dy1line2, dx2line2, dy2line2;
-    var dxtext, dytext, dxtext2, dytext2;
 
     var counterbr = 0;
     var icGlobal;
@@ -4467,7 +4467,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 3
         if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
-            
+
             var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
             linewithlinegb[i] = linegb.append("line")
                 .attr("id", "linewithlinegb" + i)
