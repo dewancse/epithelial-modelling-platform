@@ -49,11 +49,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         speciesList = [],
         geneList = [],
         proteinList = [],
-        sourcefmaList = [],
-        sinkfmaList = [],
-        meduriList = [],
-        totalList = [],
-        fmaList = [],
         head = [],
         id = 0;
 
@@ -354,20 +349,15 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             speciesList = [];
             geneList = [];
             proteinList = [];
-            sourcefmaList = [];
-            sinkfmaList = [];
-            meduriList = [];
-            totalList = [];
-            fmaList = [];
             head = [];
 
             id = 0; // id to index each Model_entity
 
-            mainUtils.ontologyQuery(uriOPB, uriCHEBI, keyValue);
+            mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
         }
     })
 
-    mainUtils.ontologyQuery = function (uriOPB, uriCHEBI, keyValue) {
+    mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
 
         if (uriCHEBI == "") {
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
@@ -412,135 +402,75 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             query,
             function (jsonModel) {
 
-                if (id == jsonModel.results.bindings.length) {
-                    return;
-                }
+                var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
+                var query = 'SELECT ?Species ' + 'WHERE ' +
+                    '{ ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
 
-                // source fma, sink fma and mediator
-                var model = jsonModel.results.bindings[id].Model_entity.value;
-                var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                    'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                    'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
-                    'WHERE { ' +
-                    '<' + model + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                    '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-                    '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-                    '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-                    '?source_entity ro:part_of ?source_part_of_entity. ' +
-                    '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-                    '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-                    '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-                    '?sink_entity ro:part_of ?sink_part_of_entity. ' +
-                    '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
-                    '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
-                    '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
-                    '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-                    '}'
-
+                // Species
                 sendPostRequest(
                     endpoint,
                     query,
-                    function (jsonObjFlux) {
+                    function (jsonSpecies) {
 
                         var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                        var query = 'SELECT ?Species ' + 'WHERE ' +
-                            '{ ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
+                        var query = 'SELECT ?Gene ' + 'WHERE ' +
+                            '{ ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
 
-                        // Species
+                        // Gene
                         sendPostRequest(
                             endpoint,
                             query,
-                            function (jsonSpecies) {
+                            function (jsonGene) {
 
                                 var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                                var query = 'SELECT ?Gene ' + 'WHERE ' +
-                                    '{ ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
+                                var query = 'SELECT ?Protein ' + 'WHERE ' +
+                                    '{ ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
 
-                                // Gene
+                                // Protein
                                 sendPostRequest(
                                     endpoint,
                                     query,
-                                    function (jsonGene) {
+                                    function (jsonProtein) {
 
-                                        var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                                        var query = 'SELECT ?Protein ' + 'WHERE ' +
-                                            '{ ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
+                                        // model and biological meaning
+                                        modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
+                                        biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
 
-                                        // Protein
-                                        sendPostRequest(
-                                            endpoint,
-                                            query,
-                                            function (jsonProtein) {
+                                        // species
+                                        if (jsonSpecies.results.bindings.length == 0)
+                                            speciesList.push("Undefined");
+                                        else
+                                            speciesList.push(jsonSpecies.results.bindings[0].Species.value);
 
-                                                // model and biological meaning
-                                                modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
-                                                biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
+                                        // gene
+                                        if (jsonGene.results.bindings.length == 0)
+                                            geneList.push("Undefined");
+                                        else
+                                            geneList.push(jsonGene.results.bindings[0].Gene.value);
 
-                                                // reinitialize flux instances
-                                                sourcefmaList = [];
-                                                sinkfmaList = [];
-                                                meduriList = [];
+                                        // protein
+                                        if (jsonProtein.results.bindings.length == 0)
+                                            proteinList.push("Undefined");
+                                        else
+                                            proteinList.push(jsonProtein.results.bindings[0].Protein.value);
 
-                                                // source fma, sink fma and mediator
-                                                for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
+                                        head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
-                                                    if (jsonObjFlux.results.bindings[i].source_fma == undefined)
-                                                        sourcefmaList.push("");
-                                                    else
-                                                        sourcefmaList.push(jsonObjFlux.results.bindings[i].source_fma.value);
+                                        mainUtils.showDiscoverModels(
+                                            head,
+                                            modelEntity,
+                                            biologicalMeaning,
+                                            speciesList,
+                                            geneList,
+                                            proteinList);
 
-                                                    if (jsonObjFlux.results.bindings[i].sink_fma == undefined)
-                                                        sinkfmaList.push("");
-                                                    else
-                                                        sinkfmaList.push(jsonObjFlux.results.bindings[i].sink_fma.value);
+                                        id++; // increment index of modelEntity
 
-                                                    if (jsonObjFlux.results.bindings[i].med_entity_uri == undefined)
-                                                        meduriList.push("");
-                                                    else
-                                                        meduriList.push(jsonObjFlux.results.bindings[i].med_entity_uri.value);
-                                                }
+                                        if (id == jsonModel.results.bindings.length) {
+                                            return;
+                                        }
 
-                                                // remove duplicate
-                                                sourcefmaList = uniqueifySrcSnkMed(sourcefmaList);
-                                                sinkfmaList = uniqueifySrcSnkMed(sinkfmaList);
-                                                meduriList = uniqueifySrcSnkMed(meduriList);
-
-                                                totalList.push(sourcefmaList + "," + sinkfmaList + "," + meduriList);
-
-                                                // species
-                                                if (jsonSpecies.results.bindings.length == 0)
-                                                    speciesList.push("Undefined");
-                                                else
-                                                    speciesList.push(jsonSpecies.results.bindings[0].Species.value);
-
-                                                // gene
-                                                if (jsonGene.results.bindings.length == 0)
-                                                    geneList.push("Undefined");
-                                                else
-                                                    geneList.push(jsonGene.results.bindings[0].Gene.value);
-
-                                                // protein
-                                                if (jsonProtein.results.bindings.length == 0)
-                                                    proteinList.push("Undefined");
-                                                else
-                                                    proteinList.push(jsonProtein.results.bindings[0].Protein.value);
-
-                                                head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
-
-                                                // Get more useful information
-                                                var len = modelEntity.length;
-                                                mainUtils.searchListAJAX(
-                                                    modelEntity[len - 1],
-                                                    speciesList[len - 1],
-                                                    geneList[len - 1],
-                                                    proteinList[len - 1],
-                                                    totalList,
-                                                    id);
-
-                                                id++; // increment index of modelEntity
-                                                mainUtils.ontologyQuery(uriOPB, uriCHEBI, keyValue); // callback
-                                            },
-                                            true);
+                                        mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue); // callback
                                     },
                                     true);
                             },
@@ -551,120 +481,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             true);
     }
 
-    mainUtils.searchListAJAX = function (modelEntityid, speciesListid, geneListid, proteinListid, totalList, id) {
-
-        // query for flux or flux of solutes
-        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-            'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-            'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-            'SELECT ?Model_srcentity ?Biological_srcmeaning ?source_fma ?Model_snkentity ?Biological_snkmeaning ?sink_fma ' +
-            'WHERE { ' +
-            '<' + modelEntityid + '> semsim:isComputationalComponentFor ?model_prop. ' +
-            '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-            '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-            '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-            '?source_prop semsim:physicalPropertyOf ?source_entity. ' +
-            '?Model_srcentity semsim:isComputationalComponentFor ?source_prop. ' +
-            '?Model_srcentity dcterms:description ?Biological_srcmeaning. ' +
-            '?source_entity ro:part_of ?source_entity_fma. ' +
-            '?source_entity_fma semsim:hasPhysicalDefinition ?source_fma. ' +
-            '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-            '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-            '?sink_prop semsim:physicalPropertyOf ?sink_entity. ' +
-            '?Model_snkentity semsim:isComputationalComponentFor ?sink_prop. ' +
-            '?Model_snkentity dcterms:description ?Biological_snkmeaning. ' +
-            '?sink_entity ro:part_of ?sink_entity_fma. ' +
-            '?sink_entity_fma semsim:hasPhysicalDefinition ?sink_fma. ' +
-            '}'
-
-        sendPostRequest(
-            endpoint,
-            query,
-            function (jsonModel) {
-
-                var jsonModelObj = [];
-
-                // Parsing into Model_entity and Biological_meaning object
-                for (var i = 0; i < jsonModel.results.bindings.length; i++) {
-                    jsonModelObj.push({
-                        Model_entity: jsonModel.results.bindings[i].Model_srcentity.value,
-                        Biological_meaning: jsonModel.results.bindings[i].Biological_srcmeaning.value,
-                        fma: jsonModel.results.bindings[i].source_fma.value
-                    });
-                }
-
-                for (var i = 0; i < jsonModel.results.bindings.length; i++) {
-                    jsonModelObj.push({
-                        Model_entity: jsonModel.results.bindings[i].Model_snkentity.value,
-                        Biological_meaning: jsonModel.results.bindings[i].Biological_snkmeaning.value,
-                        fma: jsonModel.results.bindings[i].sink_fma.value
-                    });
-                }
-
-                // remove redundant objects
-                jsonModelObj = uniqueifyModelEntity(jsonModelObj);
-
-                for (var m = 0; m < jsonModelObj.length; m++) {
-                    modelEntity.push(jsonModelObj[m].Model_entity);
-                    biologicalMeaning.push(jsonModelObj[m].Biological_meaning);
-                    speciesList.push(speciesListid);
-                    geneList.push(geneListid);
-                    proteinList.push(proteinListid);
-                    totalList.push(jsonModelObj[m].fma);
-                }
-
-                // concentration block
-                if (jsonModelObj.length == 0) {
-                    // query for concentration or concentration of solutes
-                    var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                        'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-                        'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                        'SELECT ?biologicalMeaning ?fma ' +
-                        'WHERE { ' +
-                        '<' + modelEntityid + '> dcterms:description ?biologicalMeaning. ' +
-                        '<' + modelEntityid + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                        '?model_prop semsim:physicalPropertyOf ?entity. ' +
-                        '?entity ro:part_of ?entity_fma. ' +
-                        '?entity_fma semsim:hasPhysicalDefinition ?fma. ' +
-                        '}'
-
-                    sendPostRequest(
-                        endpoint,
-                        query,
-                        function (jsonModelCon) {
-
-                            totalList[id] = jsonModelCon.results.bindings[0].fma.value;
-
-                            mainUtils.searchList(
-                                head,
-                                modelEntity,
-                                biologicalMeaning,
-                                speciesList,
-                                geneList,
-                                proteinList,
-                                totalList);
-                        },
-                        true);
-                }
-                else { // flux block
-
-                    mainUtils.searchList(
-                        head,
-                        modelEntity,
-                        biologicalMeaning,
-                        speciesList,
-                        geneList,
-                        proteinList,
-                        totalList);
-                }
-            },
-            true
-        );
-    }
-
     // TODO: make a common table platform for all functions
     // Show semantic annotation extracted from PMR
-    mainUtils.searchList = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, totalList) {
+    mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
         // annotate variable id to variable name
         var idarray = [];
@@ -737,13 +556,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                 // Table body
                 var tbody = document.createElement("tbody");
-                for (var i = 0; i < totalList.length; i++) {
+                for (var i = 0; i < modelEntity.length; i++) {
                     var tr = document.createElement("tr");
 
                     var temp = [];
                     var td = [];
 
-                    // Ignore the semsim URI ==> weinstein_1995#NHE3_C_ext_Na
                     temp.push(cellmodelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
 
                     for (var j = 0; j < temp.length; j++) {
@@ -759,7 +577,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                         if (j == 1) {
                             td[j] = document.createElement("td");
-                            td[j].id = totalList[i];
                             td[j].appendChild(document.createTextNode(temp[j]));
                             tr.appendChild(td[j]);
                         }
