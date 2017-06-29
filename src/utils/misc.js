@@ -3,7 +3,6 @@
  */
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
-
     var indexOfHash = fma.name.search("#");
     var srctext = fma.name.slice(indexOfHash + 1);
     var indexOfdot = srctext.indexOf('.');
