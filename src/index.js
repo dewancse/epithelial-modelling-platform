@@ -524,130 +524,92 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         );
     }
 
-// TODO: make a common table platform for all functions
-// Show semantic annotation extracted from PMR
+    // TODO: make a common table platform for all functions
+    // Show semantic annotation extracted from PMR
     mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
-        // annotate variable id to variable name
-        var idarray = [];
-        var cellmodelEntity = [];
+        var searchList = document.getElementById("searchList");
 
-        for (var i = 0; i < modelEntity.length; i++) {
-            var idWithStr = modelEntity[i]; // event.srcElement.id;
-            var indexOfHash = idWithStr.search("#");
-            var id = idWithStr.slice(indexOfHash + 1, idWithStr.length);
-            idarray.push(id);
+        // Search result does not match
+        if (head.length == 0) {
+            searchList.innerHTML = "<section class='container-fluid'><label><br>No Search Results!</label></section>";
+            return;
         }
 
-        // TODO: dynamic workspace name 267!
-        var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + 267 + "/" + "rawfile" +
-            "/" + "HEAD" + "/" + idWithStr;
+        // Make empty space for a new search
+        searchList.innerHTML = "";
 
-        sendGetRequest(
-            vEndPoint,
-            function (str) {
-                var parser = new DOMParser();
-                var xmlDoc = parser.parseFromString(str, "text/xml");
+        var table = document.createElement("table");
+        table.className = "table table-hover table-condensed"; //table-bordered table-striped
 
-                // Look up by variable tag
-                for (var i = 0; i < idarray.length; i++) {
-                    for (var j = 0; j < xmlDoc.getElementsByTagName("variable").length; j++) {
-                        if (xmlDoc.getElementsByTagName("variable")[j].getAttribute("cmeta:id") == idarray[i]) {
-                            var varName = xmlDoc.getElementsByTagName("variable")[j].getAttribute("name");
-                            var idWithStr = modelEntity[i]; // event.srcElement.id;
-                            var indexOfHash = idWithStr.search("#");
-                            cellmodelEntity.push(idWithStr.slice(0, indexOfHash + 1) + varName);
+        // Table header
+        var thead = document.createElement("thead");
+        var tr = document.createElement("tr");
+        for (var i = 0; i < head.length; i++) {
+            // Empty header for checkbox column
+            if (i == 0) {
+                var th = document.createElement("th");
+                th.appendChild(document.createTextNode(""));
+                tr.appendChild(th);
+            }
 
-                            // console.log("SearchList Variable name: ", varName);
-                            // console.log("Searchlist modelEntity: ", cellmodelEntity[i]);
-                        }
-                    }
+            var th = document.createElement("th");
+            th.appendChild(document.createTextNode(head[i]));
+            tr.appendChild(th);
+        }
+
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
+        // Table body
+        var tbody = document.createElement("tbody");
+        for (var i = 0; i < modelEntity.length; i++) {
+            var tr = document.createElement("tr");
+
+            var temp = [];
+            var td = [];
+
+            temp.push(modelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
+
+            for (var j = 0; j < temp.length; j++) {
+                if (j == 0) {
+                    td[j] = document.createElement("td");
+                    var label = document.createElement('label');
+                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" ' +
+                        'data-action="search" value="' + modelEntity[i] + '" class="checkbox"></label>';
+
+                    td[j].appendChild(label);
+                    tr.appendChild(td[j]);
                 }
 
-                var searchList = document.getElementById("searchList");
-
-                // Search result does not match
-                if (head.length == 0) {
-                    searchList.innerHTML = "<section class='container-fluid'><label><br>No Search Results!</label></section>";
-                    return;
+                if (j == 1) {
+                    td[j] = document.createElement("td");
+                    td[j].appendChild(document.createTextNode(temp[j]));
+                    tr.appendChild(td[j]);
                 }
-
-                // Make empty space for a new search
-                searchList.innerHTML = "";
-
-                var table = document.createElement("table");
-                table.className = "table table-hover table-condensed"; //table-bordered table-striped
-
-                // Table header
-                var thead = document.createElement("thead");
-                var tr = document.createElement("tr");
-                for (var i = 0; i < head.length; i++) {
-                    // Empty header for checkbox column
-                    if (i == 0) {
-                        var th = document.createElement("th");
-                        th.appendChild(document.createTextNode(""));
-                        tr.appendChild(th);
-                    }
-
-                    var th = document.createElement("th");
-                    th.appendChild(document.createTextNode(head[i]));
-                    tr.appendChild(th);
+                else {
+                    td[j] = document.createElement("td");
+                    td[j].appendChild(document.createTextNode(temp[j]));
+                    tr.appendChild(td[j]);
                 }
+            }
 
-                thead.appendChild(tr);
-                table.appendChild(thead);
+            tbody.appendChild(tr);
+        }
 
-                // Table body
-                var tbody = document.createElement("tbody");
-                for (var i = 0; i < modelEntity.length; i++) {
-                    var tr = document.createElement("tr");
+        table.appendChild(tbody);
+        searchList.appendChild(table);
 
-                    var temp = [];
-                    var td = [];
+        // Fill in the search attribute value
+        var searchTxt = document.getElementById("searchTxt");
+        searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
 
-                    temp.push(cellmodelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
-
-                    for (var j = 0; j < temp.length; j++) {
-                        if (j == 0) {
-                            td[j] = document.createElement("td");
-                            var label = document.createElement('label');
-                            label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" ' +
-                                'data-action="search" value="' + modelEntity[i] + '" class="checkbox"></label>';
-
-                            td[j].appendChild(label);
-                            tr.appendChild(td[j]);
-                        }
-
-                        if (j == 1) {
-                            td[j] = document.createElement("td");
-                            td[j].appendChild(document.createTextNode(temp[j]));
-                            tr.appendChild(td[j]);
-                        }
-                        else {
-                            td[j] = document.createElement("td");
-                            td[j].appendChild(document.createTextNode(temp[j]));
-                            tr.appendChild(td[j]);
-                        }
-                    }
-
-                    tbody.appendChild(tr);
-                }
-
-                table.appendChild(tbody);
-                searchList.appendChild(table);
-
-                // Fill in the search attribute value
-                var searchTxt = document.getElementById("searchTxt");
-                searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
-
-                // SET main content in the local storage
-                var maincontent = document.getElementById('main-content');
-                sessionStorage.setItem('searchListContent', $(maincontent).html());
-            },
-            false);
+        // SET main content in the local storage
+        var maincontent = document.getElementById('main-content');
+        sessionStorage.setItem('searchListContent', $(maincontent).html());
     }
 
-// Load the view
+    // Load the view
     mainUtils.loadViewHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -682,7 +644,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             true);
     };
 
-// Load the model
+    // Load the model
     mainUtils.loadModelHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -713,142 +675,114 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         switchMenuToActive(activeItem, "#listModels");
     };
 
-// TODO: move to utils directory
-// Show selected items in a table
+    // TODO: move to utils directory
+    // Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
-        var cellmodelEntity;
-        var idWithStr = modelEntityName; // event.srcElement.id;
-        var indexOfHash = idWithStr.search("#");
-        var id = idWithStr.slice(indexOfHash + 1, idWithStr.length);
+        console.log("showModel: ", jsonObj);
 
-        // TODO: dynamic workspace name 267!
-        var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + 267 + "/" + "rawfile" +
-            "/" + "HEAD" + "/" + idWithStr;
+        var modelList = document.getElementById("modelList");
 
-        sendGetRequest(
-            vEndPoint,
-            function (str) {
-                var parser = new DOMParser();
-                var xmlDoc = parser.parseFromString(str, "text/xml");
+        var table = document.createElement("table");
+        table.className = "table table-hover table-condensed"; //table-bordered table-striped
 
-                // Look up by variable tag
-                for (var j = 0; j < xmlDoc.getElementsByTagName("variable").length; j++) {
-                    if (xmlDoc.getElementsByTagName("variable")[j].getAttribute("cmeta:id") == id) {
-                        var varName = xmlDoc.getElementsByTagName("variable")[j].getAttribute("name");
-                        cellmodelEntity = idWithStr.slice(0, indexOfHash + 1) + varName;
+        // Table header
+        var thead = document.createElement("thead");
+        var tr = document.createElement("tr");
+        for (var i = 0; i < jsonObj.head.vars.length; i++) {
+            if (i == 0) {
+                var th = document.createElement("th");
+                var label = document.createElement('label');
+                label.innerHTML = '<input id="' + jsonObj.head.vars[0] + '" type="checkbox" name="attributeAll" ' +
+                    'class="attributeAll" data-action="model" value="' + jsonObj.head.vars[0] + '" ></label>';
 
-                        // console.log("showmodel Variable name: ", varName);
-                        // console.log("showmodel modelEntity: ", cellmodelEntity);
-                    }
+                th.appendChild(label);
+                tr.appendChild(th);
+            }
+
+            var th = document.createElement("th");
+            th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
+            tr.appendChild(th);
+        }
+
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
+        // Table body
+        for (var i = 0; i < jsonObj.head.vars.length; i++) {
+            if (i == 0) {
+                // search list to model list with empty model
+                if (jsonObj.results.bindings.length == 0) break;
+
+                var label = document.createElement('label');
+                label.innerHTML = '<input id="' + modelEntityName + '" type="checkbox" name="attribute" ' +
+                    'class="attribute" data-action="model" value="' + modelEntityName + '" ></label>';
+
+                model.push(label);
+            }
+
+            if (jsonObj.head.vars[i] == "Compartment") {
+                var compartment = "";
+                for (var c = 0; c < jsonObj.results.bindings.length; c++) {
+                    if (c == 0)
+                        compartment += jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
+                    else
+                        compartment += "," + jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
                 }
 
-                console.log("showModel: ", jsonObj);
-
-                var modelList = document.getElementById("modelList");
-
-                var table = document.createElement("table");
-                table.className = "table table-hover table-condensed"; //table-bordered table-striped
-
-                // Table header
-                var thead = document.createElement("thead");
-                var tr = document.createElement("tr");
-                for (var i = 0; i < jsonObj.head.vars.length; i++) {
-                    if (i == 0) {
-                        var th = document.createElement("th");
-                        var label = document.createElement('label');
-                        label.innerHTML = '<input id="' + jsonObj.head.vars[0] + '" type="checkbox" name="attributeAll" ' +
-                            'class="attributeAll" data-action="model" value="' + jsonObj.head.vars[0] + '" ></label>';
-
-                        th.appendChild(label);
-                        tr.appendChild(th);
-                    }
-
-                    var th = document.createElement("th");
-                    th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
-                    tr.appendChild(th);
+                model.push(compartment);
+            }
+            else {
+                if (jsonObj.head.vars[i] == "Model_entity") {
+                    model.push(modelEntityName);
                 }
+                else
+                    model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
+            }
+        }
 
-                thead.appendChild(tr);
-                table.appendChild(thead);
+        // 1D to 2D array
+        while (model.length) {
+            model2DArray.push(model.splice(0, 6)); // 5 + 1 (checkbox) header elemenet
+        }
 
-                // Table body
-                for (var i = 0; i < jsonObj.head.vars.length; i++) {
-                    if (i == 0) {
-                        // search list to model list with empty model
-                        if (jsonObj.results.bindings.length == 0) break;
+        console.log("model and model2DArray: ", model, model2DArray);
 
-                        var label = document.createElement('label');
-                        label.innerHTML = '<input id="' + modelEntityName + '" type="checkbox" name="attribute" ' +
-                            'class="attribute" data-action="model" value="' + modelEntityName + '" ></label>';
+        var td = [];
+        var tbody = document.createElement("tbody");
+        for (var ix = 0; ix < model2DArray.length; ix++) {
+            var tr = document.createElement("tr");
+            // +1 for adding checkbox column
+            for (var j = 0; j < jsonObj.head.vars.length + 1; j++) {
+                td[j] = document.createElement("td");
+                if (j == 0)
+                    td[j].appendChild(model2DArray[ix][j]);
+                else
+                    td[j].appendChild(document.createTextNode(model2DArray[ix][j]));
 
-                        model.push(label);
-                    }
+                // Id for each row
+                if (j == 1)
+                    tr.setAttribute("id", model2DArray[ix][j]);
 
-                    if (jsonObj.head.vars[i] == "Compartment") {
-                        var compartment = "";
-                        for (var c = 0; c < jsonObj.results.bindings.length; c++) {
-                            if (c == 0)
-                                compartment += jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
-                            else
-                                compartment += "," + jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
-                        }
+                tr.appendChild(td[j]);
+            }
 
-                        model.push(compartment);
-                    }
-                    else {
-                        if (jsonObj.head.vars[i] == "Model_entity") {
-                            model.push(cellmodelEntity);
-                        }
-                        else
-                            model.push(jsonObj.results.bindings[0][jsonObj.head.vars[i]].value);
-                    }
-                }
+            tbody.appendChild(tr);
+        }
 
-                // 1D to 2D array
-                while (model.length) {
-                    model2DArray.push(model.splice(0, 6)); // 5 + 1 (checkbox) header elemenet
-                }
+        table.appendChild(tbody);
+        modelList.appendChild(table);
 
-                console.log("model and model2DArray: ", model, model2DArray);
-
-                var td = [];
-                var tbody = document.createElement("tbody");
-                for (var ix = 0; ix < model2DArray.length; ix++) {
-                    var tr = document.createElement("tr");
-                    // +1 for adding checkbox column
-                    for (var j = 0; j < jsonObj.head.vars.length + 1; j++) {
-                        td[j] = document.createElement("td");
-                        if (j == 0)
-                            td[j].appendChild(model2DArray[ix][j]);
-                        else
-                            td[j].appendChild(document.createTextNode(model2DArray[ix][j]));
-
-                        // Id for each row
-                        if (j == 1)
-                            tr.setAttribute("id", model2DArray[ix][j]);
-
-                        tr.appendChild(td[j]);
-                    }
-
-                    tbody.appendChild(tr);
-                }
-
-                table.appendChild(tbody);
-                modelList.appendChild(table);
-
-                // Un-check checkbox in the model page
-                // load epithelial to model discovery to load model
-                for (var i = 0; i < $('table tr td label').length; i++) {
-                    if ($('table tr td label')[i].firstChild.checked == true) {
-                        $('table tr td label')[i].firstChild.checked = false;
-                    }
-                }
-            },
-            false);
+        // Un-check checkbox in the model page
+        // load epithelial to model discovery to load model
+        for (var i = 0; i < $('table tr td label').length; i++) {
+            if ($('table tr td label')[i].firstChild.checked == true) {
+                $('table tr td label')[i].firstChild.checked = false;
+            }
+        }
     };
 
-// Toggle table column in Model discovery
+    // Toggle table column in Model discovery
     mainUtils.toggleColHtml = function () {
 
         if (event.srcElement.checked == false) {
@@ -868,7 +802,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-// Toggle table column in Load model
+    // Toggle table column in Load model
     mainUtils.toggleColModelHtml = function () {
 
         if (event.srcElement.checked == false) {
@@ -888,7 +822,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-// Filter search results
+    // Filter search results
     mainUtils.filterSearchHtml = function () {
 
         var tempstr = [];
@@ -945,7 +879,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     };
 
-// TODO: move to utils directory
+    // TODO: move to utils directory
     mainUtils.deleteRowModelHtml = function () {
 
         // Un-check header checkbox if body is empty
@@ -978,7 +912,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         // TODO: click when empty loadmodel table!! Fix this!!
     };
 
-// Load the SVG model
+    // Load the SVG model
     mainUtils.loadSVGModelHtml = function () {
 
         sendGetRequest(
@@ -992,7 +926,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             false);
     };
 
-// Load the epithelial
+    // Load the epithelial
     mainUtils.loadEpithelialHtml = function () {
 
         sendGetRequest(
@@ -1162,41 +1096,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         apicalMembrane,
                         basolateralMembrane,
                         membrane);
-
-                    // var idWithStr = membrane[0].source_name;
-                    // var indexOfHash = idWithStr.search("#");
-                    // var id = idWithStr.slice(indexOfHash + 1, idWithStr.length);
-                    //
-                    // // TODO: dynamic workspace name 267!
-                    // var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + 267 + "/" + "rawfile" +
-                    //     "/" + "HEAD" + "/" + idWithStr;
-                    //
-                    // sendGetRequest(
-                    //     vEndPoint,
-                    //     function (str) {
-                    //         var parser = new DOMParser();
-                    //         var xmlDoc = parser.parseFromString(str, "text/xml");
-                    //
-                    //         // Look up by variable tag
-                    //         for (var j = 0; j < xmlDoc.getElementsByTagName("variable").length; j++) {
-                    //             if (xmlDoc.getElementsByTagName("variable")[j].getAttribute("cmeta:id") == id) {
-                    //                 var varName = xmlDoc.getElementsByTagName("variable")[j].getAttribute("name");
-                    //
-                    //                 console.log("epithelial Variable name: ", varName);
-                    //             }
-                    //         }
-                    //
-                    //         membrane[0].source_text = membrane[0].sink_text = membrane[0].med_text = varName;
-                    //
-                    //         showsvgEpithelial(
-                    //             concentration_fma,
-                    //             source_fma2,
-                    //             sink_fma2,
-                    //             apicalMembrane,
-                    //             basolateralMembrane,
-                    //             membrane);
-                    //     },
-                    //     false);
                 }
                 else {
                     for (var i = 0; i < membrane.length; i++) {
@@ -1366,8 +1265,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         mainUtils.srcDescMediatorOfFluxes();
     };
 
-// Expose utility to the global object
+    // Expose utility to the global object
     global.$mainUtils = mainUtils;
-
 })
 (window);
