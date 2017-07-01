@@ -6317,6 +6317,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         geneList = [],
         proteinList = [],
         head = [],
+        filterModelEntity = [],
         id = 0;
 
     var str = [];
@@ -6548,6 +6549,16 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
                 },
                 {
+                    "key1": "flux", "key2": "glucose",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+                },
+                {
+                    "key1": "flux", "key2": "lactate",
+                    "opb": "<http://identifiers.org/opb/OPB_00593>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+                },
+                {
                     "key1": "flux", "key2": "ATP",
                     "opb": "<http://identifiers.org/opb/OPB_00593>",
                     "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
@@ -6596,6 +6607,16 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     "opb": "<http://identifiers.org/opb/OPB_00340>",
                     "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
                 },
+                {
+                    "key1": "concentration", "key2": "glucose",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+                },
+                {
+                    "key1": "concentration", "key2": "lactate",
+                    "opb": "<http://identifiers.org/opb/OPB_00340>",
+                    "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+                },
             ];
 
             for (var i = 0; i < dictionary.length; i++) {
@@ -6617,6 +6638,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             geneList = [];
             proteinList = [];
             head = [];
+            filterModelEntity = [];
 
             id = 0; // id to index each Model_entity
 
@@ -6668,6 +6690,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             endpoint,
             query,
             function (jsonModel) {
+
+                console.log("jsonModel: ", jsonModel);
 
                 var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
                 var query = 'SELECT ?Species ' + 'WHERE ' +
@@ -6745,11 +6769,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     },
                     true);
             },
-            true);
+            true
+        );
     }
 
-    // TODO: make a common table platform for all functions
-    // Show semantic annotation extracted from PMR
+// TODO: make a common table platform for all functions
+// Show semantic annotation extracted from PMR
     mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
         // annotate variable id to variable name
@@ -6782,8 +6807,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                             var indexOfHash = idWithStr.search("#");
                             cellmodelEntity.push(idWithStr.slice(0, indexOfHash + 1) + varName);
 
-                            console.log("SearchList Variable name: ", varName);
-                            console.log("Searchlist modelEntity: ", cellmodelEntity[i]);
+                            // console.log("SearchList Variable name: ", varName);
+                            // console.log("Searchlist modelEntity: ", cellmodelEntity[i]);
                         }
                     }
                 }
@@ -6871,7 +6896,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             false);
     }
 
-    // Load the view
+// Load the view
     mainUtils.loadViewHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -6906,7 +6931,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             true);
     };
 
-    // Load the model
+// Load the model
     mainUtils.loadModelHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
@@ -6937,8 +6962,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         switchMenuToActive(activeItem, "#listModels");
     };
 
-    // TODO: move to utils directory
-    // Show selected items in a table
+// TODO: move to utils directory
+// Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
         var cellmodelEntity;
@@ -6962,8 +6987,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         var varName = xmlDoc.getElementsByTagName("variable")[j].getAttribute("name");
                         cellmodelEntity = idWithStr.slice(0, indexOfHash + 1) + varName;
 
-                        console.log("showmodel Variable name: ", varName);
-                        console.log("showmodel modelEntity: ", cellmodelEntity);
+                        // console.log("showmodel Variable name: ", varName);
+                        // console.log("showmodel modelEntity: ", cellmodelEntity);
                     }
                 }
 
@@ -7072,7 +7097,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             false);
     };
 
-    // Toggle table column in Model discovery
+// Toggle table column in Model discovery
     mainUtils.toggleColHtml = function () {
 
         if (event.srcElement.checked == false) {
@@ -7092,7 +7117,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
     };
 
-    // Toggle table column in Load model
+// Toggle table column in Load model
     mainUtils.toggleColModelHtml = function () {
 
         if (event.srcElement.checked == false) {
@@ -7112,7 +7137,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
     };
 
-    // Filter search results
+// Filter search results
     mainUtils.filterSearchHtml = function () {
 
         var tempstr = [];
@@ -7169,7 +7194,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
     };
 
-    // TODO: move to utils directory
+// TODO: move to utils directory
     mainUtils.deleteRowModelHtml = function () {
 
         // Un-check header checkbox if body is empty
@@ -7202,7 +7227,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         // TODO: click when empty loadmodel table!! Fix this!!
     };
 
-    // Load the SVG model
+// Load the SVG model
     mainUtils.loadSVGModelHtml = function () {
 
         sendGetRequest(
@@ -7216,7 +7241,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             false);
     };
 
-    // Load the epithelial
+// Load the epithelial
     mainUtils.loadEpithelialHtml = function () {
 
         sendGetRequest(
@@ -7372,6 +7397,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                 // exceptional case: one flux is chosen
                 if (membrane.length <= 1) {
+                    console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
+                    console.log("membrane.length <= 1 source_fma2: ", source_fma2);
+                    console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
+                    console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
+                    console.log("membrane.length <= 1 basolateralMembrane: ", basolateralMembrane);
+                    console.log("membrane.length <= 1 membrane: ", membrane);
 
                     showsvgEpithelial(
                         concentration_fma,
@@ -7584,10 +7615,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         mainUtils.srcDescMediatorOfFluxes();
     };
 
-    // Expose utility to the global object
+// Expose utility to the global object
     global.$mainUtils = mainUtils;
 
-})(window);
+})
+(window);
 
 /***/ }),
 /* 6 */
