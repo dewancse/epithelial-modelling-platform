@@ -654,7 +654,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
             'WHERE { GRAPH ?Workspace { ' +
             'OPTIONAL { ' + '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein } . ' +
-            // 'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/description> ?Protein } . ' +
+            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/description> ?Protein } . ' +
             'OPTIONAL { ' + '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species } . ' +
             'OPTIONAL { ' + '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene } . ' +
             'OPTIONAL { ' + '<' + cellmlModel + '#Compartment> <http://purl.org/dc/terms/description> ?Compartment } . ' +
@@ -1098,6 +1098,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         membrane);
                 }
                 else {
+
+                    console.log("membrane.length >= 1 membrane: ", membrane);
+
                     for (var i = 0; i < membrane.length; i++) {
                         for (var j = i + 1; j < membrane.length; j++) {
                             mainUtils.makecotransporter(membrane[i], membrane[j]);

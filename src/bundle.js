@@ -338,16 +338,43 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
-    var tempBas = [], tempBas2 = [], tempBasID = [], idBaso = 0;
-    var typeOfModel, counter = 0, id = 0;
-    var tempSpecies = "", tempGene = "";
-    var relatedModel = [], relatedModel2 = [], relatedModelID = [], idProtein = 0, cModel;
-    var proteinVar, loc;
-    var dx, dy, dxtext, dytext, dxtext2, dytext2;
-    var dx1line, dy1line, dx2line, dy2line, dx1line2, dy1line2, dx2line2, dy2line2;
+    // weinstein model
+    var membraneOBJ = {
+        source_text: "J_NHE3_Na",
+        source_fma: apicalID,
+        source_name: "weinstein_1995.cellml#NHE3.J_NHE3_Na"
+    };
 
-    var counterbr = 0;
-    var icGlobal;
+    // chang fujita epithelial model
+    // var membraneOBJ = {
+    //     source_text: "J_mc_Na",
+    //     source_fma: apicalID,
+    //     source_name: "chang_fujita_b_1999.cellml#mc_sodium_flux.J_mc_Na"
+    // };
+
+    // warren model
+    // var membraneOBJ = {
+    //     source_text: "J_mc_Na",
+    //     source_fma: apicalID,
+    //     source_name: "warren_2010.cellml#Jserca_Jserca"
+    // };
+
+    /*
+     * relatedModel - all related models
+     * relatedModelValue - filtered related models which have #protein
+     * relatedModelID - relatedModel which have #protein
+     * */
+    var relatedModel = [], relatedModelValue = [], relatedModelID = [], workspaceName = "";
+    var membraneModel = [], membraneModelValue = [], membraneModeID = [], membraneObject = [];
+    var proteinName, cellmlModel, loc, typeOfModel, altCellmlModel = "", cthis;
+    var idProtein = 0, idAltProtein = 0, idMembrane = 0, counterbr = 0, iGlobal, organIndex;
+
+    var dx = [], dy = [],
+        dxtext = [], dytext = [], dxtext2 = [], dytext2 = [],
+        dx1line = [], dy1line = [], dx2line = [], dy2line = [],
+        dx1line2 = [], dy1line2 = [], dx2line2 = [], dy2line2 = [];
+
+    var id = 0;
 
     var tempJSON = [
         {
@@ -372,36 +399,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     ];
 
-    var kidney = [
-        {
-            "key": "http://identifiers.org/fma/FMA:84666",
-            "value": "apical plasma membrane"
-        },
-        {
-            "key": "http://identifiers.org/fma/FMA:70973",
-            "value": "epithelial cell of proximal tubule"
-        },
-        {
-            "key": "http://identifiers.org/fma/FMA:17693",
-            "value": "proximal convoluted tubule"
-        },
-        {
-            "key": "http://identifiers.org/fma/FMA:66836",
-            "value": "Portion of cytosol"
-        },
-        {
-            "key": "http://identifiers.org/fma/FMA:84669",
-            "value": "basolateralMembrane plasma membrane"
-        },
-        {
-            "key": "http://identifiers.org/fma/FMA:17716",
-            "value": "Proximal straight tubule"
-        }
-    ];
-
     var organ = [
         {
             "key": [
+                {
+                    "key": "http://identifiers.org/fma/FMA:7203",
+                    "value": "kidney"
+                },
                 {
                     "key": "http://identifiers.org/fma/FMA:84666",
                     "value": "apical plasma membrane"
@@ -411,12 +415,20 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     "value": "epithelial cell of proximal tubule"
                 },
                 {
+                    "key": "http://identifiers.org/fma/FMA:70981",
+                    "value": "epithelial cell of Distal tubule"
+                },
+                {
                     "key": "http://identifiers.org/fma/FMA:17693",
                     "value": "proximal convoluted tubule"
                 },
                 {
+                    "key": "http://identifiers.org/fma/FMA:17721",
+                    "value": "distal convoluted tubule"
+                },
+                {
                     "key": "http://identifiers.org/fma/FMA:66836",
-                    "value": "Portion of cytosol"
+                    "value": "portion of cytosol"
                 },
                 {
                     "key": "http://identifiers.org/fma/FMA:84669",
@@ -424,10 +436,53 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 },
                 {
                     "key": "http://identifiers.org/fma/FMA:17716",
-                    "value": "Proximal straight tubule"
-                }],
+                    "value": "proximal straight tubule"
+                },
+                {
+                    "key": "http://identifiers.org/fma/FMA:17717",
+                    "value": "ascending limb of loop of Henle"
+                },
+                {
+                    "key": "http://identifiers.org/fma/FMA:17705",
+                    "value": "descending limb of loop of Henle"
+                },
+                {
+                    "key": "http://identifiers.org/go/GO:0072061",
+                    "value": "inner medullary collecting duct development"
+                },
+                {
+                    "key": "http://identifiers.org/ma/MA:0002595",
+                    "value": "renal medullary capillary"
+                },
+                {
+                    "key": "http://identifiers.org/uberon/UBERON:0004726",
+                    "value": "vasa recta"
+                },
+                {
+                    "key": "http://identifiers.org/uberon/UBERON:0009091",
+                    "value": "vasa recta ascending limb"
+                },
+                {
+                    "key": "http://identifiers.org/uberon/UBERON:0004775",
+                    "value": "outer renal medulla vasa recta"
+                },
+                {
+                    "key": "http://identifiers.org/uberon/UBERON:0004776",
+                    "value": "inner renal medulla vasa recta"
+                }
+            ],
 
             "value": "Kidney"
+        },
+        {
+            "key": [
+                {
+                    "key": "http://identifiers.org/fma/FMA:7195",
+                    "value": "lung"
+                }
+            ],
+
+            "value": "Lung"
         }
     ];
 
@@ -847,6 +902,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     console.log("paracellularMembrane: ", paracellularMembrane);
     console.log("wallOfSmoothERMembrane: ", wallOfSmoothERMembrane);
     console.log("wallOfRoughERMembrane: ", wallOfRoughERMembrane);
+
+    var combinedMembrane = [];
+
+    for (var i = 0; i < apicalMembrane.length; i++)
+        combinedMembrane.push(apicalMembrane[i]);
+    for (var i = 0; i < basolateralMembrane.length; i++)
+        combinedMembrane.push(basolateralMembrane[i]);
+
+    console.log("combinedMembrane: ", combinedMembrane);
 
     var g = document.getElementById("#svgVisualize"),
         wth = 1200,
@@ -1305,12 +1369,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         checkBoxwrer[i] = new d3CheckBox();
     }
 
-    for (var i = 0; i < apicalMembrane.length; i++) {
+    for (var i = 0; i < combinedMembrane.length; i++) {
         checkBox[i] = new d3CheckBox();
-    }
-
-    for (var i = 0; i < basolateralMembrane.length; i++) {
-        checkBoxb[i] = new d3CheckBox();
     }
 
     for (var i = 0; i < paracellularMembrane.length; i++) {
@@ -1318,29 +1378,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     var update = function () {
-        for (var i = 0; i < apicalMembrane.length; i++) {
-            if (apicalMembrane[i].source_text2 != "channel") {
+        for (var i = 0; i < combinedMembrane.length; i++) {
+            if (combinedMembrane[i].source_text2 != "channel") {
                 checkedchk[i] = checkBox[i].checked();
                 // drag enable and disable
                 if (checkedchk[i] == true) {
-                    linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
-                    linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
                     circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
-
-                    if (linewithlineg2[i] != undefined && linewithtextg2[i] != undefined) {
-                        linewithlineg2[i].call(d3.drag().on("drag", dragcircleline));
-                        linewithtextg2[i].call(d3.drag().on("drag", dragcircleline));
-                    }
                 }
                 else {
-                    linewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithtextg[i].call(d3.drag().on("drag", dragcircleendchkbx));
                     circlewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
-
-                    if (linewithlineg2[i] != undefined && linewithtextg2[i] != undefined) {
-                        linewithlineg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                        linewithtextg2[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    }
                 }
             } else {
                 checkedchk[i] = checkBox[i].checked();
@@ -1354,46 +1400,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     polygonlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
                     polygontext[i].call(d3.drag().on("drag", dragcircleendchkbx));
                     polygon[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                }
-            }
-        }
-
-        for (var i = 0; i < basolateralMembrane.length; i++) {
-            if (basolateralMembrane[i].source_text2 != "channel") {
-                checkedchkb[i] = checkBoxb[i].checked();
-                // drag enable and disable
-                if (checkedchkb[i] == true) {
-                    linewithlinegb[i].call(d3.drag().on("drag", dragcirclelineb));
-                    linewithtextgb[i].call(d3.drag().on("drag", dragcirclelineb));
-                    circlewithlinegb[i].call(d3.drag().on("drag", dragcirclelineb));
-
-                    if (linewithlineg2b[i] != undefined && linewithtextg2b[i] != undefined) {
-                        linewithlineg2b[i].call(d3.drag().on("drag", dragcirclelineb));
-                        linewithtextg2b[i].call(d3.drag().on("drag", dragcirclelineb));
-                    }
-                }
-                else {
-                    linewithlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithtextgb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    circlewithlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-
-                    if (linewithlineg2b[i] != undefined && linewithtextg2b[i] != undefined) {
-                        linewithlineg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                        linewithtextg2b[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    }
-                }
-            } else {
-                checkedchkb[i] = checkBoxb[i].checked();
-                // drag enable and disable
-                if (checkedchkb[i] == true) {
-                    polygonlinegb[i].call(d3.drag().on("drag", dragpolygonandlineb));
-                    polygontextb[i].call(d3.drag().on("drag", dragpolygonandlineb));
-                    polygonb[i].call(d3.drag().on("drag", dragpolygonandlineb));
-                }
-                else {
-                    polygonlinegb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    polygontextb[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    polygonb[i].call(d3.drag().on("drag", dragcircleendchkbx));
                 }
             }
         }
@@ -1412,27 +1418,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     };
 
-    for (var i = 0; i < apicalMembrane.length; i++) {
-
-        var textvaluechk = apicalMembrane[i].source_text + " " + apicalMembrane[i].source_text2;
+    for (var i = 0; i < combinedMembrane.length; i++) {
+        var textvaluechk = combinedMembrane[i].source_text + " " + combinedMembrane[i].source_text2;
 
         checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
         checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
 
         checkboxsvg.call(checkBox[i]);
-
-        yinitialchk += ydistancechk;
-        ytextinitialchk += ydistancechk;
-    }
-
-    for (var i = 0; i < basolateralMembrane.length; i++) {
-
-        var textvaluechkb = basolateralMembrane[i].source_text + " " + basolateralMembrane[i].source_text2;
-
-        checkBoxb[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
-        checkBoxb[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechkb + "");
-
-        checkboxsvg.call(checkBoxb[i]);
 
         yinitialchk += ydistancechk;
         ytextinitialchk += ydistancechk;
@@ -1602,428 +1594,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         });
         return retval;
     }
-
-    var findSpeciesGene = function (cModel, jsonModel) {
-
-        var query = 'SELECT ?Species ' +
-            'WHERE { GRAPH ?g { ' +
-            '<' + cModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
-            '}}'
-
-        sendPostRequest(
-            endpoint,
-            query,
-            function (jsonSpecies) {
-
-                var query = 'SELECT ?Gene ' +
-                    'WHERE { GRAPH ?g { ' +
-                    '<' + cModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
-                    '}}'
-
-                sendPostRequest(
-                    endpoint,
-                    query,
-                    function (jsonGene) {
-
-                        var label = document.createElement('label');
-                        label.innerHTML = '<br><input id="' + cModel + '#Species" type="checkbox" ' +
-                            'value="' + jsonSpecies.results.bindings[0].Species.value + '"> ' +
-                            '' + jsonSpecies.results.bindings[0].Species.value + '</label>';
-
-                        tempSpecies += label.innerHTML;
-
-                        label.innerHTML = '<br><input id="' + cModel + '#Gene" type="checkbox" ' +
-                            'value="' + jsonGene.results.bindings[0].Gene.value + '"> ' +
-                            '' + jsonGene.results.bindings[0].Gene.value + '</label>';
-
-                        tempGene += label.innerHTML;
-
-                        id++;
-
-                        if (id == jsonModel.results.bindings.length) {
-                            basoMembrane();
-                            return;
-                        }
-
-                        // parsing
-                        var tModel = jsonModel.results.bindings[id].cellmlmodel.value;
-                        var indexOfHash = tModel.search("#");
-                        tModel = tModel.slice(0, indexOfHash);
-
-                        findSpeciesGene(tModel, jsonModel);
-
-                    }, true);
-            }, true);
-    }
-
-    var findProtein = function (relatedModel, jsonModel) {
-        var query = 'SELECT ?Protein ' +
-            'WHERE { GRAPH ?g { ' +
-            '<' + relatedModel[idProtein] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
-            '}}'
-
-        sendPostRequest(
-            endpoint,
-            query,
-            function (jsonProtein) {
-
-                if (jsonProtein.results.bindings[0] != undefined) {
-                    relatedModel2.push(jsonProtein.results.bindings[0].Protein.value);
-                    relatedModelID.push(relatedModel[idProtein]);
-                }
-
-                idProtein++;
-
-                if (idProtein == relatedModel.length) {
-                    findSpeciesGene(cModel, jsonModel);
-                    return;
-                }
-
-                findProtein(relatedModel, jsonModel);
-
-            }, true);
-    }
-
-    var basoMembrane = function () {
-        var query = 'SELECT ?cellmlmodel ?located_in ' +
-            'WHERE { GRAPH ?g { ' +
-            '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
-            'FILTER (str(?located_in) = "http://identifiers.org/fma/FMA:84669"). ' +
-            '}}'
-
-        sendPostRequest(
-            endpoint,
-            query,
-            function (jsonbasolateralMembrane) {
-
-                for (var i = 0; i < jsonbasolateralMembrane.results.bindings.length; i++) {
-                    for (var j = 0; j < kidney.length; j++) {
-                        if (jsonbasolateralMembrane.results.bindings[i].located_in.value == kidney[j].key) {
-
-                            // parsing
-                            var kModel = jsonbasolateralMembrane.results.bindings[i].cellmlmodel.value;
-                            var indexOfHash = kModel.search("#");
-                            kModel = kModel.slice(0, indexOfHash);
-
-                            tempBas.push(kModel);
-
-                            break;
-                        }
-                    }
-                }
-
-                tempBas = uniqueify(tempBas);
-
-                basoMembrane2();
-
-            }, true);
-    }
-
-    var basoMembrane2 = function () {
-        var query = 'SELECT ?Protein ' +
-            'WHERE { GRAPH ?g { ' +
-            '<' + tempBas[idBaso] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
-            '}}'
-
-        sendPostRequest(
-            endpoint,
-            query,
-            function (jsonProtein) {
-
-                if (jsonProtein.results.bindings[0] != undefined) {
-                    tempBas2.push(jsonProtein.results.bindings[0].Protein.value);
-                    tempBasID.push(tempBas[idBaso]);
-                }
-
-                idBaso++;
-
-                if (idBaso == tempBas.length) {
-
-                    var msg = "<p><b>Would you like to move ... ?</b><\p>";
-                    var msg2 = "<p><b>" + proteinVar + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
-                        "<b>" + loc + "</b><\p>";
-
-                    // TODO: make similar URI thing on model, biological, species, gene, and protein
-                    var model = "<p><b>Model: </b>" + tempJSON[0].value + "</p>";
-                    var biological = "<p><b>Biological Meaning: </b>" + tempJSON[1].value + "</p>";
-                    var species = "<p><b>Species: </b>" + tempJSON[2].value + "</p>";
-                    var gene = "<p><b>Gene: </b>" + tempJSON[3].value + "</p>";
-                    var protein = "<p><b>Protein: </b>" + tempJSON[4].value + "</p>";
-
-                    // interesting .. !!!
-                    var otherSpecies = "<p><b>Other species of <b>" + proteinVar + "</b>: </b>" + tempSpecies + "</p>";
-                    var otherGene = "<p><b>Other genes of <b>" + proteinVar + "</b>: </b>" + tempGene + "</p>";
-
-                    var otherKidney = "<p><b>Other kidney models in PMR: </b>";
-                    for (var i = 0; i < relatedModel2.length; i++) {
-
-                        if (proteinVar == relatedModel2[i])
-                            continue;
-
-                        var label = document.createElement('label');
-                        label.innerHTML = '<br><input id="' + relatedModelID[i] + '#Protein" type="checkbox" ' +
-                            'value="' + relatedModel2[i] + '"> ' + relatedModel2[i] + '</label>';
-
-                        otherKidney += label.innerHTML;
-                    }
-
-                    var basolateralMembraneTransporter = "<p><b>Basolateral membrane transporters might be of interest: </b>";
-                    for (var i = 0; i < tempBas2.length; i++) {
-
-                        var label = document.createElement('label');
-                        label.innerHTML = '<br><input id="' + tempBasID[i] + '#Protein" type="checkbox" ' +
-                            'value="' + tempBas2[i] + '"> ' + tempBas2[i] + '</label>';
-
-                        basolateralMembraneTransporter += label.innerHTML;
-                    }
-
-
-                    $('#modalBody')
-                        .append(msg)
-                        .append(msg2)
-                        .append(model)
-                        .append(biological)
-                        .append(species)
-                        .append(gene)
-                        .append(protein);
-
-                    var msg3 = "<br><p><b>Recommendations or suggestions:</b><\p>";
-
-                    $('#modalBody')
-                        .append(msg3)
-                        .append(otherSpecies)
-                        .append(otherGene)
-                        .append(otherKidney)
-                        .append(basolateralMembraneTransporter);
-
-                    return;
-                }
-
-                basoMembrane2();
-
-            }, true);
-    }
-
-    var Modal = function (options) {
-        var $this = this;
-
-        options = options ? options : {};
-        $this.options = {};
-        $this.options.header = options.header !== undefined ? options.header : false;
-        $this.options.footer = options.footer !== undefined ? options.footer : false;
-        $this.options.closeButton = options.closeButton !== undefined ? options.closeButton : true;
-        $this.options.footerCloseButton = options.footerCloseButton !== undefined ? options.footerCloseButton : false;
-        $this.options.footerSaveButton = options.footerSaveButton !== undefined ? options.footerSaveButton : false;
-        $this.options.id = options.id !== undefined ? options.id : "myModal";
-
-        /**
-         * Append modal window html to body
-         */
-        $this.createModal = function () {
-            $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
-            $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
-            var win = $('.modal-content', $this.selector);
-
-            if ($this.options.header) {
-                win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
-
-                if ($this.options.closeButton) {
-                    win.find('.modal-header').prepend('<button type="button" class="close" data-dismiss="modal">&times;</button>');
-                }
-            }
-
-            win.append('<div class="modal-body"></div>');
-            if ($this.options.footer) {
-                win.append('<div class="modal-footer"></div>');
-
-                if ($this.options.footerCloseButton) {
-                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
-                }
-
-                if ($this.options.footerSaveButton) {
-                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
-                }
-            }
-
-            // close button clicked!!
-            win[0].lastElementChild.children[0].onclick = function (event) {
-
-                // TODO: Assign dx1line, etc vaiables to all the apical, basolateral membranes, etc
-                // decrement y-axis of line and circle
-                yvalue -= ydistance;
-                cyvalue -= ydistance;
-
-                // line 1
-                linewithlineg[icGlobal]
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("x1", dx1line)
-                    .attr("y1", dy1line)
-                    .attr("x2", dx2line)
-                    .attr("y2", dy2line);
-
-                // text 1
-                linewithtextg[icGlobal]
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("x", dxtext)
-                    .attr("y", dytext);
-
-                // circle
-                circlewithlineg[icGlobal]
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("cx", dx)
-                    .attr("cy", dy);
-
-                if (linewithlineg2[icGlobal] != undefined) {
-                    // line 2
-                    linewithlineg2[icGlobal]
-                        .transition()
-                        .delay(1000)
-                        .duration(1000)
-                        .attr("x1", dx1line2)
-                        .attr("y1", dy1line2)
-                        .attr("x2", dx2line2)
-                        .attr("y2", dy2line2);
-
-                    // text 2
-                    linewithtextg2[icGlobal]
-                        .transition()
-                        .delay(1000)
-                        .duration(1000)
-                        .attr("x", dxtext2)
-                        .attr("y", dytext2);
-                }
-
-                // move back line from Basolateral to Apical Membrane
-                linebasolateral
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .style("stroke", "orange");
-            }
-
-            // save button clicked!!
-            win[0].lastElementChild.children[1].onclick = function (event) {
-
-                console.log("save clicked!");
-
-                // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
-
-                        console.log("Species clicked!!");
-
-                        console.log("checked: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
-                        console.log("id: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
-                    }
-                }
-
-                // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[13].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked) {
-
-                        console.log("Gene clicked!!");
-
-                        console.log("checked: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
-                        console.log("id: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
-                    }
-                }
-
-                // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[14].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
-
-                        console.log("other Kidney clicked!!");
-                        console.log("other Kidney clicked event: ", event);
-
-                        console.log("checked: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
-                        console.log("id: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
-                    }
-                }
-
-                // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[15].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].checked) {
-                        console.log("checked: ", win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].checked);
-                        console.log("id: ", win[0].children[1].children[0].children[15].getElementsByTagName("input")[i].id);
-                    }
-                }
-
-                // lineBasolateralMembrane
-                linebasolateral
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .style("stroke", "orange");
-            }
-        };
-
-        /**
-         * Set header text. It makes sense only if the options.header is logical true.
-         * @param {String} html New header text.
-         */
-        $this.setHeader = function (html) {
-            $this.window.find('.modal-title').html(html);
-        };
-
-        /**
-         * Set body HTML.
-         * @param {String} html New body HTML
-         */
-        $this.setBody = function (html) {
-            $this.window.find('.modal-body').html(html);
-        };
-
-        /**
-         * Set footer HTML.
-         * @param {String} html New footer HTML
-         */
-        $this.setFooter = function (html) {
-            $this.window.find('.modal-footer').html(html);
-        };
-
-        /**
-         * Return window body element.
-         * @returns {jQuery} The body element
-         */
-        $this.getBody = function () {
-            return $this.window.find('.modal-body');
-        };
-
-        /**
-         * Show modal window
-         */
-        $this.show = function () {
-            $this.window.modal('show');
-        };
-
-        /**
-         * Hide modal window
-         */
-        $this.hide = function () {
-            $this.window.modal('hide');
-        };
-
-        /**
-         * Toggle modal window
-         */
-        $this.toggle = function () {
-            $this.window.modal('toggle');
-        };
-
-        $this.selector = "#" + $this.options.id;
-        if (!$($this.selector).length) {
-            $this.createModal();
-        }
-
-        $this.window = $($this.selector);
-        $this.setHeader($this.options.header);
-    };
 
     // Gap Junction
     for (var i = 0; i < celljunction.length; i++) {
@@ -3679,35 +3249,35 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    // Apical membrane
-    for (var i = 0; i < apicalMembrane.length; i++) {
-        var textvalue = apicalMembrane[i].source_text;
-        var textvalue2 = apicalMembrane[i].source_text2;
-        var src_fma = apicalMembrane[i].source_fma;
-        var src_fma2 = apicalMembrane[i].source_fma2;
-        var snk_fma = apicalMembrane[i].sink_fma;
-        var snk_fma2 = apicalMembrane[i].sink_fma2;
+    // Apical and basolateral membrane
+    for (var i = 0; i < combinedMembrane.length; i++) {
+        var textvalue = combinedMembrane[i].source_text;
+        var textvalue2 = combinedMembrane[i].source_text2;
+        var src_fma = combinedMembrane[i].source_fma;
+        var src_fma2 = combinedMembrane[i].source_fma2;
+        var snk_fma = combinedMembrane[i].sink_fma;
+        var snk_fma2 = combinedMembrane[i].sink_fma2;
         var textWidth = getTextWidth(textvalue, 12);
 
         // case 1
         if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
             var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + i)
+                .attr("id", "linewithlineg" + linewithlineg.length)
                 .attr("x1", function (d) {
-                    dx1line = d.x;
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
-                    dy1line = d.y;
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
-                    dx2line = d.x + lineLen;
+                    dx2line[i] = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
-                    dy2line = d.y;
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -3717,13 +3287,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + i)
+                .attr("id", "linewithtextg" + linewithtextg.length)
                 .attr("x", function (d) {
-                    dxtext = d.x;
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
-                    dytext = d.y;
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -3735,13 +3305,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
             circlewithlineg[i] = linegcircle.append("circle")
-                .attr("id", "circlewithlineg" + i)
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", circlewithlineg.length)
+                .attr("membrane", apicalID)
                 .attr("cx", function (d) {
-                    dx = d.x;
+                    dx[i] = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
-                    dy = d.y + radius;
+                    dy[i] = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -3752,21 +3330,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + i)
+                    .attr("id", "linewithlineg2" + linewithlineg2.length)
                     .attr("x1", function (d) {
-                        dx1line2 = d.x;
+                        dx1line2[i] = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
-                        dy1line2 = d.y;
+                        dy1line2[i] = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
-                        dx2line2 = d.x + lineLen;
+                        dx2line2[i] = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
-                        dy2line2 = d.y;
+                        dy2line2[i] = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
@@ -3778,13 +3356,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + i)
+                    .attr("id", "linewithtextg2" + linewithtextg2.length)
                     .attr("x", function (d) {
-                        dxtext2 = d.x;
+                        dxtext2[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
-                        dytext2 = d.y;
+                        dytext2[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -3804,17 +3382,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
             var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + i)
+                .attr("id", "linewithlineg" + linewithlineg.length)
                 .attr("x1", function (d) {
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
+                    dx2line[i] = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -3824,11 +3406,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10, y: yvalue + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + i)
+                .attr("id", "linewithtextg" + linewithtextg.length)
                 .attr("x", function (d) {
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -3840,11 +3424,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
             circlewithlineg[i] = linegcircle.append("circle")
-                .attr("id", "circlewithlineg" + i)
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", circlewithlineg.length)
+                .attr("membrane", apicalID)
                 .attr("cx", function (d) {
+                    dx[i] = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
+                    dy[i] = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -3855,33 +3449,39 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + i)
+                    .attr("id", "linewithlineg2" + linewithlineg2.length)
                     .attr("x1", function (d) {
+                        dx1line2[i] = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
+                        dy1line2[i] = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
+                        dx2line2[i] = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
+                        dy2line2[i] = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
                     .attr("stroke-width", 2)
-                    .attr("marker-start", "url(#start)")
+                    .attr("marker-end", "url(#end)")
                     .attr("cursor", "pointer");
 
                 var linegtext2 = lineg2.append("g").data([{
                     x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + i)
+                    .attr("id", "linewithtextg2" + linewithtextg2.length)
                     .attr("x", function (d) {
+                        dxtext2[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
+                        dytext2[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -3901,17 +3501,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
             var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + i)
+                .attr("id", "linewithlineg" + linewithlineg.length)
                 .attr("x1", function (d) {
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
+                    dx2line[i] = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -3921,11 +3525,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + i)
+                .attr("id", "linewithtextg" + linewithtextg.length)
                 .attr("x", function (d) {
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -3937,11 +3543,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
             circlewithlineg[i] = linegcircle.append("circle")
-                .attr("id", "circlewithlineg" + i)
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", circlewithlineg.length)
+                .attr("membrane", apicalID)
                 .attr("cx", function (d) {
+                    dx[i] = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
+                    dy[i] = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -3952,17 +3568,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + i)
+                    .attr("id", "linewithlineg2" + linewithlineg2.length)
                     .attr("x1", function (d) {
+                        dx1line2[i] = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
+                        dy1line2[i] = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
+                        dx2line2[i] = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
+                        dy2line2[i] = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
@@ -3974,11 +3594,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + i)
+                    .attr("id", "linewithtextg2" + linewithtextg2.length)
                     .attr("x", function (d) {
+                        dxtext2[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
+                        dytext2[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -3998,17 +3620,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
             var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + i)
+                .attr("id", "linewithlineg" + linewithlineg.length)
                 .attr("x1", function (d) {
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
+                    dx2line[i] = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -4018,11 +3644,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10, y: yvalue + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + i)
+                .attr("id", "linewithtextg" + linewithtextg.length)
                 .attr("x", function (d) {
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -4034,11 +3662,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
             circlewithlineg[i] = linegcircle.append("circle")
-                .attr("id", "circlewithlineg" + i)
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", circlewithlineg.length)
+                .attr("membrane", apicalID)
                 .attr("cx", function (d) {
+                    dx[i] = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
+                    dy[i] = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -4049,17 +3687,21 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + i)
+                    .attr("id", "linewithlineg2" + linewithlineg2.length)
                     .attr("x1", function (d) {
+                        dx1line2[i] = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
+                        dy1line2[i] = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
+                        dx2line2[i] = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
+                        dy2line2[i] = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
@@ -4071,11 +3713,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + i)
+                    .attr("id", "linewithtextg2" + linewithtextg2.length)
                     .attr("x", function (d) {
+                        dxtext2[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
+                        dytext2[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -4091,500 +3735,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             cyvalue += ydistance;
         }
 
-        // case 5
-        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
-            var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-end", "url(#end)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
-                .attr("id", "polygon" + i)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontext[i] = polygontextg.append("text")
-                .attr("id", "polygontext" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 6
-        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
-            var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-start", "url(#start)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
-                .attr("id", "polygon" + i)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontext[i] = polygontextg.append("text")
-                .attr("id", "polygontext" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 7
-        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
-            var leakg = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            leaklineg[i] = leakg.append("line")
-                .attr("id", "leaklineg" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-end", "url(#end)")
-                .attr("cursor", "pointer");
-
-            var leaktextg = leakg.append("g").data([{x: xvalue - polygonlineLen / 2 - 10, y: yvalue + 5}]);
-
-            leaktext[i] = leaktextg.append("text")
-                .attr("id", "leaktext" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(textvalue);
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 8
-        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
-            var leakg = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            leaklineg[i] = leakg.append("line")
-                .attr("id", "leaklineg" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-start", "url(#start)")
-                .attr("cursor", "pointer");
-
-            var leaktextg = leakg.append("g").data([{x: xvalue + polygonlineLen / 2 + 10, y: yvalue + 5}]);
-
-            leaktext[i] = leaktextg.append("text")
-                .attr("id", "leaktext" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(textvalue);
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 9
-        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "ATP" && snk_fma2 == "ATP")) {
-            var polygongATP = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            polygonlinegATP[i] = polygongATP.append("line")
-                .attr("id", "polygonlinegATP" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-end", "url(#end)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygongATP.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
-                .attr("id", "polygon" + i)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygongATP.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontextATP[i] = polygontextg.append("g").append("text")
-                .attr("id", "polygontextATP" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // ATP rectangle
-            var atprect = polygongATP.append("g").append("rect")
-                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue) + ")rotate(-45)")
-                .attr("id", ATPID)
-                .attr("width", 26)
-                .attr("height", 26)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "10px")
-                .attr("fill", "white");
-
-            var atptextg = polygongATP.append("g").data([{x: xvalue + 8, y: yvalue + 5}]);
-            atprectText[i] = atptextg.append("text")
-                .attr("id", "atprectText" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-family", "Times New Roman")
-                .attr("font-size", "16px")
-                .attr("font-weight", "bold")
-                .attr("fill", "red")
-                .attr("cursor", "pointer")
-                .text("A");
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 10
-        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "ATP" && snk_fma2 == "ATP")) {
-            var polygongATP = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            polygonlinegATP[i] = polygongATP.append("line")
-                .attr("id", "polygonlinegATP" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-start", "url(#start)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygongATP.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
-                .attr("id", "polygon" + i)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygongATP.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontextATP[i] = polygontextg.append("text")
-                .attr("id", "polygontextATP" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // ATP rectangle
-            var atprect = polygongATP.append("g").append("rect")
-                .attr("transform", "translate(" + (xvalue - 5 + polygonlineLen) + "," + (yvalue) + ")rotate(-45)")
-                .attr("id", ATPID)
-                .attr("width", 26)
-                .attr("height", 26)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "10px")
-                .attr("fill", "white");
-
-            var atptextg = polygongATP.append("g").data([{x: xvalue + polygonlineLen + 8, y: yvalue + 5}]);
-            atprectText[i] = atptextg.append("text")
-                .attr("id", "atprectText" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-family", "Times New Roman")
-                .attr("font-size", "16px")
-                .attr("font-weight", "bold")
-                .attr("fill", "red")
-                .attr("cursor", "pointer")
-                .text("A");
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 11
-        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "p2y2" && snk_fma2 == "p2y2")) {
-            var linegpy = newg.append("g").data([{x: xvalue, y: yvalue}]);
-            linewithlinegpy[i] = linegpy.append("g").append("rect")
-                .attr("id", "linewithlinegpy" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            var linegpy2 = newg.append("g").data([{x: xvalue, y: yvalue + 8}]);
-            linewithlinegpy2[i] = linegpy2.append("g").append("rect")
-                .attr("id", "linewithlinegpy2" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            var linegpy3 = newg.append("g").data([{x: xvalue, y: yvalue + 16}]);
-            linewithlinegpy3[i] = linegpy3.append("g").append("rect")
-                .attr("id", "linewithlinegpy3" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 12
-        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "p2y2" && snk_fma2 == "p2y2")) {
-            var linegpy = newg.append("g").data([{x: xvalue, y: yvalue}]);
-            linewithlinegpy[i] = linegpy.append("g").append("rect")
-                .attr("id", "linewithlinegpy" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 3)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            var linegpy2 = newg.append("g").data([{x: xvalue, y: yvalue + 8}]);
-            linewithlinegpy2[i] = linegpy2.append("g").append("rect")
-                .attr("id", "linewithlinegpy2" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            var linegpy3 = newg.append("g").data([{x: xvalue, y: yvalue + 16}]);
-            linewithlinegpy3[i] = linegpy3.append("g").append("rect")
-                .attr("id", "linewithlinegpy3" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-    }
-
-    // Basolateral membrane
-    for (var i = 0; i < basolateralMembrane.length; i++) {
-        var textvalue = basolateralMembrane[i].source_text;
-        var textvalue2 = basolateralMembrane[i].source_text2;
-        var src_fma = basolateralMembrane[i].source_fma;
-        var src_fma2 = basolateralMembrane[i].source_fma2;
-        var snk_fma = basolateralMembrane[i].sink_fma;
-        var snk_fma2 = basolateralMembrane[i].sink_fma2;
-        var textWidth = getTextWidth(textvalue, 12);
-
         // case 1
         if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
-            var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
-            linewithlinegb[i] = linegb.append("line")
-                .attr("id", "linewithlinegb" + i)
+            var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+            linewithlineg[i] = lineg.append("line")
+                .attr("id", "linewithlineg" + linewithlineg.length)
                 .attr("x1", function (d) {
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
+                    dx2line[i] = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -4592,13 +3761,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("marker-end", "url(#end)")
                 .attr("cursor", "pointer");
 
-            var linegtextb = linegb.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
-            linewithtextgb[i] = linegtextb.append("text")
-                .attr("id", "linewithtextgb" + i)
+            var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
+            linewithtextg[i] = linegtext.append("text")
+                .attr("id", "linewithtextg" + linewithtextg.length)
                 .attr("x", function (d) {
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -4608,13 +3779,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "pointer")
                 .text(textvalue);
 
-            var linegcircleb = linegb.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
-            circlewithlinegb[i] = linegcircleb.append("circle")
-                .attr("id", "circlewithlinegb" + i)
+            var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+            circlewithlineg[i] = linegcircle.append("circle")
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", circlewithlineg.length)
+                .attr("membrane", basolateralID)
                 .attr("cx", function (d) {
+                    dx[i] = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
+                    dy[i] = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -4623,19 +3804,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "move");
 
             if (textvalue2 != "single flux") {
-                var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
-                linewithlineg2b[i] = lineg2b.append("line")
-                    .attr("id", "linewithlineg2b" + i)
+                var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+                linewithlineg2[i] = lineg2.append("line")
+                    .attr("id", "linewithlineg2" + linewithlineg2.length)
                     .attr("x1", function (d) {
+                        dx1line2[i] = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
+                        dy1line2[i] = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
+                        dx2line2[i] = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
+                        dy2line2[i] = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
@@ -4643,15 +3828,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-end", "url(#end)")
                     .attr("cursor", "pointer");
 
-                var linegtext2b = lineg2b.append("g").data([{
+                var linegtext2 = lineg2.append("g").data([{
                     x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
                 }]);
-                linewithtextg2b[i] = linegtext2b.append("text")
-                    .attr("id", "linewithtextg2b" + i)
+                linewithtextg2[i] = linegtext2.append("text")
+                    .attr("id", "linewithtextg2" + linewithtextg2.length)
                     .attr("x", function (d) {
+                        dxtext2[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
+                        dytext2[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -4663,25 +3850,29 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // increment y-axis of line and circle
-            yvalueb += ydistanceb;
-            cyvalueb += ydistanceb;
+            yvalueb += ydistance;
+            cyvalueb += ydistance;
         }
 
         // case 2
         if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
-            var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
-            linewithlinegb[i] = linegb.append("line")
-                .attr("id", "linewithlinegb" + i)
+            var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+            linewithlineg[i] = lineg.append("line")
+                .attr("id", "linewithlineg" + linewithlineg.length)
                 .attr("x1", function (d) {
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
+                    dx2line[i] = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -4689,13 +3880,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("marker-start", "url(#start)")
                 .attr("cursor", "pointer");
 
-            var linegtextb = linegb.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
-            linewithtextgb[i] = linegtextb.append("text")
-                .attr("id", "linewithtextgb" + i)
+            var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
+            linewithtextg[i] = linegtext.append("text")
+                .attr("id", "linewithtextg" + linewithtextg.length)
                 .attr("x", function (d) {
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -4705,13 +3898,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "pointer")
                 .text(textvalue);
 
-            var linegcircleb = linegb.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
-            circlewithlinegb[i] = linegcircleb.append("circle")
-                .attr("id", "circlewithlinegb" + i)
+            var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+            circlewithlineg[i] = linegcircle.append("circle")
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", circlewithlineg.length)
+                .attr("membrane", basolateralID)
                 .attr("cx", function (d) {
+                    dx[i] = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
+                    dy[i] = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -4720,19 +3923,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "move");
 
             if (textvalue2 != "single flux") {
-                var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
-                linewithlineg2b[i] = lineg2b.append("line")
-                    .attr("id", "linewithlineg2b" + i)
+                var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+                linewithlineg2[i] = lineg2.append("line")
+                    .attr("id", "linewithlineg2" + linewithlineg2.length)
                     .attr("x1", function (d) {
+                        dx1line2[i] = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
+                        dy1line2[i] = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
+                        dx2line2[i] = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
+                        dy2line2[i] = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
@@ -4740,15 +3947,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-start", "url(#start)")
                     .attr("cursor", "pointer");
 
-                var linegtext2b = lineg2b.append("g").data([{
+                var linegtext2 = lineg2.append("g").data([{
                     x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
                 }]);
-                linewithtextg2b[i] = linegtext2b.append("text")
-                    .attr("id", "linewithtextg2b" + i)
+                linewithtextg2[i] = linegtext2.append("text")
+                    .attr("id", "linewithtextg2" + linewithtextg2.length)
                     .attr("x", function (d) {
+                        dxtext2[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
+                        dytext2[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -4760,26 +3969,29 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // increment y-axis of line and circle
-            yvalueb += ydistanceb;
-            cyvalueb += ydistanceb;
+            yvalueb += ydistance;
+            cyvalueb += ydistance;
         }
 
         // case 3
         if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
-
-            var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
-            linewithlinegb[i] = linegb.append("line")
-                .attr("id", "linewithlinegb" + i)
+            var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+            linewithlineg[i] = lineg.append("line")
+                .attr("id", "linewithlineg" + linewithlineg.length)
                 .attr("x1", function (d) {
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
+                    dx2line[i] = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -4787,13 +3999,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("marker-end", "url(#end)")
                 .attr("cursor", "pointer");
 
-            var linegtextb = linegb.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
-            linewithtextgb[i] = linegtextb.append("text")
-                .attr("id", "linewithtextgb" + i)
+            var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
+            linewithtextg[i] = linegtext.append("text")
+                .attr("id", "linewithtextg" + linewithtextg.length)
                 .attr("x", function (d) {
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -4803,13 +4017,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "pointer")
                 .text(textvalue);
 
-            var linegcircleb = linegb.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
-            circlewithlinegb[i] = linegcircleb.append("circle")
-                .attr("id", "circlewithlinegb" + i)
+            var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+            circlewithlineg[i] = linegcircle.append("circle")
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", circlewithlineg.length)
+                .attr("membrane", basolateralID)
                 .attr("cx", function (d) {
+                    dx[i] = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
+                    dy[i] = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -4818,19 +4042,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "move");
 
             if (textvalue2 != "single flux") {
-                var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
-                linewithlineg2b[i] = lineg2b.append("line")
-                    .attr("id", "linewithlineg2b" + i)
+                var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+                linewithlineg2[i] = lineg2.append("line")
+                    .attr("id", "linewithlineg2" + linewithlineg2.length)
                     .attr("x1", function (d) {
+                        dx1line2[i] = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
+                        dy1line2[i] = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
+                        dx2line2[i] = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
+                        dy2line2[i] = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
@@ -4838,15 +4066,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-start", "url(#start)")
                     .attr("cursor", "pointer");
 
-                var linegtext2b = lineg2b.append("g").data([{
+                var linegtext2 = lineg2.append("g").data([{
                     x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
                 }]);
-                linewithtextg2b[i] = linegtext2b.append("text")
-                    .attr("id", "linewithtextg2b" + i)
+                linewithtextg2[i] = linegtext2.append("text")
+                    .attr("id", "linewithtextg2" + linewithtextg2.length)
                     .attr("x", function (d) {
+                        dxtext2[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
+                        dytext2[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -4858,25 +4088,29 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // increment y-axis of line and circle
-            yvalueb += ydistanceb;
-            cyvalueb += ydistanceb;
+            yvalueb += ydistance;
+            cyvalueb += ydistance;
         }
 
         // case 4
         if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
-            var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
-            linewithlinegb[i] = linegb.append("line")
-                .attr("id", "linewithlinegb" + i)
+            var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+            linewithlineg[i] = lineg.append("line")
+                .attr("id", "linewithlineg" + linewithlineg.length)
                 .attr("x1", function (d) {
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
+                    dx2line[i] = d.x + lineLen;
                     return d.x + lineLen;
                 })
                 .attr("y2", function (d) {
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -4884,13 +4118,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("marker-start", "url(#start)")
                 .attr("cursor", "pointer");
 
-            var linegtextb = linegb.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
-            linewithtextgb[i] = linegtextb.append("text")
-                .attr("id", "linewithtextgb" + i)
+            var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
+            linewithtextg[i] = linegtext.append("text")
+                .attr("id", "linewithtextg" + linewithtextg.length)
                 .attr("x", function (d) {
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -4900,13 +4136,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "pointer")
                 .text(textvalue);
 
-            var linegcircleb = linegb.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
-            circlewithlinegb[i] = linegcircleb.append("circle")
-                .attr("id", "circlewithlinegb" + i)
+            var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+            circlewithlineg[i] = linegcircle.append("circle")
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", circlewithlineg.length)
+                .attr("membrane", basolateralID)
                 .attr("cx", function (d) {
+                    dx[i] = d.x;
                     return d.x;
                 })
                 .attr("cy", function (d) {
+                    dy[i] = d.y + radius;
                     return d.y + radius;
                 })
                 .attr("r", radius)
@@ -4915,19 +4161,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "move");
 
             if (textvalue2 != "single flux") {
-                var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
-                linewithlineg2b[i] = lineg2b.append("line")
-                    .attr("id", "linewithlineg2b" + i)
+                var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+                linewithlineg2[i] = lineg2.append("line")
+                    .attr("id", "linewithlineg2" + linewithlineg2.length)
                     .attr("x1", function (d) {
+                        dx1line2[i] = d.x;
                         return d.x;
                     })
                     .attr("y1", function (d) {
+                        dy1line2[i] = d.y;
                         return d.y;
                     })
                     .attr("x2", function (d) {
+                        dx2line2[i] = d.x + lineLen;
                         return d.x + lineLen;
                     })
                     .attr("y2", function (d) {
+                        dy2line2[i] = d.y;
                         return d.y;
                     })
                     .attr("stroke", "black")
@@ -4935,15 +4185,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-end", "url(#end)")
                     .attr("cursor", "pointer");
 
-                var linegtext2b = lineg2b.append("g").data([{
+                var linegtext2 = lineg2.append("g").data([{
                     x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
                 }]);
-                linewithtextg2b[i] = linegtext2b.append("text")
-                    .attr("id", "linewithtextg2b" + i)
+                linewithtextg2[i] = linegtext2.append("text")
+                    .attr("id", "linewithtextg2" + linewithtextg2.length)
                     .attr("x", function (d) {
+                        dxtext2[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
+                        dytext2[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -4955,478 +4207,2320 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // increment y-axis of line and circle
-            yvalueb += ydistanceb;
-            cyvalueb += ydistanceb;
-        }
-
-        // case 5
-        if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
-            var polygongb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
-            polygonlinegb[i] = polygongb.append("line")
-                .attr("id", "polygonlinegb" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-start", "url(#start)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygonb[i] = polygongb.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
-                .attr("id", "polygonb" + i)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextgb = polygongb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontextb[i] = polygontextgb.append("text")
-                .attr("id", "polygontextb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // increment y-axis of line and circle
-            yvalueb += ydistanceb;
-            cyvalueb += ydistanceb;
-        }
-
-        // case 6
-        if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
-            var polygongb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
-            polygonlinegb[i] = polygongb.append("line")
-                .attr("id", "polygonlinegb" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-end", "url(#end)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygonb[i] = polygongb.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
-                .attr("id", "polygonb" + i)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextgb = polygongb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontextb[i] = polygontextgb.append("text")
-                .attr("id", "polygontextb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // increment y-axis of line and circle
-            yvalueb += ydistanceb;
-            cyvalueb += ydistanceb;
-        }
-
-        // case 7
-        if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
-            var leakgb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
-            leaklinegb[i] = leakgb.append("line")
-                .attr("id", "leaklinegb" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-start", "url(#start)")
-                .attr("cursor", "pointer");
-
-            var leaktextgb = leakgb.append("g").data([{x: xvalue + polygonlineLen / 2 + 10 + width, y: yvalueb + 5}]);
-
-            leaktextb[i] = leaktextgb.append("text")
-                .attr("id", "leaktextb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(textvalue);
-
-            // increment y-axis of line and circle
-            yvalueb += ydistanceb;
-            cyvalueb += ydistanceb;
-        }
-
-        // case 8
-        if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
-            var leakgb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
-            leaklinegb[i] = leakgb.append("line")
-                .attr("id", "leaklinegb" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-end", "url(#end)")
-                .attr("cursor", "pointer");
-
-            var leaktextgb = leakgb.append("g").data([{x: xvalue - polygonlineLen / 2 - 10 + width, y: yvalueb + 5}]);
-
-            leaktextb[i] = leaktextgb.append("text")
-                .attr("id", "leaktextb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(textvalue);
-
-            // increment y-axis of line and circle
-            yvalueb += ydistanceb;
-            cyvalueb += ydistanceb;
-        }
-
-        // case 9
-        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "ATP" && snk_fma2 == "ATP")) {
-            var polygongATPb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalue}]);
-            polygonlinegATPb[i] = polygongATPb.append("line")
-                .attr("id", "polygonlinegATP" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-end", "url(#end)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygongATPb.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalue - 30) + ")")
-                .attr("id", "polygon" + i)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygongATPb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalue + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontextATPb[i] = polygontextg.append("g").append("text")
-                .attr("id", "polygontextATPb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // ATP rectangle
-            var atprect = polygongATPb.append("g").append("rect")
-                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalue) + ")rotate(-45)")
-                .attr("id", ATPID)
-                .attr("width", 26)
-                .attr("height", 26)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "10px")
-                .attr("fill", "white");
-
-            var atptextg = polygongATPb.append("g").data([{x: xvalue + 8 + width, y: yvalue + 5}]);
-            atprectTextb[i] = atptextg.append("text")
-                .attr("id", "atprectTextb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-family", "Times New Roman")
-                .attr("font-size", "16px")
-                .attr("font-weight", "bold")
-                .attr("fill", "red")
-                .attr("cursor", "pointer")
-                .text("A");
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 10
-        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "ATP" && snk_fma2 == "ATP")) {
-            var polygongATPb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalue}]);
-            polygonlinegATPb[i] = polygongATPb.append("line")
-                .attr("id", "polygonlinegATPb" + i)
-                .attr("x1", function (d) {
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-start", "url(#start)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygongATPb.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalue - 30) + ")")
-                .attr("id", "polygon" + i)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygongATPb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalue + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontextATPb[i] = polygontextg.append("text")
-                .attr("id", "polygontextATPb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // ATP rectangle
-            var atprect = polygongATPb.append("g").append("rect")
-                .attr("transform", "translate(" + (xvalue - 5 + polygonlineLen + width) + "," + (yvalue) + ")rotate(-45)")
-                .attr("id", ATPID)
-                .attr("width", 26)
-                .attr("height", 26)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "10px")
-                .attr("fill", "white");
-
-            var atptextg = polygongATPb.append("g").data([{x: xvalue + polygonlineLen + 8 + width, y: yvalue + 5}]);
-            atprectTextb[i] = atptextg.append("text")
-                .attr("id", "atprectTextb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("font-family", "Times New Roman")
-                .attr("font-size", "16px")
-                .attr("font-weight", "bold")
-                .attr("fill", "red")
-                .attr("cursor", "pointer")
-                .text("A");
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 11
-        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "p2y2" && snk_fma2 == "p2y2")) {
-            var linegpyb = newg.append("g").data([{x: xvalue, y: yvalue}]);
-            linewithlinegpyb[i] = linegpyb.append("g").append("rect")
-                .attr("id", "linewithlinegpyb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            var linegpy2b = newg.append("g").data([{x: xvalue, y: yvalue + 8}]);
-            linewithlinegpy2b[i] = linegpy2b.append("g").append("rect")
-                .attr("id", "linewithlinegpy2b" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            var linegpy3b = newg.append("g").data([{x: xvalue, y: yvalue + 16}]);
-            linewithlinegpy3b[i] = linegpy3b.append("g").append("rect")
-                .attr("id", "linewithlinegpy3b" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 12
-        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "p2y2" && snk_fma2 == "p2y2")) {
-            var linegpyb = newg.append("g").data([{x: xvalue, y: yvalue}]);
-            linewithlinegpyb[i] = linegpyb.append("g").append("rect")
-                .attr("id", "linewithlinegpyb" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 3)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            var linegpy2b = newg.append("g").data([{x: xvalue, y: yvalue + 8}]);
-            linewithlinegpy2b[i] = linegpy2b.append("g").append("rect")
-                .attr("id", "linewithlinegpy2b" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            var linegpy3b = newg.append("g").data([{x: xvalue, y: yvalue + 16}]);
-            linewithlinegpy3b[i] = linegpy3b.append("g").append("rect")
-                .attr("id", "linewithlinegpy3b" + i)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", lineLen)
-                .attr("height", 4)
-                .attr("stroke", "black")
-                .attr("strokeWidth", "12px")
-                .attr("fill", "white");
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
+            yvalueb += ydistance;
+            cyvalueb += ydistance;
         }
     }
+
+    // // Basolateral membrane
+    // for (var i = apicalMembrane.length; i < totalLength; i++) {
+    //     var textvalue = basolateralMembrane[i].source_text;
+    //     var textvalue2 = basolateralMembrane[i].source_text2;
+    //     var src_fma = basolateralMembrane[i].source_fma;
+    //     var src_fma2 = basolateralMembrane[i].source_fma2;
+    //     var snk_fma = basolateralMembrane[i].sink_fma;
+    //     var snk_fma2 = basolateralMembrane[i].sink_fma2;
+    //     var textWidth = getTextWidth(textvalue, 12);
+    //
+    //     // case 1
+    //     if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
+    //         var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+    //         linewithlineg[i] = lineg.append("line")
+    //             .attr("id", "linewithlineg" + linewithlineg.length)
+    //             .attr("x1", function (d) {
+    //                 dx1line[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 dy1line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 dx2line[i] = d.x + lineLen;
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 dy2line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
+    //         linewithtextg[i] = linegtext.append("text")
+    //             .attr("id", "linewithtextg" + linewithtextg.length)
+    //             .attr("x", function (d) {
+    //                 dxtext[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 dytext[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+    //         circlewithlineg[i] = linegcircle.append("circle")
+    //             .attr("id", function (d) {
+    //                 return [
+    //                     membraneOBJ.source_text,
+    //                     membraneOBJ.source_fma,
+    //                     membraneOBJ.source_name
+    //                 ];
+    //             })
+    //             .attr("index", circlewithlineg.length)
+    //             .attr("membrane", basolateralID)
+    //             .attr("cx", function (d) {
+    //                 dx[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 dy[i] = d.y + radius;
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "orange")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+    //             linewithlineg2[i] = lineg2.append("line")
+    //                 .attr("id", "linewithlineg2" + linewithlineg2.length)
+    //                 .attr("x1", function (d) {
+    //                     dx1line2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     dy1line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     dx2line2[i] = d.x + lineLen;
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     dy2line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-end", "url(#end)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2 = lineg2.append("g").data([{
+    //                 x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2[i] = linegtext2.append("text")
+    //                 .attr("id", "linewithtextg2" + linewithtextg2.length)
+    //                 .attr("x", function (d) {
+    //                     dxtext2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     dytext2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistance;
+    //         cyvalueb += ydistance;
+    //     }
+    //
+    //     // case 2
+    //     if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
+    //         var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+    //         linewithlineg[i] = lineg.append("line")
+    //             .attr("id", "linewithlineg" + linewithlineg.length)
+    //             .attr("x1", function (d) {
+    //                 dx1line[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 dy1line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 dx2line[i] = d.x + lineLen;
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 dy2line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
+    //         linewithtextg[i] = linegtext.append("text")
+    //             .attr("id", "linewithtextg" + linewithtextg.length)
+    //             .attr("x", function (d) {
+    //                 dxtext[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 dytext[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+    //         circlewithlineg[i] = linegcircle.append("circle")
+    //             .attr("id", function (d) {
+    //                 return [
+    //                     membraneOBJ.source_text,
+    //                     membraneOBJ.source_fma,
+    //                     membraneOBJ.source_name
+    //                 ];
+    //             })
+    //             .attr("index", circlewithlineg.length)
+    //             .attr("membrane", basolateralID)
+    //             .attr("cx", function (d) {
+    //                 dx[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 dy[i] = d.y + radius;
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "orange")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+    //             linewithlineg2[i] = lineg2.append("line")
+    //                 .attr("id", "linewithlineg2" + linewithlineg2.length)
+    //                 .attr("x1", function (d) {
+    //                     dx1line2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     dy1line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     dx2line2[i] = d.x + lineLen;
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     dy2line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-start", "url(#start)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2 = lineg2.append("g").data([{
+    //                 x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2[i] = linegtext2.append("text")
+    //                 .attr("id", "linewithtextg2" + linewithtextg2.length)
+    //                 .attr("x", function (d) {
+    //                     dxtext2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     dytext2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistance;
+    //         cyvalueb += ydistance;
+    //     }
+    //
+    //     // case 3
+    //     if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
+    //         var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+    //         linewithlineg[i] = lineg.append("line")
+    //             .attr("id", "linewithlineg" + linewithlineg.length)
+    //             .attr("x1", function (d) {
+    //                 dx1line[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 dy1line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 dx2line[i] = d.x + lineLen;
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 dy2line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
+    //         linewithtextg[i] = linegtext.append("text")
+    //             .attr("id", "linewithtextg" + linewithtextg.length)
+    //             .attr("x", function (d) {
+    //                 dxtext[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 dytext[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+    //         circlewithlineg[i] = linegcircle.append("circle")
+    //             .attr("id", function (d) {
+    //                 return [
+    //                     membraneOBJ.source_text,
+    //                     membraneOBJ.source_fma,
+    //                     membraneOBJ.source_name
+    //                 ];
+    //             })
+    //             .attr("index", circlewithlineg.length)
+    //             .attr("membrane", basolateralID)
+    //             .attr("cx", function (d) {
+    //                 dx[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 dy[i] = d.y + radius;
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "orange")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+    //             linewithlineg2[i] = lineg2.append("line")
+    //                 .attr("id", "linewithlineg2" + linewithlineg2.length)
+    //                 .attr("x1", function (d) {
+    //                     dx1line2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     dy1line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     dx2line2[i] = d.x + lineLen;
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     dy2line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-start", "url(#start)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2 = lineg2.append("g").data([{
+    //                 x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2[i] = linegtext2.append("text")
+    //                 .attr("id", "linewithtextg2" + linewithtextg2.length)
+    //                 .attr("x", function (d) {
+    //                     dxtext2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     dytext2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistance;
+    //         cyvalueb += ydistance;
+    //     }
+    //
+    //     // case 4
+    //     if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
+    //         var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+    //         linewithlineg[i] = lineg.append("line")
+    //             .attr("id", "linewithlineg" + linewithlineg.length)
+    //             .attr("x1", function (d) {
+    //                 dx1line[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 dy1line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 dx2line[i] = d.x + lineLen;
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 dy2line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
+    //         linewithtextg[i] = linegtext.append("text")
+    //             .attr("id", "linewithtextg" + linewithtextg.length)
+    //             .attr("x", function (d) {
+    //                 dxtext[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 dytext[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+    //         circlewithlineg[i] = linegcircle.append("circle")
+    //             .attr("id", function (d) {
+    //                 return [
+    //                     membraneOBJ.source_text,
+    //                     membraneOBJ.source_fma,
+    //                     membraneOBJ.source_name
+    //                 ];
+    //             })
+    //             .attr("index", circlewithlineg.length)
+    //             .attr("membrane", basolateralID)
+    //             .attr("cx", function (d) {
+    //                 dx[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 dy[i] = d.y + radius;
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "orange")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+    //             linewithlineg2[i] = lineg2.append("line")
+    //                 .attr("id", "linewithlineg2" + linewithlineg2.length)
+    //                 .attr("x1", function (d) {
+    //                     dx1line2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     dy1line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     dx2line2[i] = d.x + lineLen;
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     dy2line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-end", "url(#end)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2 = lineg2.append("g").data([{
+    //                 x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2[i] = linegtext2.append("text")
+    //                 .attr("id", "linewithtextg2" + linewithtextg2.length)
+    //                 .attr("x", function (d) {
+    //                     dxtext2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     dytext2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistance;
+    //         cyvalueb += ydistance;
+    //     }
+    // }
+
+    // // Apical membrane
+    // for (var i = 0; i < apicalMembrane.length; i++) {
+    //     var textvalue = apicalMembrane[i].source_text;
+    //     var textvalue2 = apicalMembrane[i].source_text2;
+    //     var src_fma = apicalMembrane[i].source_fma;
+    //     var src_fma2 = apicalMembrane[i].source_fma2;
+    //     var snk_fma = apicalMembrane[i].sink_fma;
+    //     var snk_fma2 = apicalMembrane[i].sink_fma2;
+    //     var textWidth = getTextWidth(textvalue, 12);
+    //
+    //     // case 1
+    //     if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
+    //         var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
+    //         linewithlineg[i] = lineg.append("line")
+    //             .attr("id", "linewithlineg" + linewithlineg.length)
+    //             .attr("x1", function (d) {
+    //                 dx1line[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 dy1line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 dx2line[i] = d.x + lineLen;
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 dy2line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
+    //         linewithtextg[i] = linegtext.append("text")
+    //             .attr("id", "linewithtextg" + linewithtextg.length)
+    //             .attr("x", function (d) {
+    //                 dxtext[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 dytext[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
+    //         circlewithlineg[i] = linegcircle.append("circle")
+    //             .attr("id", function (d) {
+    //                 return [
+    //                     membraneOBJ.source_text,
+    //                     membraneOBJ.source_fma,
+    //                     membraneOBJ.source_name
+    //                 ];
+    //             })
+    //             .attr("index", circlewithlineg.length)
+    //             .attr("membrane", apicalID)
+    //             .attr("cx", function (d) {
+    //                 dx[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 dy[i] = d.y + radius;
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "lightgreen")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+    //             linewithlineg2[i] = lineg2.append("line")
+    //                 .attr("id", "linewithlineg2" + linewithlineg2.length)
+    //                 .attr("x1", function (d) {
+    //                     dx1line2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     dy1line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     dx2line2[i] = d.x + lineLen;
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     dy2line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-end", "url(#end)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2 = lineg2.append("g").data([{
+    //                 x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2[i] = linegtext2.append("text")
+    //                 .attr("id", "linewithtextg2" + linewithtextg2.length)
+    //                 .attr("x", function (d) {
+    //                     dxtext2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     dytext2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 2
+    //     if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
+    //         var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
+    //         linewithlineg[i] = lineg.append("line")
+    //             .attr("id", "linewithlineg" + linewithlineg.length)
+    //             .attr("x1", function (d) {
+    //                 dx1line[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 dy1line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 dx2line[i] = d.x + lineLen;
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 dy2line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10, y: yvalue + 5}]);
+    //         linewithtextg[i] = linegtext.append("text")
+    //             .attr("id", "linewithtextg" + linewithtextg.length)
+    //             .attr("x", function (d) {
+    //                 dxtext[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 dytext[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
+    //         circlewithlineg[i] = linegcircle.append("circle")
+    //             .attr("id", function (d) {
+    //                 return [
+    //                     membraneOBJ.source_text,
+    //                     membraneOBJ.source_fma,
+    //                     membraneOBJ.source_name
+    //                 ];
+    //             })
+    //             .attr("index", circlewithlineg.length)
+    //             .attr("membrane", apicalID)
+    //             .attr("cx", function (d) {
+    //                 dx[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 dy[i] = d.y + radius;
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "lightgreen")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+    //             linewithlineg2[i] = lineg2.append("line")
+    //                 .attr("id", "linewithlineg2" + linewithlineg2.length)
+    //                 .attr("x1", function (d) {
+    //                     dx1line2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     dy1line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     dx2line2[i] = d.x + lineLen;
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     dy2line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-end", "url(#end)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2 = lineg2.append("g").data([{
+    //                 x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2[i] = linegtext2.append("text")
+    //                 .attr("id", "linewithtextg2" + linewithtextg2.length)
+    //                 .attr("x", function (d) {
+    //                     dxtext2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     dytext2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 3
+    //     if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
+    //         var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
+    //         linewithlineg[i] = lineg.append("line")
+    //             .attr("id", "linewithlineg" + linewithlineg.length)
+    //             .attr("x1", function (d) {
+    //                 dx1line[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 dy1line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 dx2line[i] = d.x + lineLen;
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 dy2line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
+    //         linewithtextg[i] = linegtext.append("text")
+    //             .attr("id", "linewithtextg" + linewithtextg.length)
+    //             .attr("x", function (d) {
+    //                 dxtext[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 dytext[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
+    //         circlewithlineg[i] = linegcircle.append("circle")
+    //             .attr("id", function (d) {
+    //                 return [
+    //                     membraneOBJ.source_text,
+    //                     membraneOBJ.source_fma,
+    //                     membraneOBJ.source_name
+    //                 ];
+    //             })
+    //             .attr("index", circlewithlineg.length)
+    //             .attr("membrane", apicalID)
+    //             .attr("cx", function (d) {
+    //                 dx[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 dy[i] = d.y + radius;
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "lightgreen")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+    //             linewithlineg2[i] = lineg2.append("line")
+    //                 .attr("id", "linewithlineg2" + linewithlineg2.length)
+    //                 .attr("x1", function (d) {
+    //                     dx1line2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     dy1line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     dx2line2[i] = d.x + lineLen;
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     dy2line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-start", "url(#start)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2 = lineg2.append("g").data([{
+    //                 x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2[i] = linegtext2.append("text")
+    //                 .attr("id", "linewithtextg2" + linewithtextg2.length)
+    //                 .attr("x", function (d) {
+    //                     dxtext2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     dytext2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 4
+    //     if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
+    //         var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
+    //         linewithlineg[i] = lineg.append("line")
+    //             .attr("id", "linewithlineg" + linewithlineg.length)
+    //             .attr("x1", function (d) {
+    //                 dx1line[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 dy1line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 dx2line[i] = d.x + lineLen;
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 dy2line[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10, y: yvalue + 5}]);
+    //         linewithtextg[i] = linegtext.append("text")
+    //             .attr("id", "linewithtextg" + linewithtextg.length)
+    //             .attr("x", function (d) {
+    //                 dxtext[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 dytext[i] = d.y;
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
+    //         circlewithlineg[i] = linegcircle.append("circle")
+    //             .attr("id", function (d) {
+    //                 return [
+    //                     membraneOBJ.source_text,
+    //                     membraneOBJ.source_fma,
+    //                     membraneOBJ.source_name
+    //                 ];
+    //             })
+    //             .attr("index", circlewithlineg.length)
+    //             .attr("membrane", apicalID)
+    //             .attr("cx", function (d) {
+    //                 dx[i] = d.x;
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 dy[i] = d.y + radius;
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "lightgreen")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
+    //             linewithlineg2[i] = lineg2.append("line")
+    //                 .attr("id", "linewithlineg2" + linewithlineg2.length)
+    //                 .attr("x1", function (d) {
+    //                     dx1line2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     dy1line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     dx2line2[i] = d.x + lineLen;
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     dy2line2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-end", "url(#end)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2 = lineg2.append("g").data([{
+    //                 x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2[i] = linegtext2.append("text")
+    //                 .attr("id", "linewithtextg2" + linewithtextg2.length)
+    //                 .attr("x", function (d) {
+    //                     dxtext2[i] = d.x;
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     dytext2[i] = d.y;
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 5
+    //     if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+    //         var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+    //         polygonlineg[i] = polygong.append("line")
+    //             .attr("id", "polygonlineg" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         // Polygon
+    //         polygon[i] = polygong.append("g").append("polygon")
+    //             .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
+    //             .attr("id", "polygon" + i)
+    //             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+    //             .attr("fill", "yellow")
+    //             .attr("stroke", "black")
+    //             .attr("stroke-linecap", "round")
+    //             .attr("stroke-linejoin", "round")
+    //             .attr("cursor", "move");
+    //
+    //         var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+    //
+    //         var txt = textvalue.substr(5); // temp solution
+    //         if (txt == "Cl") txt = txt + "-";
+    //         else txt = txt + "+";
+    //
+    //         polygontext[i] = polygontextg.append("text")
+    //             .attr("id", "polygontext" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(txt);
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 6
+    //     if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+    //         var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+    //         polygonlineg[i] = polygong.append("line")
+    //             .attr("id", "polygonlineg" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         // Polygon
+    //         polygon[i] = polygong.append("g").append("polygon")
+    //             .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
+    //             .attr("id", "polygon" + i)
+    //             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+    //             .attr("fill", "yellow")
+    //             .attr("stroke", "black")
+    //             .attr("stroke-linecap", "round")
+    //             .attr("stroke-linejoin", "round")
+    //             .attr("cursor", "move");
+    //
+    //         var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+    //
+    //         var txt = textvalue.substr(5); // temp solution
+    //         if (txt == "Cl") txt = txt + "-";
+    //         else txt = txt + "+";
+    //
+    //         polygontext[i] = polygontextg.append("text")
+    //             .attr("id", "polygontext" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(txt);
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 7
+    //     if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+    //         var leakg = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+    //         leaklineg[i] = leakg.append("line")
+    //             .attr("id", "leaklineg" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var leaktextg = leakg.append("g").data([{x: xvalue - polygonlineLen / 2 - 10, y: yvalue + 5}]);
+    //
+    //         leaktext[i] = leaktextg.append("text")
+    //             .attr("id", "leaktext" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(textvalue);
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 8
+    //     if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+    //         var leakg = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+    //         leaklineg[i] = leakg.append("line")
+    //             .attr("id", "leaklineg" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var leaktextg = leakg.append("g").data([{x: xvalue + polygonlineLen / 2 + 10, y: yvalue + 5}]);
+    //
+    //         leaktext[i] = leaktextg.append("text")
+    //             .attr("id", "leaktext" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(textvalue);
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 9
+    //     if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "ATP" && snk_fma2 == "ATP")) {
+    //         var polygongATP = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+    //         polygonlinegATP[i] = polygongATP.append("line")
+    //             .attr("id", "polygonlinegATP" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         // Polygon
+    //         polygon[i] = polygongATP.append("g").append("polygon")
+    //             .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
+    //             .attr("id", "polygon" + i)
+    //             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+    //             .attr("fill", "yellow")
+    //             .attr("stroke", "black")
+    //             .attr("stroke-linecap", "round")
+    //             .attr("stroke-linejoin", "round")
+    //             .attr("cursor", "move");
+    //
+    //         var polygontextg = polygongATP.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+    //
+    //         var txt = textvalue.substr(5); // temp solution
+    //         if (txt == "Cl") txt = txt + "-";
+    //         else txt = txt + "+";
+    //
+    //         polygontextATP[i] = polygontextg.append("g").append("text")
+    //             .attr("id", "polygontextATP" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(txt);
+    //
+    //         // ATP rectangle
+    //         var atprect = polygongATP.append("g").append("rect")
+    //             .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue) + ")rotate(-45)")
+    //             .attr("id", ATPID)
+    //             .attr("width", 26)
+    //             .attr("height", 26)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "10px")
+    //             .attr("fill", "white");
+    //
+    //         var atptextg = polygongATP.append("g").data([{x: xvalue + 8, y: yvalue + 5}]);
+    //         atprectText[i] = atptextg.append("text")
+    //             .attr("id", "atprectText" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "16px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text("A");
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 10
+    //     if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "ATP" && snk_fma2 == "ATP")) {
+    //         var polygongATP = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+    //         polygonlinegATP[i] = polygongATP.append("line")
+    //             .attr("id", "polygonlinegATP" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         // Polygon
+    //         polygon[i] = polygongATP.append("g").append("polygon")
+    //             .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
+    //             .attr("id", "polygon" + i)
+    //             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+    //             .attr("fill", "yellow")
+    //             .attr("stroke", "black")
+    //             .attr("stroke-linecap", "round")
+    //             .attr("stroke-linejoin", "round")
+    //             .attr("cursor", "move");
+    //
+    //         var polygontextg = polygongATP.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+    //
+    //         var txt = textvalue.substr(5); // temp solution
+    //         if (txt == "Cl") txt = txt + "-";
+    //         else txt = txt + "+";
+    //
+    //         polygontextATP[i] = polygontextg.append("text")
+    //             .attr("id", "polygontextATP" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(txt);
+    //
+    //         // ATP rectangle
+    //         var atprect = polygongATP.append("g").append("rect")
+    //             .attr("transform", "translate(" + (xvalue - 5 + polygonlineLen) + "," + (yvalue) + ")rotate(-45)")
+    //             .attr("id", ATPID)
+    //             .attr("width", 26)
+    //             .attr("height", 26)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "10px")
+    //             .attr("fill", "white");
+    //
+    //         var atptextg = polygongATP.append("g").data([{x: xvalue + polygonlineLen + 8, y: yvalue + 5}]);
+    //         atprectText[i] = atptextg.append("text")
+    //             .attr("id", "atprectText" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "16px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text("A");
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 11
+    //     if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "p2y2" && snk_fma2 == "p2y2")) {
+    //         var linegpy = newg.append("g").data([{x: xvalue, y: yvalue}]);
+    //         linewithlinegpy[i] = linegpy.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         var linegpy2 = newg.append("g").data([{x: xvalue, y: yvalue + 8}]);
+    //         linewithlinegpy2[i] = linegpy2.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy2" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         var linegpy3 = newg.append("g").data([{x: xvalue, y: yvalue + 16}]);
+    //         linewithlinegpy3[i] = linegpy3.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy3" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 12
+    //     if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "p2y2" && snk_fma2 == "p2y2")) {
+    //         var linegpy = newg.append("g").data([{x: xvalue, y: yvalue}]);
+    //         linewithlinegpy[i] = linegpy.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 3)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         var linegpy2 = newg.append("g").data([{x: xvalue, y: yvalue + 8}]);
+    //         linewithlinegpy2[i] = linegpy2.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy2" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         var linegpy3 = newg.append("g").data([{x: xvalue, y: yvalue + 16}]);
+    //         linewithlinegpy3[i] = linegpy3.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy3" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    // }
+
+    // Basolateral membrane
+    // for (var i = 0; i < basolateralMembrane.length; i++) {
+    //     var textvalue = basolateralMembrane[i].source_text;
+    //     var textvalue2 = basolateralMembrane[i].source_text2;
+    //     var src_fma = basolateralMembrane[i].source_fma;
+    //     var src_fma2 = basolateralMembrane[i].source_fma2;
+    //     var snk_fma = basolateralMembrane[i].sink_fma;
+    //     var snk_fma2 = basolateralMembrane[i].sink_fma2;
+    //     var textWidth = getTextWidth(textvalue, 12);
+    //
+    //     // case 1
+    //     if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
+    //         var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+    //         linewithlinegb[i] = linegb.append("line")
+    //             .attr("id", "linewithlinegb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtextb = linegb.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
+    //         linewithtextgb[i] = linegtextb.append("text")
+    //             .attr("id", "linewithtextgb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircleb = linegb.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+    //         circlewithlinegb[i] = linegcircleb.append("circle")
+    //             .attr("id", "circlewithlinegb" + i)
+    //             .attr("cx", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "orange")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+    //             linewithlineg2b[i] = lineg2b.append("line")
+    //                 .attr("id", "linewithlineg2b" + i)
+    //                 .attr("x1", function (d) {
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-end", "url(#end)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2b = lineg2b.append("g").data([{
+    //                 x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2b[i] = linegtext2b.append("text")
+    //                 .attr("id", "linewithtextg2b" + i)
+    //                 .attr("x", function (d) {
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistanceb;
+    //         cyvalueb += ydistanceb;
+    //     }
+    //
+    //     // case 2
+    //     if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
+    //         var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+    //         linewithlinegb[i] = linegb.append("line")
+    //             .attr("id", "linewithlinegb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtextb = linegb.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
+    //         linewithtextgb[i] = linegtextb.append("text")
+    //             .attr("id", "linewithtextgb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircleb = linegb.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+    //         circlewithlinegb[i] = linegcircleb.append("circle")
+    //             .attr("id", "circlewithlinegb" + i)
+    //             .attr("cx", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "orange")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+    //             linewithlineg2b[i] = lineg2b.append("line")
+    //                 .attr("id", "linewithlineg2b" + i)
+    //                 .attr("x1", function (d) {
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-start", "url(#start)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2b = lineg2b.append("g").data([{
+    //                 x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2b[i] = linegtext2b.append("text")
+    //                 .attr("id", "linewithtextg2b" + i)
+    //                 .attr("x", function (d) {
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistanceb;
+    //         cyvalueb += ydistanceb;
+    //     }
+    //
+    //     // case 3
+    //     if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
+    //
+    //         var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+    //         linewithlinegb[i] = linegb.append("line")
+    //             .attr("id", "linewithlinegb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtextb = linegb.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
+    //         linewithtextgb[i] = linegtextb.append("text")
+    //             .attr("id", "linewithtextgb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircleb = linegb.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+    //         circlewithlinegb[i] = linegcircleb.append("circle")
+    //             .attr("id", "circlewithlinegb" + i)
+    //             .attr("cx", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "orange")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+    //             linewithlineg2b[i] = lineg2b.append("line")
+    //                 .attr("id", "linewithlineg2b" + i)
+    //                 .attr("x1", function (d) {
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-start", "url(#start)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2b = lineg2b.append("g").data([{
+    //                 x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2b[i] = linegtext2b.append("text")
+    //                 .attr("id", "linewithtextg2b" + i)
+    //                 .attr("x", function (d) {
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistanceb;
+    //         cyvalueb += ydistanceb;
+    //     }
+    //
+    //     // case 4
+    //     if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
+    //         var linegb = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
+    //         linewithlinegb[i] = linegb.append("line")
+    //             .attr("id", "linewithlinegb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + lineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var linegtextb = linegb.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
+    //         linewithtextgb[i] = linegtextb.append("text")
+    //             .attr("id", "linewithtextgb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "12px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text(textvalue);
+    //
+    //         var linegcircleb = linegb.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
+    //         circlewithlinegb[i] = linegcircleb.append("circle")
+    //             .attr("id", "circlewithlinegb" + i)
+    //             .attr("cx", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("cy", function (d) {
+    //                 return d.y + radius;
+    //             })
+    //             .attr("r", radius)
+    //             .attr("fill", "orange")
+    //             .attr("stroke-width", 20)
+    //             .attr("cursor", "move");
+    //
+    //         if (textvalue2 != "single flux") {
+    //             var lineg2b = linegb.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
+    //             linewithlineg2b[i] = lineg2b.append("line")
+    //                 .attr("id", "linewithlineg2b" + i)
+    //                 .attr("x1", function (d) {
+    //                     return d.x;
+    //                 })
+    //                 .attr("y1", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("x2", function (d) {
+    //                     return d.x + lineLen;
+    //                 })
+    //                 .attr("y2", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("stroke", "black")
+    //                 .attr("stroke-width", 2)
+    //                 .attr("marker-end", "url(#end)")
+    //                 .attr("cursor", "pointer");
+    //
+    //             var linegtext2b = lineg2b.append("g").data([{
+    //                 x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
+    //             }]);
+    //             linewithtextg2b[i] = linegtext2b.append("text")
+    //                 .attr("id", "linewithtextg2b" + i)
+    //                 .attr("x", function (d) {
+    //                     return d.x;
+    //                 })
+    //                 .attr("y", function (d) {
+    //                     return d.y;
+    //                 })
+    //                 .attr("font-family", "Times New Roman")
+    //                 .attr("font-size", "12px")
+    //                 .attr("font-weight", "bold")
+    //                 .attr("fill", "red")
+    //                 .attr("cursor", "pointer")
+    //                 .text(textvalue2);
+    //         }
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistanceb;
+    //         cyvalueb += ydistanceb;
+    //     }
+    //
+    //     // case 5
+    //     if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+    //         var polygongb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+    //         polygonlinegb[i] = polygongb.append("line")
+    //             .attr("id", "polygonlinegb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         // Polygon
+    //         polygonb[i] = polygongb.append("g").append("polygon")
+    //             .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
+    //             .attr("id", "polygonb" + i)
+    //             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+    //             .attr("fill", "yellow")
+    //             .attr("stroke", "black")
+    //             .attr("stroke-linecap", "round")
+    //             .attr("stroke-linejoin", "round")
+    //             .attr("cursor", "move");
+    //
+    //         var polygontextgb = polygongb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
+    //
+    //         var txt = textvalue.substr(5); // temp solution
+    //         if (txt == "Cl") txt = txt + "-";
+    //         else txt = txt + "+";
+    //
+    //         polygontextb[i] = polygontextgb.append("text")
+    //             .attr("id", "polygontextb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(txt);
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistanceb;
+    //         cyvalueb += ydistanceb;
+    //     }
+    //
+    //     // case 6
+    //     if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+    //         var polygongb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+    //         polygonlinegb[i] = polygongb.append("line")
+    //             .attr("id", "polygonlinegb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         // Polygon
+    //         polygonb[i] = polygongb.append("g").append("polygon")
+    //             .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
+    //             .attr("id", "polygonb" + i)
+    //             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+    //             .attr("fill", "yellow")
+    //             .attr("stroke", "black")
+    //             .attr("stroke-linecap", "round")
+    //             .attr("stroke-linejoin", "round")
+    //             .attr("cursor", "move");
+    //
+    //         var polygontextgb = polygongb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
+    //
+    //         var txt = textvalue.substr(5); // temp solution
+    //         if (txt == "Cl") txt = txt + "-";
+    //         else txt = txt + "+";
+    //
+    //         polygontextb[i] = polygontextgb.append("text")
+    //             .attr("id", "polygontextb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(txt);
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistanceb;
+    //         cyvalueb += ydistanceb;
+    //     }
+    //
+    //     // case 7
+    //     if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+    //         var leakgb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+    //         leaklinegb[i] = leakgb.append("line")
+    //             .attr("id", "leaklinegb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var leaktextgb = leakgb.append("g").data([{x: xvalue + polygonlineLen / 2 + 10 + width, y: yvalueb + 5}]);
+    //
+    //         leaktextb[i] = leaktextgb.append("text")
+    //             .attr("id", "leaktextb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(textvalue);
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistanceb;
+    //         cyvalueb += ydistanceb;
+    //     }
+    //
+    //     // case 8
+    //     if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
+    //         var leakgb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+    //         leaklinegb[i] = leakgb.append("line")
+    //             .attr("id", "leaklinegb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         var leaktextgb = leakgb.append("g").data([{x: xvalue - polygonlineLen / 2 - 10 + width, y: yvalueb + 5}]);
+    //
+    //         leaktextb[i] = leaktextgb.append("text")
+    //             .attr("id", "leaktextb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(textvalue);
+    //
+    //         // increment y-axis of line and circle
+    //         yvalueb += ydistanceb;
+    //         cyvalueb += ydistanceb;
+    //     }
+    //
+    //     // case 9
+    //     if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "ATP" && snk_fma2 == "ATP")) {
+    //         var polygongATPb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalue}]);
+    //         polygonlinegATPb[i] = polygongATPb.append("line")
+    //             .attr("id", "polygonlinegATP" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("cursor", "pointer");
+    //
+    //         // Polygon
+    //         polygon[i] = polygongATPb.append("g").append("polygon")
+    //             .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalue - 30) + ")")
+    //             .attr("id", "polygon" + i)
+    //             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+    //             .attr("fill", "yellow")
+    //             .attr("stroke", "black")
+    //             .attr("stroke-linecap", "round")
+    //             .attr("stroke-linejoin", "round")
+    //             .attr("cursor", "move");
+    //
+    //         var polygontextg = polygongATPb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalue + 5}]);
+    //
+    //         var txt = textvalue.substr(5); // temp solution
+    //         if (txt == "Cl") txt = txt + "-";
+    //         else txt = txt + "+";
+    //
+    //         polygontextATPb[i] = polygontextg.append("g").append("text")
+    //             .attr("id", "polygontextATPb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(txt);
+    //
+    //         // ATP rectangle
+    //         var atprect = polygongATPb.append("g").append("rect")
+    //             .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalue) + ")rotate(-45)")
+    //             .attr("id", ATPID)
+    //             .attr("width", 26)
+    //             .attr("height", 26)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "10px")
+    //             .attr("fill", "white");
+    //
+    //         var atptextg = polygongATPb.append("g").data([{x: xvalue + 8 + width, y: yvalue + 5}]);
+    //         atprectTextb[i] = atptextg.append("text")
+    //             .attr("id", "atprectTextb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "16px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text("A");
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 10
+    //     if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "ATP" && snk_fma2 == "ATP")) {
+    //         var polygongATPb = newg.append("g").data([{x: xvalue - 5 + width, y: yvalue}]);
+    //         polygonlinegATPb[i] = polygongATPb.append("line")
+    //             .attr("id", "polygonlinegATPb" + i)
+    //             .attr("x1", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y1", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("x2", function (d) {
+    //                 return d.x + polygonlineLen;
+    //             })
+    //             .attr("y2", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("stroke", "black")
+    //             .attr("stroke-width", 2)
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("cursor", "pointer");
+    //
+    //         // Polygon
+    //         polygon[i] = polygongATPb.append("g").append("polygon")
+    //             .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalue - 30) + ")")
+    //             .attr("id", "polygon" + i)
+    //             .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+    //             .attr("fill", "yellow")
+    //             .attr("stroke", "black")
+    //             .attr("stroke-linecap", "round")
+    //             .attr("stroke-linejoin", "round")
+    //             .attr("cursor", "move");
+    //
+    //         var polygontextg = polygongATPb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalue + 5}]);
+    //
+    //         var txt = textvalue.substr(5); // temp solution
+    //         if (txt == "Cl") txt = txt + "-";
+    //         else txt = txt + "+";
+    //
+    //         polygontextATPb[i] = polygontextg.append("text")
+    //             .attr("id", "polygontextATPb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-size", "12px")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "move")
+    //             .text(txt);
+    //
+    //         // ATP rectangle
+    //         var atprect = polygongATPb.append("g").append("rect")
+    //             .attr("transform", "translate(" + (xvalue - 5 + polygonlineLen + width) + "," + (yvalue) + ")rotate(-45)")
+    //             .attr("id", ATPID)
+    //             .attr("width", 26)
+    //             .attr("height", 26)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "10px")
+    //             .attr("fill", "white");
+    //
+    //         var atptextg = polygongATPb.append("g").data([{x: xvalue + polygonlineLen + 8 + width, y: yvalue + 5}]);
+    //         atprectTextb[i] = atptextg.append("text")
+    //             .attr("id", "atprectTextb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("font-family", "Times New Roman")
+    //             .attr("font-size", "16px")
+    //             .attr("font-weight", "bold")
+    //             .attr("fill", "red")
+    //             .attr("cursor", "pointer")
+    //             .text("A");
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 11
+    //     if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "p2y2" && snk_fma2 == "p2y2")) {
+    //         var linegpyb = newg.append("g").data([{x: xvalue, y: yvalue}]);
+    //         linewithlinegpyb[i] = linegpyb.append("g").append("rect")
+    //             .attr("id", "linewithlinegpyb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         var linegpy2b = newg.append("g").data([{x: xvalue, y: yvalue + 8}]);
+    //         linewithlinegpy2b[i] = linegpy2b.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy2b" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         var linegpy3b = newg.append("g").data([{x: xvalue, y: yvalue + 16}]);
+    //         linewithlinegpy3b[i] = linegpy3b.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy3b" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    //
+    //     // case 12
+    //     if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "p2y2" && snk_fma2 == "p2y2")) {
+    //         var linegpyb = newg.append("g").data([{x: xvalue, y: yvalue}]);
+    //         linewithlinegpyb[i] = linegpyb.append("g").append("rect")
+    //             .attr("id", "linewithlinegpyb" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 3)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         var linegpy2b = newg.append("g").data([{x: xvalue, y: yvalue + 8}]);
+    //         linewithlinegpy2b[i] = linegpy2b.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy2b" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         var linegpy3b = newg.append("g").data([{x: xvalue, y: yvalue + 16}]);
+    //         linewithlinegpy3b[i] = linegpy3b.append("g").append("rect")
+    //             .attr("id", "linewithlinegpy3b" + i)
+    //             .attr("x", function (d) {
+    //                 return d.x;
+    //             })
+    //             .attr("y", function (d) {
+    //                 return d.y;
+    //             })
+    //             .attr("width", lineLen)
+    //             .attr("height", 4)
+    //             .attr("stroke", "black")
+    //             .attr("strokeWidth", "12px")
+    //             .attr("fill", "white");
+    //
+    //         // increment y-axis of line and circle
+    //         yvalue += ydistance;
+    //         cyvalue += ydistance;
+    //     }
+    // }
 
     // Paracellular membrane
     var xprect = document.getElementsByTagName("rect")[5].x.baseVal.value;
@@ -5610,58 +6704,76 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     function dragcircleline(d) {
+        // console.log("this: ", this);
+        // console.log("d3.select(this): ", d3.select(this));
+        iGlobal = this.getAttribute("index");
 
-        var cthis = this;
+        cthis = this;
 
-        // Circle: strip all the non-digit characters (\D or [^0-9])
-        var ic = this.id.replace(/\D/g, '');
-        icGlobal = ic;
+        // console.log("index: ", iGlobal);
 
-        var axis = groupcordinates("circlewithlineg" + ic, ic);
-        circlewithlineg[ic]
-            .attr("cx", axis.shift())
-            .attr("cy", axis.shift());
+        var dx = d3.event.dx;
+        var dy = d3.event.dy;
 
-        // Text: strip all the non-digit characters (\D or [^0-9])
-        var axis = groupcordinates("linewithtextg" + ic, ic);
-        linewithtextg[ic]
-            .attr("x", axis.shift())
-            .attr("y", axis.shift());
+        // if (this.tagName == "circle") {}
+        d3.select(this)
+            .attr("cx", parseFloat(this.cx.baseVal.value) + dx)
+            .attr("cy", parseFloat(this.cy.baseVal.value) + dy);
 
-        if (linewithtextg2[ic] != undefined) {
-            // Text: strip all the non-digit characters (\D or [^0-9])
-            var axis = groupcordinates("linewithtextg2" + ic, ic);
-            linewithtextg2[ic]
-                .attr("x", axis.shift())
-                .attr("y", axis.shift());
+        // line 1
+        // if (this.tagName == "line") {}
+        linewithlineg[iGlobal]
+            .attr("x1", parseFloat(d3.select("#" + "linewithlineg" + iGlobal).attr("x1")) + dx)
+            .attr("y1", parseFloat(d3.select("#" + "linewithlineg" + iGlobal).attr("y1")) + dy)
+            .attr("x2", parseFloat(d3.select("#" + "linewithlineg" + iGlobal).attr("x2")) + dx)
+            .attr("y2", parseFloat(d3.select("#" + "linewithlineg" + iGlobal).attr("y2")) + dy);
+
+        // text 1
+        // if (this.tagName == "text") {}
+        linewithtextg[iGlobal]
+            .attr("x", parseFloat(d3.select("#" + "linewithtextg" + iGlobal).attr("x")) + dx)
+            .attr("y", parseFloat(d3.select("#" + "linewithtextg" + iGlobal).attr("y")) + dy);
+
+        if (linewithlineg2[iGlobal] != undefined && linewithtextg2[iGlobal] != undefined) {
+            // line 2
+            // if (this.tagName == "line") {}
+            linewithlineg2[iGlobal]
+                .attr("x1", parseFloat(d3.select("#" + "linewithlineg2" + iGlobal).attr("x1")) + dx)
+                .attr("y1", parseFloat(d3.select("#" + "linewithlineg2" + iGlobal).attr("y1")) + dy)
+                .attr("x2", parseFloat(d3.select("#" + "linewithlineg2" + iGlobal).attr("x2")) + dx)
+                .attr("y2", parseFloat(d3.select("#" + "linewithlineg2" + iGlobal).attr("y2")) + dy);
+
+            // text 2
+            // if (this.tagName == "text") {}
+            linewithtextg2[iGlobal]
+                .attr("x", parseFloat(d3.select("#" + "linewithtextg2" + iGlobal).attr("x")) + dx)
+                .attr("y", parseFloat(d3.select("#" + "linewithtextg2" + iGlobal).attr("y")) + dy);
         }
 
-        // line: strip all the non-digit characters (\D or [^0-9])
-        var axis = groupcordinates("linewithlineg" + ic, ic);
-        linewithlineg[ic]
-            .attr("x1", axis.shift())
-            .attr("y1", axis.shift())
-            .attr("x2", axis.shift())
-            .attr("y2", axis.shift());
+        var mindex, membrane = this.getAttribute("membrane");
+        var line = document.getElementsByTagName("line");
 
-        if (linewithlineg2[ic] != undefined) {
-            // line2: strip all the non-digit characters (\D or [^0-9])
-            var axis = groupcordinates("linewithlineg2" + ic, ic);
-            linewithlineg2[ic]
-                .attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
+        for (var i = 0; i < document.getElementsByTagName("line").length; i++) {
+            if (line[i].id == membrane && i == 0) {
+                mindex = 1;
+                break;
+            }
+            if (line[i].id == membrane && i == 1) {
+                mindex = 0;
+                break;
+            }
         }
+
+        // console.log("membrane, mindex: ", membrane, mindex);
 
         // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
-        var lineb_x = document.getElementsByTagName("line")[1].x1.baseVal.value;
-        var lineb_y1 = document.getElementsByTagName("line")[1].y1.baseVal.value;
-        var lineb_y2 = document.getElementsByTagName("line")[1].y2.baseVal.value;
-        var cx = d3.select(cthis)._groups[0][0].cx.baseVal.value;
-        var cy = d3.select(cthis)._groups[0][0].cy.baseVal.value;
-        var lineb_id = document.getElementsByTagName("line")[1].id;
-        var circle_id = d3.select(cthis)._groups[0][0].id;
+        var lineb_x = line[mindex].x1.baseVal.value;
+        var lineb_y1 = line[mindex].y1.baseVal.value;
+        var lineb_y2 = line[mindex].y2.baseVal.value;
+        var cx = this.cx.baseVal.value;
+        var cy = this.cy.baseVal.value;
+        var lineb_id = line[mindex].id;
+        var circle_id = this.id;
 
         if ((cx >= (lineb_x - radius) && cx <= lineb_x + 20 + radius) &&
             (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
@@ -5686,100 +6798,146 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 $('#myModal').on('shown.bs.modal', function () {
 
-                    var query = 'SELECT ?cellmlmodel ?Protein ' +
+                    var circleID = cthis.getAttribute("id").split(",");
+                    console.log("circleID: ", circleID);
+
+                    // parsing
+                    cellmlModel = circleID[2];
+                    var indexOfHash = cellmlModel.search("#");
+                    cellmlModel = cellmlModel.slice(0, indexOfHash);
+
+                    var query = 'SELECT ?Protein ' +
                         'WHERE { GRAPH ?g { ' +
-                        '?cellmlmodel <http://purl.org/dc/terms/description> ?Protein . ' +
-                        'FILTER (str(?Protein) = "Numerical Model") . ' + // "Sodium/hydrogen exchanger 3"
+                        '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
                         '}}'
 
-                    // query 1 - cellml model name
+                    // protein name
                     sendPostRequest(
                         endpoint,
                         query,
                         function (jsonModel) {
 
+                            proteinName = jsonModel.results.bindings[0].Protein.value;
                             console.log("jsonModel: ", jsonModel);
+                            console.log("protein name: ", proteinName);
 
-                            // parsing
-                            cModel = jsonModel.results.bindings[0].cellmlmodel.value;
-                            var indexOfHash = cModel.search("#");
-                            cModel = cModel.slice(0, indexOfHash);
-
-                            var query = 'SELECT ?located_in ' +
+                            var query = 'SELECT ?cellmlmodel ' +
                                 'WHERE { GRAPH ?g { ' +
-                                '<' + cModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
+                                '?cellmlmodel <http://purl.org/dc/terms/description> "' + jsonModel.results.bindings[0].Protein.value + '". ' +
                                 '}}'
 
-                            // query 2 - location of that cellml model
                             sendPostRequest(
                                 endpoint,
                                 query,
-                                function (jsonLocatedin) {
+                                function (jsonCellmlModel) {
 
-                                    loc = "";
-                                    // get locations of an organ
-                                    for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                                        for (var j = 0; j < kidney.length; j++) {
-                                            if (kidney[j].key == jsonLocatedin.results.bindings[i].located_in.value) {
-                                                loc += kidney[j].value;
+                                    console.log("jsonCellmlModel: ", jsonCellmlModel);
 
-                                                break;
-                                            }
-                                        }
-
-                                        if (i == jsonLocatedin.results.bindings.length - 1)
-                                            loc += ".";
-                                        else
-                                            loc += ", ";
-                                    }
-
-                                    proteinVar = jsonModel.results.bindings[0].Protein.value;
-
-                                    // get type of model
-                                    for (var i = 0; i < organ.length; i++) {
-                                        for (var j = 0; j < organ[i].key.length; j++) {
-                                            for (var k = 0; k < kidney.length; k++) {
-                                                if (kidney[k].key == organ[i].key[j].key)
-                                                    counter++;
-                                            }
-                                        }
-
-                                        if (i == organ.length - 1 && counter == organ[i].key.length) {
-                                            typeOfModel = organ[i].value;
-                                        }
-                                    }
-
-                                    // query - 3 related cellml model
-                                    var query = 'SELECT ?cellmlmodel ?located_in ' +
+                                    var query = 'SELECT ?located_in ' +
                                         'WHERE { GRAPH ?g { ' +
-                                        '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
+                                        '<' + cellmlModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
                                         '}}'
 
+                                    // location of that cellml model
                                     sendPostRequest(
                                         endpoint,
                                         query,
-                                        function (jsonRelatedModel) {
+                                        function (jsonLocatedin) {
 
-                                            for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
-                                                for (var j = 0; j < kidney.length; j++) {
-                                                    if (jsonRelatedModel.results.bindings[i].located_in.value == kidney[j].key) {
+                                            console.log("jsonLocatedin: ", jsonLocatedin);
 
-                                                        // parsing
-                                                        var kModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
-                                                        var indexOfHash = kModel.search("#");
-                                                        kModel = kModel.slice(0, indexOfHash);
+                                            var counter = 0;
+                                            // Type of model - kidney, lungs, etc
+                                            for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                                                for (var j = 0; j < organ.length; j++) {
+                                                    for (var k = 0; k < organ[j].key.length; k++) {
+                                                        if (jsonLocatedin.results.bindings[i].located_in.value == organ[j].key[k].key)
+                                                            counter++;
 
-                                                        relatedModel.push(kModel);
-
-                                                        break;
+                                                        if (counter == jsonLocatedin.results.bindings.length) {
+                                                            typeOfModel = organ[j].value;
+                                                            organIndex = j;
+                                                            break;
+                                                        }
                                                     }
+                                                    if (counter == jsonLocatedin.results.bindings.length)
+                                                        break;
                                                 }
+                                                if (counter == jsonLocatedin.results.bindings.length)
+                                                    break;
                                             }
 
-                                            relatedModel = uniqueify(relatedModel);
+                                            loc = "";
+                                            counter = 0;
+                                            // get locations of the above type of model
+                                            for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                                                for (var j = 0; j < organ[organIndex].key.length; j++) {
+                                                    if (jsonLocatedin.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
+                                                        loc += organ[organIndex].key[j].value;
 
-                                            findProtein(relatedModel, jsonModel);
+                                                        if (i == jsonLocatedin.results.bindings.length - 1)
+                                                            loc += ".";
+                                                        else
+                                                            loc += ", ";
 
+                                                        counter++;
+                                                    }
+                                                    if (counter == jsonLocatedin.results.bindings.length)
+                                                        break;
+                                                }
+                                                if (counter == jsonLocatedin.results.bindings.length)
+                                                    break;
+                                            }
+
+                                            // related cellml model, i.e. kidney, lungs, etc
+                                            var query = 'SELECT ?cellmlmodel ?located_in ' +
+                                                'WHERE { GRAPH ?g { ' +
+                                                '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
+                                                '}}'
+
+                                            sendPostRequest(
+                                                endpoint,
+                                                query,
+                                                function (jsonRelatedModel) {
+
+                                                    console.log("jsonRelatedModel: ", jsonRelatedModel);
+
+                                                    for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
+                                                        for (var j = 0; j < organ[organIndex].key.length; j++) {
+                                                            if (jsonRelatedModel.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
+                                                                // parsing
+                                                                var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
+                                                                var indexOfHash = tempModel.search("#");
+                                                                tempModel = tempModel.slice(0, indexOfHash);
+
+                                                                relatedModel.push(tempModel);
+
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    relatedModel = uniqueify(relatedModel);
+
+                                                    // kidney, lungs, heart, etc
+                                                    // console.log("relatedModel: ", relatedModel);
+
+                                                    console.log("jsonCellmlModel: ", jsonCellmlModel);
+
+                                                    var alternativeCellmlArray = [];
+                                                    for (var i = 0; i < relatedModel.length; i++) {
+                                                        if (relatedModel[i] != cellmlModel) {
+                                                            alternativeCellmlArray.push(relatedModel[i]);
+                                                        }
+                                                    }
+
+                                                    relatedCellmlModel(
+                                                        relatedModel,
+                                                        alternativeCellmlArray,
+                                                        cthis.getAttribute("membrane")
+                                                    );
+
+                                                }, true);
                                         }, true);
                                 }, true);
                         }, true);
@@ -5790,104 +6948,488 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    function dragcirclelineb(d) {
+    // related kidney, lungs, etc model
+    var relatedCellmlModel = function (relatedModel, alternativeCellmlArray, membrane) {
+        var query = 'SELECT ?Protein ?workspaceName ' +
+            'WHERE { GRAPH ?workspaceName { ' +
+            '<' + relatedModel[idProtein] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+            '}}'
 
-        // Circle: strip all the non-digit characters (\D or [^0-9])
-        var ic = this.id.replace(/\D/g, '');
-        var axis = groupcordinates("circlewithlinegb" + ic, ic);
-        circlewithlinegb[ic]
-            .attr("cx", axis.shift())
-            .attr("cy", axis.shift());
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonProtein) {
+                if (jsonProtein.results.bindings.length != 0) {
+                    relatedModelValue.push(jsonProtein.results.bindings[0].Protein.value);
+                    relatedModelID.push(relatedModel[idProtein]);
+                    workspaceName = jsonProtein.results.bindings[0].workspaceName.value;
+                }
 
-        // Text: strip all the non-digit characters (\D or [^0-9])
-        var axis = groupcordinates("linewithtextgb" + ic, ic);
-        linewithtextgb[ic]
-            .attr("x", axis.shift())
-            .attr("y", axis.shift());
+                idProtein++;
 
-        if (linewithtextg2b[ic] != undefined) {
-            // Text: strip all the non-digit characters (\D or [^0-9])
-            var axis = groupcordinates("linewithtextg2b" + ic, ic);
-            linewithtextg2b[ic]
-                .attr("x", axis.shift())
-                .attr("y", axis.shift());
-        }
+                if (idProtein == relatedModel.length) {
+                    alternativeCellmlModel(alternativeCellmlArray, membrane);
+                    return;
+                }
 
-        // line: strip all the non-digit characters (\D or [^0-9])
-        var axis = groupcordinates("linewithlinegb" + ic, ic);
-        linewithlinegb[ic]
-            .attr("x1", axis.shift())
-            .attr("y1", axis.shift())
-            .attr("x2", axis.shift())
-            .attr("y2", axis.shift());
+                relatedCellmlModel(relatedModel, alternativeCellmlArray, membrane);
 
-        if (linewithlineg2b[ic] != undefined) {
-            // line2: strip all the non-digit characters (\D or [^0-9])
-            var axis = groupcordinates("linewithlineg2b" + ic, ic);
-            linewithlineg2b[ic]
-                .attr("x1", axis.shift())
-                .attr("y1", axis.shift())
-                .attr("x2", axis.shift())
-                .attr("y2", axis.shift());
-        }
+            }, true);
     }
 
-    function groupcordinates(groups, ic) {
+    // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
+    var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
-        var dx = d3.event.dx;
-        var dy = d3.event.dy;
+        var query = 'SELECT ?Protein ?URI ?workspaceName ' +
+            'WHERE { GRAPH ?workspaceName { ' +
+            '<' + alternativeCellmlArray[idAltProtein] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+            '<' + alternativeCellmlArray[idAltProtein] + '#Protein> <http://www.obofoundry.org/ro/ro.owl#hasPhysicalDefinition> ?URI . ' +
+            '}}'
 
-        // Circle groups
-        if (groups == "polygontext" + ic) {
-            var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
-            var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonAltProtein) {
+                if (jsonAltProtein.results.bindings.length != 0) {
+                    if (jsonAltProtein.results.bindings[0].Protein.value == proteinName) {
+                        workspaceName = jsonAltProtein.results.bindings[0].workspaceName.value;
+                        var URI = jsonAltProtein.results.bindings[0].URI.value;
 
-            return [xNew, yNew];
+                        var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeCellmlArray[idAltProtein];
+                        var label = document.createElement('label');
+                        label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '#Protein" type="checkbox" ' +
+                            'value="' + alternativeCellmlArray[idAltProtein] + '">' +
+                            '<a href="' + workspaceURI + '" target="_blank"> ' + URI + '</a></label>';
+
+                        altCellmlModel += label.innerHTML;
+                    }
+                }
+
+                idAltProtein++;
+
+                if (idAltProtein == alternativeCellmlArray.length) {
+
+                    // If apical Then basolateral and vice versa
+                    var membraneName;
+                    if (membrane == apicalID) {
+                        membrane = basolateralID;
+                        membraneName = "Basolateral membrane";
+                    }
+                    else {
+                        membrane = apicalID;
+                        membraneName = "Apical membrane";
+                    }
+
+                    // TODO: make it dynamic
+                    if (workspaceName == "") {
+                        relatedMembrane(267, membrane, membraneName);
+                        return;
+                    }
+                    else {
+                        relatedMembrane(workspaceName, membrane, membraneName);
+                        return;
+                    }
+                }
+
+                alternativeCellmlModel(alternativeCellmlArray, membrane);
+
+            }, true);
+    }
+
+    // existing apical or basolateral membrane in PMR
+    var relatedMembrane = function (workspaceName, membrane, membraneName) {
+        var query = 'SELECT ?cellmlmodel ?located_in ' +
+            'WHERE { GRAPH ?g { ' +
+            '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> <' + membrane + '>. ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonRelatedMembrane) {
+
+                console.log("jsonRelatedMembrane: ", jsonRelatedMembrane);
+
+                for (var i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
+                    for (var j = 0; j < organ[organIndex].key.length; j++) {
+                        // parsing
+                        var kModel = jsonRelatedMembrane.results.bindings[i].cellmlmodel.value;
+                        var indexOfHash = kModel.search("#");
+                        kModel = kModel.slice(0, indexOfHash);
+
+                        membraneModel.push(kModel);
+
+                        break;
+                    }
+                }
+
+                membraneModel = uniqueify(membraneModel);
+                // console.log("membraneModel: ", membraneModel);
+
+                relatedMembraneModel(workspaceName, membraneName);
+
+            }, true);
+    }
+
+    var relatedMembraneModel = function (workspaceName, membraneName) {
+        var query = 'SELECT ?Protein ' +
+            'WHERE { GRAPH ?g { ' +
+            '<' + membraneModel[idMembrane] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonRelatedMembraneModel) {
+
+                console.log("jsonRelatedMembraneModel: ", jsonRelatedMembraneModel);
+
+                var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                    'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                    'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
+                    'WHERE { ' +
+                    '<weinstein_1995-human-baso.cellml#NHE3.J_NHE3_Na> semsim:isComputationalComponentFor ?model_prop. ' +
+                    '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+                    '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
+                    '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
+                    '?source_entity ro:part_of ?source_part_of_entity. ' +
+                    '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
+                    '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
+                    '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
+                    '?sink_entity ro:part_of ?sink_part_of_entity. ' +
+                    '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
+                    '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
+                    '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
+                    '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
+                    '}'
+
+                sendPostRequest(
+                    endpoint,
+                    query,
+                    function (jsonObjFlux) {
+                        console.log("jsonObjFlux: ", jsonObjFlux);
+
+                        if (jsonRelatedMembraneModel.results.bindings.length != 0) {
+                            membraneModelValue.push(jsonRelatedMembraneModel.results.bindings[0].Protein.value);
+                            // membraneModeID.push(membraneModel[idMembrane]);
+
+                            membraneObject.push({
+                                source_fma: jsonObjFlux.results.bindings[0].source_fma.value,
+                                sink_fma: jsonObjFlux.results.bindings[0].sink_fma.value,
+                                med_fma: jsonObjFlux.results.bindings[0].med_entity_uri.value,
+                            });
+
+                            membraneModeID.push([
+                                jsonObjFlux.results.bindings[0].source_fma.value,
+                                jsonObjFlux.results.bindings[0].sink_fma.value,
+                                jsonObjFlux.results.bindings[0].med_entity_uri.value
+                            ]);
+                        }
+
+                        // console.log("membraneObject: ", membraneObject);
+                        // console.log("idMembrane: ", idMembrane);
+                        // console.log("membraneModel.length: ", membraneModel.length);
+                        // console.log("membraneModeID: ", membraneModeID);
+
+                        idMembrane++;
+
+                        if (idMembrane == membraneModel.length) {
+                            var msg = "<p><b>Would you like to move?</b><\p>";
+                            var msg2 = "<p><b>" + proteinName + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
+                                "<b>" + loc + "</b><\p>";
+
+                            // TODO: make similar URI thing on model, biological, species, gene, and protein
+                            var model = "<p><b>Model: </b>" + tempJSON[0].value + "</p>";
+                            var biological = "<p><b>Biological Meaning: </b>" + tempJSON[1].value + "</p>";
+                            var species = "<p><b>Species: </b>" + tempJSON[2].value + "</p>";
+                            var gene = "<p><b>Gene: </b>" + tempJSON[3].value + "</p>";
+                            var protein = "<p><b>Protein: </b>" + tempJSON[4].value + "</p>";
+
+                            var alternativeModel = "<p><b>Alternative model of <b>" + proteinName + "</b></b>" + altCellmlModel + "</p>";
+
+                            // Related apical or basolateral model
+                            var membraneTransporter = "<p><b>" + membraneName + " model</b>";
+                            if (membraneModelValue.length == 0) {
+                                membraneTransporter += "<br>Not Exist";
+                            }
+                            else {
+                                for (var i = 0; i < membraneModelValue.length; i++) {
+                                    var label = document.createElement('label');
+                                    label.innerHTML = '<br><input id="' + membraneModeID[i] + '#Protein" type="checkbox" ' +
+                                        'value="' + membraneModelValue[i] + '"> ' + membraneModelValue[i] + '</label>';
+
+                                    membraneTransporter += label.innerHTML;
+                                }
+                            }
+
+                            // related organ models in PMR
+                            var relatedOrganModels = "<p><b>" + typeOfModel + " model in PMR</b>";
+                            if (relatedModelValue.length == 0) {
+                                relatedOrganModels += "<br>Not Exist";
+                            }
+                            else {
+                                for (var i = 0; i < relatedModelValue.length; i++) {
+
+                                    if (proteinName == relatedModelValue[i])
+                                        continue;
+
+                                    var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + relatedModelID[i];
+
+                                    var label = document.createElement('label');
+                                    label.innerHTML = '<br><a href="' + workspaceURI + '" target="_blank"> ' + relatedModelValue[i] + '</a></label>';
+
+                                    relatedOrganModels += label.innerHTML;
+                                }
+                            }
+
+                            $('#modalBody')
+                                .append(msg)
+                                .append(msg2)
+                                .append(model)
+                                .append(biological)
+                                .append(species)
+                                .append(gene)
+                                .append(protein);
+
+                            var msg3 = "<br><p><b>Recommendations/suggestions based on existing models in PMR<b><\p>";
+
+                            $('#modalBody')
+                                .append(msg3)
+                                .append(membraneTransporter)
+                                .append(alternativeModel)
+                                .append(relatedOrganModels);
+
+                            console.log("outside modelbody!");
+
+                            // TODO: How to write test case
+                            // https://code.tutsplus.com/tutorials/testing-javascript-with-phantomjs--net-28243
+                            // http://mochajs.org/#getting-started
+                            // git commit and push; Travis will automate  continuous testing
+                            // mocha.ui('bdd');
+                            // mocha.reporter('html');
+                            // var assert = chai.assert;
+                            //
+                            // describe('modelBody test', function () {
+                            //     describe('modelBody test', function () {
+                            //         it('should return -1 when the value is not present', function () {
+                            //             assert.equal(1, [1, 2, 3].indexOf(4));
+                            //             console.log("inside modelbody!");
+                            //         });
+                            //     });
+                            // });
+
+                            return;
+                        }
+
+                        relatedMembraneModel(workspaceName, membraneName);
+                    },
+                    true);
+            }, true);
+    }
+
+    var Modal = function (options) {
+        var $this = this;
+
+        options = options ? options : {};
+        $this.options = {};
+        $this.options.header = options.header !== undefined ? options.header : false;
+        $this.options.footer = options.footer !== undefined ? options.footer : false;
+        $this.options.closeButton = options.closeButton !== undefined ? options.closeButton : true;
+        $this.options.footerCloseButton = options.footerCloseButton !== undefined ? options.footerCloseButton : false;
+        $this.options.footerSaveButton = options.footerSaveButton !== undefined ? options.footerSaveButton : false;
+        $this.options.id = options.id !== undefined ? options.id : "myModal";
+
+        /**
+         * Append modal window html to body
+         */
+        $this.createModal = function () {
+            $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
+            $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
+            var win = $('.modal-content', $this.selector);
+
+            if ($this.options.header) {
+                win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
+
+                if ($this.options.closeButton) {
+                    win.find('.modal-header').prepend('<button type="button" class="close" data-dismiss="modal">&times;</button>');
+                }
+            }
+
+            win.append('<div class="modal-body"></div>');
+            if ($this.options.footer) {
+                win.append('<div class="modal-footer"></div>');
+
+                if ($this.options.footerCloseButton) {
+                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                }
+
+                if ($this.options.footerSaveButton) {
+                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                }
+            }
+
+            // close button clicked!!
+            win[0].lastElementChild.children[0].onclick = function (event) {
+                // line 1
+                linewithlineg[iGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x1", dx1line[iGlobal])
+                    .attr("y1", dy1line[iGlobal])
+                    .attr("x2", dx2line[iGlobal])
+                    .attr("y2", dy2line[iGlobal]);
+
+                // text 1
+                linewithtextg[iGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x", dxtext[iGlobal])
+                    .attr("y", dytext[iGlobal]);
+
+                // circle
+                circlewithlineg[iGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("cx", dx[iGlobal])
+                    .attr("cy", dy[iGlobal]);
+
+                if (linewithlineg2[iGlobal] != undefined && linewithtextg2[iGlobal] != undefined) {
+                    // line 2
+                    linewithlineg2[iGlobal]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x1", dx1line2[iGlobal])
+                        .attr("y1", dy1line2[iGlobal])
+                        .attr("x2", dx2line2[iGlobal])
+                        .attr("y2", dy2line2[iGlobal]);
+
+                    // text 2
+                    linewithtextg2[iGlobal]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", dxtext2[iGlobal])
+                        .attr("y", dytext2[iGlobal]);
+                }
+            }
+
+            // save button clicked!!
+            win[0].lastElementChild.children[1].onclick = function (event) {
+
+                console.log("save clicked!");
+                console.log("cthis: ", cthis);
+
+                // checkbox!!
+                for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
+                    if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
+
+                        console.log("Basolateral or apical model clicked!!");
+
+                        console.log("checked: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
+                        console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                        cthis.id = win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id;
+                        console.log("cthis AFTER: ", cthis);
+                        console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                    }
+                }
+
+                // checkbox!!
+                for (var i = 0; i < win[0].children[1].children[0].children[13].getElementsByTagName("input").length; i++) {
+                    if (win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked) {
+
+                        console.log("Alternative model clicked!!");
+
+                        console.log("checked: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
+                        console.log("id: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
+                    }
+                }
+
+                // checkbox!!
+                for (var i = 0; i < win[0].children[1].children[0].children[14].getElementsByTagName("input").length; i++) {
+                    if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
+
+                        console.log("Related cellml model clicked!!");
+
+                        console.log("checked: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
+                        console.log("id: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
+                    }
+                }
+
+                // lineBasolateralMembrane
+                // TODO: apical!!
+
+                linebasolateral
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .style("stroke", "orange");
+            }
+        };
+
+        /**
+         * Set header text. It makes sense only if the options.header is logical true.
+         * @param {String} html New header text.
+         */
+        $this.setHeader = function (html) {
+            $this.window.find('.modal-title').html(html);
+        };
+
+        /**
+         * Set body HTML.
+         * @param {String} html New body HTML
+         */
+        $this.setBody = function (html) {
+            $this.window.find('.modal-body').html(html);
+        };
+
+        /**
+         * Set footer HTML.
+         * @param {String} html New footer HTML
+         */
+        $this.setFooter = function (html) {
+            $this.window.find('.modal-footer').html(html);
+        };
+
+        /**
+         * Return window body element.
+         * @returns {jQuery} The body element
+         */
+        $this.getBody = function () {
+            return $this.window.find('.modal-body');
+        };
+
+        /**
+         * Show modal window
+         */
+        $this.show = function () {
+            $this.window.modal('show');
+        };
+
+        /**
+         * Hide modal window
+         */
+        $this.hide = function () {
+            $this.window.modal('hide');
+        };
+
+        /**
+         * Toggle modal window
+         */
+        $this.toggle = function () {
+            $this.window.modal('toggle');
+        };
+
+        $this.selector = "#" + $this.options.id;
+        if (!$($this.selector).length) {
+            $this.createModal();
         }
-        else if (groups == "circlewithlineg" + ic) { // circle groups
-            var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
-            var cyNew = parseFloat(d3.select("#" + groups + "").attr("cy")) + dy;
 
-            return [cxNew, cyNew];
-        }
-        else if ((groups == "linewithtextg" + ic) || (groups == "linewithtextg2" + ic)) { // text groups
-            var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
-            var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
-
-            return [xNew, yNew];
-        }
-        else if (groups == "circlewithlinegb" + ic) { // circle groups
-            var cxNew = parseFloat(d3.select("#" + groups + "").attr("cx")) + dx;
-            var cyNew = parseFloat(d3.select("#" + groups + "").attr("cy")) + dy;
-
-            return [cxNew, cyNew];
-        }
-        else if ((groups == "linewithtextgb" + ic) || (groups == "linewithtextg2b" + ic)) { // text groups
-            var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
-            var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
-
-            return [xNew, yNew];
-        }
-        else if (groups == "polygontextb" + ic) {
-            var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
-            var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
-
-            return [xNew, yNew];
-        }
-        else if (groups == "linewithtextgc" + ic) {
-            var xNew = parseFloat(d3.select("#" + groups + "").attr("x")) + dx;
-            var yNew = parseFloat(d3.select("#" + groups + "").attr("y")) + dy;
-
-            return [xNew, yNew];
-        }
-        else { // Line groups
-            var x1New = parseFloat(d3.select("#" + groups + "").attr("x1")) + dx;
-            var y1New = parseFloat(d3.select("#" + groups + "").attr("y1")) + dy;
-            var x2New = parseFloat(d3.select("#" + groups + "").attr("x2")) + dx;
-            var y2New = parseFloat(d3.select("#" + groups + "").attr("y2")) + dy;
-
-            return [x1New, y1New, x2New, y2New];
-        }
+        $this.window = $($this.selector);
+        $this.setHeader($this.options.header);
     }
 
     function dragcircle(d) {
@@ -6921,7 +8463,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var query = 'SELECT ?Model_entity ?Protein ?Species ?Gene ?Compartment ' +
             'WHERE { GRAPH ?Workspace { ' +
             'OPTIONAL { ' + '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein } . ' +
-            // 'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/description> ?Protein } . ' +
+            'OPTIONAL { ?Model_entity <http://purl.org/dc/terms/description> ?Protein } . ' +
             'OPTIONAL { ' + '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species } . ' +
             'OPTIONAL { ' + '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene } . ' +
             'OPTIONAL { ' + '<' + cellmlModel + '#Compartment> <http://purl.org/dc/terms/description> ?Compartment } . ' +
@@ -7365,6 +8907,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         membrane);
                 }
                 else {
+
+                    console.log("membrane.length >= 1 membrane: ", membrane);
+
                     for (var i = 0; i < membrane.length; i++) {
                         for (var j = i + 1; j < membrane.length; j++) {
                             mainUtils.makecotransporter(membrane[i], membrane[j]);
