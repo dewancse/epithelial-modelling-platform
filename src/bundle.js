@@ -368,7 +368,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var membraneModel = [], membraneModelValue = [], membraneModeID = [], membraneObject = [];
     var proteinName, cellmlModel, loc, typeOfModel, altCellmlModel = "", cthis;
     var idProtein = 0, idAltProtein = 0, idMembrane = 0, counterbr = 0;
-    var icircleGlobal, ipolyGlobal, iparaGlobal, organIndex;
+    var icircleGlobal, organIndex;
 
     var dx = [], dy = [],
         dxtext = [], dytext = [], dxtext2 = [], dytext2 = [],
@@ -1339,7 +1339,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         xvaluewser = xER + 10 + 20, yvaluewser = yER - lineLen / 2,
         xvaluewrer = xER - lineLenwser / 2, yvaluewrer = yER + 10 + 20,
         ydistance = 70, ydistanceb = 70, xdistancewser = 40, ydistancewrer = 40,
-        polygonlineg = [], polygon = [], polygontext = [], polygonlinegwser = [], polygonlinegwrer = [],
+        polygonlineg = [], polygon = [], polygontextg = [], polygonlinegwser = [], polygonlinegwrer = [],
         leaktextwser = [], leaktextwrer = [], leaklinegwser = [], leaklinegwrer = [],
         leaklineg = [], leaktext = [], leaklinegb = [], leaktextb = [],
         polygonlinegb = [], polygonb = [], polygontextb = [], polygontextwser = [], polygontextwrer = [],
@@ -1385,10 +1385,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         checkBox[i] = new d3CheckBox();
     }
 
-    // for (var i = 0; i < paracellularMembrane.length; i++) {
-    //     checkBoxc[i] = new d3CheckBox();
-    // }
-
     var update = function () {
         for (var i = 0; i < combinedMembrane.length; i++) {
             if (combinedMembrane[i].source_text2 != "channel" && combinedMembrane[i].source_text2 != "diffusive channel") {
@@ -1404,7 +1400,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 checkedchk[i] = checkBox[i].checked();
                 // drag enable and disable
                 if (checkedchk[i] == true) {
-                    polygon[i].call(d3.drag().on("drag", dragpolygonandline));
+                    polygon[i].call(d3.drag().on("drag", dragcircleline));
                 }
                 else {
                     polygon[i].call(d3.drag().on("drag", dragcircleendchkbx));
@@ -1413,7 +1409,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 checkedchk[i] = checkBox[i].checked();
                 // drag enable and disable
                 if (checkedchk[i] == true) {
-                    console.log("update: ", checkedchk[i], linewithlineg[i], linewithtextg[i]);
                     linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
                     linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
                 }
@@ -1423,19 +1418,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 }
             }
         }
-
-        // for (var i = 0; i < paracellularMembrane.length; i++) {
-        //     checkedchkc[i] = checkBoxc[i].checked();
-        //     // drag enable and disable
-        //     if (checkedchkc[i] == true) {
-        //         linewithlinegc[i].call(d3.drag().on("drag", dragtextandline));
-        //         linewithtextgc[i].call(d3.drag().on("drag", dragtextandline));
-        //     }
-        //     else {
-        //         linewithlinegc[i].call(d3.drag().on("drag", dragcircleendchkbx));
-        //         linewithtextgc[i].call(d3.drag().on("drag", dragcircleendchkbx));
-        //     }
-        // }
     };
 
     for (var i = 0; i < combinedMembrane.length; i++) {
@@ -1446,23 +1428,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         checkboxsvg.call(checkBox[i]);
 
-        console.log("svgtext: ", textvaluechk);
-
         yinitialchk += ydistancechk;
         ytextinitialchk += ydistancechk;
     }
-
-    // for (var i = 0; i < paracellularMembrane.length; i++) {
-    //     var textvaluechkc = paracellularMembrane[i].source_text + " " + paracellularMembrane[i].source_text2;
-    //
-    //     checkBoxc[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
-    //     checkBoxc[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechkc + "");
-    //
-    //     checkboxsvg.call(checkBoxc[i]);
-    //
-    //     yinitialchk += ydistancechk;
-    //     ytextinitialchk += ydistancechk;
-    // }
 
     function d3CheckBox() {
 
@@ -3753,6 +3721,148 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             cyvalue += ydistance;
         }
 
+        // case 5
+        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+            polygonlineg[i] = polygong.append("line")
+                .attr("id", "polygonlineg" + polygonlineg.length)
+                .attr("x1", function (d) {
+                    dx1line[i] = d.x;
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    dy1line[i] = d.y;
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    dx2line[i] = d.x + polygonlineLen;
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    dy2line[i] = d.y;
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "pointer");
+
+            // Polygon
+            polygon[i] = polygong.append("g").append("polygon")
+                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", polygon.length)
+                .attr("membrane", apicalID)
+                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                .attr("fill", "yellow")
+                .attr("stroke", "black")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-linejoin", "round")
+                .attr("cursor", "move");
+
+            var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+
+            var txt = textvalue.substr(5); // temp solution
+            if (txt == "Cl") txt = txt + "-";
+            else txt = txt + "+";
+
+            polygontextg[i] = polygontext.append("text")
+                .attr("id", "polygontextg" + polygontextg.length)
+                .attr("x", function (d) {
+                    dxtext[i] = d.x;
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    dytext[i] = d.y;
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(txt);
+
+            // increment y-axis of line and circle
+            yvalue += ydistance;
+            cyvalue += ydistance;
+        }
+
+        // case 6
+        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
+            polygonlineg[i] = polygong.append("line")
+                .attr("id", "polygonlineg" + polygonlineg.length)
+                .attr("x1", function (d) {
+                    dx1line[i] = d.x;
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    dy1line[i] = d.y;
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    dx2line[i] = d.x + polygonlineLen;
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    dy2line[i] = d.y;
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-start", "url(#start)")
+                .attr("cursor", "pointer");
+
+            // Polygon
+            polygon[i] = polygong.append("g").append("polygon")
+                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", polygon.length)
+                .attr("membrane", apicalID)
+                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                .attr("fill", "yellow")
+                .attr("stroke", "black")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-linejoin", "round")
+                .attr("cursor", "move");
+
+            var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+
+            var txt = textvalue.substr(5); // temp solution
+            if (txt == "Cl") txt = txt + "-";
+            else txt = txt + "+";
+
+            polygontextg[i] = polygontext.append("text")
+                .attr("id", "polygontextg" + polygontextg.length)
+                .attr("x", function (d) {
+                    dxtext[i] = d.x;
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    dytext[i] = d.y;
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(txt);
+
+            // increment y-axis of line and circle
+            yvalue += ydistance;
+            cyvalue += ydistance;
+        }
+
         // case 1
         if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
             var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
@@ -4229,6 +4339,148 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             cyvalueb += ydistance;
         }
 
+        // case 5
+        if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+            polygonlineg[i] = polygong.append("line")
+                .attr("id", "polygonlineg" + polygonlineg.length)
+                .attr("x1", function (d) {
+                    dx1polygonline[i] = d.x;
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    dy1polygonline[i] = d.y;
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    dx2polygonline[i] = d.x + polygonlineLen;
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    dy2polygonline[i] = d.y;
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-start", "url(#start)")
+                .attr("cursor", "pointer");
+
+            // Polygon
+            polygon[i] = polygong.append("g").append("polygon")
+                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", polygon.length)
+                .attr("membrane", basolateralID)
+                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                .attr("fill", "yellow")
+                .attr("stroke", "black")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-linejoin", "round")
+                .attr("cursor", "move");
+
+            var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
+
+            var txt = textvalue.substr(5); // temp solution
+            if (txt == "Cl") txt = txt + "-";
+            else txt = txt + "+";
+
+            polygontextg[i] = polygontext.append("text")
+                .attr("id", "polygontextg" + polygontextg.length)
+                .attr("x", function (d) {
+                    dxpolygontext[i] = d.x;
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    dypolygontext[i] = d.y;
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(txt);
+
+            // increment y-axis of line and circle
+            yvalueb += ydistance;
+            cyvalueb += ydistance;
+        }
+
+        // case 6
+        if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
+            polygonlineg[i] = polygong.append("line")
+                .attr("id", "polygonlineg" + polygonlineg.length)
+                .attr("x1", function (d) {
+                    dx1polygonline[i] = d.x;
+                    return d.x;
+                })
+                .attr("y1", function (d) {
+                    dy1polygonline[i] = d.y;
+                    return d.y;
+                })
+                .attr("x2", function (d) {
+                    dx2polygonline[i] = d.x + polygonlineLen;
+                    return d.x + polygonlineLen;
+                })
+                .attr("y2", function (d) {
+                    dy2polygonline[i] = d.y;
+                    return d.y;
+                })
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "pointer");
+
+            // Polygon
+            polygon[i] = polygong.append("g").append("polygon")
+                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
+                .attr("id", function (d) {
+                    return [
+                        membraneOBJ.source_text,
+                        membraneOBJ.source_fma,
+                        membraneOBJ.source_name
+                    ];
+                })
+                .attr("index", polygon.length)
+                .attr("membrane", basolateralID)
+                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                .attr("fill", "yellow")
+                .attr("stroke", "black")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-linejoin", "round")
+                .attr("cursor", "move");
+
+            var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
+
+            var txt = textvalue.substr(5); // temp solution
+            if (txt == "Cl") txt = txt + "-";
+            else txt = txt + "+";
+
+            polygontextg[i] = polygontext.append("text")
+                .attr("id", "polygontextg" + polygontextg.length)
+                .attr("x", function (d) {
+                    dxpolygontext[i] = d.x;
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    dypolygontext[i] = d.y;
+                    return d.y;
+                })
+                .attr("font-size", "12px")
+                .attr("fill", "red")
+                .attr("cursor", "move")
+                .text(txt);
+
+            // increment y-axis of line and circle
+            yvalueb += ydistance;
+            cyvalueb += ydistance;
+        }
+
         // paracellular channel
         if (textvalue2 == "diffusive channel") {
             var lineg = newg.append("g").data([{x: xpvalue, y: ypvalue + 5}]);
@@ -4275,8 +4527,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("marker-end", "url(#end)")
                 .attr("cursor", "move");
 
-            console.log("textvalue2: ", textvalue2, linewithlineg[i], linewithtextg[i]);
-
             ypvalue += ypdistance;
         }
     }
@@ -4290,148 +4540,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         var snk_fma = apicalMembrane[i].sink_fma;
         var snk_fma2 = apicalMembrane[i].sink_fma2;
         var textWidth = getTextWidth(textvalue, 12);
-
-        // case 5
-        if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
-            var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + polygonlineg.length)
-                .attr("x1", function (d) {
-                    dx1polygonline[i] = d.x;
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    dy1polygonline[i] = d.y;
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    dx2polygonline[i] = d.x + polygonlineLen;
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    dy2polygonline[i] = d.y;
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-end", "url(#end)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
-                .attr("id", function (d) {
-                    return [
-                        membraneOBJ.source_text,
-                        membraneOBJ.source_fma,
-                        membraneOBJ.source_name
-                    ];
-                })
-                .attr("index", "polygon" + polygon.length)
-                .attr("membrane", apicalID)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontext[i] = polygontextg.append("text")
-                .attr("id", "polygontext" + polygontext.length)
-                .attr("x", function (d) {
-                    dxpolygontext[i] = d.x;
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    dypolygontext[i] = d.y;
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
-
-        // case 6
-        if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
-            var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + polygonlineg.length)
-                .attr("x1", function (d) {
-                    dx1polygonline[i] = d.x;
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    dy1polygonline[i] = d.y;
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    dx2polygonline[i] = d.x + polygonlineLen;
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    dy2polygonline[i] = d.y;
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-start", "url(#start)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
-                .attr("id", function (d) {
-                    return [
-                        membraneOBJ.source_text,
-                        membraneOBJ.source_fma,
-                        membraneOBJ.source_name
-                    ];
-                })
-                .attr("index", "polygon" + polygon.length)
-                .attr("membrane", apicalID)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontext[i] = polygontextg.append("text")
-                .attr("id", "polygontext" + polygontext.length)
-                .attr("x", function (d) {
-                    dxpolygontext[i] = d.x;
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    dypolygontext[i] = d.y;
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // increment y-axis of line and circle
-            yvalue += ydistance;
-            cyvalue += ydistance;
-        }
 
         // TODO: Fix variable names later
         // case 7
@@ -4799,148 +4907,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         var snk_fma2 = basolateralMembrane[i].sink_fma2;
         var textWidth = getTextWidth(textvalue, 12);
 
-        // case 5
-        if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
-            var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + polygonlineg.length)
-                .attr("x1", function (d) {
-                    dx1polygonline[i] = d.x;
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    dy1polygonline[i] = d.y;
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    dx2polygonline[i] = d.x + polygonlineLen;
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    dy2polygonline[i] = d.y;
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-start", "url(#start)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
-                .attr("id", function (d) {
-                    return [
-                        membraneOBJ.source_text,
-                        membraneOBJ.source_fma,
-                        membraneOBJ.source_name
-                    ];
-                })
-                .attr("index", "polygon" + polygon.length)
-                .attr("membrane", basolateralID)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontext[i] = polygontextg.append("text")
-                .attr("id", "polygontext" + polygontext.length)
-                .attr("x", function (d) {
-                    dxpolygontext[i] = d.x;
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    dypolygontext[i] = d.y;
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // increment y-axis of line and circle
-            yvalueb += ydistance;
-            cyvalueb += ydistance;
-        }
-
-        // case 6
-        if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
-            var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + polygonlineg.length)
-                .attr("x1", function (d) {
-                    dx1polygonline[i] = d.x;
-                    return d.x;
-                })
-                .attr("y1", function (d) {
-                    dy1polygonline[i] = d.y;
-                    return d.y;
-                })
-                .attr("x2", function (d) {
-                    dx2polygonline[i] = d.x + polygonlineLen;
-                    return d.x + polygonlineLen;
-                })
-                .attr("y2", function (d) {
-                    dy2polygonline[i] = d.y;
-                    return d.y;
-                })
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("marker-end", "url(#end)")
-                .attr("cursor", "pointer");
-
-            // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
-                .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
-                .attr("id", function (d) {
-                    return [
-                        membraneOBJ.source_text,
-                        membraneOBJ.source_fma,
-                        membraneOBJ.source_name
-                    ];
-                })
-                .attr("index", "polygon" + polygon.length)
-                .attr("membrane", basolateralID)
-                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                .attr("fill", "yellow")
-                .attr("stroke", "black")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
-
-            var polygontextg = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
-
-            var txt = textvalue.substr(5); // temp solution
-            if (txt == "Cl") txt = txt + "-";
-            else txt = txt + "+";
-
-            polygontext[i] = polygontextg.append("text")
-                .attr("id", "polygontext" + polygontext.length)
-                .attr("x", function (d) {
-                    dxpolygontext[i] = d.x;
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    dypolygontext[i] = d.y;
-                    return d.y;
-                })
-                .attr("font-size", "12px")
-                .attr("fill", "red")
-                .attr("cursor", "move")
-                .text(txt);
-
-            // increment y-axis of line and circle
-            yvalueb += ydistance;
-            cyvalueb += ydistance;
-        }
-
         // TODO: Fix variable names later
         // case 7
         if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "leak" && snk_fma2 == "leak")) {
@@ -5297,51 +5263,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    // for (var i = 0; i < paracellularMembrane.length; i++) {
-    //     var textvalue = paracellularMembrane[i].source_text;
-    //     var src_fma = paracellularMembrane[i].source_fma;
-    //     var snk_fma = paracellularMembrane[i].sink_fma;
-    //     var textWidth = getTextWidth(textvalue, 12);
-    //
-    //     var linegc = newg.append("g").data([{x: xpvalue, y: ypvalue + 5}]);
-    //     linewithtextgc[i] = linegc.append("text")
-    //         .attr("id", "linewithtextgc" + i)
-    //         .attr("x", function (d) {
-    //             return d.x;
-    //         })
-    //         .attr("y", function (d) {
-    //             return d.y;
-    //         })
-    //         .attr("font-family", "Times New Roman")
-    //         .attr("font-size", "12px")
-    //         .attr("font-weight", "bold")
-    //         .attr("fill", "red")
-    //         .attr("cursor", "move")
-    //         .text(textvalue);
-    //
-    //     var linetextg = linegc.append("g").data([{x: xpvalue + textWidth + 10, y: ypvalue}]);
-    //     linewithlinegc[i] = linetextg.append("line")
-    //         .attr("id", "linewithlinegc" + i)
-    //         .attr("x1", function (d) {
-    //             return d.x;
-    //         })
-    //         .attr("y1", function (d) {
-    //             return d.y;
-    //         })
-    //         .attr("x2", function (d) {
-    //             return d.x + pcellLen;
-    //         })
-    //         .attr("y2", function (d) {
-    //             return d.y;
-    //         })
-    //         .attr("stroke", "black")
-    //         .attr("stroke-width", 2)
-    //         .attr("marker-end", "url(#end)")
-    //         .attr("cursor", "move");
-    //
-    //     ypvalue += ypdistance;
-    // }
-
     // Change marker direction and text position
     var state = 0;
     document.addEventListener('click', function (event) {
@@ -5379,13 +5300,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     })
 
     function dragcircleline(d) {
-        console.log("this: ", this);
-        console.log("d3.select(this): ", d3.select(this));
+        // console.log("this: ", this);
+        // console.log("d3.select(this): ", d3.select(this));
         icircleGlobal = this.getAttribute("index");
 
         cthis = this;
 
-        console.log("index: ", icircleGlobal);
+        // console.log("index: ", icircleGlobal);
 
         var dx = d3.event.dx;
         var dy = d3.event.dy;
@@ -5424,6 +5345,37 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("y", parseFloat(d3.select("#" + "linewithtextg2" + icircleGlobal).attr("y")) + dy);
         }
 
+        if (polygonlineg[icircleGlobal] != undefined) {
+            // line
+            polygonlineg[icircleGlobal]
+                .attr("x1", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("x1")) + dx)
+                .attr("y1", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("y1")) + dy)
+                .attr("x2", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("x2")) + dx)
+                .attr("y2", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("y2")) + dy);
+
+            // text
+            polygontextg[icircleGlobal]
+                .attr("x", parseFloat(d3.select("#" + "polygontextg" + icircleGlobal).attr("x")) + dx)
+                .attr("y", parseFloat(d3.select("#" + "polygontextg" + icircleGlobal).attr("y")) + dy);
+        }
+
+        if (this.tagName == "polygon") {
+            var xNew = [], yNew = [], points = "";
+            var pointsLen = d3.select(this)._groups[0][0].points.length;
+
+            for (var i = 0; i < pointsLen; i++) {
+                xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
+                yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
+
+                points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
+
+                if (i != pointsLen - 1)
+                    points = points.concat(" ");
+            }
+
+            d3.select(this).attr("points", points);
+        }
+
         var mindex, membrane = this.getAttribute("membrane");
         var line = document.getElementsByTagName("line");
 
@@ -5440,7 +5392,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // console.log("membrane, mindex: ", membrane, mindex);
         // If paracellular's diffusive channel Then undefined
-        if (line[mindex] != undefined) {
+        if (line[mindex] != undefined && this.cx != undefined) {
             // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
             var lineb_x = line[mindex].x1.baseVal.value;
             var lineb_y1 = line[mindex].y1.baseVal.value;
@@ -5626,61 +5578,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     function dragcircleendchkbx(d) {
         d3.select(this).classed("dragging", false);
-    }
-
-    // function dragtextandline(d) {
-    //
-    //     // line: strip all the non-digit characters (\D or [^0-9])
-    //     var ic = this.id.replace(/\D/g, '');
-    //     var axis = groupcordinates("linewithlinegc" + ic, ic);
-    //     linewithlinegc[ic]
-    //         .attr("x1", axis.shift())
-    //         .attr("y1", axis.shift())
-    //         .attr("x2", axis.shift())
-    //         .attr("y2", axis.shift());
-    //
-    //     // text
-    //     var axis = groupcordinates("linewithtextgc" + ic, ic);
-    //     linewithtextgc[ic]
-    //         .attr("x", axis.shift())
-    //         .attr("y", axis.shift())
-    //
-    // }
-
-    function dragpolygonandline(d) {
-
-        ipolyGlobal = this.getAttribute("index");
-
-        var dx = d3.event.dx;
-        var dy = d3.event.dy;
-
-        // line
-        polygonlineg[ipolyGlobal]
-            .attr("x1", parseFloat(d3.select("#" + "polygonlineg" + ipolyGlobal).attr("x1")) + dx)
-            .attr("y1", parseFloat(d3.select("#" + "polygonlineg" + ipolyGlobal).attr("y1")) + dy)
-            .attr("x2", parseFloat(d3.select("#" + "polygonlineg" + ipolyGlobal).attr("x2")) + dx)
-            .attr("y2", parseFloat(d3.select("#" + "polygonlineg" + ipolyGlobal).attr("y2")) + dy);
-
-        // text
-        polygontextg[ipolyGlobal]
-            .attr("x", parseFloat(d3.select("#" + "polygontextg" + ipolyGlobal).attr("x")) + dx)
-            .attr("y", parseFloat(d3.select("#" + "polygontextg" + ipolyGlobal).attr("y")) + dy);
-
-        // polygon
-        var xNew = [], yNew = [], points = "";
-        var pointsLen = d3.select(this)._groups[0][0].points.length;
-
-        for (var i = 0; i < pointsLen; i++) {
-            xNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].x) + dx;
-            yNew[i] = parseFloat(d3.select(this)._groups[0][0].points[i].y) + dy;
-
-            points = points.concat("" + xNew[i] + "").concat(",").concat("" + yNew[i] + "");
-
-            if (i != pointsLen - 1)
-                points = points.concat(" ");
-        }
-
-        d3.select(this).attr("points", points);
     }
 
     // related kidney, lungs, etc model
@@ -6006,6 +5903,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             // close button clicked!!
             win[0].lastElementChild.children[0].onclick = function (event) {
 
+                // fluxes including paracellular flux
                 if (linewithlineg[icircleGlobal] != undefined) {
                     // line 1
                     linewithlineg[icircleGlobal]
@@ -6056,32 +5954,26 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     }
                 }
 
-                if (polygonlineg[ipolyGlobal] != undefined) {
+                if (polygonlineg[icircleGlobal] != undefined) {
                     // line 1
-                    polygonlineg[ipolyGlobal]
+                    polygonlineg[icircleGlobal]
                         .transition()
                         .delay(1000)
                         .duration(1000)
-                        .attr("x1", dx1polygonline[ipolyGlobal])
-                        .attr("y1", dy1polygonline[ipolyGlobal])
-                        .attr("x2", dx2polygonline[ipolyGlobal])
-                        .attr("y2", dy2polygonline[ipolyGlobal]);
+                        .attr("x1", dx1polygonline[icircleGlobal])
+                        .attr("y1", dy1polygonline[icircleGlobal])
+                        .attr("x2", dx2polygonline[icircleGlobal])
+                        .attr("y2", dy2polygonline[icircleGlobal]);
 
                     // text 1
-                    polygontextg[ipolyGlobal]
+                    polygontextg[icircleGlobal]
                         .transition()
                         .delay(1000)
                         .duration(1000)
-                        .attr("x", dxpolygontext[ipolyGlobal])
-                        .attr("y", dypolygontext[ipolyGlobal]);
+                        .attr("x", dxpolygontext[icircleGlobal])
+                        .attr("y", dypolygontext[icircleGlobal]);
 
-                    // // circle
-                    // circlewithlineg[icircleGlobal]
-                    //     .transition()
-                    //     .delay(1000)
-                    //     .duration(1000)
-                    //     .attr("cx", dx[icircleGlobal])
-                    //     .attr("cy", dy[icircleGlobal]);
+                    // TODO: polygon!!
                 }
             }
 
