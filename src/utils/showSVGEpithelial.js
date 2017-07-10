@@ -40,18 +40,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
     // weinstein model
-    var membraneOBJ = {
-        source_text: "J_NHE3_Na",
-        source_fma: apicalID,
-        source_name: "weinstein_1995.cellml#NHE3.J_NHE3_Na"
-    };
+    // var membraneOBJ = {
+    //     source_text: "J_NHE3_Na",
+    //     source_fma: apicalID,
+    //     source_name: "weinstein_1995.cellml#NHE3.J_NHE3_Na"
+    // };
 
     // chang fujita epithelial model
-    // var membraneOBJ = {
-    //     source_text: "J_mc_Na",
-    //     source_fma: apicalID,
-    //     source_name: "chang_fujita_b_1999.cellml#mc_sodium_flux.J_mc_Na"
-    // };
+    var membraneOBJ = {
+        source_text: "J_mc_Na",
+        source_fma: apicalID,
+        source_name: "chang_fujita_b_1999.cellml#mc_sodium_flux.J_mc_Na"
+    };
 
     // warren model
     // var membraneOBJ = {
