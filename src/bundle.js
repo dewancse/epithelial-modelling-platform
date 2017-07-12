@@ -348,10 +348,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var wallOfRoughERMembrane = [];
     var celljunction = [];
 
-    // Code for drag and pop up .....
-    var apicalCircle = "http://identifiers.org/fma/FMA:84666";
-    var basolateralMembraneID = "http://identifiers.org/fma/FMA:84669";
-
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
     // weinstein model
@@ -389,12 +385,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var dx = [], dy = [],
         dxtext = [], dytext = [], dxtext2 = [], dytext2 = [],
         dx1line = [], dy1line = [], dx2line = [], dy2line = [],
-        dx1line2 = [], dy1line2 = [], dx2line2 = [], dy2line2 = [],
-        dx1polygonline = [], dy1polygonline = [], dx2polygonline = [], dy2polygonline = [],
-        dxpolygontext = [], dypolygontext = [];
+        dx1line2 = [], dy1line2 = [], dx2line2 = [], dy2line2 = [];
 
     var id = 0;
-    
+
     var organ = [
         {
             "key": [
@@ -1375,32 +1369,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var update = function () {
         for (var i = 0; i < combinedMembrane.length; i++) {
-            if (combinedMembrane[i].source_text2 != "channel" && combinedMembrane[i].source_text2 != "diffusive channel") {
-                checkedchk[i] = checkBox[i].checked();
-                if (checkedchk[i] == true) {
-                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
-                }
-                else {
-                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleendline));
-                }
-            } else if (combinedMembrane[i].source_text2 == "channel") {
-                checkedchk[i] = checkBox[i].checked();
-                if (checkedchk[i] == true) {
-                    polygon[i].call(d3.drag().on("drag", dragcircleline));
-                }
-                else {
-                    polygon[i].call(d3.drag().on("drag", dragcircleendline));
-                }
-            } else {
-                checkedchk[i] = checkBox[i].checked();
-                if (checkedchk[i] == true) {
-                    linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
-                    linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
-                }
-                else {
-                    linewithlineg[i].call(d3.drag().on("drag", dragcircleendline));
-                    linewithtextg[i].call(d3.drag().on("drag", dragcircleendline));
-                }
+            checkedchk[i] = checkBox[i].checked();
+            if (checkedchk[i] == true) {
+                circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
+            }
+            else {
+                circlewithlineg[i].call(d3.drag().on("drag", dragcircleendline));
             }
         }
     };
@@ -3208,7 +3182,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    // Apical and basolateral membrane
+    // apical, basolateral and paracellular membrane
     for (var i = 0; i < combinedMembrane.length; i++) {
         var textvalue = combinedMembrane[i].source_text;
         var textvalue2 = combinedMembrane[i].source_text2;
@@ -3220,9 +3194,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 1
         if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -3246,7 +3221,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -3271,7 +3246,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", circlewithlineg.length)
+                .attr("index", tempID)
                 .attr("membrane", apicalID)
                 .attr("cx", function (d) {
                     dx[i] = d.x;
@@ -3286,10 +3261,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-width", 20)
                 .attr("cursor", "move");
 
+            console.log("case 1 flux api BEFORE : ", i, tempID);
+
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + linewithlineg2.length)
+                    .attr("id", "linewithlineg2" + tempID)
                     .attr("x1", function (d) {
                         dx1line2[i] = d.x;
                         return d.x;
@@ -3315,7 +3292,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + linewithtextg2.length)
+                    .attr("id", "linewithtextg2" + tempID)
                     .attr("x", function (d) {
                         dxtext2[i] = d.x;
                         return d.x;
@@ -3339,9 +3316,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 2
         if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -3365,7 +3343,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10, y: yvalue + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -3390,7 +3368,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", circlewithlineg.length)
+                .attr("index", tempID)
                 .attr("membrane", apicalID)
                 .attr("cx", function (d) {
                     dx[i] = d.x;
@@ -3408,7 +3386,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + linewithlineg2.length)
+                    .attr("id", "linewithlineg2" + tempID)
                     .attr("x1", function (d) {
                         dx1line2[i] = d.x;
                         return d.x;
@@ -3434,7 +3412,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + linewithtextg2.length)
+                    .attr("id", "linewithtextg2" + tempID)
                     .attr("x", function (d) {
                         dxtext2[i] = d.x;
                         return d.x;
@@ -3458,9 +3436,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 3
         if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -3484,7 +3463,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10, y: yvalue + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -3509,7 +3488,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", circlewithlineg.length)
+                .attr("index", tempID)
                 .attr("membrane", apicalID)
                 .attr("cx", function (d) {
                     dx[i] = d.x;
@@ -3527,7 +3506,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + linewithlineg2.length)
+                    .attr("id", "linewithlineg2" + tempID)
                     .attr("x1", function (d) {
                         dx1line2[i] = d.x;
                         return d.x;
@@ -3553,7 +3532,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue - textWidth - 10, y: yvalue + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + linewithtextg2.length)
+                    .attr("id", "linewithtextg2" + tempID)
                     .attr("x", function (d) {
                         dxtext2[i] = d.x;
                         return d.x;
@@ -3577,9 +3556,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 4
         if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -3603,7 +3583,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10, y: yvalue + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -3628,7 +3608,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", circlewithlineg.length)
+                .attr("index", tempID)
                 .attr("membrane", apicalID)
                 .attr("cx", function (d) {
                     dx[i] = d.x;
@@ -3646,7 +3626,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + linewithlineg2.length)
+                    .attr("id", "linewithlineg2" + tempID)
                     .attr("x1", function (d) {
                         dx1line2[i] = d.x;
                         return d.x;
@@ -3672,7 +3652,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue + lineLen + 10, y: yvalue + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + linewithtextg2.length)
+                    .attr("id", "linewithtextg2" + tempID)
                     .attr("x", function (d) {
                         dxtext2[i] = d.x;
                         return d.x;
@@ -3696,9 +3676,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 5
         if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            var tempID = circlewithlineg.length;
             var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + polygonlineg.length)
+            linewithlineg[i] = polygong.append("line")
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -3721,7 +3702,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "pointer");
 
             // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
+            circlewithlineg[i] = polygong.append("g").append("polygon")
                 .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
                 .attr("id", function (d) {
                     return [
@@ -3730,7 +3711,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", polygon.length)
+                .attr("index", tempID)
                 .attr("membrane", apicalID)
                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                 .attr("fill", "yellow")
@@ -3745,8 +3726,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (txt == "Cl") txt = txt + "-";
             else txt = txt + "+";
 
-            polygontextg[i] = polygontext.append("text")
-                .attr("id", "polygontextg" + polygontextg.length)
+            linewithtextg[i] = polygontext.append("text")
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -3760,6 +3741,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "move")
                 .text(txt);
 
+            console.log("case 5 channel BEFORE : ", i, tempID);
+
             // increment y-axis of line and circle
             yvalue += ydistance;
             cyvalue += ydistance;
@@ -3767,9 +3750,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 6
         if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            var tempID = circlewithlineg.length;
             var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + polygonlineg.length)
+            linewithlineg[i] = polygong.append("line")
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -3792,7 +3776,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "pointer");
 
             // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
+            circlewithlineg[i] = polygong.append("g").append("polygon")
                 .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
                 .attr("id", function (d) {
                     return [
@@ -3801,7 +3785,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", polygon.length)
+                .attr("index", tempID)
                 .attr("membrane", apicalID)
                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                 .attr("fill", "yellow")
@@ -3816,8 +3800,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (txt == "Cl") txt = txt + "-";
             else txt = txt + "+";
 
-            polygontextg[i] = polygontext.append("text")
-                .attr("id", "polygontextg" + polygontextg.length)
+            linewithtextg[i] = polygontext.append("text")
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -3838,9 +3822,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 1
         if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -3864,7 +3849,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -3889,7 +3874,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", circlewithlineg.length)
+                .attr("index", tempID)
                 .attr("membrane", basolateralID)
                 .attr("cx", function (d) {
                     dx[i] = d.x;
@@ -3907,7 +3892,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + linewithlineg2.length)
+                    .attr("id", "linewithlineg2" + tempID)
                     .attr("x1", function (d) {
                         dx1line2[i] = d.x;
                         return d.x;
@@ -3933,7 +3918,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + linewithtextg2.length)
+                    .attr("id", "linewithtextg2" + tempID)
                     .attr("x", function (d) {
                         dxtext2[i] = d.x;
                         return d.x;
@@ -3957,9 +3942,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 2
         if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -3983,7 +3969,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -4008,7 +3994,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", circlewithlineg.length)
+                .attr("index", tempID)
                 .attr("membrane", basolateralID)
                 .attr("cx", function (d) {
                     dx[i] = d.x;
@@ -4026,7 +4012,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + linewithlineg2.length)
+                    .attr("id", "linewithlineg2" + tempID)
                     .attr("x1", function (d) {
                         dx1line2[i] = d.x;
                         return d.x;
@@ -4052,7 +4038,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + linewithtextg2.length)
+                    .attr("id", "linewithtextg2" + tempID)
                     .attr("x", function (d) {
                         dxtext2[i] = d.x;
                         return d.x;
@@ -4076,9 +4062,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 3
         if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -4102,7 +4089,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -4127,7 +4114,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", circlewithlineg.length)
+                .attr("index", tempID)
                 .attr("membrane", basolateralID)
                 .attr("cx", function (d) {
                     dx[i] = d.x;
@@ -4142,10 +4129,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-width", 20)
                 .attr("cursor", "move");
 
+            console.log("case 3 flux api BEFORE : ", i, tempID);
+
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + linewithlineg2.length)
+                    .attr("id", "linewithlineg2" + tempID)
                     .attr("x1", function (d) {
                         dx1line2[i] = d.x;
                         return d.x;
@@ -4171,7 +4160,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue - textWidth - 10 + width, y: yvalueb + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + linewithtextg2.length)
+                    .attr("id", "linewithtextg2" + tempID)
                     .attr("x", function (d) {
                         dxtext2[i] = d.x;
                         return d.x;
@@ -4195,9 +4184,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 4
         if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
             linewithlineg[i] = lineg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -4221,7 +4211,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
             linewithtextg[i] = linegtext.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
                     dxtext[i] = d.x;
                     return d.x;
@@ -4246,7 +4236,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", circlewithlineg.length)
+                .attr("index", tempID)
                 .attr("membrane", basolateralID)
                 .attr("cx", function (d) {
                     dx[i] = d.x;
@@ -4264,7 +4254,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
-                    .attr("id", "linewithlineg2" + linewithlineg2.length)
+                    .attr("id", "linewithlineg2" + tempID)
                     .attr("x1", function (d) {
                         dx1line2[i] = d.x;
                         return d.x;
@@ -4290,7 +4280,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     x: xvalue + lineLen + 10 + width, y: yvalueb + radius * 2 + markerHeight
                 }]);
                 linewithtextg2[i] = linegtext2.append("text")
-                    .attr("id", "linewithtextg2" + linewithtextg2.length)
+                    .attr("id", "linewithtextg2" + tempID)
                     .attr("x", function (d) {
                         dxtext2[i] = d.x;
                         return d.x;
@@ -4314,23 +4304,24 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 5
         if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            var tempID = circlewithlineg.length;
             var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + polygonlineg.length)
+            linewithlineg[i] = polygong.append("line")
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
-                    dx1polygonline[i] = d.x;
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
-                    dy1polygonline[i] = d.y;
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
-                    dx2polygonline[i] = d.x + polygonlineLen;
+                    dx2line[i] = d.x + polygonlineLen;
                     return d.x + polygonlineLen;
                 })
                 .attr("y2", function (d) {
-                    dy2polygonline[i] = d.y;
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -4339,7 +4330,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "pointer");
 
             // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
+            circlewithlineg[i] = polygong.append("g").append("polygon")
                 .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
                 .attr("id", function (d) {
                     return [
@@ -4348,7 +4339,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", polygon.length)
+                .attr("index", tempID)
                 .attr("membrane", basolateralID)
                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                 .attr("fill", "yellow")
@@ -4363,14 +4354,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (txt == "Cl") txt = txt + "-";
             else txt = txt + "+";
 
-            polygontextg[i] = polygontext.append("text")
-                .attr("id", "polygontextg" + polygontextg.length)
+            linewithtextg[i] = polygontext.append("text")
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
-                    dxpolygontext[i] = d.x;
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
-                    dypolygontext[i] = d.y;
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-size", "12px")
@@ -4385,23 +4376,24 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // case 6
         if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            var tempID = circlewithlineg.length;
             var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
-            polygonlineg[i] = polygong.append("line")
-                .attr("id", "polygonlineg" + polygonlineg.length)
+            linewithlineg[i] = polygong.append("line")
+                .attr("id", "linewithlineg" + tempID)
                 .attr("x1", function (d) {
-                    dx1polygonline[i] = d.x;
+                    dx1line[i] = d.x;
                     return d.x;
                 })
                 .attr("y1", function (d) {
-                    dy1polygonline[i] = d.y;
+                    dy1line[i] = d.y;
                     return d.y;
                 })
                 .attr("x2", function (d) {
-                    dx2polygonline[i] = d.x + polygonlineLen;
+                    dx2line[i] = d.x + polygonlineLen;
                     return d.x + polygonlineLen;
                 })
                 .attr("y2", function (d) {
-                    dy2polygonline[i] = d.y;
+                    dy2line[i] = d.y;
                     return d.y;
                 })
                 .attr("stroke", "black")
@@ -4410,7 +4402,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cursor", "pointer");
 
             // Polygon
-            polygon[i] = polygong.append("g").append("polygon")
+            circlewithlineg[i] = polygong.append("g").append("polygon")
                 .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
                 .attr("id", function (d) {
                     return [
@@ -4419,7 +4411,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         membraneOBJ.source_name
                     ];
                 })
-                .attr("index", polygon.length)
+                .attr("index", tempID)
                 .attr("membrane", basolateralID)
                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                 .attr("fill", "yellow")
@@ -4434,14 +4426,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             if (txt == "Cl") txt = txt + "-";
             else txt = txt + "+";
 
-            polygontextg[i] = polygontext.append("text")
-                .attr("id", "polygontextg" + polygontextg.length)
+            linewithtextg[i] = polygontext.append("text")
+                .attr("id", "linewithtextg" + tempID)
                 .attr("x", function (d) {
-                    dxpolygontext[i] = d.x;
+                    dxtext[i] = d.x;
                     return d.x;
                 })
                 .attr("y", function (d) {
-                    dypolygontext[i] = d.y;
+                    dytext[i] = d.y;
                     return d.y;
                 })
                 .attr("font-size", "12px")
@@ -4456,16 +4448,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // paracellular channel
         if (textvalue2 == "diffusive channel") {
+            var tempID = circlewithlineg.length;
             var lineg = newg.append("g").data([{x: xpvalue, y: ypvalue + 5}]);
-            linewithtextg[i] = lineg.append("text")
-                .attr("id", "linewithtextg" + linewithtextg.length)
-                .attr("index", linewithtextg.length)
+            circlewithlineg[i] = lineg.append("text") // linewithtextg
+                .attr("id", "linewithtextg" + tempID)
+                .attr("index", tempID)
                 .attr("x", function (d) {
-                    dxtext[i] = d.x;
+                    dx[i] = d.x; // dxtext
                     return d.x;
                 })
                 .attr("y", function (d) {
-                    dytext[i] = d.y;
+                    dy[i] = d.y; // dytext
                     return d.y;
                 })
                 .attr("font-family", "Times New Roman")
@@ -4477,8 +4470,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             var linetextg = lineg.append("g").data([{x: xpvalue + textWidth + 10, y: ypvalue}]);
             linewithlineg[i] = linetextg.append("line")
-                .attr("id", "linewithlineg" + linewithlineg.length)
-                .attr("index", linewithlineg.length)
+                .attr("id", "linewithlineg" + tempID)
+                .attr("index", tempID)
                 .attr("x1", function (d) {
                     dx1line[i] = d.x;
                     return d.x;
@@ -5290,46 +5283,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("cy", parseFloat(this.cy.baseVal.value) + dy);
         }
 
-        if (linewithlineg[icircleGlobal] != undefined) {
-            // line 1
-            linewithlineg[icircleGlobal]
-                .attr("x1", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("x1")) + dx)
-                .attr("y1", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("y1")) + dy)
-                .attr("x2", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("x2")) + dx)
-                .attr("y2", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("y2")) + dy);
-
-            // text 1
-            linewithtextg[icircleGlobal]
+        if (this.tagName == "text") {
+            circlewithlineg[icircleGlobal] // text
                 .attr("x", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("x")) + dx)
                 .attr("y", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("y")) + dy);
-        }
-
-        if (linewithlineg2[icircleGlobal] != undefined) {
-            // line 2
-            linewithlineg2[icircleGlobal]
-                .attr("x1", parseFloat(d3.select("#" + "linewithlineg2" + icircleGlobal).attr("x1")) + dx)
-                .attr("y1", parseFloat(d3.select("#" + "linewithlineg2" + icircleGlobal).attr("y1")) + dy)
-                .attr("x2", parseFloat(d3.select("#" + "linewithlineg2" + icircleGlobal).attr("x2")) + dx)
-                .attr("y2", parseFloat(d3.select("#" + "linewithlineg2" + icircleGlobal).attr("y2")) + dy);
-
-            // text 2
-            linewithtextg2[icircleGlobal]
-                .attr("x", parseFloat(d3.select("#" + "linewithtextg2" + icircleGlobal).attr("x")) + dx)
-                .attr("y", parseFloat(d3.select("#" + "linewithtextg2" + icircleGlobal).attr("y")) + dy);
-        }
-
-        if (polygonlineg[icircleGlobal] != undefined) {
-            // line
-            polygonlineg[icircleGlobal]
-                .attr("x1", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("x1")) + dx)
-                .attr("y1", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("y1")) + dy)
-                .attr("x2", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("x2")) + dx)
-                .attr("y2", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("y2")) + dy);
-
-            // text
-            polygontextg[icircleGlobal]
-                .attr("x", parseFloat(d3.select("#" + "polygontextg" + icircleGlobal).attr("x")) + dx)
-                .attr("y", parseFloat(d3.select("#" + "polygontextg" + icircleGlobal).attr("y")) + dy);
         }
 
         if (this.tagName == "polygon") {
@@ -5348,6 +5305,52 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             d3.select(this).attr("points", points);
         }
+
+        if (linewithlineg[icircleGlobal] != undefined) {
+            // line 1
+            linewithlineg[icircleGlobal]
+                .attr("x1", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("x1")) + dx)
+                .attr("y1", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("y1")) + dy)
+                .attr("x2", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("x2")) + dx)
+                .attr("y2", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("y2")) + dy);
+        }
+
+        if (linewithtextg[icircleGlobal] != undefined) {
+            // text 1
+            linewithtextg[icircleGlobal]
+                .attr("x", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("x")) + dx)
+                .attr("y", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("y")) + dy);
+        }
+
+        if (linewithlineg2[icircleGlobal] != undefined) {
+            // line 2
+            linewithlineg2[icircleGlobal]
+                .attr("x1", parseFloat(d3.select("#" + "linewithlineg2" + icircleGlobal).attr("x1")) + dx)
+                .attr("y1", parseFloat(d3.select("#" + "linewithlineg2" + icircleGlobal).attr("y1")) + dy)
+                .attr("x2", parseFloat(d3.select("#" + "linewithlineg2" + icircleGlobal).attr("x2")) + dx)
+                .attr("y2", parseFloat(d3.select("#" + "linewithlineg2" + icircleGlobal).attr("y2")) + dy);
+        }
+
+        if (linewithtextg2[icircleGlobal] != undefined) {
+            // text 2
+            linewithtextg2[icircleGlobal]
+                .attr("x", parseFloat(d3.select("#" + "linewithtextg2" + icircleGlobal).attr("x")) + dx)
+                .attr("y", parseFloat(d3.select("#" + "linewithtextg2" + icircleGlobal).attr("y")) + dy);
+        }
+
+        // if (polygonlineg[icircleGlobal] != undefined) {
+        //     // line
+        //     polygonlineg[icircleGlobal]
+        //         .attr("x1", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("x1")) + dx)
+        //         .attr("y1", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("y1")) + dy)
+        //         .attr("x2", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("x2")) + dx)
+        //         .attr("y2", parseFloat(d3.select("#" + "polygonlineg" + icircleGlobal).attr("y2")) + dy);
+        //
+        //     // text
+        //     polygontextg[icircleGlobal]
+        //         .attr("x", parseFloat(d3.select("#" + "polygontextg" + icircleGlobal).attr("x")) + dx)
+        //         .attr("y", parseFloat(d3.select("#" + "polygontextg" + icircleGlobal).attr("y")) + dy);
+        // }
 
         var mindex, membrane = this.getAttribute("membrane");
         var line = document.getElementsByTagName("line");
@@ -5893,9 +5896,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             // close button clicked!!
             win[0].lastElementChild.children[0].onclick = function (event) {
 
-                // fluxes including paracellular flux
                 if (linewithlineg[icircleGlobal] != undefined) {
-                    // line 1
                     linewithlineg[icircleGlobal]
                         .transition()
                         .delay(1000)
@@ -5904,66 +5905,43 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("y1", dy1line[icircleGlobal])
                         .attr("x2", dx2line[icircleGlobal])
                         .attr("y2", dy2line[icircleGlobal]);
+                }
 
-                    // text 1
+                if (linewithtextg[icircleGlobal] != undefined) {
                     linewithtextg[icircleGlobal]
                         .transition()
                         .delay(1000)
                         .duration(1000)
                         .attr("x", dxtext[icircleGlobal])
                         .attr("y", dytext[icircleGlobal]);
-
-                    if (circlewithlineg[icircleGlobal] != undefined) {
-                        // circle
-                        circlewithlineg[icircleGlobal]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("cx", dx[icircleGlobal])
-                            .attr("cy", dy[icircleGlobal]);
-                    }
-
-                    if (linewithlineg2[icircleGlobal] != undefined) {
-                        // line 2
-                        linewithlineg2[icircleGlobal]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("x1", dx1line2[icircleGlobal])
-                            .attr("y1", dy1line2[icircleGlobal])
-                            .attr("x2", dx2line2[icircleGlobal])
-                            .attr("y2", dy2line2[icircleGlobal]);
-
-                        // text 2
-                        linewithtextg2[icircleGlobal]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("x", dxtext2[icircleGlobal])
-                            .attr("y", dytext2[icircleGlobal]);
-                    }
                 }
 
-                if (polygonlineg[icircleGlobal] != undefined) {
-                    // line 1
-                    polygonlineg[icircleGlobal]
+                // TODO: Polygon move back
+                circlewithlineg[icircleGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("cx", dx[icircleGlobal])
+                    .attr("cy", dy[icircleGlobal]);
+
+                if (linewithlineg2[icircleGlobal] != undefined) {
+                    linewithlineg2[icircleGlobal]
                         .transition()
                         .delay(1000)
                         .duration(1000)
-                        .attr("x1", dx1polygonline[icircleGlobal])
-                        .attr("y1", dy1polygonline[icircleGlobal])
-                        .attr("x2", dx2polygonline[icircleGlobal])
-                        .attr("y2", dy2polygonline[icircleGlobal]);
+                        .attr("x1", dx1line2[icircleGlobal])
+                        .attr("y1", dy1line2[icircleGlobal])
+                        .attr("x2", dx2line2[icircleGlobal])
+                        .attr("y2", dy2line2[icircleGlobal]);
+                }
 
-                    // text 1
-                    polygontextg[icircleGlobal]
+                if (linewithtextg2[icircleGlobal] != undefined) {
+                    linewithtextg2[icircleGlobal]
                         .transition()
                         .delay(1000)
                         .duration(1000)
-                        .attr("x", dxpolygontext[icircleGlobal])
-                        .attr("y", dypolygontext[icircleGlobal]);
-
-                    // TODO: polygon!!
+                        .attr("x", dxtext2[icircleGlobal])
+                        .attr("y", dytext2[icircleGlobal]);
                 }
             }
 
