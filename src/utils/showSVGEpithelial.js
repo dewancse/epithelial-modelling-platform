@@ -43,9 +43,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
      * */
     var relatedModel = [], relatedModelValue = [], relatedModelID = [], workspaceName = "";
     var membraneModel = [], membraneModelValue = [], membraneModeID = [], membraneObject = [];
-    var proteinName, cellmlModel, biological_meaning, speciesName, geneName, loc, typeOfModel, altCellmlModel = "", cthis;
-    var idProtein = 0, idAltProtein = 0, idMembrane = 0, counterbr = 0;
-    var icircleGlobal, organIndex, source_name;
+    var proteinName, cellmlModel, biological_meaning, biological_meaning2, speciesName, geneName;
+    var idProtein = 0, idAltProtein = 0, idMembrane = 0, counterbr = 0, loc, typeOfModel, altCellmlModel = "", cthis;
+    var icircleGlobal, organIndex, source_name, source_name2;
 
     var dx = [], dy = [],
         dxtext = [], dytext = [], dxtext2 = [], dytext2 = [],
@@ -196,7 +196,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     // TODO: now skipping source_name2, etc below, however, it is used to
-    // TODO: make cotransporter of the apical and basolateral membrane in index.js file
+    // TODO: make cotransporters in the apical and basolateral membrane (see index.js)
 
     // TODO: Hard coded for Nachannel, Clchannel, Kchannel, IP3 receptor, ATP, p2y2
     for (var i = 0; i < membrane.length; i++) {
@@ -2908,6 +2908,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     // apical, basolateral and paracellular membrane
     for (var i = 0; i < combinedMembrane.length; i++) {
         source_name = combinedMembrane[i].source_name;
+        source_name2 = combinedMembrane[i].source_name2;
         var textvalue = combinedMembrane[i].source_text;
         var textvalue2 = combinedMembrane[i].source_text2;
         var src_fma = combinedMembrane[i].source_fma;
@@ -2967,7 +2968,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3087,7 +3088,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3207,7 +3208,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3327,7 +3328,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3430,7 +3431,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3464,7 +3465,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("fill", "red")
                 .attr("cursor", "move")
                 .text(txt);
-            
+
             // increment y-axis of line and circle
             yvalue += ydistance;
             cyvalue += ydistance;
@@ -3502,7 +3503,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3591,7 +3592,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3711,7 +3712,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3831,7 +3832,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -3850,7 +3851,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("fill", "orange")
                 .attr("stroke-width", 20)
                 .attr("cursor", "move");
-            
+
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
@@ -3951,7 +3952,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             circlewithlineg[i] = linegcircle.append("circle")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -4054,7 +4055,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -4126,7 +4127,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
                 .attr("id", function (d) {
                     return [
-                        source_name,
+                        source_name, source_name2,
                         textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                         src_fma, src_fma2, snk_fma, snk_fma2
                     ];
@@ -5117,13 +5118,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                         console.log("indexOfHash and cellmlModel: ", indexOfHash, cellmlModel);
 
-                        var query = 'SELECT ?Protein ?Biological_meaning ?Species ?Gene ' +
-                            'WHERE { GRAPH ?g { ' +
-                            '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
-                            '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
-                            '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
-                            '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
-                            '}}'
+                        if (circleID[1] != "") {
+                            var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Species ?Gene ' +
+                                'WHERE { GRAPH ?g { ' +
+                                '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+                                '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
+                                '<' + circleID[1] + '> <http://purl.org/dc/terms/description> ?Biological_meaning2 . ' +
+                                '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
+                                '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
+                                '}}'
+                        }
+                        else {
+                            var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Species ?Gene ' +
+                                'WHERE { GRAPH ?g { ' +
+                                '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+                                '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
+                                '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
+                                '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
+                                '}}'
+                        }
 
                         // protein name
                         sendPostRequest(
@@ -5135,6 +5148,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                 proteinName = jsonModel.results.bindings[0].Protein.value;
                                 biological_meaning = jsonModel.results.bindings[0].Biological_meaning.value;
+
+                                if (circleID[1] != "")
+                                    biological_meaning2 = jsonModel.results.bindings[0].Biological_meaning2.value;
+                                else
+                                    biological_meaning2 = "";
+
                                 speciesName = jsonModel.results.bindings[0].Species.value;
                                 geneName = jsonModel.results.bindings[0].Gene.value;
 
@@ -5462,14 +5481,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             var msg2 = "<p><b>" + proteinName + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
                                 "<b>" + loc + "</b><\p>";
 
-                            // TODO: make similar URI thing on model, biological, species, gene, and protein
                             var model = "<p><b>Model: </b>" + cellmlModel + "</p>";
                             var biological = "<p><b>Biological Meaning: </b>" + biological_meaning + "</p>";
+
+                            if (biological_meaning2 != "")
+                                biological += "<p>" + biological_meaning2 + "</p>";
+
                             var species = "<p><b>Species: </b>" + speciesName + "</p>";
                             var gene = "<p><b>Gene: </b>" + geneName + "</p>";
                             var protein = "<p><b>Protein: </b>" + proteinName + "</p>";
-
-                            var alternativeModel = "<p><b>Alternative model of <b>" + proteinName + "</b></b>" + altCellmlModel + "</p>";
 
                             // Related apical or basolateral model
                             var membraneTransporter = "<p><b>" + membraneName + " model</b>";
@@ -5486,9 +5506,19 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 }
                             }
 
-                            // related organ models in PMR
+                            // Alternative model
+                            var alternativeModel = "<p><b>Alternative model of " + proteinName + "</b>";
+                            if (altCellmlModel == "") {
+                                alternativeModel += "<br>Not Exist";
+                            }
+                            else {
+                                alternativeModel += "</b>" + altCellmlModel + "</p>";
+                            }
+
+                            // related organ models (kidney, lungs, etc) in PMR
                             var relatedOrganModels = "<p><b>" + typeOfModel + " model in PMR</b>";
-                            if (relatedModelValue.length == 0) {
+                            console.log("related kidney model: ", relatedModelValue, relatedOrganModels);
+                            if (relatedModelValue.length == 1) { // includes own protein name
                                 relatedOrganModels += "<br>Not Exist";
                             }
                             else {
