@@ -1,6 +1,20 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
+
+// remove duplicate model entity and biological meaning
+var uniqueify = function (es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j] === e)
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
     var indexOfHash = fma.name.search("#");
@@ -142,6 +156,7 @@ function iteration(length) {
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
 exports.headTitle = headTitle;
+exports.uniqueify = uniqueify;
 exports.uniqueifySrcSnkMed = uniqueifySrcSnkMed;
 exports.uniqueifyModelEntity = uniqueifyModelEntity;
 exports.uniqueifyEpithelial = uniqueifyEpithelial;

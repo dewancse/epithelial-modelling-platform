@@ -73,6 +73,20 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
+
+// remove duplicate model entity and biological meaning
+var uniqueify = function (es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j] === e)
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
     var indexOfHash = fma.name.search("#");
@@ -214,6 +228,7 @@ function iteration(length) {
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
 exports.headTitle = headTitle;
+exports.uniqueify = uniqueify;
 exports.uniqueifySrcSnkMed = uniqueifySrcSnkMed;
 exports.uniqueifyModelEntity = uniqueifyModelEntity;
 exports.uniqueifyEpithelial = uniqueifyEpithelial;
@@ -302,6 +317,7 @@ exports.sendPostRequest = sendPostRequest;
  */
 var solutesBouncing = __webpack_require__(6).solutesBouncing;
 var getTextWidth = __webpack_require__(0).getTextWidth;
+var uniqueify = __webpack_require__(0).uniqueify;
 var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
@@ -366,7 +382,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
      * */
     var relatedModel = [], relatedModelValue = [], relatedModelID = [], workspaceName = "";
     var membraneModel = [], membraneModelValue = [], membraneModeID = [], membraneObject = [];
-    var proteinName, cellmlModel, loc, typeOfModel, altCellmlModel = "", cthis;
+    var proteinName, cellmlModel, biological_meaning, speciesName, geneName, loc, typeOfModel, altCellmlModel = "", cthis;
     var idProtein = 0, idAltProtein = 0, idMembrane = 0, counterbr = 0;
     var icircleGlobal, organIndex;
 
@@ -378,30 +394,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         dxpolygontext = [], dypolygontext = [];
 
     var id = 0;
-
-    var tempJSON = [
-        {
-            "key": "Model: ",
-            "value": "Chang_fujita"
-        },
-        {
-            "key": "Biological_meaning: ",
-            "value": "Flux of sodium from luminal to cytosol compartment through Na-Cl cotransporter, K-Cl cotransporter, and apical membrane"
-        },
-        {
-            "key": "Species",
-            "value": "RAT"
-        },
-        {
-            "key": "Gene",
-            "value": "SlAC5"
-        },
-        {
-            "key": "Protein",
-            "value": "Sodium Hydrogen 3 Antiporter"
-        }
-    ];
-
+    
     var organ = [
         {
             "key": [
@@ -1342,17 +1335,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         polygonlineg = [], polygon = [], polygontextg = [], polygonlinegwser = [], polygonlinegwrer = [],
         leaktextwser = [], leaktextwrer = [], leaklinegwser = [], leaklinegwrer = [],
         leaklineg = [], leaktext = [], leaklinegb = [], leaktextb = [],
-        polygonlinegb = [], polygonb = [], polygontextb = [], polygontextwser = [], polygontextwrer = [],
+        polygontextwser = [], polygontextwrer = [],
         circlewithlineg = [], linewithlineg = [], circletextwser = [], circletextwrer = [],
         linewithlineg2 = [], linewithtextg = [], linewithtextg2 = [],
         linewithlinegwser = [], linewithlineg2wser = [],
         linewithtextgwser = [], linewithtextg2wser = [], circlewithlinegwser = [],
         linewithlinegwrer = [], linewithlineg2wrer = [],
         linewithtextgwrer = [], linewithtextg2wrer = [], circlewithlinegwrer = [],
-        circlewithlinegb = [], linewithlinegb = [],
-        linewithlineg2b = [], linewithtextgb = [], linewithtextg2b = [],
-        linewithlinegc = [], linewithtextgc = [],
-        polygongctoc = [], polygonlinegctoc = [], polygontextctoc = [],
+        polygonlinegctoc = [], polygontextctoc = [],
         polygonlinegATP = [], polygontextATP = [], atprectText = [],
         polygonlinegATPb = [], polygontextATPb = [], atprectTextb = [],
         linewithlinegpy = [], linewithlinegpy2 = [], linewithlinegpy3 = [],
@@ -1367,11 +1357,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     // SVG checkbox with drag on-off
     var checkboxsvg = newg.append("g");
 
-    var checkBox = [], checkBoxb = [], checkBoxc = [], checkBoxwser = [], checkBoxwrer = [],
-        checkedchk = [], checkedchkb = [], checkedchkc = [],
-        ydistancechk = 50, yinitialchk = 185,
-        ytextinitialchk = 200,
-        markerWidth = 4, markerHeight = 4;
+    var checkBox = [], checkBoxwser = [], checkBoxwrer = [],
+        checkedchk = [], ydistancechk = 50, yinitialchk = 185,
+        ytextinitialchk = 200, markerWidth = 4, markerHeight = 4;
 
     for (var i = 0; i < wallOfSmoothERMembrane.length; i++) {
         checkBoxwser[i] = new d3CheckBox();
@@ -1389,32 +1377,29 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         for (var i = 0; i < combinedMembrane.length; i++) {
             if (combinedMembrane[i].source_text2 != "channel" && combinedMembrane[i].source_text2 != "diffusive channel") {
                 checkedchk[i] = checkBox[i].checked();
-                // drag enable and disable
                 if (checkedchk[i] == true) {
                     circlewithlineg[i].call(d3.drag().on("drag", dragcircleline));
                 }
                 else {
-                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    circlewithlineg[i].call(d3.drag().on("drag", dragcircleendline));
                 }
             } else if (combinedMembrane[i].source_text2 == "channel") {
                 checkedchk[i] = checkBox[i].checked();
-                // drag enable and disable
                 if (checkedchk[i] == true) {
                     polygon[i].call(d3.drag().on("drag", dragcircleline));
                 }
                 else {
-                    polygon[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    polygon[i].call(d3.drag().on("drag", dragcircleendline));
                 }
             } else {
                 checkedchk[i] = checkBox[i].checked();
-                // drag enable and disable
                 if (checkedchk[i] == true) {
                     linewithlineg[i].call(d3.drag().on("drag", dragcircleline));
                     linewithtextg[i].call(d3.drag().on("drag", dragcircleline));
                 }
                 else {
-                    linewithlineg[i].call(d3.drag().on("drag", dragcircleendchkbx));
-                    linewithtextg[i].call(d3.drag().on("drag", dragcircleendchkbx));
+                    linewithlineg[i].call(d3.drag().on("drag", dragcircleendline));
+                    linewithtextg[i].call(d3.drag().on("drag", dragcircleendline));
                 }
             }
         }
@@ -1488,6 +1473,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 });
 
             g.on("click", function () {
+
+                counterbr = 0;
+
                 checked = !checked;
                 mark.style("opacity", (checked) ? 1 : 0);
 
@@ -1566,21 +1554,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         return checkBox;
     }
 
-    // End of svg checkbox
-
-    // remove duplicate model entity and biological meaning
-    function uniqueify(es) {
-        var retval = [];
-        es.forEach(function (e) {
-            for (var j = 0; j < retval.length; j++) {
-                if (retval[j] === e)
-                    return;
-            }
-            retval.push(e);
-        });
-        return retval;
-    }
-
     // Gap Junction
     for (var i = 0; i < celljunction.length; i++) {
         var textvalue = celljunction[i].source_text;
@@ -1624,11 +1597,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongctoc.append("g").data([{
+            var polygontext = polygongctoc.append("g").data([{
                 x: xvaluectoc - 15 + 120,
                 y: yvaluectoc - 15 + height
             }]);
-            polygontextctoc[i] = polygontextg.append("text")
+            polygontextctoc[i] = polygontext.append("text")
                 .attr("id", "polygontextctoc" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -2210,8 +2183,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongwser.append("g").data([{x: xvaluewser - 15, y: yvaluewser - 15}]);
-            polygontextwser[i] = polygontextg.append("text")
+            var polygontext = polygongwser.append("g").data([{x: xvaluewser - 15, y: yvaluewser - 15}]);
+            polygontextwser[i] = polygontext.append("text")
                 .attr("id", "polygontextwser" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -2290,12 +2263,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongwser.append("g").data([{
+            var polygontext = polygongwser.append("g").data([{
                 x: xvaluewser - 15,
                 y: yvaluewser + polygonlineLen + 15
             }]);
 
-            polygontextwser[i] = polygontextg.append("text")
+            polygontextwser[i] = polygontext.append("text")
                 .attr("id", "polygontextwser" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -3003,12 +2976,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongwrer.append("g").data([{
+            var polygontext = polygongwrer.append("g").data([{
                 x: xvaluewrer + polygonlineLen + widthER,
                 y: yvaluewrer + 5
             }]);
 
-            polygontextwrer[i] = polygontextg.append("text")
+            polygontextwrer[i] = polygontext.append("text")
                 .attr("id", "polygontextwrer" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -3090,12 +3063,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongwrer.append("g").data([{
+            var polygontext = polygongwrer.append("g").data([{
                 x: xvaluewrer - 10 - polygonlineLen + widthER,
                 y: yvaluewrer + 5
             }]);
 
-            polygontextwrer[i] = polygontextg.append("text")
+            polygontextwrer[i] = polygontext.append("text")
                 .attr("id", "polygontextwrer" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -4659,13 +4632,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongATP.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+            var polygontext = polygongATP.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
 
             var txt = textvalue.substr(5); // temp solution
             if (txt == "Cl") txt = txt + "-";
             else txt = txt + "+";
 
-            polygontextATP[i] = polygontextg.append("g").append("text")
+            polygontextATP[i] = polygontext.append("g").append("text")
                 .attr("id", "polygontextATP" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -4742,13 +4715,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongATP.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
+            var polygontext = polygongATP.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
 
             var txt = textvalue.substr(5); // temp solution
             if (txt == "Cl") txt = txt + "-";
             else txt = txt + "+";
 
-            polygontextATP[i] = polygontextg.append("text")
+            polygontextATP[i] = polygontext.append("text")
                 .attr("id", "polygontextATP" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -5025,13 +4998,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongATPb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalue + 5}]);
+            var polygontext = polygongATPb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalue + 5}]);
 
             var txt = textvalue.substr(5); // temp solution
             if (txt == "Cl") txt = txt + "-";
             else txt = txt + "+";
 
-            polygontextATPb[i] = polygontextg.append("g").append("text")
+            polygontextATPb[i] = polygontext.append("g").append("text")
                 .attr("id", "polygontextATPb" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -5108,13 +5081,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke-linejoin", "round")
                 .attr("cursor", "move");
 
-            var polygontextg = polygongATPb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalue + 5}]);
+            var polygontext = polygongATPb.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalue + 5}]);
 
             var txt = textvalue.substr(5); // temp solution
             if (txt == "Cl") txt = txt + "-";
             else txt = txt + "+";
 
-            polygontextATPb[i] = polygontextg.append("text")
+            polygontextATPb[i] = polygontext.append("text")
                 .attr("id", "polygontextATPb" + i)
                 .attr("x", function (d) {
                     return d.x;
@@ -5433,9 +5406,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         var indexOfHash = cellmlModel.search("#");
                         cellmlModel = cellmlModel.slice(0, indexOfHash);
 
-                        var query = 'SELECT ?Protein ' +
+                        console.log("cellmlModel: ", cellmlModel);
+
+                        var query = 'SELECT ?Protein ?Biological_meaning ?Species ?Gene ' +
                             'WHERE { GRAPH ?g { ' +
                             '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+                            '<' + circleID[2] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
+                            '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
+                            '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
                             '}}'
 
                         // protein name
@@ -5444,13 +5422,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             query,
                             function (jsonModel) {
 
-                                proteinName = jsonModel.results.bindings[0].Protein.value;
                                 console.log("jsonModel: ", jsonModel);
-                                console.log("protein name: ", proteinName);
+
+                                proteinName = jsonModel.results.bindings[0].Protein.value;
+                                biological_meaning = jsonModel.results.bindings[0].Biological_meaning.value;
+                                speciesName = jsonModel.results.bindings[0].Species.value;
+                                geneName = jsonModel.results.bindings[0].Gene.value;
+
+                                console.log("protein, species, gene: ", proteinName, speciesName, geneName);
 
                                 var query = 'SELECT ?cellmlmodel ' +
                                     'WHERE { GRAPH ?g { ' +
-                                    '?cellmlmodel <http://purl.org/dc/terms/description> "' + jsonModel.results.bindings[0].Protein.value + '". ' +
+                                    '?cellmlmodel <http://purl.org/dc/terms/description> "' + proteinName + '". ' +
                                     '}}'
 
                                 sendPostRequest(
@@ -5576,7 +5559,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    function dragcircleendchkbx(d) {
+    function dragcircleendline(d) {
         d3.select(this).classed("dragging", false);
     }
 
@@ -5771,11 +5754,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "<b>" + loc + "</b><\p>";
 
                             // TODO: make similar URI thing on model, biological, species, gene, and protein
-                            var model = "<p><b>Model: </b>" + tempJSON[0].value + "</p>";
-                            var biological = "<p><b>Biological Meaning: </b>" + tempJSON[1].value + "</p>";
-                            var species = "<p><b>Species: </b>" + tempJSON[2].value + "</p>";
-                            var gene = "<p><b>Gene: </b>" + tempJSON[3].value + "</p>";
-                            var protein = "<p><b>Protein: </b>" + tempJSON[4].value + "</p>";
+                            var model = "<p><b>Model: </b>" + cellmlModel + "</p>";
+                            var biological = "<p><b>Biological Meaning: </b>" + biological_meaning + "</p>";
+                            var species = "<p><b>Species: </b>" + speciesName + "</p>";
+                            var gene = "<p><b>Gene: </b>" + geneName + "</p>";
+                            var protein = "<p><b>Protein: </b>" + proteinName + "</p>";
+
+                            // // TODO: make similar URI thing on model, biological, species, gene, and protein
+                            // var model = "<p><b>Model: </b>" + tempJSON[0].value + "</p>";
+                            // var biological = "<p><b>Biological Meaning: </b>" + tempJSON[1].value + "</p>";
+                            // var species = "<p><b>Species: </b>" + tempJSON[2].value + "</p>";
+                            // var gene = "<p><b>Gene: </b>" + tempJSON[3].value + "</p>";
+                            // var protein = "<p><b>Protein: </b>" + tempJSON[4].value + "</p>";
 
                             var alternativeModel = "<p><b>Alternative model of <b>" + proteinName + "</b></b>" + altCellmlModel + "</p>";
 
@@ -6091,9 +6081,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         $this.window = $($this.selector);
         $this.setHeader($this.options.header);
     }
-
-    var markerWidth = 4;
-    var markerHeight = 4;
 
     // build the start arrow.
     svg.append("svg:defs")
