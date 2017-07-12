@@ -1031,12 +1031,20 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     if (tempProtein.length != 0 && tempApical.length != 0) {
                         apicalMembrane.push(
                             {
-                                // source_name: membrane1.source_name,
+                                source_name: membrane1.source_name,
+                                sink_name: membrane1.sink_name,
+                                med_text: membrane1.med_text,
+                                med_fma: membrane1.med_fma,
+                                med_pr: membrane1.med_pr,
                                 source_text: membrane1.source_text,
                                 source_fma: membrane1.source_fma,
                                 sink_text: membrane1.sink_text,
                                 sink_fma: membrane1.sink_fma,
-                                // source_name2: membrane2.source_name,
+                                source_name2: membrane2.source_name,
+                                sink_name2: membrane2.sink_name,
+                                med_text2: membrane2.med_text,
+                                med_fma2: membrane2.med_fma,
+                                med_pr2: membrane2.med_pr,
                                 source_text2: membrane2.source_text,
                                 source_fma2: membrane2.source_fma,
                                 sink_text2: membrane2.sink_text,
@@ -1048,16 +1056,24 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     if (tempProtein.length != 0 && tempBasolateral.length != 0) {
                         basolateralMembrane.push(
                             {
-                                // source_name: membrane1.source_name,
+                                source_name: membrane1.source_name,
+                                sink_name: membrane1.sink_name,
+                                med_text: membrane1.med_text,
+                                med_fma: membrane1.med_fma,
+                                med_pr: membrane1.med_pr,
                                 source_text: membrane1.source_text,
                                 source_fma: membrane1.source_fma,
                                 sink_text: membrane1.sink_text,
                                 sink_fma: membrane1.sink_fma,
-                                // source_name2: membrane2.source_name,
+                                source_name2: membrane2.source_name,
+                                sink_name2: membrane2.sink_name,
+                                med_text2: membrane2.med_text,
+                                med_fma2: membrane2.med_fma,
+                                med_pr2: membrane2.med_pr,
                                 source_text2: membrane2.source_text,
                                 source_fma2: membrane2.source_fma,
                                 sink_text2: membrane2.sink_text,
-                                sink_fma2: membrane2.sink_fma
+                                sink_fma2: membrane2.sink_fma,
                             });
                     }
 
