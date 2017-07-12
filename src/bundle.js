@@ -1918,27 +1918,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
-    // weinstein model
-    // var membraneOBJ = {
-    //     source_text: "J_NHE3_Na",
-    //     source_fma: apicalID,
-    //     source_name: "weinstein_1995.cellml#NHE3.J_NHE3_Na"
-    // };
-
-    // chang fujita epithelial model
-    var membraneOBJ = {
-        source_text: "J_mc_Na",
-        source_fma: apicalID,
-        source_name: "chang_fujita_b_1999.cellml#mc_sodium_flux.J_mc_Na"
-    };
-
-    // warren model
-    // var membraneOBJ = {
-    //     source_text: "J_mc_Na",
-    //     source_fma: apicalID,
-    //     source_name: "warren_2010.cellml#Jserca_Jserca"
-    // };
-
     /*
      * relatedModel - all related models
      * relatedModelValue - filtered related models which have #protein
@@ -1948,7 +1927,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var membraneModel = [], membraneModelValue = [], membraneModeID = [], membraneObject = [];
     var proteinName, cellmlModel, biological_meaning, speciesName, geneName, loc, typeOfModel, altCellmlModel = "", cthis;
     var idProtein = 0, idAltProtein = 0, idMembrane = 0, counterbr = 0;
-    var icircleGlobal, organIndex;
+    var icircleGlobal, organIndex, source_name;
 
     var dx = [], dy = [],
         dxtext = [], dytext = [], dxtext2 = [], dytext2 = [],
@@ -4810,7 +4789,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // apical, basolateral and paracellular membrane
     for (var i = 0; i < combinedMembrane.length; i++) {
-        var source_name = combinedMembrane[i].source_name;
+        source_name = combinedMembrane[i].source_name;
         var textvalue = combinedMembrane[i].source_text;
         var textvalue2 = combinedMembrane[i].source_text2;
         var src_fma = combinedMembrane[i].source_fma;
@@ -4889,8 +4868,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("fill", "lightgreen")
                 .attr("stroke-width", 20)
                 .attr("cursor", "move");
-
-            console.log("case 1 flux api BEFORE : ", i, tempID);
 
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
@@ -5369,9 +5346,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("fill", "red")
                 .attr("cursor", "move")
                 .text(txt);
-
-            console.log("case 5 channel BEFORE : ", i, tempID);
-
+            
             // increment y-axis of line and circle
             yvalue += ydistance;
             cyvalue += ydistance;
@@ -5757,9 +5732,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("fill", "orange")
                 .attr("stroke-width", 20)
                 .attr("cursor", "move");
-
-            console.log("case 3 flux api BEFORE : ", i, tempID);
-
+            
             if (textvalue2 != "single flux") {
                 var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
                 linewithlineg2[i] = lineg2.append("line")
@@ -7321,7 +7294,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
                     'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
                     'WHERE { ' +
-                    '<weinstein_1995-human-baso.cellml#NHE3.J_NHE3_Na> semsim:isComputationalComponentFor ?model_prop. ' +
+                    '<' + source_name + '> semsim:isComputationalComponentFor ?model_prop. ' +
                     '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
                     '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
                     '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
@@ -7359,10 +7332,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             ]);
                         }
 
-                        // console.log("membraneObject: ", membraneObject);
-                        // console.log("idMembrane: ", idMembrane);
-                        // console.log("membraneModel.length: ", membraneModel.length);
-                        // console.log("membraneModeID: ", membraneModeID);
+                        console.log("membraneObject: ", membraneObject);
+                        console.log("idMembrane: ", idMembrane);
+                        console.log("membraneModel.length: ", membraneModel.length);
+                        console.log("membraneModeID: ", membraneModeID);
 
                         idMembrane++;
 
@@ -7377,13 +7350,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             var species = "<p><b>Species: </b>" + speciesName + "</p>";
                             var gene = "<p><b>Gene: </b>" + geneName + "</p>";
                             var protein = "<p><b>Protein: </b>" + proteinName + "</p>";
-
-                            // // TODO: make similar URI thing on model, biological, species, gene, and protein
-                            // var model = "<p><b>Model: </b>" + tempJSON[0].value + "</p>";
-                            // var biological = "<p><b>Biological Meaning: </b>" + tempJSON[1].value + "</p>";
-                            // var species = "<p><b>Species: </b>" + tempJSON[2].value + "</p>";
-                            // var gene = "<p><b>Gene: </b>" + tempJSON[3].value + "</p>";
-                            // var protein = "<p><b>Protein: </b>" + tempJSON[4].value + "</p>";
 
                             var alternativeModel = "<p><b>Alternative model of <b>" + proteinName + "</b></b>" + altCellmlModel + "</p>";
 
@@ -7440,23 +7406,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .append(relatedOrganModels);
 
                             console.log("outside modelbody!");
-
-                            // TODO: How to write test case
-                            // https://code.tutsplus.com/tutorials/testing-javascript-with-phantomjs--net-28243
-                            // http://mochajs.org/#getting-started
-                            // git commit and push; Travis will automate  continuous testing
-                            // mocha.ui('bdd');
-                            // mocha.reporter('html');
-                            // var assert = chai.assert;
-                            //
-                            // describe('modelBody test', function () {
-                            //     describe('modelBody test', function () {
-                            //         it('should return -1 when the value is not present', function () {
-                            //             assert.equal(1, [1, 2, 3].indexOf(4));
-                            //             console.log("inside modelbody!");
-                            //         });
-                            //     });
-                            // });
 
                             return;
                         }
