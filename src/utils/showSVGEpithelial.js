@@ -5,6 +5,7 @@ var solutesBouncing = require("./solutesBouncing.js").solutesBouncing;
 var getTextWidth = require("../utils/misc.js").getTextWidth;
 var uniqueify = require("../utils/misc.js").uniqueify;
 var sendPostRequest = require("../libs/ajax-utils.js").sendPostRequest;
+var sendGetRequest = require("../libs/ajax-utils.js").sendGetRequest;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
@@ -5320,6 +5321,24 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }, true);
     }
 
+    // Load Ontology Lookup Service
+    var loadOLS = function () {
+        // http://purl.obolibrary.org/obo/PR_P48764
+        // http://purl.obolibrary.org/obo/PR_G3X939
+        // http://purl.obolibrary.org/obo/PR_P26432
+
+        var pr_uri = "http://purl.obolibrary.org/obo/PR_P48764";
+        var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pr_uri;
+
+        sendGetRequest(endpointOLS, showOLS, true);
+    };
+
+    var showOLS = function (jsonObj) {
+        console.log("OLS: ", jsonObj);
+        console.log("OLS Label: ", jsonObj._embedded.terms[0].label);
+        console.log("OLS Synonyms: ", jsonObj._embedded.terms[0].synonyms);
+    };
+
     // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
     var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
@@ -5333,49 +5352,104 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             endpoint,
             query,
             function (jsonAltProtein) {
+
+                // console.log("jsonAltProtein OUTSIDE: ", jsonAltProtein);
+                var flagvar = true;
+
                 if (jsonAltProtein.results.bindings.length != 0) {
                     if (jsonAltProtein.results.bindings[0].Protein.value == proteinName) {
-                        workspaceName = jsonAltProtein.results.bindings[0].workspaceName.value;
-                        var URI = jsonAltProtein.results.bindings[0].URI.value;
 
-                        var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeCellmlArray[idAltProtein];
-                        var label = document.createElement('label');
-                        label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '#Protein" type="checkbox" ' +
-                            'value="' + alternativeCellmlArray[idAltProtein] + '">' +
-                            '<a href="' + workspaceURI + '" target="_blank"> ' + URI + '</a></label>';
+                        // console.log("jsonAltProtein INSIDE: ", jsonAltProtein);
+                        flagvar = false;
 
-                        altCellmlModel += label.innerHTML;
+                        var callOLS = function () {
+
+                            // console.log("jsonAltProtein INSIDE callOLS: ", jsonAltProtein);
+
+                            workspaceName = jsonAltProtein.results.bindings[0].workspaceName.value;
+                            var URI = jsonAltProtein.results.bindings[0].URI.value;
+                            var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeCellmlArray[idAltProtein];
+
+                            var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + URI;
+
+                            sendGetRequest(
+                                endpointOLS,
+                                function (jsonOLSObj) {
+                                    var label = document.createElement('label');
+                                    label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '#Protein" type="checkbox" ' +
+                                        'value="' + alternativeCellmlArray[idAltProtein] + '">' +
+                                        '<a href="' + workspaceURI + '" target="_blank"> ' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
+
+                                    altCellmlModel += label.innerHTML;
+
+                                    flagvar = true;
+
+                                    // console.log("jsonAltProtein INSIDE sendGetRequest: ", jsonAltProtein);
+
+                                    idAltProtein++;
+
+                                    if (idAltProtein == alternativeCellmlArray.length) {
+
+                                        // If apical Then basolateral and vice versa
+                                        var membraneName;
+                                        if (membrane == apicalID) {
+                                            membrane = basolateralID;
+                                            membraneName = "Basolateral membrane";
+                                        }
+                                        else {
+                                            membrane = apicalID;
+                                            membraneName = "Apical membrane";
+                                        }
+
+                                        // TODO: make it dynamic
+                                        if (workspaceName == "") {
+                                            relatedMembrane(267, membrane, membraneName);
+                                            return;
+                                        }
+                                        else {
+                                            relatedMembrane(workspaceName, membrane, membraneName);
+                                            return;
+                                        }
+                                    }
+
+                                    alternativeCellmlModel(alternativeCellmlArray, membrane);
+                                },
+                                true);
+                        }
+
+                        callOLS();
                     }
                 }
 
-                idAltProtein++;
+                if (flagvar == true) {
+                    idAltProtein++;
 
-                if (idAltProtein == alternativeCellmlArray.length) {
+                    if (idAltProtein == alternativeCellmlArray.length) {
 
-                    // If apical Then basolateral and vice versa
-                    var membraneName;
-                    if (membrane == apicalID) {
-                        membrane = basolateralID;
-                        membraneName = "Basolateral membrane";
-                    }
-                    else {
-                        membrane = apicalID;
-                        membraneName = "Apical membrane";
+                        // If apical Then basolateral and vice versa
+                        var membraneName;
+                        if (membrane == apicalID) {
+                            membrane = basolateralID;
+                            membraneName = "Basolateral membrane";
+                        }
+                        else {
+                            membrane = apicalID;
+                            membraneName = "Apical membrane";
+                        }
+
+                        // TODO: make it dynamic
+                        if (workspaceName == "") {
+                            relatedMembrane(267, membrane, membraneName);
+                            return;
+                        }
+                        else {
+                            relatedMembrane(workspaceName, membrane, membraneName);
+                            return;
+                        }
                     }
 
-                    // TODO: make it dynamic
-                    if (workspaceName == "") {
-                        relatedMembrane(267, membrane, membraneName);
-                        return;
-                    }
-                    else {
-                        relatedMembrane(workspaceName, membrane, membraneName);
-                        return;
-                    }
+                    alternativeCellmlModel(alternativeCellmlArray, membrane);
                 }
-
-                alternativeCellmlModel(alternativeCellmlArray, membrane);
-
             }, true);
     }
 
@@ -5469,10 +5543,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             ]);
                         }
 
-                        console.log("membraneObject: ", membraneObject);
-                        console.log("idMembrane: ", idMembrane);
-                        console.log("membraneModel.length: ", membraneModel.length);
-                        console.log("membraneModeID: ", membraneModeID);
+                        // console.log("membraneObject: ", membraneObject);
+                        // console.log("idMembrane: ", idMembrane);
+                        // console.log("membraneModel.length: ", membraneModel.length);
+                        // console.log("membraneModeID: ", membraneModeID);
 
                         idMembrane++;
 
@@ -5508,6 +5582,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                             // Alternative model
                             var alternativeModel = "<p><b>Alternative model of " + proteinName + "</b>";
+                            console.log("Alternative model: ", altCellmlModel);
                             if (altCellmlModel == "") {
                                 alternativeModel += "<br>Not Exist";
                             }
