@@ -357,7 +357,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
      * relatedModelID - relatedModel which have #protein
      * */
     var relatedModel = [], relatedModelValue = [], relatedModelID = [], workspaceName = "";
-    var membraneModel = [], membraneModelValue = [], membraneModeID = [], membraneObject = [];
+    var membraneModel = [], membraneModelValue = [], membraneModelID = [], membraneObject = [];
     var proteinName, cellmlModel, biological_meaning, biological_meaning2, speciesName, geneName;
     var idProtein = 0, idAltProtein = 0, idMembrane = 0, counterbr = 0, loc, typeOfModel, altCellmlModel = "", cthis;
     var icircleGlobal, organIndex, source_name, source_name2;
@@ -5431,8 +5431,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         var indexOfHash = cellmlModel.search("#");
                         cellmlModel = cellmlModel.slice(0, indexOfHash);
 
-                        console.log("indexOfHash and cellmlModel: ", indexOfHash, cellmlModel);
-
                         if (circleID[1] != "") {
                             var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Species ?Gene ' +
                                 'WHERE { GRAPH ?g { ' +
@@ -5635,24 +5633,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }, true);
     }
 
-    // Load Ontology Lookup Service
-    var loadOLS = function () {
-        // http://purl.obolibrary.org/obo/PR_P48764
-        // http://purl.obolibrary.org/obo/PR_G3X939
-        // http://purl.obolibrary.org/obo/PR_P26432
-
-        var pr_uri = "http://purl.obolibrary.org/obo/PR_P48764";
-        var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pr_uri;
-
-        sendGetRequest(endpointOLS, showOLS, true);
-    };
-
-    var showOLS = function (jsonObj) {
-        console.log("OLS: ", jsonObj);
-        console.log("OLS Label: ", jsonObj._embedded.terms[0].label);
-        console.log("OLS Synonyms: ", jsonObj._embedded.terms[0].synonyms);
-    };
-
     // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
     var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
@@ -5667,13 +5647,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             query,
             function (jsonAltProtein) {
 
-                console.log("jsonAltProtein OUTSIDE: ", jsonAltProtein);
+                // console.log("jsonAltProtein OUTSIDE: ", jsonAltProtein);
                 var flagvar = true;
 
                 if (jsonAltProtein.results.bindings.length != 0) {
                     if (jsonAltProtein.results.bindings[0].Protein.value == proteinName) {
 
-                        console.log("jsonAltProtein INSIDE: ", jsonAltProtein);
+                        // console.log("jsonAltProtein INSIDE: ", jsonAltProtein);
                         flagvar = false;
 
                         var callOLS = function () {
@@ -5690,7 +5670,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 endpointOLS,
                                 function (jsonOLSObj) {
                                     var label = document.createElement('label');
-                                    label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '#Protein" type="checkbox" ' +
+                                    label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '" type="checkbox" ' +
                                         'value="' + alternativeCellmlArray[idAltProtein] + '">' +
                                         '<a href="' + workspaceURI + '" target="_blank"> ' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
 
@@ -5698,7 +5678,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                     flagvar = true;
 
-                                    console.log("jsonAltProtein INSIDE sendGetRequest: ", jsonAltProtein);
+                                    // console.log("jsonAltProtein INSIDE sendGetRequest: ", jsonAltProtein);
 
                                     idAltProtein++;
 
@@ -5815,6 +5795,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 console.log("jsonRelatedMembraneModel: ", jsonRelatedMembraneModel);
 
+                // TODO: membraneModel[idMembrane] has cellml model name without component and
+                // TODO: variable name which can not make an object similar to membrane in index.js.
+                // TODO: find out how to integrate this: membraneModel[idMembrane]#component.variable
                 var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                     'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
                     'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
@@ -5850,17 +5833,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 med_fma: jsonObjFlux.results.bindings[0].med_entity_uri.value,
                             });
 
-                            membraneModeID.push([
+                            membraneModelID.push([
                                 jsonObjFlux.results.bindings[0].source_fma.value,
                                 jsonObjFlux.results.bindings[0].sink_fma.value,
                                 jsonObjFlux.results.bindings[0].med_entity_uri.value
                             ]);
                         }
 
-                        // console.log("membraneObject: ", membraneObject);
-                        // console.log("idMembrane: ", idMembrane);
-                        // console.log("membraneModel.length: ", membraneModel.length);
-                        // console.log("membraneModeID: ", membraneModeID);
+                        console.log("membraneObject: ", membraneObject);
+                        console.log("idMembrane: ", idMembrane);
+                        console.log("membraneModel.length: ", membraneModel.length);
+                        console.log("membraneModelID: ", membraneModelID);
 
                         idMembrane++;
 
@@ -5887,7 +5870,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             else {
                                 for (var i = 0; i < membraneModelValue.length; i++) {
                                     var label = document.createElement('label');
-                                    label.innerHTML = '<br><input id="' + membraneModeID[i] + '#Protein" type="checkbox" ' +
+                                    label.innerHTML = '<br><input id="' + membraneModelID[i] + '" type="checkbox" ' +
                                         'value="' + membraneModelValue[i] + '"> ' + membraneModelValue[i] + '</label>';
 
                                     membraneTransporter += label.innerHTML;
@@ -5896,7 +5879,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                             // Alternative model
                             var alternativeModel = "<p><b>Alternative model of " + proteinName + "</b>";
-                            console.log("Alternative model: ", altCellmlModel);
+                            // console.log("Alternative model: ", altCellmlModel);
                             if (altCellmlModel == "") {
                                 alternativeModel += "<br>Not Exist";
                             }
@@ -5906,7 +5889,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                             // related organ models (kidney, lungs, etc) in PMR
                             var relatedOrganModels = "<p><b>" + typeOfModel + " model in PMR</b>";
-                            console.log("related kidney model: ", relatedModelValue, relatedOrganModels);
+                            // console.log("related kidney model: ", relatedModelValue, relatedOrganModels);
                             if (relatedModelValue.length == 1) { // includes own protein name
                                 relatedOrganModels += "<br>Not Exist";
                             }
@@ -5948,8 +5931,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         }
 
                         relatedMembraneModel(workspaceName, membraneName);
-                    },
-                    true);
+
+                    }, true);
             }, true);
     }
 
