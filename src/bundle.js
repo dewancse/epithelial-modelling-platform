@@ -5411,7 +5411,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 else tempYvalue = yvalue;
 
                 if ((cx >= lineb_x && cx <= lineb_x + 5) &&
-                    (cy >= tempYvalue && cy <= tempYvalue + 5) && (lineb_id != circle_id)) {
+                    (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
                     document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "yellow");
                 }
             }
@@ -5461,9 +5461,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 else tempYvalue = yvalue;
 
                 if ((cx >= lineb_x && cx <= lineb_x + 5) &&
-                    (cy >= tempYvalue && cy <= tempYvalue + 5) && (lineb_id != circle_id)) {
+                    (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
 
-                    document.getElementsByTagName("line")[1].style.setProperty("stroke", "orange");
+                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "yellow");
 
                     if (counterbr == 0) {
 
@@ -6180,6 +6180,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 }
 
                 membraneColorBack();
+
+                var index = d3.select(cthis)._groups[0][0].attributes[1].value;
+                var stylefill = d3.select(cthis)._groups[0][0].attributes[6].value;
+
+                if (stylefill == "lightgreen")
+                    circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "orange");
+                else
+                    circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "lightgreen");
             }
         };
 
