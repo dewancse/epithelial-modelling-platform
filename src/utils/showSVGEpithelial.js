@@ -6,6 +6,8 @@ var getTextWidth = require("../utils/misc.js").getTextWidth;
 var uniqueify = require("../utils/misc.js").uniqueify;
 var sendPostRequest = require("../libs/ajax-utils.js").sendPostRequest;
 var sendGetRequest = require("../libs/ajax-utils.js").sendGetRequest;
+var insertHtml = require("../utils/misc.js").insertHtml;
+var showLoading = require("../utils/misc.js").showLoading;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
@@ -143,7 +145,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             "value": "Lung"
         }
     ];
-
+    
     // Extract apical fluxes
     for (var i = 0; i < apicalMembrane.length; i++) {
         tempapical.push({
@@ -5209,6 +5211,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 m.getBody().html('<div id="modalBody"></div>');
                                 m.show();
 
+                                showLoading("#modalBody");
+
                                 var circleID = cthis.getAttribute("id").split(",");
                                 console.log("circleID: ", circleID);
 
@@ -5678,7 +5682,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         if (idMembrane == membraneModel.length) {
                             idMembrane = 0;
 
-                            var msg = "<p><b>Would you like to move?</b><\p>";
                             var msg2 = "<p><b>" + proteinName + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
                                 "<b>" + loc + "</b><\p>";
 
@@ -5738,8 +5741,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 }
                             }
 
+                            $('#modalBody').empty();
+
                             $('#modalBody')
-                                .append(msg)
                                 .append(msg2)
                                 .append(model)
                                 .append(biological)
@@ -5900,38 +5904,44 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("cthis: ", cthis);
 
                 // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[12] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
 
-                        console.log("Basolateral or apical model clicked!!");
+                            console.log("Basolateral or apical model clicked!!");
 
-                        console.log("checked: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
-                        console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
-                        cthis.id = win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id;
-                        console.log("cthis AFTER: ", cthis);
-                        console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                            console.log("checked: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                            cthis.id = win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id;
+                            console.log("cthis AFTER: ", cthis);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                        }
                     }
                 }
 
                 // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[13].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[13] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[13].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked) {
 
-                        console.log("Alternative model clicked!!");
+                            console.log("Alternative model clicked!!");
 
-                        console.log("checked: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
-                        console.log("id: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
+                            console.log("checked: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
+                            console.log("id: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
+                        }
                     }
                 }
 
                 // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[14].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[14] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[14].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
 
-                        console.log("Related cellml model clicked!!");
+                            console.log("Related cellml model clicked!!");
 
-                        console.log("checked: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
-                        console.log("id: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
+                            console.log("checked: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
+                            console.log("id: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
+                        }
                     }
                 }
 

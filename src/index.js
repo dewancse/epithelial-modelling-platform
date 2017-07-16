@@ -12,6 +12,10 @@ var iteration = require("./utils/misc.js").iteration;
 var showView = require("./utils/showView.js").showView;
 var showSVGModelHtml = require("./utils/showSVGModel.js").showSVGModelHtml;
 var showsvgEpithelial = require("./utils/showSVGEpithelial.js").showsvgEpithelial;
+var insertHtml = require("./utils/misc.js").insertHtml;
+var showLoading = require("./utils/misc.js").showLoading;
+var activeMenu = require("./utils/misc.js").activeMenu;
+var switchMenuToActive = require("./utils/misc.js").switchMenuToActive;
 
 var sendGetRequest = require("./libs/ajax-utils.js").sendGetRequest;
 var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
@@ -54,43 +58,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         id = 0;
 
     var str = [];
-
-    // Convenience function for inserting innerHTML for 'select'
-    var insertHtml = function (selector, html) {
-        var targetElem = document.querySelector(selector);
-        targetElem.innerHTML = html;
-    };
-
-    // Show loading icon inside element identified by 'selector'.
-    var showLoading = function (selector) {
-        var html = "<div class='text-center'>";
-        html += "<img src='img/ajax-loader.gif'></div>";
-        insertHtml(selector, html);
-    };
-
-    // Find the current active menu button
-    var activeMenu = function () {
-        var classes = document.querySelector("#ulistItems");
-        for (var i = 0; i < classes.getElementsByTagName("li").length; i++) {
-            if (classes.getElementsByTagName("li")[i].className === "active")
-                return classes.getElementsByTagName("li")[i].id;
-        }
-    };
-
-    // Remove the class 'active' from source to target button
-    var switchMenuToActive = function (source, target) {
-        // Remove 'active' from source button
-        var classes = document.querySelector(source).className;
-        classes = classes.replace(new RegExp("active", "g"), "");
-        document.querySelector(source).className = classes;
-
-        // Add 'active' to target button if not already there
-        classes = document.querySelector(target).className;
-        if (classes.indexOf("active") === -1) {
-            classes += "active";
-            document.querySelector(target).className = classes;
-        }
-    };
 
     mainUtils.loadHomeHtml = function () {
         // Switch from current active button to home button
@@ -1286,5 +1253,4 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     // Expose utility to the global object
     global.$mainUtils = mainUtils;
-})
-(window);
+})(window);

@@ -73,6 +73,42 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
+// Convenience function for inserting innerHTML for 'select'
+var insertHtml = function (selector, html) {
+    var targetElem = document.querySelector(selector);
+    targetElem.innerHTML = html;
+};
+
+// Show loading icon inside element identified by 'selector'.
+var showLoading = function (selector) {
+    var html = "<div class='text-center'>";
+    html += "<img src='../src/img/ajax-loader.gif'></div>";
+    insertHtml(selector, html);
+};
+
+// Find the current active menu button
+var activeMenu = function () {
+    var classes = document.querySelector("#ulistItems");
+    for (var i = 0; i < classes.getElementsByTagName("li").length; i++) {
+        if (classes.getElementsByTagName("li")[i].className === "active")
+            return classes.getElementsByTagName("li")[i].id;
+    }
+};
+
+// Remove the class 'active' from source to target button
+var switchMenuToActive = function (source, target) {
+    // Remove 'active' from source button
+    var classes = document.querySelector(source).className;
+    classes = classes.replace(new RegExp("active", "g"), "");
+    document.querySelector(source).className = classes;
+
+    // Add 'active' to target button if not already there
+    classes = document.querySelector(target).className;
+    if (classes.indexOf("active") === -1) {
+        classes += "active";
+        document.querySelector(target).className = classes;
+    }
+};
 
 // remove duplicate model entity and biological meaning
 var uniqueify = function (es) {
@@ -238,6 +274,10 @@ exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
 exports.iteration = iteration;
 exports.compare = compare;
+exports.insertHtml = insertHtml;
+exports.showLoading = showLoading;
+exports.activeMenu = activeMenu;
+exports.switchMenuToActive = switchMenuToActive;
 
 /***/ }),
 /* 1 */
@@ -320,6 +360,8 @@ var getTextWidth = __webpack_require__(0).getTextWidth;
 var uniqueify = __webpack_require__(0).uniqueify;
 var sendPostRequest = __webpack_require__(1).sendPostRequest;
 var sendGetRequest = __webpack_require__(1).sendGetRequest;
+var insertHtml = __webpack_require__(0).insertHtml;
+var showLoading = __webpack_require__(0).showLoading;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
@@ -457,7 +499,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             "value": "Lung"
         }
     ];
-
+    
     // Extract apical fluxes
     for (var i = 0; i < apicalMembrane.length; i++) {
         tempapical.push({
@@ -5523,6 +5565,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 m.getBody().html('<div id="modalBody"></div>');
                                 m.show();
 
+                                showLoading("#modalBody");
+
                                 var circleID = cthis.getAttribute("id").split(",");
                                 console.log("circleID: ", circleID);
 
@@ -5992,7 +6036,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         if (idMembrane == membraneModel.length) {
                             idMembrane = 0;
 
-                            var msg = "<p><b>Would you like to move?</b><\p>";
                             var msg2 = "<p><b>" + proteinName + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
                                 "<b>" + loc + "</b><\p>";
 
@@ -6052,8 +6095,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 }
                             }
 
+                            $('#modalBody').empty();
+
                             $('#modalBody')
-                                .append(msg)
                                 .append(msg2)
                                 .append(model)
                                 .append(biological)
@@ -6214,38 +6258,44 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("cthis: ", cthis);
 
                 // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[12] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
 
-                        console.log("Basolateral or apical model clicked!!");
+                            console.log("Basolateral or apical model clicked!!");
 
-                        console.log("checked: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
-                        console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
-                        cthis.id = win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id;
-                        console.log("cthis AFTER: ", cthis);
-                        console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                            console.log("checked: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                            cthis.id = win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id;
+                            console.log("cthis AFTER: ", cthis);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                        }
                     }
                 }
 
                 // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[13].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[13] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[13].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked) {
 
-                        console.log("Alternative model clicked!!");
+                            console.log("Alternative model clicked!!");
 
-                        console.log("checked: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
-                        console.log("id: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
+                            console.log("checked: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
+                            console.log("id: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
+                        }
                     }
                 }
 
                 // checkbox!!
-                for (var i = 0; i < win[0].children[1].children[0].children[14].getElementsByTagName("input").length; i++) {
-                    if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[14] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[14].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
 
-                        console.log("Related cellml model clicked!!");
+                            console.log("Related cellml model clicked!!");
 
-                        console.log("checked: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
-                        console.log("id: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
+                            console.log("checked: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
+                            console.log("id: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
+                        }
                     }
                 }
 
@@ -6704,6 +6754,10 @@ var iteration = __webpack_require__(0).iteration;
 var showView = __webpack_require__(4).showView;
 var showSVGModelHtml = __webpack_require__(3).showSVGModelHtml;
 var showsvgEpithelial = __webpack_require__(2).showsvgEpithelial;
+var insertHtml = __webpack_require__(0).insertHtml;
+var showLoading = __webpack_require__(0).showLoading;
+var activeMenu = __webpack_require__(0).activeMenu;
+var switchMenuToActive = __webpack_require__(0).switchMenuToActive;
 
 var sendGetRequest = __webpack_require__(1).sendGetRequest;
 var sendPostRequest = __webpack_require__(1).sendPostRequest;
@@ -6746,43 +6800,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         id = 0;
 
     var str = [];
-
-    // Convenience function for inserting innerHTML for 'select'
-    var insertHtml = function (selector, html) {
-        var targetElem = document.querySelector(selector);
-        targetElem.innerHTML = html;
-    };
-
-    // Show loading icon inside element identified by 'selector'.
-    var showLoading = function (selector) {
-        var html = "<div class='text-center'>";
-        html += "<img src='img/ajax-loader.gif'></div>";
-        insertHtml(selector, html);
-    };
-
-    // Find the current active menu button
-    var activeMenu = function () {
-        var classes = document.querySelector("#ulistItems");
-        for (var i = 0; i < classes.getElementsByTagName("li").length; i++) {
-            if (classes.getElementsByTagName("li")[i].className === "active")
-                return classes.getElementsByTagName("li")[i].id;
-        }
-    };
-
-    // Remove the class 'active' from source to target button
-    var switchMenuToActive = function (source, target) {
-        // Remove 'active' from source button
-        var classes = document.querySelector(source).className;
-        classes = classes.replace(new RegExp("active", "g"), "");
-        document.querySelector(source).className = classes;
-
-        // Add 'active' to target button if not already there
-        classes = document.querySelector(target).className;
-        if (classes.indexOf("active") === -1) {
-            classes += "active";
-            document.querySelector(target).className = classes;
-        }
-    };
 
     mainUtils.loadHomeHtml = function () {
         // Switch from current active button to home button
