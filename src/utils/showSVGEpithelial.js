@@ -481,7 +481,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     source_text2: "Gap Junction",
                     source_fma2: "Gap Junction",
                     sink_text2: "Gap Junction",
-                    sink_fma2: "Gap Junction"
+                    sink_fma2: "Gap Junction",
+                    source_name: membrane[i].source_name,
+                    sink_name: membrane[i].sink_name,
+                    med_text: membrane[i].med_text,
+                    med_fma: membrane[i].med_fma,
+                    med_pr: membrane[i].med_pr
                 });
 
             membrane[i].source_text2 = "Gap Junction";
@@ -500,7 +505,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     source_text2: "IP3 flux",
                     source_fma2: "IP3 flux",
                     sink_text2: "IP3 flux",
-                    sink_fma2: "IP3 flux"
+                    sink_fma2: "IP3 flux",
+                    source_name: membrane[i].source_name,
+                    sink_name: membrane[i].sink_name,
+                    med_text: membrane[i].med_text,
+                    med_fma: membrane[i].med_fma,
+                    med_pr: membrane[i].med_pr
                 });
 
             membrane[i].source_text2 = "IP3 flux";
@@ -519,7 +529,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     source_text2: "leak",
                     source_fma2: "leak",
                     sink_text2: "leak",
-                    sink_fma2: "leak"
+                    sink_fma2: "leak",
+                    source_name: membrane[i].source_name,
+                    sink_name: membrane[i].sink_name,
+                    med_text: membrane[i].med_text,
+                    med_fma: membrane[i].med_fma,
+                    med_pr: membrane[i].med_pr
                 });
 
             membrane[i].source_text2 = "leak";
@@ -538,7 +553,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     source_text2: "IP3 flux",
                     source_fma2: "IP3 flux",
                     sink_text2: "IP3 flux",
-                    sink_fma2: "IP3 flux"
+                    sink_fma2: "IP3 flux",
+                    source_name: membrane[i].source_name,
+                    sink_name: membrane[i].sink_name,
+                    med_text: membrane[i].med_text,
+                    med_fma: membrane[i].med_fma,
+                    med_pr: membrane[i].med_pr
                 });
 
             membrane[i].source_text2 = "IP3 flux";
@@ -557,7 +577,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     source_text2: "leak",
                     source_fma2: "leak",
                     sink_text2: "leak",
-                    sink_fma2: "leak"
+                    sink_fma2: "leak",
+                    source_name: membrane[i].source_name,
+                    sink_name: membrane[i].sink_name,
+                    med_text: membrane[i].med_text,
+                    med_fma: membrane[i].med_fma,
+                    med_pr: membrane[i].med_pr
                 });
 
             membrane[i].source_text2 = "leak";
@@ -579,7 +604,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     source_text2: "single flux",
                     source_fma2: "single flux",
                     sink_text2: "single flux",
-                    sink_fma2: "single flux"
+                    sink_fma2: "single flux",
+                    source_name: membrane[i].source_name,
+                    sink_name: membrane[i].sink_name,
+                    med_text: membrane[i].med_text,
+                    med_fma: membrane[i].med_fma,
+                    med_pr: membrane[i].med_pr
                 });
 
             membrane[i].source_text2 = "single flux";
@@ -598,7 +628,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     source_text2: "single flux",
                     source_fma2: "single flux",
                     sink_text2: "single flux",
-                    sink_fma2: "single flux"
+                    sink_fma2: "single flux",
+                    source_name: membrane[i].source_name,
+                    sink_name: membrane[i].sink_name,
+                    med_text: membrane[i].med_text,
+                    med_fma: membrane[i].med_fma,
+                    med_pr: membrane[i].med_pr
                 });
 
             membrane[i].source_text2 = "single flux";
@@ -1071,13 +1106,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     // SVG checkbox with drag on-off
     var checkboxsvg = newg.append("g");
 
-    var checkBox = [], checkBoxwser = [], checkBoxwrer = [],
-        checkedchk = [], ydistancechk = 50, yinitialchk = 185,
-        ytextinitialchk = 200, markerWidth = 4, markerHeight = 4;
-
-    for (var i = 0; i < wallOfRoughERMembrane.length; i++) {
-        checkBoxwrer[i] = new d3CheckBox();
-    }
+    var checkBox = [], checkedchk = [],
+        ydistancechk = 50, yinitialchk = 185, ytextinitialchk = 200,
+        markerWidth = 4, markerHeight = 4;
 
     for (var i = 0; i < combinedMembrane.length; i++) {
         checkBox[i] = new d3CheckBox();

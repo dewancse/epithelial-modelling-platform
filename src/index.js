@@ -1123,6 +1123,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
+                    console.log("jsonObjFlux: ", jsonObjFlux);
+
                     for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
 
                         if (jsonObjFlux.results.bindings[i].source_fma == undefined)

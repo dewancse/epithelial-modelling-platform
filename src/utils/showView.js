@@ -13,7 +13,7 @@ var showView = function (jsonObj, viewHtmlContent) {
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
         var divHead = document.createElement("div");
-        divHead.className = "h2";
+        divHead.className = "h3";
 
         var divText = document.createElement("div");
         divText.className = "p";
