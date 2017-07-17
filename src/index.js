@@ -411,6 +411,11 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             query,
             function (jsonModel) {
 
+                if (jsonModel.results.bindings.length == 0) {
+                    mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
+                    return;
+                }
+
                 var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
                 var query = 'SELECT ?Species ' + 'WHERE ' +
                     '{ ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
@@ -1040,7 +1045,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                 source_text2: membrane2.source_text,
                                 source_fma2: membrane2.source_fma,
                                 sink_text2: membrane2.sink_text,
-                                sink_fma2: membrane2.sink_fma,
+                                sink_fma2: membrane2.sink_fma
                             });
                     }
 
