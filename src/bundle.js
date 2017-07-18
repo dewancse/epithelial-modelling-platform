@@ -1440,21 +1440,29 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var ypvalue = yprect + 25;
     var ypdistance = 35;
 
-    var lineLen = 50, radius = 20, radiuswser = 15,
-        polygonlineLen = 60, lineLenwser = 40, pcellLen = 100,
+    var radius = 20, radiuswser = 15,
+        lineLen = 50, polygonlineLen = 60, lineLenwser = 40, pcellLen = 100,
+
         xvalue = xrect - lineLen / 2, // x coordinate before epithelial rectangle
         yvalue = yrect + 10 + 50, // initial distance 50
+        cxvalue = xrect, cyvalue = yrect + 10 + 50, // initial distance 50
+        ydistance = 70,
+
         yvalueb = yrect + 10 + 50, // initial distance 50
+        ydistanceb = 70, cyvalueb = yrect + 10 + 50, // initial distance 50
+
         xvaluewser = xER + 10 + 20, yvaluewser = yER - lineLen / 2,
         xvaluewrer = xER - lineLenwser / 2, yvaluewrer = yER + 10 + 20,
-        ydistance = 70, ydistanceb = 70, xdistancewser = 40, ydistancewrer = 40,
-        polygon = [], circlewithlineg = [], linewithlineg = [],
-        linewithlineg2 = [], linewithtextg = [], linewithtextg2 = [], circlewithlinegIP3 = [],
+
+        circlewithlineg = [], linewithlineg = [], linewithlineg2 = [],
+        linewithtextg = [], linewithtextg2 = [], circlewithlinegIP3 = [], polygon = [],
+
         xvaluectoc = x + 10 + 20, yvaluectoc = y - lineLen / 2,
-        cxvaluectoc = x + 10 + 30, xdistancectoc = 40, cxvalue = xrect, cxvaluewser = xER + 10 + 20,
-        cyvaluewser = yER, cxvaluewrer = xER, cyvaluewrer = yER + 10 + 20,
-        cyvalue = yrect + 10 + 50, // initial distance 50
-        cyvalueb = yrect + 10 + 50; // initial distance 50
+        cxvaluectoc = x + 10 + 30, xdistancectoc = 40,
+
+        cxvaluewser = xER + 10 + 20, cyvaluewser = yER, xdistancewser = 40,
+        cxvaluewrer = xER, cyvaluewrer = yER + 10 + 20, ydistancewrer = 40;
+
 
     // TODO: does not work for bi-directional arrow, Fix this
     // SVG checkbox with drag on-off
@@ -7777,6 +7785,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                         head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
+                                        console.log("jsonModel: ", jsonModel, head, modelEntity, biologicalMeaning, speciesList, id);
                                         mainUtils.showDiscoverModels(
                                             head,
                                             modelEntity,
@@ -8585,8 +8594,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
     // Expose utility to the global object
     global.$mainUtils = mainUtils;
-})
-(window);
+
+})(window);
 
 /***/ }),
 /* 6 */

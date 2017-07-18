@@ -516,6 +516,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                         head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
+                                        console.log("jsonModel: ", jsonModel, head, modelEntity, biologicalMeaning, speciesList, id);
                                         mainUtils.showDiscoverModels(
                                             head,
                                             modelEntity,
@@ -1324,5 +1325,5 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     // Expose utility to the global object
     global.$mainUtils = mainUtils;
-})
-(window);
+
+})(window);
