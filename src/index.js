@@ -76,9 +76,33 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     };
 
     // On page load (before img or CSS)
-    document.addEventListener("DOMContentLoaded", function (event) {
+    document.addEventListener("DOMContentLoaded: ", function (event) {
         // Place some startup code here
     });
+
+    var isExist = function (element) {
+        console.log("element: ", element);
+        // remove duplicate components with same variable
+        var indexOfHash = element.search("#"),
+            cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
+            componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
+            indexOfDot = componentVariableName.indexOf('.'),
+            variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
+
+        for (var i = 0; i < templistOfModel.length; i++) {
+            var indexOfHash2 = templistOfModel[i].search("#"),
+                cellmlModelName2 = templistOfModel[i].slice(0, indexOfHash2), // weinstein_1995.cellml
+                componentVariableName2 = templistOfModel[i].slice(indexOfHash2 + 1), // NHE3.J_NHE3_Na
+                indexOfDot2 = componentVariableName2.indexOf('.'),
+                variableName2 = componentVariableName2.slice(indexOfDot2 + 1); // J_NHE3_Na
+
+            if (cellmlModelName == cellmlModelName2 && variableName == variableName2) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     // Event handling for SEARCH, MODEL
     var actions = {
@@ -101,6 +125,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     mainUtils.workspaceName = "";
                 }
             }
+
+
         },
 
         model: function (event) {
@@ -111,11 +137,14 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             if (event.srcElement.className == "attribute") {
 
                 if (event.srcElement.checked) {
-                    templistOfModel.push(event.srcElement.value);
 
-                    // for making visualization graph
-                    modelEntityNameArray.push(event.srcElement.value);
-                    modelEntityFullNameArray.push(event.srcElement.value);
+                    if (!isExist(event.srcElement.value)) {
+                        templistOfModel.push(event.srcElement.value);
+
+                        // for making visualization graph
+                        modelEntityNameArray.push(event.srcElement.value);
+                        modelEntityFullNameArray.push(event.srcElement.value);
+                    }
                 }
                 else {
                     var pos = templistOfModel.indexOf(event.srcElement.value);
@@ -142,11 +171,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     for (var i = 0; i < $('.attribute').length; i++) {
                         $('.attribute')[i].checked = true;
 
-                        templistOfModel.push($('.attribute')[i].value);
+                        if (!isExist($('.attribute')[i].value)) {
+                            templistOfModel.push($('.attribute')[i].value);
 
-                        // for making visualization graph
-                        modelEntityNameArray.push($('.attribute')[i].value);
-                        modelEntityFullNameArray.push($('.attribute')[i].value);
+                            // for making visualization graph
+                            modelEntityNameArray.push($('.attribute')[i].value);
+                            modelEntityFullNameArray.push($('.attribute')[i].value);
+                        }
                     }
                 }
                 else {
@@ -163,6 +194,21 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     }
                 }
             }
+
+            // remove duplicate in templistOfModel
+            templistOfModel = templistOfModel.filter(function (item, pos) {
+                return templistOfModel.indexOf(item) == pos;
+            })
+
+            // remove duplicate in modelEntityNameArray
+            modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
+                return modelEntityNameArray.indexOf(item) == pos;
+            })
+
+            // remove duplicate in modelEntityFullNameArray
+            modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
+                return modelEntityFullNameArray.indexOf(item) == pos;
+            })
         }
     };
 
@@ -579,6 +625,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         // SET main content in the local storage
         var maincontent = document.getElementById('main-content');
         sessionStorage.setItem('searchListContent', $(maincontent).html());
+
+        // Reinitialize so that last workspace does not appear in the Load Models
+        // page when clicked from Model Discovery and Epithelial Model Platform page
+        // mainUtils.workspaceName = "";
     }
 
     // Load the view
@@ -614,6 +664,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     false);
             },
             true);
+
+        // Reinitialize so that last workspace does not appear in the Load Models
+        // page when clicked from Model Discovery and Epithelial Model Platform page
+        // mainUtils.workspaceName = "";
     };
 
     // Load the model
@@ -641,6 +695,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 sendPostRequest(endpoint, query, mainUtils.showModel, true);
             },
             false);
+
 
         // Switch from current active button to models button
         var activeItem = "#" + activeMenu();
@@ -752,6 +807,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 $('table tr td label')[i].firstChild.checked = false;
             }
         }
+
+        // Reinitialize so that last workspace does not appear in the Load Models
+        // page when clicked from Model Discovery and Epithelial Model Platform page
+        // mainUtils.workspaceName = "";
     };
 
     // Toggle table column in Model discovery
@@ -861,7 +920,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
         // Model_entity with same name will be removed
         // regardless of the current instance of checkboxes
-        templistOfModel.forEach(function (element) {
+        templistOfModel.forEach(function (element, tempIndex) {
             for (var i = 0; i < $('table tr').length; i++) {
 
                 if ($('table tr')[i].id == element) {
@@ -874,6 +933,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                             model2DArray.splice(index, 1);
                         }
                     })
+
+                    // Remove from modelEntityNameArray
+                    modelEntityNameArray.splice(tempIndex, 1);
+
+                    // Remove from modelEntityFullNameArray
+                    modelEntityFullNameArray.splice(tempIndex, 1);
                 }
             }
         });
@@ -913,16 +978,15 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     mainUtils.loadEpithelial = function (epithelialHtmlContent) {
 
+        // Reinitialize so that last workspace does not appear in the Load Models
+        // page when clicked from Model Discovery and Epithelial Model Platform page
+        // mainUtils.workspaceName = "";
+
         // remove model name, keep only solutes
         for (var i = 0; i < modelEntityNameArray.length; i++) {
             var indexOfHash = modelEntityNameArray[i].search("#");
             modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
         }
-
-        // remove duplicate
-        modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
-            return modelEntityNameArray.indexOf(item) == pos;
-        })
 
         console.log("loadEpithelial in model2DArr: ", model2DArray);
         console.log("loadEpithelial in modelEntityNameArray: ", modelEntityNameArray);
@@ -1260,4 +1324,5 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     // Expose utility to the global object
     global.$mainUtils = mainUtils;
-})(window);
+})
+(window);
