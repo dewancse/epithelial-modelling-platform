@@ -7350,7 +7350,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     });
 
     var isExist = function (element) {
-        console.log("element: ", element);
+        // console.log("element: ", element);
         // remove duplicate components with same variable
         var indexOfHash = element.search("#"),
             cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
@@ -8298,7 +8298,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 query,
                 function (jsonObj) {
 
-                    console.log("jsonObj: ", jsonObj);
+                    // console.log("jsonObj: ", jsonObj);
 
                     var tempProtein = [], tempApical = [], tempBasolateral = [];
 
@@ -8467,7 +8467,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
-                    console.log("jsonObjFlux: ", jsonObjFlux);
+                    // console.log("jsonObjFlux: ", jsonObjFlux);
 
                     for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
 
@@ -8551,46 +8551,96 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                             index++;
 
                             if (source_fma.length != 0) {
+                                if (source_fma.length == 1) {
+                                    var srctext = parserFmaNameText(source_fma[0]);
+                                    var snktext = parserFmaNameText(sink_fma[0]);
+                                    var medfmatext = parserFmaNameText(med_fma[0]);
 
-                                var srctext = parserFmaNameText(source_fma[0]);
-                                var snktext = parserFmaNameText(sink_fma[0]);
-                                var medfmatext = parserFmaNameText(med_fma[0]);
+                                    if (med_pr[0] == undefined) { // temp solution
+                                        membrane.push({
+                                            source_text: srctext,
+                                            source_fma: source_fma[0].fma,
+                                            source_name: source_fma[0].name,
+                                            sink_text: snktext,
+                                            sink_fma: sink_fma[0].fma,
+                                            sink_name: sink_fma[0].name,
+                                            med_text: medfmatext,
+                                            med_fma: med_fma[0].fma,
+                                            med_pr: undefined
+                                        });
+                                    }
+                                    else {
+                                        membrane.push({
+                                            source_text: srctext,
+                                            source_fma: source_fma[0].fma,
+                                            source_name: source_fma[0].name,
+                                            sink_text: snktext,
+                                            sink_fma: sink_fma[0].fma,
+                                            sink_name: sink_fma[0].name,
+                                            med_text: medfmatext,
+                                            med_fma: med_fma[0].fma,
+                                            med_pr: med_pr[0].fma
+                                        });
+                                    }
 
-                                if (med_pr[0] == undefined) { // temp solution
-                                    membrane.push({
-                                        source_text: srctext,
-                                        source_fma: source_fma[0].fma,
-                                        source_name: source_fma[0].name,
-                                        sink_text: snktext,
-                                        sink_fma: sink_fma[0].fma,
-                                        sink_name: sink_fma[0].name,
-                                        med_text: medfmatext,
-                                        med_fma: med_fma[0].fma,
-                                        med_pr: undefined
-                                    });
+                                    source_fma2.push(source_fma[0]);
+                                    sink_fma2.push(sink_fma[0]);
+                                } else {
+                                    // Swap if source and sink faces same direction
+                                    if (source_fma[0].fma == sink_fma[0].fma) {
+                                        var tempFMA = sink_fma[0].fma,
+                                            tempName = sink_fma[0].name;
+
+                                        sink_fma[0].fma = sink_fma[1].fma;
+                                        sink_fma[0].name = sink_fma[1].name;
+                                        sink_fma[1].fma = tempFMA;
+                                        sink_fma[1].name = tempName;
+                                    }
+
+                                    for (var i = 0; i < source_fma.length; i++) {
+                                        var srctext = parserFmaNameText(source_fma[i]);
+                                        var snktext = parserFmaNameText(sink_fma[i]);
+
+                                        if (med_fma[i] != undefined)
+                                            var medfmatext = parserFmaNameText(med_fma[i]);
+
+                                        if (med_pr[i] == undefined) { // temp solution
+                                            membrane.push({
+                                                source_text: srctext,
+                                                source_fma: source_fma[i].fma,
+                                                source_name: source_fma[i].name,
+                                                sink_text: snktext,
+                                                sink_fma: sink_fma[i].fma,
+                                                sink_name: sink_fma[i].name,
+                                                med_text: medfmatext,
+                                                med_fma: undefined, // med_fma[i].fma,
+                                                med_pr: undefined
+                                            });
+                                        }
+                                        else {
+                                            membrane.push({
+                                                source_text: srctext,
+                                                source_fma: source_fma[i].fma,
+                                                source_name: source_fma[i].name,
+                                                sink_text: snktext,
+                                                sink_fma: sink_fma[i].fma,
+                                                sink_name: sink_fma[i].name,
+                                                med_text: medfmatext,
+                                                med_fma: med_fma[i].fma,
+                                                med_pr: med_pr[i].fma
+                                            });
+                                        }
+
+                                        source_fma2.push(source_fma[i]);
+                                        sink_fma2.push(sink_fma[i]);
+                                    }
                                 }
-                                else {
-                                    membrane.push({
-                                        source_text: srctext,
-                                        source_fma: source_fma[0].fma,
-                                        source_name: source_fma[0].name,
-                                        sink_text: snktext,
-                                        sink_fma: sink_fma[0].fma,
-                                        sink_name: sink_fma[0].name,
-                                        med_text: medfmatext,
-                                        med_fma: med_fma[0].fma,
-                                        med_pr: med_pr[0].fma
-                                    });
-                                }
-
-                                source_fma2.push(source_fma[0]);
-                                sink_fma2.push(sink_fma[0]);
-
-                                source_fma = [];
-                                sink_fma = [];
-                                med_fma = [];
-                                med_pr = [];
                             }
+
+                            source_fma = [];
+                            sink_fma = [];
+                            med_fma = [];
+                            med_pr = [];
 
                             mainUtils.srcDescMediatorOfFluxes(); // callback
                         },
