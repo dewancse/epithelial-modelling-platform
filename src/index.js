@@ -516,7 +516,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                         head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
-                                        console.log("jsonModel: ", jsonModel, head, modelEntity, biologicalMeaning, speciesList, id);
                                         mainUtils.showDiscoverModels(
                                             head,
                                             modelEntity,
@@ -1029,6 +1028,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 endpoint,
                 query,
                 function (jsonObj) {
+
+                    console.log("jsonObj: ", jsonObj);
+
                     var tempProtein = [], tempApical = [], tempBasolateral = [];
 
                     for (var m = 0; m < jsonObj.results.bindings.length; m++) {
@@ -1064,54 +1066,62 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         return tempBasolateral.indexOf(item) == pos;
                     })
 
-                    // cotransporter in apical membrane
-                    if (tempProtein.length != 0 && tempApical.length != 0) {
-                        apicalMembrane.push(
-                            {
-                                source_name: membrane1.source_name,
-                                sink_name: membrane1.sink_name,
-                                med_text: membrane1.med_text,
-                                med_fma: membrane1.med_fma,
-                                med_pr: membrane1.med_pr,
-                                source_text: membrane1.source_text,
-                                source_fma: membrane1.source_fma,
-                                sink_text: membrane1.sink_text,
-                                sink_fma: membrane1.sink_fma,
-                                source_name2: membrane2.source_name,
-                                sink_name2: membrane2.sink_name,
-                                med_text2: membrane2.med_text,
-                                med_fma2: membrane2.med_fma,
-                                med_pr2: membrane2.med_pr,
-                                source_text2: membrane2.source_text,
-                                source_fma2: membrane2.source_fma,
-                                sink_text2: membrane2.sink_text,
-                                sink_fma2: membrane2.sink_fma
-                            });
-                    }
+                    console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
 
-                    // cotransporter in basolateral membrane
-                    if (tempProtein.length != 0 && tempBasolateral.length != 0) {
-                        basolateralMembrane.push(
-                            {
-                                source_name: membrane1.source_name,
-                                sink_name: membrane1.sink_name,
-                                med_text: membrane1.med_text,
-                                med_fma: membrane1.med_fma,
-                                med_pr: membrane1.med_pr,
-                                source_text: membrane1.source_text,
-                                source_fma: membrane1.source_fma,
-                                sink_text: membrane1.sink_text,
-                                sink_fma: membrane1.sink_fma,
-                                source_name2: membrane2.source_name,
-                                sink_name2: membrane2.sink_name,
-                                med_text2: membrane2.med_text,
-                                med_fma2: membrane2.med_fma,
-                                med_pr2: membrane2.med_pr,
-                                source_text2: membrane2.source_text,
-                                source_fma2: membrane2.source_fma,
-                                sink_text2: membrane2.sink_text,
-                                sink_fma2: membrane2.sink_fma
-                            });
+                    var NHE3 = "http://purl.obolibrary.org/obo/PR_P26433";
+                    // cotransporter in apical membrane
+                    for (var i = 0; i < tempProtein.length; i++) {
+
+                        if (tempProtein[i] == NHE3) continue;
+
+                        if (tempProtein.length != 0 && tempApical.length != 0) {
+                            apicalMembrane.push(
+                                {
+                                    source_name: membrane1.source_name,
+                                    sink_name: membrane1.sink_name,
+                                    med_text: membrane1.med_text,
+                                    med_fma: membrane1.med_fma,
+                                    med_pr: membrane1.med_pr,
+                                    source_text: membrane1.source_text,
+                                    source_fma: membrane1.source_fma,
+                                    sink_text: membrane1.sink_text,
+                                    sink_fma: membrane1.sink_fma,
+                                    source_name2: membrane2.source_name,
+                                    sink_name2: membrane2.sink_name,
+                                    med_text2: membrane2.med_text,
+                                    med_fma2: membrane2.med_fma,
+                                    med_pr2: membrane2.med_pr,
+                                    source_text2: membrane2.source_text,
+                                    source_fma2: membrane2.source_fma,
+                                    sink_text2: membrane2.sink_text,
+                                    sink_fma2: membrane2.sink_fma
+                                });
+                        }
+
+                        // cotransporter in basolateral membrane
+                        if (tempProtein.length != 0 && tempBasolateral.length != 0) {
+                            basolateralMembrane.push(
+                                {
+                                    source_name: membrane1.source_name,
+                                    sink_name: membrane1.sink_name,
+                                    med_text: membrane1.med_text,
+                                    med_fma: membrane1.med_fma,
+                                    med_pr: membrane1.med_pr,
+                                    source_text: membrane1.source_text,
+                                    source_fma: membrane1.source_fma,
+                                    sink_text: membrane1.sink_text,
+                                    sink_fma: membrane1.sink_fma,
+                                    source_name2: membrane2.source_name,
+                                    sink_name2: membrane2.sink_name,
+                                    med_text2: membrane2.med_text,
+                                    med_fma2: membrane2.med_fma,
+                                    med_pr2: membrane2.med_pr,
+                                    source_text2: membrane2.source_text,
+                                    source_fma2: membrane2.source_fma,
+                                    sink_text2: membrane2.sink_text,
+                                    sink_fma2: membrane2.sink_fma
+                                });
+                        }
                     }
 
                     counter++;
