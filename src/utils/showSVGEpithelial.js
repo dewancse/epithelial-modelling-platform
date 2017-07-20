@@ -1819,6 +1819,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", apicalID)
+                    .attr("cx", function (d) {
+                        dx[i] = xvalue - 5;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvalue - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -1890,6 +1898,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", apicalID)
+                    .attr("cx", function (d) {
+                        dx[i] = xvalue - 5;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvalue - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -2063,6 +2079,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", apicalID)
+                    .attr("cx", function (d) {
+                        dx[i] = xvalue - 5;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvalue - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -2172,6 +2196,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", apicalID)
+                    .attr("cx", function (d) {
+                        dx[i] = xvalue - 5;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvalue - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -2888,6 +2920,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", basolateralID)
+                    .attr("cx", function (d) {
+                        dx[i] = xvalue - 5 + width;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvalueb - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -2959,6 +2999,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", basolateralID)
+                    .attr("cx", function (d) {
+                        dx[i] = xvalue - 5 + width;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvalueb - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -3132,6 +3180,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", basolateralID)
+                    .attr("cx", function (d) {
+                        dx[i] = xvalue - 5 + width;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvalue - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -3240,6 +3296,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", basolateralID)
+                    .attr("cx", function (d) {
+                        dx[i] = xvalue - 5 + width;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvalue - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -3527,6 +3591,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 })
                 .attr("index", tempID)
                 .attr("membrane", celljunctionID)
+                .attr("cx", function (d) {
+                    dx[i] = xvaluectoc + 30 + 120;
+                    return dx[i];
+                })
+                .attr("cy", function (d) {
+                    dy[i] = yvaluectoc - 5 + height;
+                    return dy[i];
+                })
                 .attr("points", "10,20 240,20 235,30 240,40 10,40 15,30")
                 .attr("fill", "yellow")
                 .attr("stroke", "black")
@@ -4239,6 +4311,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", wallOfSmoothER)
+                    .attr("cx", function (d) {
+                        dx[i] = xvaluewser + 30;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvaluewser - 5;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -4337,6 +4417,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", wallOfSmoothER)
+                    .attr("cx", function (d) {
+                        dx[i] = xvaluewser + 30;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvaluewser - 5;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -5199,6 +5287,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", wallOfRoughER)
+                    .attr("cx", function (d) {
+                        dx[i] = xvaluewrer - 10 + widthER;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvaluewrer - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -5304,6 +5400,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("index", tempID)
                     .attr("membrane", wallOfRoughER)
+                    .attr("cx", function (d) {
+                        dx[i] = xvaluewrer - 10 + widthER;
+                        return dx[i];
+                    })
+                    .attr("cy", function (d) {
+                        dy[i] = yvaluewrer - 30;
+                        return dy[i];
+                    })
                     .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
                     .attr("fill", "yellow")
                     .attr("stroke", "black")
@@ -5607,14 +5711,26 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
 
         initdragcircleandend();
+
         // If paracellular's diffusive channel Then undefined
-        if (line[mindex] != undefined && this.cx != undefined) {
+        if (line[mindex] != undefined) {
             // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
             var lineb_x = line[mindex].x1.baseVal.value;
             var lineb_y1 = line[mindex].y1.baseVal.value;
             var lineb_y2 = line[mindex].y2.baseVal.value;
-            var cx = this.cx.baseVal.value;
-            var cy = this.cy.baseVal.value;
+
+            var cx, cy;
+            if (this.tagName == "circle") {
+                cx = this.cx.baseVal.value;
+                cy = this.cy.baseVal.value;
+            }
+
+            // TODO: polygon does not work!! check event!!
+            if (this.tagName == "polygon") {
+                cx = d3.event.x;
+                cy = d3.event.y;
+            }
+
             var lineb_id = line[mindex].id;
             var circle_id = this.id;
 
@@ -5641,16 +5757,26 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     function dragcircleendline(d) {
-        // d3.select(this).classed("dragging", false);
         initdragcircleandend();
+
         // If paracellular's diffusive channel Then undefined
-        if (line[mindex] != undefined && this.cx != undefined) {
+        if (line[mindex] != undefined) {
             // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
             var lineb_x = line[mindex].x1.baseVal.value;
             var lineb_y1 = line[mindex].y1.baseVal.value;
             var lineb_y2 = line[mindex].y2.baseVal.value;
-            var cx = cthis.cx.baseVal.value;
-            var cy = cthis.cy.baseVal.value;
+
+            if (cthis.tagName == "circle") {
+                var cx = cthis.cx.baseVal.value;
+                var cy = cthis.cy.baseVal.value;
+            }
+
+            // TODO: polygon does not work!! check event!!
+            if (cthis.tagName == "polygon") {
+                var cx = event.x;
+                var cy = event.y;
+            }
+
             var lineb_id = line[mindex].id;
             var circle_id = cthis.id;
 
@@ -6319,13 +6445,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("y", dytext[icircleGlobal]);
         }
 
-        // TODO: Polygon move back
-        circlewithlineg[icircleGlobal]
-            .transition()
-            .delay(1000)
-            .duration(1000)
-            .attr("cx", dx[icircleGlobal])
-            .attr("cy", dy[icircleGlobal]);
+        if (circlewithlineg[icircleGlobal]._groups[0][0].tagName == "polygon") {
+            circlewithlineg[icircleGlobal]
+                .transition()
+                .delay(1000)
+                .duration(1000)
+                .attr("transform", "translate(" + dx[icircleGlobal] + "," + dy[icircleGlobal] + ")")
+                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
+        }
+
+        if (circlewithlineg[icircleGlobal]._groups[0][0].tagName == "circle") {
+            circlewithlineg[icircleGlobal]
+                .transition()
+                .delay(1000)
+                .duration(1000)
+                .attr("cx", dx[icircleGlobal])
+                .attr("cy", dy[icircleGlobal]);
+        }
 
         if (linewithlineg2[icircleGlobal] != undefined) {
             linewithlineg2[icircleGlobal]
@@ -6477,10 +6613,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var index = d3.select(cthis)._groups[0][0].attributes[1].value;
                 var stylefill = d3.select(cthis)._groups[0][0].attributes[6].value;
 
+                // channel in yellow color showing error - temp solution
+                // if (circlewithlineg[index] != undefined) {
                 if (stylefill == "lightgreen")
                     circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "orange");
                 else
                     circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "lightgreen");
+                // }
 
                 // Reinitialise to store fluxes/models in next iteration
                 membraneModelValue = [];
