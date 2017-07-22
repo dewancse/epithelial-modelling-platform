@@ -5583,6 +5583,28 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
+    // div for tooltip
+    var div = d3.select("#svgVisualize").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    // add circles with tooltips
+    newg.selectAll("circle")
+        .on("mouseover", function (d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", 1);
+            div.html(
+                '<a href="https://www.cellml.org/" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                '&nbsp;&nbsp;' +
+                '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function (d) {
+            div.style("display", "none");
+        });
+
     // Change marker direction and text position
     var state = 0;
     document.addEventListener('click', function (event) {

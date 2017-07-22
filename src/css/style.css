@@ -38,3 +38,15 @@ circle {
     stroke: #6495ED;
     stroke-width: 1.5px;
 }
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 80px;
+    height: 25px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightblue; // #e9efec;
+    border: 0px;
+    border-radius: 8px;
+}
