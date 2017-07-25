@@ -1280,9 +1280,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         return checkBox;
     }
 
+    var div = d3.select("#svgVisualize").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    // click middle mouse to hide the tooltip
+    document.addEventListener("mousedown", function (event) {
+        // console.log("mousedown: ", event.which);
+
+        // 1 => left click, 2 => middle click, 3 => right click
+        if (event.which == 2)
+            div.style("display", "none");
+    })
+
     // apical, basolateral, paracellular, cell junction, wall of smooth and rough ER membrane
     for (var i = 0; i < combinedMembrane.length; i++) {
         source_name = combinedMembrane[i].source_name;
+
+        var tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+            "rawfile" + "/" + "HEAD" + "/" + source_name;
 
         if (combinedMembrane[i].source_name2 != undefined)
             source_name2 = combinedMembrane[i].source_name2;
@@ -1371,7 +1387,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("r", radius)
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
@@ -1490,7 +1524,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("r", radius)
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
@@ -1609,7 +1661,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("r", radius)
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
@@ -1728,7 +1798,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("r", radius)
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
@@ -1832,7 +1920,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke", "black")
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
 
@@ -1911,7 +2017,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke", "black")
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
 
@@ -2010,7 +2134,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("font-size", "12px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
-                    .text(textvalue);
+                    .text(textvalue)
 
                 linewithlineg[i] = leakg.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -2472,7 +2596,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("r", radius)
                     .attr("fill", "orange")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
@@ -2591,7 +2733,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("r", radius)
                     .attr("fill", "orange")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
@@ -2710,7 +2870,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("r", radius)
                     .attr("fill", "orange")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
@@ -2829,7 +3007,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("r", radius)
                     .attr("fill", "orange")
                     .attr("stroke-width", 20)
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
@@ -2933,7 +3129,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke", "black")
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
 
                 var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
 
@@ -3012,8 +3226,26 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke", "black")
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
-                    .attr("cursor", "move");
+                    .attr("cursor", "move")
+                    .on("mouseover click", function () {
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
 
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '&nbsp;&nbsp;' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    });
+                
                 var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
 
                 var txt = textvalue.substr(5); // temp solution
@@ -3522,7 +3754,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("font-weight", "bold")
                 .attr("fill", "red")
                 .attr("cursor", "move")
-                .text(textvalue);
+                .text(textvalue)
+                .on("mouseover click", function () {
+                    div.style("display", "inline");
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", 1);
+
+                    var id = d3.select(this)._groups[0][0].id,
+                        indexOfComma = id.indexOf(','),
+                        tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                            "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                    div.html(
+                        '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                        '&nbsp;&nbsp;' +
+                        '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                });
 
             var linetextg = lineg.append("g").data([{x: xpvalue + textWidth + 10, y: ypvalue}]);
             linewithlineg[i] = linetextg.append("line")
@@ -3604,7 +3854,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("stroke", "black")
                 .attr("stroke-linecap", "round")
                 .attr("stroke-linejoin", "round")
-                .attr("cursor", "move");
+                .attr("cursor", "move")
+                .on("mouseover click", mouseoverclick);
 
             var polygontext = polygong.append("g").data([{
                 x: xvaluectoc - 15 + 120,
@@ -5583,63 +5834,41 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    // div for tooltip
-    var div = d3.select("#svgVisualize").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-
-    // add circles with tooltips
-    newg.selectAll("circle")
-        .on("mouseover", function (d) {
-            div.transition()
-                .duration(200)
-                .style("opacity", 1);
-            div.html(
-                '<a href="https://www.cellml.org/" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                '&nbsp;&nbsp;' +
-                '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function (d) {
-            div.style("display", "none");
-        });
-
     // Change marker direction and text position
     var state = 0;
-    document.addEventListener('click', function (event) {
-        if (event.srcElement.localName == "line" && event.srcElement.nodeName == "line") {
-
-            // marker direction
-            var id = event.srcElement.id;
-            markerDir(id);
-
-            // text position
-            var idText = event.srcElement.nextSibling.firstChild.id;
-            var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
-            var textWidth = getTextWidth(textContent, 12);
-            if (state == 0) {
-                d3.select("#" + idText + "")
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
-                    .attr("y", event.srcElement.y1.baseVal.value + 5);
-
-                state = 1;
-            }
-            else {
-                d3.select("#" + idText + "")
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
-                    .attr("y", event.srcElement.y1.baseVal.value + 5);
-
-                state = 0;
-            }
-        }
-    })
+    // document.addEventListener('click', function (event) {
+    //     if (event.srcElement.localName == "line" && event.srcElement.nodeName == "line") {
+    //
+    //         // marker direction
+    //         var id = event.srcElement.id;
+    //         markerDir(id);
+    //
+    //         // text position
+    //         var idText = event.srcElement.nextSibling.firstChild.id;
+    //         var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
+    //         var textWidth = getTextWidth(textContent, 12);
+    //         if (state == 0) {
+    //             d3.select("#" + idText + "")
+    //                 .transition()
+    //                 .delay(1000)
+    //                 .duration(1000)
+    //                 .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
+    //                 .attr("y", event.srcElement.y1.baseVal.value + 5);
+    //
+    //             state = 1;
+    //         }
+    //         else {
+    //             d3.select("#" + idText + "")
+    //                 .transition()
+    //                 .delay(1000)
+    //                 .duration(1000)
+    //                 .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
+    //                 .attr("y", event.srcElement.y1.baseVal.value + 5);
+    //
+    //             state = 0;
+    //         }
+    //     }
+    // })
 
     var initdragcircleandend = function () {
         var membrane = cthis.getAttribute("membrane");

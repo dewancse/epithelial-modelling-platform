@@ -106,6 +106,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     // Event handling for SEARCH, MODEL
     var actions = {
+
         search: function (event) {
 
             console.log("search event: ", event);
@@ -235,8 +236,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     // Event invocation to SEARCH, MODEL
     document.addEventListener('click', function (event) {
-
-        console.log("event: ", event);
         // If there's an action with the given name, call it
         if (typeof actions[event.srcElement.dataset.action] === "function") {
             actions[event.srcElement.dataset.action].call(this, event);

@@ -114,9 +114,7 @@ function uniqueifyModelEntity(es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
-            if (retval[j].Model_entity === e.Model_entity &&
-                retval[j].Biological_meaning === e.Biological_meaning &&
-                retval[j].fma === e.fma)
+            if (retval[j].fma === e.fma)
 
                 return;
         }
