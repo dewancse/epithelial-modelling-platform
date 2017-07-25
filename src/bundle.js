@@ -6188,39 +6188,39 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // Change marker direction and text position
     var state = 0;
-    // document.addEventListener('click', function (event) {
-    //     if (event.srcElement.localName == "line" && event.srcElement.nodeName == "line") {
-    //
-    //         // marker direction
-    //         var id = event.srcElement.id;
-    //         markerDir(id);
-    //
-    //         // text position
-    //         var idText = event.srcElement.nextSibling.firstChild.id;
-    //         var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
-    //         var textWidth = getTextWidth(textContent, 12);
-    //         if (state == 0) {
-    //             d3.select("#" + idText + "")
-    //                 .transition()
-    //                 .delay(1000)
-    //                 .duration(1000)
-    //                 .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
-    //                 .attr("y", event.srcElement.y1.baseVal.value + 5);
-    //
-    //             state = 1;
-    //         }
-    //         else {
-    //             d3.select("#" + idText + "")
-    //                 .transition()
-    //                 .delay(1000)
-    //                 .duration(1000)
-    //                 .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
-    //                 .attr("y", event.srcElement.y1.baseVal.value + 5);
-    //
-    //             state = 0;
-    //         }
-    //     }
-    // })
+    document.addEventListener('click', function (event) {
+        if (event.srcElement.localName == "line" && event.srcElement.nodeName == "line") {
+
+            // marker direction
+            var id = event.srcElement.id;
+            markerDir(id);
+
+            // text position
+            var idText = event.srcElement.nextSibling.firstChild.id;
+            var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
+            var textWidth = getTextWidth(textContent, 12);
+            if (state == 0) {
+                d3.select("#" + idText + "")
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
+                    .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                state = 1;
+            }
+            else {
+                d3.select("#" + idText + "")
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
+                    .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                state = 0;
+            }
+        }
+    })
 
     var initdragcircleandend = function () {
         var membrane = cthis.getAttribute("membrane");
@@ -7168,45 +7168,55 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 console.log("save clicked!");
                 console.log("cthis: ", cthis);
+                console.log("THIS: ", win[0].children[1].children[0]);
 
                 // checkbox!!
-                if (win[0].children[1].children[0].children[12] != undefined) {
-                    for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
-                        if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[9] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[9].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].checked) {
 
                             console.log("Basolateral or apical model clicked!!");
 
-                            console.log("checked: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
-                            cthis.id = win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id;
+                            console.log("checked: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].checked);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id);
+
+                            cthis.id = win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id;
                             console.log("cthis AFTER: ", cthis);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id);
                         }
                     }
                 }
 
                 // checkbox!!
-                if (win[0].children[1].children[0].children[13] != undefined) {
-                    for (var i = 0; i < win[0].children[1].children[0].children[13].getElementsByTagName("input").length; i++) {
-                        if (win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[10] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[10].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].checked) {
 
                             console.log("Alternative model clicked!!");
 
-                            console.log("checked: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].checked);
-                            console.log("id: ", win[0].children[1].children[0].children[13].getElementsByTagName("input")[i].id);
+                            console.log("checked: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].checked);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
+
+                            cthis.id = win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id;
+                            console.log("cthis AFTER: ", cthis);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
                         }
                     }
                 }
 
                 // checkbox!!
-                if (win[0].children[1].children[0].children[14] != undefined) {
-                    for (var i = 0; i < win[0].children[1].children[0].children[14].getElementsByTagName("input").length; i++) {
-                        if (win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked) {
+                if (win[0].children[1].children[0].children[11] != undefined) {
+                    for (var i = 0; i < win[0].children[1].children[0].children[11].getElementsByTagName("input").length; i++) {
+                        if (win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].checked) {
 
                             console.log("Related cellml model clicked!!");
 
-                            console.log("checked: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].checked);
-                            console.log("id: ", win[0].children[1].children[0].children[14].getElementsByTagName("input")[i].id);
+                            console.log("checked CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].checked);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
+
+                            cthis.id = win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id;
+                            console.log("cthis AFTER: ", cthis);
+                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
                         }
                     }
                 }
