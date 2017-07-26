@@ -1144,12 +1144,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                 // exceptional case: one flux is chosen
                 if (membrane.length <= 1) {
-                    console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
-                    console.log("membrane.length <= 1 source_fma2: ", source_fma2);
-                    console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
-                    console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
-                    console.log("membrane.length <= 1 basolateralMembrane: ", basolateralMembrane);
-                    console.log("membrane.length <= 1 membrane: ", membrane);
+                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
+                    // console.log("membrane.length <= 1 source_fma2: ", source_fma2);
+                    // console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
+                    // console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
+                    // console.log("membrane.length <= 1 basolateralMembrane: ", basolateralMembrane);
+                    // console.log("membrane.length <= 1 membrane: ", membrane);
 
                     showsvgEpithelial(
                         concentration_fma,

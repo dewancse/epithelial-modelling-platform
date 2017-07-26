@@ -3597,7 +3597,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
-                
+
                 var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
 
                 var txt = textvalue.substr(5); // temp solution
@@ -6516,8 +6516,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         speciesName = jsonModel.results.bindings[0].Species.value;
                                         geneName = jsonModel.results.bindings[0].Gene.value;
 
-                                        console.log("protein, species, gene: ", proteinName, speciesName, geneName);
-
                                         var query = 'SELECT ?cellmlmodel ' +
                                             'WHERE { GRAPH ?g { ' +
                                             '?cellmlmodel <http://purl.org/dc/terms/description> "' + proteinName + '". ' +
@@ -6750,7 +6748,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             var URI = jsonAltProtein.results.bindings[0].URI.value;
                             var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeCellmlArray[idAltProtein];
 
-                            var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + URI;
+                            var endpointOLS = "https://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + URI;
 
                             sendGetRequest(
                                 endpointOLS,
@@ -6876,6 +6874,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             '<' + membraneModel[idMembrane] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
             '}}'
 
+        console.log("membraneModel[idMembrane]: ", membraneModel[idMembrane]);
+
         sendPostRequest(
             endpoint,
             query,
@@ -6929,8 +6929,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         }
 
                         console.log("membraneObject: ", membraneObject);
-                        console.log("idMembrane: ", idMembrane);
-                        console.log("membraneModel.length: ", membraneModel.length);
+                        // console.log("idMembrane: ", idMembrane);
+                        // console.log("membraneModel.length: ", membraneModel.length);
                         console.log("membraneModelID: ", membraneModelID);
 
                         idMembrane++;
@@ -7168,7 +7168,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 console.log("save clicked!");
                 console.log("cthis: ", cthis);
-                console.log("THIS: ", win[0].children[1].children[0]);
 
                 // checkbox!!
                 if (win[0].children[1].children[0].children[9] != undefined) {
@@ -8811,12 +8810,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                 // exceptional case: one flux is chosen
                 if (membrane.length <= 1) {
-                    console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
-                    console.log("membrane.length <= 1 source_fma2: ", source_fma2);
-                    console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
-                    console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
-                    console.log("membrane.length <= 1 basolateralMembrane: ", basolateralMembrane);
-                    console.log("membrane.length <= 1 membrane: ", membrane);
+                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
+                    // console.log("membrane.length <= 1 source_fma2: ", source_fma2);
+                    // console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
+                    // console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
+                    // console.log("membrane.length <= 1 basolateralMembrane: ", basolateralMembrane);
+                    // console.log("membrane.length <= 1 membrane: ", membrane);
 
                     showsvgEpithelial(
                         concentration_fma,
