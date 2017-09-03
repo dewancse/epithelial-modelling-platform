@@ -1068,11 +1068,11 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
 
                     var NHE3 = "http://purl.obolibrary.org/obo/PR_P26433";
-                    // cotransporter in apical membrane
                     for (var i = 0; i < tempProtein.length; i++) {
 
                         if (tempProtein[i] == NHE3) continue;
 
+                        // cotransporter in apical membrane
                         if (tempProtein.length != 0 && tempApical.length != 0) {
                             apicalMembrane.push(
                                 {

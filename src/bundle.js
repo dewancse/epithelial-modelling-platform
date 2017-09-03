@@ -6448,6 +6448,28 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             // No button clicked!!
                             win[0].lastElementChild.children[0].onclick = function (event) {
                                 console.log("No clicked!");
+
+                                // duplicate only circle temporarily
+                                if (cthis.tagName == "circle") {
+                                    var cx = cthis.cx.baseVal.value;
+                                    var cy = cthis.cy.baseVal.value;
+
+                                    console.log("cthis, cx, and cy: ", cthis, cx, cy);
+
+                                    lineg.append("circle")
+                                        .attr("id", "linewithlineg" + cthis.id)
+                                        .attr("cx", function (d) {
+                                            return cx;
+                                        })
+                                        .attr("cy", function (d) {
+                                            return cy;
+                                        })
+                                        .attr("r", radius)
+                                        .attr("fill", "orange")
+                                        .attr("stroke-width", 20)
+                                        .attr("cursor", "move");
+                                }
+
                                 moveBack();
                                 membraneColorBack();
                             }
@@ -7159,6 +7181,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             // close button clicked!!
             win[0].lastElementChild.children[0].onclick = function (event) {
+                console.log("close button clicked!!");
+
                 moveBack();
                 membraneColorBack();
             }
@@ -7166,7 +7190,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             // save button clicked!!
             win[0].lastElementChild.children[1].onclick = function (event) {
 
-                console.log("save clicked!");
+                console.log("save button clicked!");
                 console.log("cthis: ", cthis);
 
                 // checkbox!!
@@ -8734,11 +8758,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
 
                     var NHE3 = "http://purl.obolibrary.org/obo/PR_P26433";
-                    // cotransporter in apical membrane
                     for (var i = 0; i < tempProtein.length; i++) {
 
                         if (tempProtein[i] == NHE3) continue;
 
+                        // cotransporter in apical membrane
                         if (tempProtein.length != 0 && tempApical.length != 0) {
                             apicalMembrane.push(
                                 {
