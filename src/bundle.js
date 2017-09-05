@@ -1030,12 +1030,27 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         width = 300,
         height = 400;
 
+    var w = 800,
+        h = height + 500; // Init 400 + 500 = 900
+
+    var prevHeight = height;
+
+    if (apicalMembrane.length > basolateralMembrane.length && apicalMembrane.length > 4)
+        height += 50 * (apicalMembrane.length - 4);
+
+    if (basolateralMembrane.length > apicalMembrane.length && basolateralMembrane.length > 4)
+        height += 50 * (basolateralMembrane.length - 4);
+
+    if (prevHeight != height) {
+        h += (height - prevHeight);
+        hth += (height - prevHeight);
+    }
+
+    console.log("Prev and Height: ", prevHeight, height, h, hth);
+
     var svg = d3.select("#svgVisualize").append("svg")
         .attr("width", wth)
         .attr("height", hth);
-
-    var w = 800,
-        h = 900;
 
     var newg = svg.append("g")
         .data([{x: w / 3, y: height / 3}]);
@@ -1288,9 +1303,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .attr("stroke-width", 25)
         .attr("opacity", 0.5);
 
-    // Paracellular Rectangle
+    var px = 265, py = height / 3 + height + height / 3 + 60; // 720
+    // Neighbour epithelial cell
     newg.append("polygon")
-        .attr("transform", "translate(265,720)")
+        .attr("transform", "translate(" + px + ", " + py + ")")
         .attr("points", "0,0 0,100 0,0 300,0 300,100 300,0")
         .attr("fill", "white")
         .attr("stroke", "url(#basicPattern)")
@@ -2882,6 +2898,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         /*  Basolateral Membrane */
         if (mediator_fma == basolateralID) {
+
             // case 1
             if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
                 var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
