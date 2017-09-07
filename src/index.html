@@ -53,5 +53,15 @@
 <script src="bundle.js"></script>
 <script src="../tests/test_harness.js"></script>
 
+<script>
+    // mocha run
+    if (window.mochaPhantomJS) {
+        mochaPhantomJS.run();
+    }
+    else {
+        mocha.run();
+    }
+</script>
+
 </body>
 </html>
