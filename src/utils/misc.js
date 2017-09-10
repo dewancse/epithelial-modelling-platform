@@ -1,40 +1,31 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
-// Convenience function for inserting innerHTML for 'select'
-var insertHtml = function (selector, html) {
-    var targetElem = document.querySelector(selector);
-    targetElem.innerHTML = html;
-};
-
 // Show loading icon inside element identified by 'selector'.
 var showLoading = function (selector) {
-    var html = "<div class='text-center'>";
-    html += "<img src='../src/img/ajax-loader.gif'></div>";
-    insertHtml(selector, html);
+    $(selector).html("<div class='text-center'><img src='../src/img/ajax-loader.gif'></div>");
 };
 
 // Find the current active menu button
 var activeMenu = function () {
-    var classes = document.querySelector("#ulistItems");
-    for (var i = 0; i < classes.getElementsByTagName("li").length; i++) {
-        if (classes.getElementsByTagName("li")[i].className === "active")
-            return classes.getElementsByTagName("li")[i].id;
+    for (var i = 0; i < $("#ulistItems li").length; i++) {
+        if ($($("#ulistItems li")[i]).attr("class") === "active")
+            return $("#ulistItems li")[i].id;
     }
 };
 
 // Remove the class 'active' from source to target button
 var switchMenuToActive = function (source, target) {
     // Remove 'active' from source button
-    var classes = document.querySelector(source).className;
+    var classes = $(source).attr("class");
     classes = classes.replace(new RegExp("active", "g"), "");
-    document.querySelector(source).className = classes;
+    $(source).addClass(classes);
 
     // Add 'active' to target button if not already there
-    classes = document.querySelector(target).className;
-    if (classes.indexOf("active") === -1) {
+    classes = $(target).attr("class");
+    if (classes != "active") {
         classes += "active";
-        document.querySelector(target).className = classes;
+        $(target).addClass(classes);
     }
 };
 
@@ -53,17 +44,17 @@ var uniqueify = function (es) {
 
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
-    var indexOfHash = fma.name.search("#");
-    var srctext = fma.name.slice(indexOfHash + 1);
-    var indexOfdot = srctext.indexOf('.');
+    var indexOfHash = fma.name.search("#"),
+        srctext = fma.name.slice(indexOfHash + 1),
+        indexOfdot = srctext.indexOf('.');
 
     return srctext.slice(indexOfdot + 1);
 }
 
 // extract species, gene, and protein names
 var parseModelName = function (modelEntity) {
-    var indexOfHash = modelEntity.search("#");
-    var modelName = modelEntity.slice(0, indexOfHash);
+    var indexOfHash = modelEntity.search("#"),
+        modelName = modelEntity.slice(0, indexOfHash);
 
     return modelName;
 }
@@ -151,10 +142,10 @@ function uniqueifySVG(es) {
 
 // Create anchor tag
 var createAnchor = function (value) {
-    var aText = document.createElement('a');
-    aText.setAttribute('href', value);
-    aText.setAttribute('target', "_blank");
-    aText.innerHTML = value;
+    var aText = $("<a/>");
+    aText.attr("href", value);
+    aText.attr("target", "_blank");
+    aText.html(value);
     return aText;
 };
 
@@ -171,7 +162,7 @@ var searchFn = function (searchItem, arrayOfItems) {
 
 // TODO: temp solution, fix this in svg
 function getTextWidth(text, fontSize, fontFace) {
-    var a = document.createElement('canvas');
+    var a = document.createElement('canvas'); // $("<canvas/>");
     var b = a.getContext('2d');
     b.font = fontSize + 'px ' + fontFace;
     return b.measureText(text).width;
@@ -200,7 +191,6 @@ exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
 exports.iteration = iteration;
 exports.compare = compare;
-exports.insertHtml = insertHtml;
 exports.showLoading = showLoading;
 exports.activeMenu = activeMenu;
 exports.switchMenuToActive = switchMenuToActive;

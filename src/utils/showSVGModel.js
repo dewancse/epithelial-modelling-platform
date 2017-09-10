@@ -55,7 +55,7 @@ var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
     console.log("links: ", links);
 
     // SVG graph
-    var g = document.getElementById("#svgVisualize2"),
+    var g = $("#svgVisualize2"),
         width = 1200,
         height = 700;
 

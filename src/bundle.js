@@ -73,40 +73,31 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
-// Convenience function for inserting innerHTML for 'select'
-var insertHtml = function (selector, html) {
-    var targetElem = document.querySelector(selector);
-    targetElem.innerHTML = html;
-};
-
 // Show loading icon inside element identified by 'selector'.
 var showLoading = function (selector) {
-    var html = "<div class='text-center'>";
-    html += "<img src='../src/img/ajax-loader.gif'></div>";
-    insertHtml(selector, html);
+    $(selector).html("<div class='text-center'><img src='../src/img/ajax-loader.gif'></div>");
 };
 
 // Find the current active menu button
 var activeMenu = function () {
-    var classes = document.querySelector("#ulistItems");
-    for (var i = 0; i < classes.getElementsByTagName("li").length; i++) {
-        if (classes.getElementsByTagName("li")[i].className === "active")
-            return classes.getElementsByTagName("li")[i].id;
+    for (var i = 0; i < $("#ulistItems li").length; i++) {
+        if ($($("#ulistItems li")[i]).attr("class") === "active")
+            return $("#ulistItems li")[i].id;
     }
 };
 
 // Remove the class 'active' from source to target button
 var switchMenuToActive = function (source, target) {
     // Remove 'active' from source button
-    var classes = document.querySelector(source).className;
+    var classes = $(source).attr("class");
     classes = classes.replace(new RegExp("active", "g"), "");
-    document.querySelector(source).className = classes;
+    $(source).addClass(classes);
 
     // Add 'active' to target button if not already there
-    classes = document.querySelector(target).className;
-    if (classes.indexOf("active") === -1) {
+    classes = $(target).attr("class");
+    if (classes != "active") {
         classes += "active";
-        document.querySelector(target).className = classes;
+        $(target).addClass(classes);
     }
 };
 
@@ -125,17 +116,17 @@ var uniqueify = function (es) {
 
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
-    var indexOfHash = fma.name.search("#");
-    var srctext = fma.name.slice(indexOfHash + 1);
-    var indexOfdot = srctext.indexOf('.');
+    var indexOfHash = fma.name.search("#"),
+        srctext = fma.name.slice(indexOfHash + 1),
+        indexOfdot = srctext.indexOf('.');
 
     return srctext.slice(indexOfdot + 1);
 }
 
 // extract species, gene, and protein names
 var parseModelName = function (modelEntity) {
-    var indexOfHash = modelEntity.search("#");
-    var modelName = modelEntity.slice(0, indexOfHash);
+    var indexOfHash = modelEntity.search("#"),
+        modelName = modelEntity.slice(0, indexOfHash);
 
     return modelName;
 }
@@ -223,10 +214,10 @@ function uniqueifySVG(es) {
 
 // Create anchor tag
 var createAnchor = function (value) {
-    var aText = document.createElement('a');
-    aText.setAttribute('href', value);
-    aText.setAttribute('target', "_blank");
-    aText.innerHTML = value;
+    var aText = $("<a/>");
+    aText.attr("href", value);
+    aText.attr("target", "_blank");
+    aText.html(value);
     return aText;
 };
 
@@ -243,7 +234,7 @@ var searchFn = function (searchItem, arrayOfItems) {
 
 // TODO: temp solution, fix this in svg
 function getTextWidth(text, fontSize, fontFace) {
-    var a = document.createElement('canvas');
+    var a = document.createElement('canvas'); // $("<canvas/>");
     var b = a.getContext('2d');
     b.font = fontSize + 'px ' + fontFace;
     return b.measureText(text).width;
@@ -272,7 +263,6 @@ exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
 exports.iteration = iteration;
 exports.compare = compare;
-exports.insertHtml = insertHtml;
 exports.showLoading = showLoading;
 exports.activeMenu = activeMenu;
 exports.switchMenuToActive = switchMenuToActive;
@@ -1024,7 +1014,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     console.log("combinedMembrane: ", combinedMembrane);
 
-    var g = document.getElementById("#svgVisualize"),
+    var g = $("#svgVisualize"),
         wth = 1200,
         hth = 900,
         width = 300,
@@ -1185,16 +1175,16 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // luminal(1), cytosol(2), interstitial(3), interstitial2(4), paracellular(5)
         for (var j = 1; j <= 5; j++) {
-            if (concentration_fma[i].fma == document.getElementsByTagName("rect")[j].id)
+            if (concentration_fma[i].fma == $("rect")[j].id)
                 break;
         }
 
         // compartments
-        if (concentration_fma[i].fma == document.getElementsByTagName("rect")[j].id) {
-            var xrect = document.getElementsByTagName("rect")[j].x.baseVal.value;
-            var yrect = document.getElementsByTagName("rect")[j].y.baseVal.value;
-            var xwidth = document.getElementsByTagName("rect")[j].width.baseVal.value;
-            var yheight = document.getElementsByTagName("rect")[j].height.baseVal.value;
+        if (concentration_fma[i].fma == $("rect")[j].id) {
+            var xrect = $("rect")[j].x.baseVal.value;
+            var yrect = $("rect")[j].y.baseVal.value;
+            var xwidth = $("rect")[j].width.baseVal.value;
+            var yheight = $("rect")[j].height.baseVal.value;
 
             var indexOfHash = concentration_fma[i].name.search("#");
             var value = concentration_fma[i].name.slice(indexOfHash + 1);
@@ -1203,7 +1193,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             solutes.push(
                 {
-                    compartment: document.getElementsByTagName("rect")[j].id,
+                    compartment: $("rect")[j].id,
                     xrect: xrect,
                     yrect: yrect,
                     width: xwidth,
@@ -1217,8 +1207,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     solutesBouncing(newg, solutes);
 
     // line apical and basolateral
-    var x = document.getElementsByTagName("rect")[0].x.baseVal.value;
-    var y = document.getElementsByTagName("rect")[0].y.baseVal.value;
+    var x = $("rect")[0].x.baseVal.value;
+    var y = $("rect")[0].y.baseVal.value;
 
     var lineapical = newg.append("line")
         .attr("id", apicalID)
@@ -1340,10 +1330,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             .attr("strokeWidth", "6px");
 
         // line: wall of smooth and rough ER
-        xER = document.getElementsByTagName("rect")[6].x.baseVal.value;
-        yER = document.getElementsByTagName("rect")[6].y.baseVal.value;
-        widthER = document.getElementsByTagName("rect")[6].width.baseVal.value;
-        heightER = document.getElementsByTagName("rect")[6].height.baseVal.value;
+        xER = $("rect")[6].x.baseVal.value;
+        yER = $("rect")[6].y.baseVal.value;
+        widthER = $("rect")[6].width.baseVal.value;
+        heightER = $("rect")[6].height.baseVal.value;
 
         // Ca2+ circle
         var xci = 0, yci = 0;
@@ -1444,12 +1434,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     // Circle and line arrow from lumen to cytosol
-    var xrect = document.getElementsByTagName("rect")[0].x.baseVal.value;
-    var yrect = document.getElementsByTagName("rect")[0].y.baseVal.value;
+    var xrect = $("rect")[0].x.baseVal.value;
+    var yrect = $("rect")[0].y.baseVal.value;
 
     // Paracellular membrane
-    var xprect = document.getElementsByTagName("rect")[5].x.baseVal.value;
-    var yprect = document.getElementsByTagName("rect")[5].y.baseVal.value;
+    var xprect = $("rect")[5].x.baseVal.value;
+    var yprect = $("rect")[5].y.baseVal.value;
     var xpvalue = xprect + 10;
     var ypvalue = yprect + 25;
     var ypdistance = 35;
@@ -1652,14 +1642,51 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    // click middle mouse to hide the tooltip
-    document.addEventListener("mousedown", function (event) {
-        // console.log("mousedown: ", event.which);
+    var state = 0;
+    $(document).on({
+        mousedown: function () {
+            // console.log("mousedown: ", event.which);
 
-        // 1 => left click, 2 => middle click, 3 => right click
-        if (event.which == 2)
-            div.style("display", "none");
-    })
+            // 1 => left click, 2 => middle click, 3 => right click
+            if (event.which == 2)
+                div.style("display", "none");
+        },
+
+        click: function () {
+            // Change marker direction and text position
+            if (event.target.localName == "line" && event.target.nodeName == "line") {
+
+                // marker direction
+                var id = event.srcElement.id;
+                markerDir(id);
+
+                // text position
+                var idText = event.srcElement.nextSibling.firstChild.id;
+                var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
+                var textWidth = getTextWidth(textContent, 12);
+                if (state == 0) {
+                    d3.select("#" + idText + "")
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
+                        .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                    state = 1;
+                }
+                else {
+                    d3.select("#" + idText + "")
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
+                        .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                    state = 0;
+                }
+            }
+        },
+    });
 
     // apical, basolateral, paracellular, cell junction, wall of smooth and rough ER membrane
     for (var i = 0; i < combinedMembrane.length; i++) {
@@ -6203,52 +6230,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    // Change marker direction and text position
-    var state = 0;
-    document.addEventListener('click', function (event) {
-        if (event.srcElement.localName == "line" && event.srcElement.nodeName == "line") {
-
-            // marker direction
-            var id = event.srcElement.id;
-            markerDir(id);
-
-            // text position
-            var idText = event.srcElement.nextSibling.firstChild.id;
-            var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
-            var textWidth = getTextWidth(textContent, 12);
-            if (state == 0) {
-                d3.select("#" + idText + "")
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
-                    .attr("y", event.srcElement.y1.baseVal.value + 5);
-
-                state = 1;
-            }
-            else {
-                d3.select("#" + idText + "")
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
-                    .attr("y", event.srcElement.y1.baseVal.value + 5);
-
-                state = 0;
-            }
-        }
-    })
-
     var initdragcircleandend = function () {
-        var membrane = cthis.getAttribute("membrane");
-        line = document.getElementsByTagName("line");
-
-        for (var i = 0; i < document.getElementsByTagName("line").length; i++) {
-            if (line[i].id == membrane && i == 0) {
+        var membrane = $(cthis).attr("membrane");
+        for (var i = 0; i < $("line").length; i++) {
+            if ($("line")[i].id == membrane && i == 0) {
                 mindex = 1;
                 break;
             }
-            if (line[i].id == membrane && i == 1) {
+            if ($("line")[i].id == membrane && i == 1) {
                 mindex = 0;
                 break;
             }
@@ -6260,28 +6249,29 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     function dragcircleline(d) {
         // console.log("this: ", this);
         // console.log("d3.select(this): ", d3.select(this));
-        icircleGlobal = this.getAttribute("index");
+        // icircleGlobal = this.getAttribute("index");
+        icircleGlobal = $(this).attr("index");
 
-        cthis = this;
+        cthis = this; // remember to debug cthis!!
 
         // console.log("index: ", icircleGlobal);
 
         var dx = d3.event.dx;
         var dy = d3.event.dy;
 
-        if (this.tagName == "circle") {
+        if ($(this).prop("tagName") == "circle") {
             d3.select(this)
-                .attr("cx", parseFloat(this.cx.baseVal.value) + dx)
-                .attr("cy", parseFloat(this.cy.baseVal.value) + dy);
+                .attr("cx", parseFloat($(this).prop("cx").baseVal.value) + dx)
+                .attr("cy", parseFloat($(this).prop("cy").baseVal.value) + dy);
         }
 
-        if (this.tagName == "text") {
+        if ($(this).prop("tagName") == "text") {
             circlewithlineg[icircleGlobal] // text
                 .attr("x", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("x")) + dx)
                 .attr("y", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("y")) + dy);
         }
 
-        if (this.tagName == "polygon") {
+        if ($(this).prop("tagName") == "polygon") {
             var xNew = [], yNew = [], points = "";
             var pointsLen = d3.select(this)._groups[0][0].points.length;
 
@@ -6330,33 +6320,42 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("y", parseFloat(d3.select("#" + "linewithtextg2" + icircleGlobal).attr("y")) + dy);
         }
 
-        initdragcircleandend();
+        // initdragcircleandend();
+        for (var i = 0; i < $("line").length; i++) {
+            if ($("line")[i].id == $(this).attr("membrane") && i == 0) {
+                mindex = 1;
+                break;
+            }
+            if ($("line")[i].id == $(this).attr("membrane") && i == 1) {
+                mindex = 0;
+                break;
+            }
+        }
 
         // If paracellular's diffusive channel Then undefined
-        if (line[mindex] != undefined) {
+        if ($("line")[mindex] != undefined) {
             // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
-            var lineb_x = line[mindex].x1.baseVal.value;
-            var lineb_y1 = line[mindex].y1.baseVal.value;
-            var lineb_y2 = line[mindex].y2.baseVal.value;
+            var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
+            var lineb_y1 = $($("line")[mindex]).prop("y1").baseVal.value;
+            var lineb_y2 = $($("line")[mindex]).prop("y2").baseVal.value;
 
             var cx, cy;
-            if (this.tagName == "circle") {
-                cx = this.cx.baseVal.value;
-                cy = this.cy.baseVal.value;
+            if ($(this).prop("tagName") == "circle") {
+                cx = $(this).prop("cx").baseVal.value;
+                cy = $(this).prop("cy").baseVal.value;
             }
 
-            // TODO: polygon does not work!! check event!!
-            if (this.tagName == "polygon") {
-                cx = d3.event.x;
-                cy = d3.event.y;
+            if ($(this).prop("tagName") == "polygon") {
+                cx = event.x;
+                cy = event.y;
             }
 
-            var lineb_id = line[mindex].id;
-            var circle_id = this.id;
+            var lineb_id = $($("line")[mindex]).prop("id");
+            var circle_id = $(this).prop("id");
 
             if ((cx >= lineb_x && cx <= lineb_x + 1) &&
                 (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
-                document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "red");
+                $($("line")[mindex]).css("stroke", "red");
 
                 var tempYvalue;
                 if (mindex == 1) tempYvalue = yvalueb;
@@ -6364,14 +6363,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 if ((cx >= lineb_x && cx <= lineb_x + 5) &&
                     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "yellow");
+                    $($("line")[mindex]).css("stroke", "yellow");
                 }
             }
             else {
                 if (mindex == 1)
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "orange");
+                    $($("line")[mindex]).css("stroke", "orange");
+
                 else
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "green");
+                    $($("line")[mindex]).css("stroke", "green");
             }
         }
     }
@@ -6380,25 +6380,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         initdragcircleandend();
 
         // If paracellular's diffusive channel Then undefined
-        if (line[mindex] != undefined) {
+        if ($("line")[mindex] != undefined) {
             // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
-            var lineb_x = line[mindex].x1.baseVal.value;
-            var lineb_y1 = line[mindex].y1.baseVal.value;
-            var lineb_y2 = line[mindex].y2.baseVal.value;
+            var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
+            var lineb_y1 = $($("line")[mindex]).prop("y1").baseVal.value;
+            var lineb_y2 = $($("line")[mindex]).prop("y2").baseVal.value;
 
-            if (cthis.tagName == "circle") {
-                var cx = cthis.cx.baseVal.value;
-                var cy = cthis.cy.baseVal.value;
+            var cx, cy;
+            if ($(cthis).prop("tagName") == "circle") {
+                cx = $(cthis).prop("cx").baseVal.value;
+                cy = $(cthis).prop("cy").baseVal.value;
             }
 
-            // TODO: polygon does not work!! check event!!
-            if (cthis.tagName == "polygon") {
-                var cx = event.x;
-                var cy = event.y;
+            if ($(cthis).prop("tagName") == "polygon") {
+                cx = event.x;
+                cy = event.y;
             }
 
-            var lineb_id = line[mindex].id;
-            var circle_id = cthis.id;
+            var lineb_id = $($("line")[mindex]).prop("id");
+            var circle_id = $(cthis).prop("id");
 
             if ((cx >= lineb_x && cx <= lineb_x + 1) &&
                 (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
@@ -6410,7 +6410,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 if ((cx >= lineb_x && cx <= lineb_x + 5) &&
                     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
 
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "yellow");
+                    $($("line")[mindex]).css("stroke", "yellow");
 
                     var m = new welcomeModal({
                         id: 'myWelcomeModal',
@@ -6454,22 +6454,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 win.append('<div class="modal-footer"></div>');
 
                                 if ($this.options.footerCloseButton) {
-                                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="closeID" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
                                 }
 
                                 if ($this.options.footerSaveButton) {
-                                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="saveID" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
                                 }
                             }
 
                             // No button clicked!!
-                            win[0].lastElementChild.children[0].onclick = function (event) {
+                            $("#closeID").click(function (event) {
                                 console.log("No clicked!");
+                                console.log("first close button clicked!");
 
                                 // duplicate only circle temporarily
-                                if (cthis.tagName == "circle") {
-                                    var cx = cthis.cx.baseVal.value;
-                                    var cy = cthis.cy.baseVal.value;
+                                if ($(cthis).prop("tagName") == "circle") {
+                                    cx = $(cthis).prop("cx").baseVal.value;
+                                    cy = $(cthis).prop("cy").baseVal.value;
 
                                     console.log("cthis, cx, and cy: ", cthis, cx, cy);
 
@@ -6489,11 +6490,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                 moveBack();
                                 membraneColorBack();
-                            }
+                            })
 
                             // Yes button clicked!!
-                            win[0].lastElementChild.children[1].onclick = function (event) {
+                            $("#saveID").click(function (event) {
+
                                 console.log("Yes clicked!");
+                                console.log("first save button clicked!");
 
                                 var m = new Modal({
                                     id: 'myModal',
@@ -6508,7 +6511,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                 showLoading("#modalBody");
 
-                                var circleID = cthis.getAttribute("id").split(",");
+                                var circleID = $(cthis).prop("id").split(",");
                                 console.log("circleID: ", circleID);
 
                                 // parsing
@@ -6668,7 +6671,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                                                 relatedCellmlModel(
                                                                     relatedModel,
                                                                     alternativeCellmlArray,
-                                                                    cthis.getAttribute("membrane")
+                                                                    $(cthis).attr("membrane")
+                                                                    /*cthis.getAttribute("membrane")*/
                                                                 );
 
                                                             }, true);
@@ -6677,7 +6681,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                     }, true);
 
                                 jQuery(window).trigger('resize');
-                            }
+                            })
                         };
 
                         /**
@@ -6715,9 +6719,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
             else {
                 if (mindex == 1)
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "orange");
+                    $($("line")[mindex]).css("stroke", "orange");
                 else
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "green");
+                    $($("line")[mindex]).css("stroke", "green");
             }
         }
     }
@@ -6795,7 +6799,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                     var label = document.createElement('label');
                                     label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '" type="checkbox" ' +
                                         'value="' + alternativeCellmlArray[idAltProtein] + '">' +
-                                        '<a href="' + workspaceURI + '" target="_blank"> ' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
+                                        '<a href="' + workspaceURI + '" target="_blank">' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
 
                                     altCellmlModel += label.innerHTML;
 
@@ -6999,7 +7003,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 for (var i = 0; i < membraneModelValue.length; i++) {
                                     var label = document.createElement('label');
                                     label.innerHTML = '<br><input id="' + membraneModelID[i] + '" type="checkbox" ' +
-                                        'value="' + membraneModelValue[i] + '"> ' + membraneModelValue[i] + '</label>';
+                                        'value="' + membraneModelValue[i] + '">' + membraneModelValue[i] + '</label>';
 
                                     membraneTransporter += label.innerHTML;
                                 }
@@ -7128,10 +7132,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // utility function
     var membraneColorBack = function () {
-        var membrane = cthis.getAttribute("membrane");
-        line = document.getElementsByTagName("line");
-        for (var i = 0; i < document.getElementsByTagName("line").length; i++) {
-            if (line[i].id == membrane && i == 0) {
+        for (var i = 0; i < $("line").length; i++) {
+            if ($("line")[i].id == $(cthis).attr("membrane") && i == 0) {
                 linebasolateral
                     .transition()
                     .delay(1000)
@@ -7141,8 +7143,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 yvalueb += ydistance;
                 break;
             }
-
-            if (line[i].id == membrane && i == 1) {
+            if ($("line")[i].id == $(this).attr("membrane") && i == 1) {
                 lineapical
                     .transition()
                     .delay(1000)
@@ -7188,27 +7189,31 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 win.append('<div class="modal-footer"></div>');
 
                 if ($this.options.footerCloseButton) {
-                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="mcloseID" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
                 }
 
                 if ($this.options.footerSaveButton) {
-                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="msaveID" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
                 }
             }
 
+            console.log("win BEFORE close and save clicked: ", win);
+
             // close button clicked!!
-            win[0].lastElementChild.children[0].onclick = function (event) {
-                console.log("close button clicked!!");
+            $("#mcloseID").click(function (event) {
+
+                console.log("second close button clicked!!");
 
                 moveBack();
                 membraneColorBack();
-            }
+            })
 
             // save button clicked!!
-            win[0].lastElementChild.children[1].onclick = function (event) {
+            $("#msaveID").click(function (event) {
 
-                console.log("save button clicked!");
-                console.log("cthis: ", cthis);
+                console.log("second save button clicked!");
+                console.log("cthis and $(cthis): ", cthis, $(cthis));
+                console.log("win AFTER save clicked: ", win);
 
                 // checkbox!!
                 if (win[0].children[1].children[0].children[9] != undefined) {
@@ -7220,7 +7225,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             console.log("checked: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].checked);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id);
 
-                            cthis.id = win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id;
+                            $(cthis).attr("id", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id)
+                            // cthis.id = win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id;
                             console.log("cthis AFTER: ", cthis);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id);
                         }
@@ -7237,7 +7243,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             console.log("checked: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].checked);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
 
-                            cthis.id = win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id;
+                            $(cthis).attr("id", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
+                            // cthis.id = win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id;
                             console.log("cthis AFTER: ", cthis);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
                         }
@@ -7254,7 +7261,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             console.log("checked CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].checked);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
 
-                            cthis.id = win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id;
+                            $(cthis).attr("id", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
+                            // cthis.id = win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id;
                             console.log("cthis AFTER: ", cthis);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
                         }
@@ -7278,7 +7286,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 membraneModelValue = [];
                 altCellmlModel = "";
                 relatedModelValue = [];
-            }
+            })
         };
 
         /**
@@ -7486,7 +7494,7 @@ var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
     console.log("links: ", links);
 
     // SVG graph
-    var g = document.getElementById("#svgVisualize2"),
+    var g = $("#svgVisualize2"),
         width = 1200,
         height = 700;
 
@@ -7658,18 +7666,14 @@ var showView = function (jsonObj, viewHtmlContent) {
 
     console.log("jsonObj: ", jsonObj);
 
-    var viewList = document.getElementById("viewList");
-
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
-        var divHead = document.createElement("div");
-        divHead.className = "h3";
+        var divHead = $("<div/>").addClass("h3");
 
-        var divText = document.createElement("div");
-        divText.className = "p";
+        var divText = $("<div/>").addClass("p");
 
-        divHead.appendChild(document.createTextNode(jsonObj.head.vars[i]));
-        divHead.appendChild(document.createElement("hr"));
-        viewList.appendChild(divHead);
+        divHead.append(jsonObj.head.vars[i]);
+        divHead.append($("<hr/>"));
+        $("#viewList").append(divHead);
 
         var tempArrayOfURL = [];
         var tempArray = [];
@@ -7683,18 +7687,17 @@ var showView = function (jsonObj, viewHtmlContent) {
                 var aText = createAnchor(tempValue);
                 tempArrayOfURL.push(tempValue);
                 if (searchFn(tempValue, tempArrayOfURL) <= 1)
-                    divText.appendChild(aText);
+                    divText.append(aText);
             }
             else {
                 tempArray.push(tempValue);
                 if (searchFn(tempValue, tempArray) <= 1)
-                    divText.appendChild(document.createTextNode(tempValue));
+                    divText.append(tempValue);
             }
 
-            viewList.appendChild(divText);
+            $("#viewList").append(divText);
 
-            var divText = document.createElement("div");
-            divText.className = "p";
+            var divText = $("<div/>").addClass("p");
         }
     }
 };
@@ -7712,14 +7715,12 @@ var parseModelName = __webpack_require__(0).parseModelName;
 var parserFmaNameText = __webpack_require__(0).parserFmaNameText;
 var headTitle = __webpack_require__(0).headTitle;
 var compare = __webpack_require__(0).compare;
-var uniqueifyModelEntity = __webpack_require__(0).uniqueifyModelEntity;
 var uniqueifyEpithelial = __webpack_require__(0).uniqueifyEpithelial;
 var uniqueifySrcSnkMed = __webpack_require__(0).uniqueifySrcSnkMed;
 var iteration = __webpack_require__(0).iteration;
 var showView = __webpack_require__(4).showView;
 var showSVGModelHtml = __webpack_require__(3).showSVGModelHtml;
 var showsvgEpithelial = __webpack_require__(2).showsvgEpithelial;
-var insertHtml = __webpack_require__(0).insertHtml;
 var showLoading = __webpack_require__(0).showLoading;
 var activeMenu = __webpack_require__(0).activeMenu;
 var switchMenuToActive = __webpack_require__(0).switchMenuToActive;
@@ -7771,7 +7772,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#listHome");
 
-        insertHtml("#main-content", "... Home Page !!!");
+        $("#main-content").html("... Home Page !!!");
     };
 
     mainUtils.loadHelp = function () {
@@ -7779,13 +7780,13 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#help");
 
-        insertHtml("#main-content", "... Help Page !!!");
+        $("#main-content").html("... Help Page !!!");
     };
 
     // On page load (before img or CSS)
-    document.addEventListener("DOMContentLoaded: ", function (event) {
-        // Place some startup code here
-    });
+    // $(document).ready(function (event) {
+    //     // Place some startup code here
+    // });
 
     var isExist = function (element) {
         // console.log("element: ", element);
@@ -7927,13 +7928,13 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             sendGetRequest(
                 searchHtml,
                 function (searchHtmlContent) {
-                    insertHtml("#main-content", searchHtmlContent);
+                    $("#main-content").html(searchHtmlContent);
                 },
                 false);
 
         }
         else {
-            insertHtml("#main-content", sessionStorage.getItem('searchListContent'));
+            $("#main-content").html(sessionStorage.getItem('searchListContent'));
         }
 
         // Switch from current active button to discovery button
@@ -7949,8 +7950,15 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
     })
 
+    // $(document).click(function (event) {
+    //     // If there's an action with the given name, call it
+    //     if (typeof actions[event.srcElement.dataset.action] === "function") {
+    //         actions[event.srcElement.dataset.action].call(this, event);
+    //     }
+    // })
+
     // semantic annotation based on search items
-    document.addEventListener('keydown', function (event) {
+    $(document).keydown(function (event) {
         if (event.key == 'Enter') {
 
             var uriOPB, uriCHEBI, keyValue;
@@ -8118,6 +8126,175 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
     })
 
+    // semantic annotation based on search items
+    // document.addEventListener('keydown', function (event) {
+    //     if (event.key == 'Enter') {
+    //
+    //         var uriOPB, uriCHEBI, keyValue;
+    //         var searchTxt = document.getElementById("searchTxt").value;
+    //
+    //         // set local storage
+    //         sessionStorage.setItem('searchTxtContent', searchTxt);
+    //
+    //         // dictionary object
+    //         var dictionary = [
+    //             {
+    //                 "key1": "flux", "key2": "",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "sodium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "hydrogen",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "ammonium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "chloride",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "potassium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "calcium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "IP3",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "glucose",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "lactate",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "aldosterone",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "thiazide",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "ATP",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "sodium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "hydrogen",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "ammonium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "chloride",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "potassium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "calcium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "IP3",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "ATP",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "glucose",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "lactate",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "aldosterone",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "thiazide",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
+    //             }
+    //         ];
+    //
+    //         for (var i = 0; i < dictionary.length; i++) {
+    //             var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
+    //                 key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
+    //
+    //             if (key1 != -1 && key2 != -1) {
+    //                 uriOPB = dictionary[i].opb;
+    //                 uriCHEBI = dictionary[i].chebi;
+    //                 keyValue = dictionary[i].key1;
+    //             }
+    //         }
+    //
+    //         showLoading("#searchList");
+    //
+    //         modelEntity = [];
+    //         biologicalMeaning = [];
+    //         speciesList = [];
+    //         geneList = [];
+    //         proteinList = [];
+    //         head = [];
+    //         filterModelEntity = [];
+    //
+    //         id = 0; // id to index each Model_entity
+    //
+    //         mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
+    //     }
+    // })
+
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
 
         if (uriCHEBI == "") {
@@ -8252,85 +8429,61 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     // Show semantic annotation extracted from PMR
     mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
-        var searchList = document.getElementById("searchList");
-
         // Search result does not match
         if (head.length == 0) {
-            searchList.innerHTML = "<section class='container-fluid'><label><br>No Search Results!</label></section>";
+            $("#searchList").html("<section class='container-fluid'><label><br>No Search Results!</label></section>");
             return;
         }
 
-        // Make empty space for a new search
-        searchList.innerHTML = "";
+        // Empty space for a new search result
+        $("#searchList").html("");
 
-        var table = document.createElement("table");
-        table.className = "table table-hover table-condensed"; //table-bordered table-striped
+        var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
         // Table header
-        var thead = document.createElement("thead");
-        var tr = document.createElement("tr");
+        var thead = $("<thead/>"), tr = $("<tr/>");
         for (var i = 0; i < head.length; i++) {
             // Empty header for checkbox column
             if (i == 0) {
-                var th = document.createElement("th");
-                th.appendChild(document.createTextNode(""));
-                tr.appendChild(th);
+                tr.append($("<th/>").append(""));
             }
 
-            var th = document.createElement("th");
-            th.appendChild(document.createTextNode(head[i]));
-            tr.appendChild(th);
+            tr.append($("<th/>").append(head[i]));
         }
 
-        thead.appendChild(tr);
-        table.appendChild(thead);
+        thead.append(tr);
+        table.append(thead);
 
         // Table body
-        var tbody = document.createElement("tbody");
+        var tbody = $("<tbody/>");
         for (var i = 0; i < modelEntity.length; i++) {
-            var tr = document.createElement("tr");
-
-            var temp = [];
-            var td = [];
-
+            var tr = $("<tr/>"), temp = [];
             temp.push(modelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
 
             for (var j = 0; j < temp.length; j++) {
                 if (j == 0) {
-                    td[j] = document.createElement("td");
-                    var label = document.createElement('label');
-                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" ' +
-                        'data-action="search" value="' + modelEntity[i] + '" class="checkbox"></label>';
-
-                    td[j].appendChild(label);
-                    tr.appendChild(td[j]);
+                    tr.append($("<td/>").append($('<label/>')
+                        .html('<input id="' + modelEntity[i] + '" type="checkbox" ' +
+                            'data-action="search" value="' + modelEntity[i] + '" class="checkbox">')));
                 }
 
-                if (j == 1) {
-                    td[j] = document.createElement("td");
-                    td[j].appendChild(document.createTextNode(temp[j]));
-                    tr.appendChild(td[j]);
-                }
-                else {
-                    td[j] = document.createElement("td");
-                    td[j].appendChild(document.createTextNode(temp[j]));
-                    tr.appendChild(td[j]);
-                }
+                if (j == 1)
+                    tr.append($("<td/>").append(temp[j]));
+                else
+                    tr.append($("<td/>").append(temp[j]));
             }
 
-            tbody.appendChild(tr);
+            tbody.append(tr);
         }
 
-        table.appendChild(tbody);
-        searchList.appendChild(table);
+        table.append(tbody);
+        $("#searchList").append(table);
 
         // Fill in the search attribute value
-        var searchTxt = document.getElementById("searchTxt");
-        searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
+        $("#searchTxt").attr("value", sessionStorage.getItem('searchTxtContent'));
 
         // SET main content in the local storage
-        var maincontent = document.getElementById('main-content');
-        sessionStorage.setItem('searchListContent', $(maincontent).html());
+        sessionStorage.setItem('searchListContent', $("#main-content").html());
 
         // Reinitialize so that last workspace does not appear in the Load Models
         // page when clicked from Model Discovery and Epithelial Model Platform page
@@ -8364,7 +8517,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 sendGetRequest(
                     viewHtml,
                     function (viewHtmlContent) {
-                        insertHtml("#main-content", viewHtmlContent);
+                        $("#main-content").html(viewHtmlContent);
                         sendPostRequest(endpoint, query, showView, true);
                     },
                     false);
@@ -8396,7 +8549,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         sendGetRequest(
             modelHtml,
             function (modelHtmlContent) {
-                insertHtml("#main-content", modelHtmlContent);
+                $("#main-content").html(modelHtmlContent);
 
                 sendPostRequest(endpoint, query, mainUtils.showModel, true);
             },
@@ -8414,44 +8567,30 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         console.log("showModel: ", jsonObj);
 
-        var modelList = document.getElementById("modelList");
-
-        var table = document.createElement("table");
-        table.className = "table table-hover table-condensed"; //table-bordered table-striped
+        var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
         // Table header
-        var thead = document.createElement("thead");
-        var tr = document.createElement("tr");
+        var thead = $("<thead/>"), tr = $("<tr/>");
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
             if (i == 0) {
-                var th = document.createElement("th");
-                var label = document.createElement('label');
-                label.innerHTML = '<input id="' + jsonObj.head.vars[0] + '" type="checkbox" name="attributeAll" ' +
-                    'class="attributeAll" data-action="model" value="' + jsonObj.head.vars[0] + '" ></label>';
-
-                th.appendChild(label);
-                tr.appendChild(th);
+                tr.append($("<th/>").append($("<label/>")
+                    .html('<input id="' + jsonObj.head.vars[0] + '" type="checkbox" name="attributeAll" ' +
+                        'class="attributeAll" data-action="model" value="' + jsonObj.head.vars[0] + '" >')));
             }
 
-            var th = document.createElement("th");
-            th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
-            tr.appendChild(th);
+            tr.append($("<th/>").append(jsonObj.head.vars[i]));
         }
 
-        thead.appendChild(tr);
-        table.appendChild(thead);
+        thead.append(tr);
+        table.append(thead);
 
-        // Table body
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
             if (i == 0) {
                 // search list to model list with empty model
                 if (jsonObj.results.bindings.length == 0) break;
 
-                var label = document.createElement('label');
-                label.innerHTML = '<input id="' + modelEntityName + '" type="checkbox" name="attribute" ' +
-                    'class="attribute" data-action="model" value="' + modelEntityName + '" ></label>';
-
-                model.push(label);
+                model.push($("<label/>").html('<input id="' + modelEntityName + '" type="checkbox" ' +
+                    'name="attribute" class="attribute" data-action="model" value="' + modelEntityName + '" >'));
             }
 
             if (jsonObj.head.vars[i] == "Compartment") {
@@ -8481,30 +8620,30 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         console.log("model and model2DArray: ", model, model2DArray);
 
-        var td = [];
-        var tbody = document.createElement("tbody");
+        // Table body
+        var tbody = $("<tbody/>"), td = [];
         for (var ix = 0; ix < model2DArray.length; ix++) {
-            var tr = document.createElement("tr");
+            var tr = $("<tr/>");
             // +1 for adding checkbox column
             for (var j = 0; j < jsonObj.head.vars.length + 1; j++) {
-                td[j] = document.createElement("td");
+                td[j] = $("<td/>");
                 if (j == 0)
-                    td[j].appendChild(model2DArray[ix][j]);
+                    td[j].append(model2DArray[ix][j]);
                 else
-                    td[j].appendChild(document.createTextNode(model2DArray[ix][j]));
+                    td[j].append(model2DArray[ix][j]);
 
                 // Id for each row
                 if (j == 1)
-                    tr.setAttribute("id", model2DArray[ix][j]);
+                    tr.attr("id", model2DArray[ix][j]);
 
-                tr.appendChild(td[j]);
+                tr.append(td[j]);
             }
 
-            tbody.appendChild(tr);
+            tbody.append(tr);
         }
 
-        table.appendChild(tbody);
-        modelList.appendChild(table);
+        table.append(tbody);
+        $("#modelList").append(table);
 
         // Un-check checkbox in the model page
         // load epithelial to model discovery to load model
@@ -8661,7 +8800,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         sendGetRequest(
             svgmodelHtml,
             function (svgmodelHtmlContent) {
-                insertHtml("#main-content", svgmodelHtmlContent);
+                $("#main-content").html(svgmodelHtmlContent);
 
                 // TODO: Fix it!!
                 sendGetRequest(svgmodelHtml, showSVGModelHtml(links, model2DArray, modelEntityNameArray), false);
@@ -8675,7 +8814,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         sendGetRequest(
             svgepithelialHtml,
             function (epithelialHtmlContent) {
-                insertHtml("#main-content", epithelialHtmlContent);
+                $("#main-content").html(epithelialHtmlContent);
 
                 sendGetRequest(svgepithelialHtml, mainUtils.loadEpithelial, false);
             },

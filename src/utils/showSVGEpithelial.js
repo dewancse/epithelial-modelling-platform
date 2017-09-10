@@ -672,7 +672,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     console.log("combinedMembrane: ", combinedMembrane);
 
-    var g = document.getElementById("#svgVisualize"),
+    var g = $("#svgVisualize"),
         wth = 1200,
         hth = 900,
         width = 300,
@@ -833,16 +833,16 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         // luminal(1), cytosol(2), interstitial(3), interstitial2(4), paracellular(5)
         for (var j = 1; j <= 5; j++) {
-            if (concentration_fma[i].fma == document.getElementsByTagName("rect")[j].id)
+            if (concentration_fma[i].fma == $("rect")[j].id)
                 break;
         }
 
         // compartments
-        if (concentration_fma[i].fma == document.getElementsByTagName("rect")[j].id) {
-            var xrect = document.getElementsByTagName("rect")[j].x.baseVal.value;
-            var yrect = document.getElementsByTagName("rect")[j].y.baseVal.value;
-            var xwidth = document.getElementsByTagName("rect")[j].width.baseVal.value;
-            var yheight = document.getElementsByTagName("rect")[j].height.baseVal.value;
+        if (concentration_fma[i].fma == $("rect")[j].id) {
+            var xrect = $("rect")[j].x.baseVal.value;
+            var yrect = $("rect")[j].y.baseVal.value;
+            var xwidth = $("rect")[j].width.baseVal.value;
+            var yheight = $("rect")[j].height.baseVal.value;
 
             var indexOfHash = concentration_fma[i].name.search("#");
             var value = concentration_fma[i].name.slice(indexOfHash + 1);
@@ -851,7 +851,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             solutes.push(
                 {
-                    compartment: document.getElementsByTagName("rect")[j].id,
+                    compartment: $("rect")[j].id,
                     xrect: xrect,
                     yrect: yrect,
                     width: xwidth,
@@ -865,8 +865,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     solutesBouncing(newg, solutes);
 
     // line apical and basolateral
-    var x = document.getElementsByTagName("rect")[0].x.baseVal.value;
-    var y = document.getElementsByTagName("rect")[0].y.baseVal.value;
+    var x = $("rect")[0].x.baseVal.value;
+    var y = $("rect")[0].y.baseVal.value;
 
     var lineapical = newg.append("line")
         .attr("id", apicalID)
@@ -988,10 +988,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             .attr("strokeWidth", "6px");
 
         // line: wall of smooth and rough ER
-        xER = document.getElementsByTagName("rect")[6].x.baseVal.value;
-        yER = document.getElementsByTagName("rect")[6].y.baseVal.value;
-        widthER = document.getElementsByTagName("rect")[6].width.baseVal.value;
-        heightER = document.getElementsByTagName("rect")[6].height.baseVal.value;
+        xER = $("rect")[6].x.baseVal.value;
+        yER = $("rect")[6].y.baseVal.value;
+        widthER = $("rect")[6].width.baseVal.value;
+        heightER = $("rect")[6].height.baseVal.value;
 
         // Ca2+ circle
         var xci = 0, yci = 0;
@@ -1092,12 +1092,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     // Circle and line arrow from lumen to cytosol
-    var xrect = document.getElementsByTagName("rect")[0].x.baseVal.value;
-    var yrect = document.getElementsByTagName("rect")[0].y.baseVal.value;
+    var xrect = $("rect")[0].x.baseVal.value;
+    var yrect = $("rect")[0].y.baseVal.value;
 
     // Paracellular membrane
-    var xprect = document.getElementsByTagName("rect")[5].x.baseVal.value;
-    var yprect = document.getElementsByTagName("rect")[5].y.baseVal.value;
+    var xprect = $("rect")[5].x.baseVal.value;
+    var yprect = $("rect")[5].y.baseVal.value;
     var xpvalue = xprect + 10;
     var ypvalue = yprect + 25;
     var ypdistance = 35;
@@ -1300,14 +1300,51 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    // click middle mouse to hide the tooltip
-    document.addEventListener("mousedown", function (event) {
-        // console.log("mousedown: ", event.which);
+    var state = 0;
+    $(document).on({
+        mousedown: function () {
+            // console.log("mousedown: ", event.which);
 
-        // 1 => left click, 2 => middle click, 3 => right click
-        if (event.which == 2)
-            div.style("display", "none");
-    })
+            // 1 => left click, 2 => middle click, 3 => right click
+            if (event.which == 2)
+                div.style("display", "none");
+        },
+
+        click: function () {
+            // Change marker direction and text position
+            if (event.target.localName == "line" && event.target.nodeName == "line") {
+
+                // marker direction
+                var id = event.srcElement.id;
+                markerDir(id);
+
+                // text position
+                var idText = event.srcElement.nextSibling.firstChild.id;
+                var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
+                var textWidth = getTextWidth(textContent, 12);
+                if (state == 0) {
+                    d3.select("#" + idText + "")
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
+                        .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                    state = 1;
+                }
+                else {
+                    d3.select("#" + idText + "")
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
+                        .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                    state = 0;
+                }
+            }
+        },
+    });
 
     // apical, basolateral, paracellular, cell junction, wall of smooth and rough ER membrane
     for (var i = 0; i < combinedMembrane.length; i++) {
@@ -5851,52 +5888,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    // Change marker direction and text position
-    var state = 0;
-    document.addEventListener('click', function (event) {
-        if (event.srcElement.localName == "line" && event.srcElement.nodeName == "line") {
-
-            // marker direction
-            var id = event.srcElement.id;
-            markerDir(id);
-
-            // text position
-            var idText = event.srcElement.nextSibling.firstChild.id;
-            var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
-            var textWidth = getTextWidth(textContent, 12);
-            if (state == 0) {
-                d3.select("#" + idText + "")
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
-                    .attr("y", event.srcElement.y1.baseVal.value + 5);
-
-                state = 1;
-            }
-            else {
-                d3.select("#" + idText + "")
-                    .transition()
-                    .delay(1000)
-                    .duration(1000)
-                    .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
-                    .attr("y", event.srcElement.y1.baseVal.value + 5);
-
-                state = 0;
-            }
-        }
-    })
-
     var initdragcircleandend = function () {
-        var membrane = cthis.getAttribute("membrane");
-        line = document.getElementsByTagName("line");
-
-        for (var i = 0; i < document.getElementsByTagName("line").length; i++) {
-            if (line[i].id == membrane && i == 0) {
+        var membrane = $(cthis).attr("membrane");
+        for (var i = 0; i < $("line").length; i++) {
+            if ($("line")[i].id == membrane && i == 0) {
                 mindex = 1;
                 break;
             }
-            if (line[i].id == membrane && i == 1) {
+            if ($("line")[i].id == membrane && i == 1) {
                 mindex = 0;
                 break;
             }
@@ -5908,28 +5907,29 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     function dragcircleline(d) {
         // console.log("this: ", this);
         // console.log("d3.select(this): ", d3.select(this));
-        icircleGlobal = this.getAttribute("index");
+        // icircleGlobal = this.getAttribute("index");
+        icircleGlobal = $(this).attr("index");
 
-        cthis = this;
+        cthis = this; // remember to debug cthis!!
 
         // console.log("index: ", icircleGlobal);
 
         var dx = d3.event.dx;
         var dy = d3.event.dy;
 
-        if (this.tagName == "circle") {
+        if ($(this).prop("tagName") == "circle") {
             d3.select(this)
-                .attr("cx", parseFloat(this.cx.baseVal.value) + dx)
-                .attr("cy", parseFloat(this.cy.baseVal.value) + dy);
+                .attr("cx", parseFloat($(this).prop("cx").baseVal.value) + dx)
+                .attr("cy", parseFloat($(this).prop("cy").baseVal.value) + dy);
         }
 
-        if (this.tagName == "text") {
+        if ($(this).prop("tagName") == "text") {
             circlewithlineg[icircleGlobal] // text
                 .attr("x", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("x")) + dx)
                 .attr("y", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("y")) + dy);
         }
 
-        if (this.tagName == "polygon") {
+        if ($(this).prop("tagName") == "polygon") {
             var xNew = [], yNew = [], points = "";
             var pointsLen = d3.select(this)._groups[0][0].points.length;
 
@@ -5978,33 +5978,42 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("y", parseFloat(d3.select("#" + "linewithtextg2" + icircleGlobal).attr("y")) + dy);
         }
 
-        initdragcircleandend();
+        // initdragcircleandend();
+        for (var i = 0; i < $("line").length; i++) {
+            if ($("line")[i].id == $(this).attr("membrane") && i == 0) {
+                mindex = 1;
+                break;
+            }
+            if ($("line")[i].id == $(this).attr("membrane") && i == 1) {
+                mindex = 0;
+                break;
+            }
+        }
 
         // If paracellular's diffusive channel Then undefined
-        if (line[mindex] != undefined) {
+        if ($("line")[mindex] != undefined) {
             // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
-            var lineb_x = line[mindex].x1.baseVal.value;
-            var lineb_y1 = line[mindex].y1.baseVal.value;
-            var lineb_y2 = line[mindex].y2.baseVal.value;
+            var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
+            var lineb_y1 = $($("line")[mindex]).prop("y1").baseVal.value;
+            var lineb_y2 = $($("line")[mindex]).prop("y2").baseVal.value;
 
             var cx, cy;
-            if (this.tagName == "circle") {
-                cx = this.cx.baseVal.value;
-                cy = this.cy.baseVal.value;
+            if ($(this).prop("tagName") == "circle") {
+                cx = $(this).prop("cx").baseVal.value;
+                cy = $(this).prop("cy").baseVal.value;
             }
 
-            // TODO: polygon does not work!! check event!!
-            if (this.tagName == "polygon") {
-                cx = d3.event.x;
-                cy = d3.event.y;
+            if ($(this).prop("tagName") == "polygon") {
+                cx = event.x;
+                cy = event.y;
             }
 
-            var lineb_id = line[mindex].id;
-            var circle_id = this.id;
+            var lineb_id = $($("line")[mindex]).prop("id");
+            var circle_id = $(this).prop("id");
 
             if ((cx >= lineb_x && cx <= lineb_x + 1) &&
                 (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
-                document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "red");
+                $($("line")[mindex]).css("stroke", "red");
 
                 var tempYvalue;
                 if (mindex == 1) tempYvalue = yvalueb;
@@ -6012,14 +6021,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 if ((cx >= lineb_x && cx <= lineb_x + 5) &&
                     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "yellow");
+                    $($("line")[mindex]).css("stroke", "yellow");
                 }
             }
             else {
                 if (mindex == 1)
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "orange");
+                    $($("line")[mindex]).css("stroke", "orange");
+
                 else
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "green");
+                    $($("line")[mindex]).css("stroke", "green");
             }
         }
     }
@@ -6028,25 +6038,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         initdragcircleandend();
 
         // If paracellular's diffusive channel Then undefined
-        if (line[mindex] != undefined) {
+        if ($("line")[mindex] != undefined) {
             // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
-            var lineb_x = line[mindex].x1.baseVal.value;
-            var lineb_y1 = line[mindex].y1.baseVal.value;
-            var lineb_y2 = line[mindex].y2.baseVal.value;
+            var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
+            var lineb_y1 = $($("line")[mindex]).prop("y1").baseVal.value;
+            var lineb_y2 = $($("line")[mindex]).prop("y2").baseVal.value;
 
-            if (cthis.tagName == "circle") {
-                var cx = cthis.cx.baseVal.value;
-                var cy = cthis.cy.baseVal.value;
+            var cx, cy;
+            if ($(cthis).prop("tagName") == "circle") {
+                cx = $(cthis).prop("cx").baseVal.value;
+                cy = $(cthis).prop("cy").baseVal.value;
             }
 
-            // TODO: polygon does not work!! check event!!
-            if (cthis.tagName == "polygon") {
-                var cx = event.x;
-                var cy = event.y;
+            if ($(cthis).prop("tagName") == "polygon") {
+                cx = event.x;
+                cy = event.y;
             }
 
-            var lineb_id = line[mindex].id;
-            var circle_id = cthis.id;
+            var lineb_id = $($("line")[mindex]).prop("id");
+            var circle_id = $(cthis).prop("id");
 
             if ((cx >= lineb_x && cx <= lineb_x + 1) &&
                 (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
@@ -6058,7 +6068,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 if ((cx >= lineb_x && cx <= lineb_x + 5) &&
                     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
 
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "yellow");
+                    $($("line")[mindex]).css("stroke", "yellow");
 
                     var m = new welcomeModal({
                         id: 'myWelcomeModal',
@@ -6102,22 +6112,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 win.append('<div class="modal-footer"></div>');
 
                                 if ($this.options.footerCloseButton) {
-                                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="closeID" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
                                 }
 
                                 if ($this.options.footerSaveButton) {
-                                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="saveID" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
                                 }
                             }
 
                             // No button clicked!!
-                            win[0].lastElementChild.children[0].onclick = function (event) {
+                            $("#closeID").click(function (event) {
                                 console.log("No clicked!");
+                                console.log("first close button clicked!");
 
                                 // duplicate only circle temporarily
-                                if (cthis.tagName == "circle") {
-                                    var cx = cthis.cx.baseVal.value;
-                                    var cy = cthis.cy.baseVal.value;
+                                if ($(cthis).prop("tagName") == "circle") {
+                                    cx = $(cthis).prop("cx").baseVal.value;
+                                    cy = $(cthis).prop("cy").baseVal.value;
 
                                     console.log("cthis, cx, and cy: ", cthis, cx, cy);
 
@@ -6137,11 +6148,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                 moveBack();
                                 membraneColorBack();
-                            }
+                            })
 
                             // Yes button clicked!!
-                            win[0].lastElementChild.children[1].onclick = function (event) {
+                            $("#saveID").click(function (event) {
+
                                 console.log("Yes clicked!");
+                                console.log("first save button clicked!");
 
                                 var m = new Modal({
                                     id: 'myModal',
@@ -6156,7 +6169,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                 showLoading("#modalBody");
 
-                                var circleID = cthis.getAttribute("id").split(",");
+                                var circleID = $(cthis).prop("id").split(",");
                                 console.log("circleID: ", circleID);
 
                                 // parsing
@@ -6316,7 +6329,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                                                 relatedCellmlModel(
                                                                     relatedModel,
                                                                     alternativeCellmlArray,
-                                                                    cthis.getAttribute("membrane")
+                                                                    $(cthis).attr("membrane")
+                                                                    /*cthis.getAttribute("membrane")*/
                                                                 );
 
                                                             }, true);
@@ -6325,7 +6339,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                     }, true);
 
                                 jQuery(window).trigger('resize');
-                            }
+                            })
                         };
 
                         /**
@@ -6363,9 +6377,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
             else {
                 if (mindex == 1)
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "orange");
+                    $($("line")[mindex]).css("stroke", "orange");
                 else
-                    document.getElementsByTagName("line")[mindex].style.setProperty("stroke", "green");
+                    $($("line")[mindex]).css("stroke", "green");
             }
         }
     }
@@ -6443,7 +6457,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                     var label = document.createElement('label');
                                     label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '" type="checkbox" ' +
                                         'value="' + alternativeCellmlArray[idAltProtein] + '">' +
-                                        '<a href="' + workspaceURI + '" target="_blank"> ' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
+                                        '<a href="' + workspaceURI + '" target="_blank">' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
 
                                     altCellmlModel += label.innerHTML;
 
@@ -6647,7 +6661,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 for (var i = 0; i < membraneModelValue.length; i++) {
                                     var label = document.createElement('label');
                                     label.innerHTML = '<br><input id="' + membraneModelID[i] + '" type="checkbox" ' +
-                                        'value="' + membraneModelValue[i] + '"> ' + membraneModelValue[i] + '</label>';
+                                        'value="' + membraneModelValue[i] + '">' + membraneModelValue[i] + '</label>';
 
                                     membraneTransporter += label.innerHTML;
                                 }
@@ -6776,10 +6790,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // utility function
     var membraneColorBack = function () {
-        var membrane = cthis.getAttribute("membrane");
-        line = document.getElementsByTagName("line");
-        for (var i = 0; i < document.getElementsByTagName("line").length; i++) {
-            if (line[i].id == membrane && i == 0) {
+        for (var i = 0; i < $("line").length; i++) {
+            if ($("line")[i].id == $(cthis).attr("membrane") && i == 0) {
                 linebasolateral
                     .transition()
                     .delay(1000)
@@ -6789,8 +6801,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 yvalueb += ydistance;
                 break;
             }
-
-            if (line[i].id == membrane && i == 1) {
+            if ($("line")[i].id == $(this).attr("membrane") && i == 1) {
                 lineapical
                     .transition()
                     .delay(1000)
@@ -6836,27 +6847,31 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 win.append('<div class="modal-footer"></div>');
 
                 if ($this.options.footerCloseButton) {
-                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="mcloseID" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
                 }
 
                 if ($this.options.footerSaveButton) {
-                    win.find('.modal-footer').append('<a data-dismiss="modal" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="msaveID" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
                 }
             }
 
+            console.log("win BEFORE close and save clicked: ", win);
+
             // close button clicked!!
-            win[0].lastElementChild.children[0].onclick = function (event) {
-                console.log("close button clicked!!");
+            $("#mcloseID").click(function (event) {
+
+                console.log("second close button clicked!!");
 
                 moveBack();
                 membraneColorBack();
-            }
+            })
 
             // save button clicked!!
-            win[0].lastElementChild.children[1].onclick = function (event) {
+            $("#msaveID").click(function (event) {
 
-                console.log("save button clicked!");
-                console.log("cthis: ", cthis);
+                console.log("second save button clicked!");
+                console.log("cthis and $(cthis): ", cthis, $(cthis));
+                console.log("win AFTER save clicked: ", win);
 
                 // checkbox!!
                 if (win[0].children[1].children[0].children[9] != undefined) {
@@ -6868,7 +6883,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             console.log("checked: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].checked);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id);
 
-                            cthis.id = win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id;
+                            $(cthis).attr("id", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id)
+                            // cthis.id = win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id;
                             console.log("cthis AFTER: ", cthis);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id);
                         }
@@ -6885,7 +6901,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             console.log("checked: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].checked);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
 
-                            cthis.id = win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id;
+                            $(cthis).attr("id", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
+                            // cthis.id = win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id;
                             console.log("cthis AFTER: ", cthis);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
                         }
@@ -6902,7 +6919,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             console.log("checked CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].checked);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
 
-                            cthis.id = win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id;
+                            $(cthis).attr("id", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
+                            // cthis.id = win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id;
                             console.log("cthis AFTER: ", cthis);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
                         }
@@ -6926,7 +6944,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 membraneModelValue = [];
                 altCellmlModel = "";
                 relatedModelValue = [];
-            }
+            })
         };
 
         /**

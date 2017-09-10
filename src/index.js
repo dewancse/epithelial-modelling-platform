@@ -5,14 +5,12 @@ var parseModelName = require("./utils/misc.js").parseModelName;
 var parserFmaNameText = require("./utils/misc.js").parserFmaNameText;
 var headTitle = require("./utils/misc.js").headTitle;
 var compare = require("./utils/misc.js").compare;
-var uniqueifyModelEntity = require("./utils/misc.js").uniqueifyModelEntity;
 var uniqueifyEpithelial = require("./utils/misc.js").uniqueifyEpithelial;
 var uniqueifySrcSnkMed = require("./utils/misc.js").uniqueifySrcSnkMed;
 var iteration = require("./utils/misc.js").iteration;
 var showView = require("./utils/showView.js").showView;
 var showSVGModelHtml = require("./utils/showSVGModel.js").showSVGModelHtml;
 var showsvgEpithelial = require("./utils/showSVGEpithelial.js").showsvgEpithelial;
-var insertHtml = require("./utils/misc.js").insertHtml;
 var showLoading = require("./utils/misc.js").showLoading;
 var activeMenu = require("./utils/misc.js").activeMenu;
 var switchMenuToActive = require("./utils/misc.js").switchMenuToActive;
@@ -64,7 +62,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#listHome");
 
-        insertHtml("#main-content", "... Home Page !!!");
+        $("#main-content").html("... Home Page !!!");
     };
 
     mainUtils.loadHelp = function () {
@@ -72,13 +70,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#help");
 
-        insertHtml("#main-content", "... Help Page !!!");
+        $("#main-content").html("... Help Page !!!");
     };
 
     // On page load (before img or CSS)
-    document.addEventListener("DOMContentLoaded: ", function (event) {
-        // Place some startup code here
-    });
+    // $(document).ready(function (event) {
+    //     // Place some startup code here
+    // });
 
     var isExist = function (element) {
         // console.log("element: ", element);
@@ -220,13 +218,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             sendGetRequest(
                 searchHtml,
                 function (searchHtmlContent) {
-                    insertHtml("#main-content", searchHtmlContent);
+                    $("#main-content").html(searchHtmlContent);
                 },
                 false);
 
         }
         else {
-            insertHtml("#main-content", sessionStorage.getItem('searchListContent'));
+            $("#main-content").html(sessionStorage.getItem('searchListContent'));
         }
 
         // Switch from current active button to discovery button
@@ -242,8 +240,15 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     })
 
+    // $(document).click(function (event) {
+    //     // If there's an action with the given name, call it
+    //     if (typeof actions[event.srcElement.dataset.action] === "function") {
+    //         actions[event.srcElement.dataset.action].call(this, event);
+    //     }
+    // })
+
     // semantic annotation based on search items
-    document.addEventListener('keydown', function (event) {
+    $(document).keydown(function (event) {
         if (event.key == 'Enter') {
 
             var uriOPB, uriCHEBI, keyValue;
@@ -411,6 +416,175 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     })
 
+    // semantic annotation based on search items
+    // document.addEventListener('keydown', function (event) {
+    //     if (event.key == 'Enter') {
+    //
+    //         var uriOPB, uriCHEBI, keyValue;
+    //         var searchTxt = document.getElementById("searchTxt").value;
+    //
+    //         // set local storage
+    //         sessionStorage.setItem('searchTxtContent', searchTxt);
+    //
+    //         // dictionary object
+    //         var dictionary = [
+    //             {
+    //                 "key1": "flux", "key2": "",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "sodium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "hydrogen",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "ammonium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "chloride",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "potassium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "calcium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "IP3",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "glucose",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "lactate",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "aldosterone",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "thiazide",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
+    //             },
+    //             {
+    //                 "key1": "flux", "key2": "ATP",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "sodium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "hydrogen",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "ammonium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "chloride",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "potassium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "calcium",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "IP3",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "ATP",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "glucose",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "lactate",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "aldosterone",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
+    //             },
+    //             {
+    //                 "key1": "concentration", "key2": "thiazide",
+    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
+    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
+    //             }
+    //         ];
+    //
+    //         for (var i = 0; i < dictionary.length; i++) {
+    //             var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
+    //                 key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
+    //
+    //             if (key1 != -1 && key2 != -1) {
+    //                 uriOPB = dictionary[i].opb;
+    //                 uriCHEBI = dictionary[i].chebi;
+    //                 keyValue = dictionary[i].key1;
+    //             }
+    //         }
+    //
+    //         showLoading("#searchList");
+    //
+    //         modelEntity = [];
+    //         biologicalMeaning = [];
+    //         speciesList = [];
+    //         geneList = [];
+    //         proteinList = [];
+    //         head = [];
+    //         filterModelEntity = [];
+    //
+    //         id = 0; // id to index each Model_entity
+    //
+    //         mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
+    //     }
+    // })
+
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
 
         if (uriCHEBI == "") {
@@ -545,85 +719,61 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     // Show semantic annotation extracted from PMR
     mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
-        var searchList = document.getElementById("searchList");
-
         // Search result does not match
         if (head.length == 0) {
-            searchList.innerHTML = "<section class='container-fluid'><label><br>No Search Results!</label></section>";
+            $("#searchList").html("<section class='container-fluid'><label><br>No Search Results!</label></section>");
             return;
         }
 
-        // Make empty space for a new search
-        searchList.innerHTML = "";
+        // Empty space for a new search result
+        $("#searchList").html("");
 
-        var table = document.createElement("table");
-        table.className = "table table-hover table-condensed"; //table-bordered table-striped
+        var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
         // Table header
-        var thead = document.createElement("thead");
-        var tr = document.createElement("tr");
+        var thead = $("<thead/>"), tr = $("<tr/>");
         for (var i = 0; i < head.length; i++) {
             // Empty header for checkbox column
             if (i == 0) {
-                var th = document.createElement("th");
-                th.appendChild(document.createTextNode(""));
-                tr.appendChild(th);
+                tr.append($("<th/>").append(""));
             }
 
-            var th = document.createElement("th");
-            th.appendChild(document.createTextNode(head[i]));
-            tr.appendChild(th);
+            tr.append($("<th/>").append(head[i]));
         }
 
-        thead.appendChild(tr);
-        table.appendChild(thead);
+        thead.append(tr);
+        table.append(thead);
 
         // Table body
-        var tbody = document.createElement("tbody");
+        var tbody = $("<tbody/>");
         for (var i = 0; i < modelEntity.length; i++) {
-            var tr = document.createElement("tr");
-
-            var temp = [];
-            var td = [];
-
+            var tr = $("<tr/>"), temp = [];
             temp.push(modelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
 
             for (var j = 0; j < temp.length; j++) {
                 if (j == 0) {
-                    td[j] = document.createElement("td");
-                    var label = document.createElement('label');
-                    label.innerHTML = '<input id="' + modelEntity[i] + '" type="checkbox" ' +
-                        'data-action="search" value="' + modelEntity[i] + '" class="checkbox"></label>';
-
-                    td[j].appendChild(label);
-                    tr.appendChild(td[j]);
+                    tr.append($("<td/>").append($('<label/>')
+                        .html('<input id="' + modelEntity[i] + '" type="checkbox" ' +
+                            'data-action="search" value="' + modelEntity[i] + '" class="checkbox">')));
                 }
 
-                if (j == 1) {
-                    td[j] = document.createElement("td");
-                    td[j].appendChild(document.createTextNode(temp[j]));
-                    tr.appendChild(td[j]);
-                }
-                else {
-                    td[j] = document.createElement("td");
-                    td[j].appendChild(document.createTextNode(temp[j]));
-                    tr.appendChild(td[j]);
-                }
+                if (j == 1)
+                    tr.append($("<td/>").append(temp[j]));
+                else
+                    tr.append($("<td/>").append(temp[j]));
             }
 
-            tbody.appendChild(tr);
+            tbody.append(tr);
         }
 
-        table.appendChild(tbody);
-        searchList.appendChild(table);
+        table.append(tbody);
+        $("#searchList").append(table);
 
         // Fill in the search attribute value
-        var searchTxt = document.getElementById("searchTxt");
-        searchTxt.setAttribute('value', sessionStorage.getItem('searchTxtContent'));
+        $("#searchTxt").attr("value", sessionStorage.getItem('searchTxtContent'));
 
         // SET main content in the local storage
-        var maincontent = document.getElementById('main-content');
-        sessionStorage.setItem('searchListContent', $(maincontent).html());
+        sessionStorage.setItem('searchListContent', $("#main-content").html());
 
         // Reinitialize so that last workspace does not appear in the Load Models
         // page when clicked from Model Discovery and Epithelial Model Platform page
@@ -657,7 +807,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 sendGetRequest(
                     viewHtml,
                     function (viewHtmlContent) {
-                        insertHtml("#main-content", viewHtmlContent);
+                        $("#main-content").html(viewHtmlContent);
                         sendPostRequest(endpoint, query, showView, true);
                     },
                     false);
@@ -689,7 +839,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         sendGetRequest(
             modelHtml,
             function (modelHtmlContent) {
-                insertHtml("#main-content", modelHtmlContent);
+                $("#main-content").html(modelHtmlContent);
 
                 sendPostRequest(endpoint, query, mainUtils.showModel, true);
             },
@@ -707,44 +857,30 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
         console.log("showModel: ", jsonObj);
 
-        var modelList = document.getElementById("modelList");
-
-        var table = document.createElement("table");
-        table.className = "table table-hover table-condensed"; //table-bordered table-striped
+        var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
         // Table header
-        var thead = document.createElement("thead");
-        var tr = document.createElement("tr");
+        var thead = $("<thead/>"), tr = $("<tr/>");
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
             if (i == 0) {
-                var th = document.createElement("th");
-                var label = document.createElement('label');
-                label.innerHTML = '<input id="' + jsonObj.head.vars[0] + '" type="checkbox" name="attributeAll" ' +
-                    'class="attributeAll" data-action="model" value="' + jsonObj.head.vars[0] + '" ></label>';
-
-                th.appendChild(label);
-                tr.appendChild(th);
+                tr.append($("<th/>").append($("<label/>")
+                    .html('<input id="' + jsonObj.head.vars[0] + '" type="checkbox" name="attributeAll" ' +
+                        'class="attributeAll" data-action="model" value="' + jsonObj.head.vars[0] + '" >')));
             }
 
-            var th = document.createElement("th");
-            th.appendChild(document.createTextNode(jsonObj.head.vars[i]));
-            tr.appendChild(th);
+            tr.append($("<th/>").append(jsonObj.head.vars[i]));
         }
 
-        thead.appendChild(tr);
-        table.appendChild(thead);
+        thead.append(tr);
+        table.append(thead);
 
-        // Table body
         for (var i = 0; i < jsonObj.head.vars.length; i++) {
             if (i == 0) {
                 // search list to model list with empty model
                 if (jsonObj.results.bindings.length == 0) break;
 
-                var label = document.createElement('label');
-                label.innerHTML = '<input id="' + modelEntityName + '" type="checkbox" name="attribute" ' +
-                    'class="attribute" data-action="model" value="' + modelEntityName + '" ></label>';
-
-                model.push(label);
+                model.push($("<label/>").html('<input id="' + modelEntityName + '" type="checkbox" ' +
+                    'name="attribute" class="attribute" data-action="model" value="' + modelEntityName + '" >'));
             }
 
             if (jsonObj.head.vars[i] == "Compartment") {
@@ -774,30 +910,30 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
         console.log("model and model2DArray: ", model, model2DArray);
 
-        var td = [];
-        var tbody = document.createElement("tbody");
+        // Table body
+        var tbody = $("<tbody/>"), td = [];
         for (var ix = 0; ix < model2DArray.length; ix++) {
-            var tr = document.createElement("tr");
+            var tr = $("<tr/>");
             // +1 for adding checkbox column
             for (var j = 0; j < jsonObj.head.vars.length + 1; j++) {
-                td[j] = document.createElement("td");
+                td[j] = $("<td/>");
                 if (j == 0)
-                    td[j].appendChild(model2DArray[ix][j]);
+                    td[j].append(model2DArray[ix][j]);
                 else
-                    td[j].appendChild(document.createTextNode(model2DArray[ix][j]));
+                    td[j].append(model2DArray[ix][j]);
 
                 // Id for each row
                 if (j == 1)
-                    tr.setAttribute("id", model2DArray[ix][j]);
+                    tr.attr("id", model2DArray[ix][j]);
 
-                tr.appendChild(td[j]);
+                tr.append(td[j]);
             }
 
-            tbody.appendChild(tr);
+            tbody.append(tr);
         }
 
-        table.appendChild(tbody);
-        modelList.appendChild(table);
+        table.append(tbody);
+        $("#modelList").append(table);
 
         // Un-check checkbox in the model page
         // load epithelial to model discovery to load model
@@ -954,7 +1090,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         sendGetRequest(
             svgmodelHtml,
             function (svgmodelHtmlContent) {
-                insertHtml("#main-content", svgmodelHtmlContent);
+                $("#main-content").html(svgmodelHtmlContent);
 
                 // TODO: Fix it!!
                 sendGetRequest(svgmodelHtml, showSVGModelHtml(links, model2DArray, modelEntityNameArray), false);
@@ -968,7 +1104,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         sendGetRequest(
             svgepithelialHtml,
             function (epithelialHtmlContent) {
-                insertHtml("#main-content", epithelialHtmlContent);
+                $("#main-content").html(epithelialHtmlContent);
 
                 sendGetRequest(svgepithelialHtml, mainUtils.loadEpithelial, false);
             },

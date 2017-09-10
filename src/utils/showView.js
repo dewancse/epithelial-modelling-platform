@@ -9,18 +9,14 @@ var showView = function (jsonObj, viewHtmlContent) {
 
     console.log("jsonObj: ", jsonObj);
 
-    var viewList = document.getElementById("viewList");
-
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
-        var divHead = document.createElement("div");
-        divHead.className = "h3";
+        var divHead = $("<div/>").addClass("h3");
 
-        var divText = document.createElement("div");
-        divText.className = "p";
+        var divText = $("<div/>").addClass("p");
 
-        divHead.appendChild(document.createTextNode(jsonObj.head.vars[i]));
-        divHead.appendChild(document.createElement("hr"));
-        viewList.appendChild(divHead);
+        divHead.append(jsonObj.head.vars[i]);
+        divHead.append($("<hr/>"));
+        $("#viewList").append(divHead);
 
         var tempArrayOfURL = [];
         var tempArray = [];
@@ -34,18 +30,17 @@ var showView = function (jsonObj, viewHtmlContent) {
                 var aText = createAnchor(tempValue);
                 tempArrayOfURL.push(tempValue);
                 if (searchFn(tempValue, tempArrayOfURL) <= 1)
-                    divText.appendChild(aText);
+                    divText.append(aText);
             }
             else {
                 tempArray.push(tempValue);
                 if (searchFn(tempValue, tempArray) <= 1)
-                    divText.appendChild(document.createTextNode(tempValue));
+                    divText.append(tempValue);
             }
 
-            viewList.appendChild(divText);
+            $("#viewList").append(divText);
 
-            var divText = document.createElement("div");
-            divText.className = "p";
+            var divText = $("<div/>").addClass("p");
         }
     }
 };
