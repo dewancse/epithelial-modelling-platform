@@ -380,6 +380,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
+    // OPB concentration and sodium atom URI
+    // <http://identifiers.org/opb/OPB_00593>
+    // <http://identifiers.org/chebi/CHEBI:26708>
+
     /*
      * relatedModel - all related models
      * relatedModelValue - filtered related models which have #protein
@@ -1648,7 +1652,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             // console.log("mousedown: ", event.which);
 
             // 1 => left click, 2 => middle click, 3 => right click
-            if (event.which == 2)
+            if (event.which == 3)
                 div.style("display", "none");
         },
 
@@ -1685,7 +1689,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     state = 0;
                 }
             }
-        },
+        }
     });
 
     // apical, basolateral, paracellular, cell junction, wall of smooth and rough ER membrane
@@ -6420,6 +6424,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         footerSaveButton: 'Yes'
                     });
 
+                    $('#myWelcomeModal').modal({backdrop: 'static', keyboard: false});
                     m.show();
 
                     function welcomeModal(options) {
@@ -6446,7 +6451,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
 
                                 if ($this.options.closeButton) {
-                                    win.find('.modal-header').prepend('<button type="button" class="close" data-dismiss="modal">&times;</button>');
+                                    win.find('.modal-header').prepend('<button type="button" ' +
+                                        'class="close" data-dismiss="modal">&times;</button>');
                                 }
                             }
 
@@ -6454,11 +6460,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 win.append('<div class="modal-footer"></div>');
 
                                 if ($this.options.footerCloseButton) {
-                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="closeID" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="closeID" href="#" ' +
+                                        'class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
                                 }
 
                                 if ($this.options.footerSaveButton) {
-                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="saveID" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="saveID" href="#" ' +
+                                        'class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
                                 }
                             }
 
@@ -6468,25 +6476,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 console.log("first close button clicked!");
 
                                 // duplicate only circle temporarily
-                                if ($(cthis).prop("tagName") == "circle") {
-                                    cx = $(cthis).prop("cx").baseVal.value;
-                                    cy = $(cthis).prop("cy").baseVal.value;
-
-                                    console.log("cthis, cx, and cy: ", cthis, cx, cy);
-
-                                    lineg.append("circle")
-                                        .attr("id", "linewithlineg" + cthis.id)
-                                        .attr("cx", function (d) {
-                                            return cx;
-                                        })
-                                        .attr("cy", function (d) {
-                                            return cy;
-                                        })
-                                        .attr("r", radius)
-                                        .attr("fill", "orange")
-                                        .attr("stroke-width", 20)
-                                        .attr("cursor", "move");
-                                }
+                                // if ($(cthis).prop("tagName") == "circle") {
+                                //     cx = $(cthis).prop("cx").baseVal.value;
+                                //     cy = $(cthis).prop("cy").baseVal.value;
+                                //
+                                //     console.log("cthis, cx, and cy: ", cthis, cx, cy);
+                                //
+                                //     lineg.append("circle")
+                                //         .attr("id", "linewithlineg" + cthis.id)
+                                //         .attr("cx", function (d) {
+                                //             return cx;
+                                //         })
+                                //         .attr("cy", function (d) {
+                                //             return cy;
+                                //         })
+                                //         .attr("r", radius)
+                                //         .attr("fill", "orange")
+                                //         .attr("stroke-width", 20)
+                                //         .attr("cursor", "move");
+                                // }
 
                                 moveBack();
                                 membraneColorBack();
@@ -6506,6 +6514,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                     footerSaveButton: 'Save'
                                 });
 
+                                $('#myModal').modal({backdrop: 'static', keyboard: false});
                                 m.getBody().html('<div id="modalBody"></div>');
                                 m.show();
 
@@ -6912,9 +6921,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     var relatedMembraneModel = function (workspaceName, membraneName) {
-        var query = 'SELECT ?Protein ' +
+        var query = 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+            'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+            'SELECT ?Protein ?URI ' +
             'WHERE { GRAPH ?g { ' +
-            '<' + membraneModel[idMembrane] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+            '<' + membraneModel[idMembrane] + '#Protein> dcterms:description ?Protein . ' +
+            '<' + membraneModel[idMembrane] + '#Protein> ro:hasPhysicalDefinition ?URI . ' +
             '}}'
 
         console.log("membraneModel[idMembrane]: ", membraneModel[idMembrane]);
@@ -6955,13 +6967,20 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         console.log("jsonObjFlux: ", jsonObjFlux);
 
                         if (jsonRelatedMembraneModel.results.bindings.length != 0) {
-                            membraneModelValue.push(jsonRelatedMembraneModel.results.bindings[0].Protein.value);
+                            membraneModelValue.push({
+                                protein: jsonRelatedMembraneModel.results.bindings[0].Protein.value,
+                                // uri1 is the dragged circle
+                                uri1: combinedMembrane[0].med_pr,
+                                uri2: jsonRelatedMembraneModel.results.bindings[0].URI.value,
+                                medfma: combinedMembrane[0].med_fma,
+                                similar: 0 // initial percent
+                            });
                             // membraneModeID.push(membraneModel[idMembrane]);
 
                             membraneObject.push({
                                 source_fma: jsonObjFlux.results.bindings[0].source_fma.value,
                                 sink_fma: jsonObjFlux.results.bindings[0].sink_fma.value,
-                                med_fma: jsonObjFlux.results.bindings[0].med_entity_uri.value,
+                                med_fma: jsonObjFlux.results.bindings[0].med_entity_uri.value
                             });
 
                             membraneModelID.push([
@@ -6995,70 +7014,107 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             var protein = "<p><b>Protein: </b>" + proteinName + "</p>";
 
                             // Related apical or basolateral model
-                            var membraneTransporter = "<p><b>" + membraneName + " model</b>";
-                            if (membraneModelValue.length == 0) {
-                                membraneTransporter += "<br>Not Exist";
-                            }
-                            else {
-                                for (var i = 0; i < membraneModelValue.length; i++) {
-                                    var label = document.createElement('label');
-                                    label.innerHTML = '<br><input id="' + membraneModelID[i] + '" type="checkbox" ' +
-                                        'value="' + membraneModelValue[i] + '">' + membraneModelValue[i] + '</label>';
-
-                                    membraneTransporter += label.innerHTML;
+                            var dataJSON = [];
+                            d3.json("data.json", function (data) {
+                                for (var i = 0; i < data.length; i++) {
+                                    dataJSON.push({
+                                        pid1: data[i].pid1,
+                                        pid2: data[i].pid2,
+                                        name1: data[i].name1,
+                                        name2: data[i].name2,
+                                        uri1: data[i].uri1,
+                                        uri2: data[i].uri2,
+                                        similar: data[i].similar
+                                    })
                                 }
-                            }
 
-                            // Alternative model
-                            var alternativeModel = "<p><b>Alternative model of " + proteinName + "</b>";
-                            // console.log("Alternative model: ", altCellmlModel);
-                            if (altCellmlModel == "") {
-                                alternativeModel += "<br>Not Exist";
-                            }
-                            else {
-                                alternativeModel += "</b>" + altCellmlModel + "</p>";
-                            }
+                                console.log("dataJSON: ", dataJSON);
 
-                            // related organ models (kidney, lungs, etc) in PMR
-                            var relatedOrganModels = "<p><b>" + typeOfModel + " model in PMR</b>";
-                            // console.log("related kidney model: ", relatedModelValue, relatedOrganModels);
-                            if (relatedModelValue.length == 1) { // includes own protein name
-                                relatedOrganModels += "<br>Not Exist";
-                            }
-                            else {
-                                for (var i = 0; i < relatedModelValue.length; i++) {
-
-                                    if (proteinName == relatedModelValue[i])
-                                        continue;
-
-                                    var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + relatedModelID[i];
-
-                                    var label = document.createElement('label');
-                                    label.innerHTML = '<br><a href="' + workspaceURI + '" target="_blank"> ' + relatedModelValue[i] + '</a></label>';
-
-                                    relatedOrganModels += label.innerHTML;
+                                for (var m = 0; m < membraneModelValue.length; m++) {
+                                    for (var n = 0; n < dataJSON.length; n++) {
+                                        if (membraneModelValue[m].uri1 == dataJSON[n].uri1 &&
+                                            membraneModelValue[m].uri2 == dataJSON[n].uri2) {
+                                            membraneModelValue[m].similar = dataJSON[n].similar;
+                                        }
+                                    }
                                 }
-                            }
 
-                            $('#modalBody').empty();
+                                console.log("membraneModelValue: ", membraneModelValue);
 
-                            $('#modalBody')
-                                .append(msg2)
-                                .append(model)
-                                .append(biological)
-                                .append(species)
-                                .append(gene)
-                                .append(protein);
+                                // Descending sorting
+                                membraneModelValue.sort(function (a, b) {
+                                    return b.similar - a.similar;
+                                });
 
-                            var msg3 = "<br><p><b>Recommendations/suggestions based on existing models in PMR<b><\p>";
+                                console.log("AFTER membraneModelValue: ", membraneModelValue);
 
-                            $('#modalBody')
-                                .append(msg3)
-                                .append(membraneTransporter)
-                                .append(alternativeModel)
-                                .append(relatedOrganModels);
+                                var membraneTransporter = "<p><b>" + membraneName + " model</b>";
+                                if (membraneModelValue.length == 0) {
+                                    membraneTransporter += "<br>Not Exist";
+                                }
+                                else {
+                                    for (var i = 0; i < membraneModelValue.length; i++) {
+                                        var label = document.createElement('label');
+                                        label.innerHTML = '<br><input id="' + membraneModelID[i] + '" type="checkbox" ' +
+                                            'value="' + membraneModelValue[i].protein + '">' +
+                                            '' + membraneModelValue[i].protein + '</label>';
 
-                            console.log("outside modelbody!");
+                                        membraneTransporter += label.innerHTML;
+                                    }
+                                }
+
+                                // Alternative model
+                                var alternativeModel = "<p><b>Alternative model of " + proteinName + "</b>";
+                                // console.log("Alternative model: ", altCellmlModel);
+                                if (altCellmlModel == "") {
+                                    alternativeModel += "<br>Not Exist";
+                                }
+                                else {
+                                    alternativeModel += "</b>" + altCellmlModel + "</p>";
+                                }
+
+                                // related organ models (kidney, lungs, etc) in PMR
+                                var relatedOrganModels = "<p><b>" + typeOfModel + " model in PMR</b>";
+                                // console.log("related kidney model: ", relatedModelValue, relatedOrganModels);
+                                if (relatedModelValue.length == 1) { // includes own protein name
+                                    relatedOrganModels += "<br>Not Exist";
+                                }
+                                else {
+                                    for (var i = 0; i < relatedModelValue.length; i++) {
+
+                                        if (proteinName == relatedModelValue[i])
+                                            continue;
+
+                                        var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + relatedModelID[i];
+
+                                        var label = document.createElement('label');
+                                        label.innerHTML = '<br><a href="' + workspaceURI + '" target="_blank"> ' + relatedModelValue[i] + '</a></label>';
+
+                                        relatedOrganModels += label.innerHTML;
+                                    }
+                                }
+
+                                $('#modalBody').empty();
+
+                                $('#modalBody')
+                                    .append(msg2)
+                                    .append(model)
+                                    .append(biological)
+                                    .append(species)
+                                    .append(gene)
+                                    .append(protein);
+
+                                var msg3 = "<br><p><b>Recommendations/suggestions based on existing models in PMR<b><\p>";
+
+                                $('#modalBody')
+                                    .append(msg3)
+                                    .append(membraneTransporter)
+                                    .append(alternativeModel)
+                                    .append(relatedOrganModels);
+
+                                console.log("outside modelbody!");
+
+                            })
 
                             return;
                         }
@@ -7180,7 +7236,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
 
                 if ($this.options.closeButton) {
-                    win.find('.modal-header').prepend('<button type="button" class="close" data-dismiss="modal">&times;</button>');
+                    win.find('.modal-header').prepend('<button type="button" ' +
+                        'class="close" data-dismiss="modal">&times;</button>');
                 }
             }
 
@@ -7189,11 +7246,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 win.append('<div class="modal-footer"></div>');
 
                 if ($this.options.footerCloseButton) {
-                    win.find('.modal-footer').append('<a data-dismiss="modal" id="mcloseID" href="#" class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="mcloseID" href="#" ' +
+                        'class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
                 }
 
                 if ($this.options.footerSaveButton) {
-                    win.find('.modal-footer').append('<a data-dismiss="modal" id="msaveID" href="#" class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="msaveID" href="#" ' +
+                        'class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
                 }
             }
 
@@ -7784,9 +7843,188 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     };
 
     // On page load (before img or CSS)
-    // $(document).ready(function (event) {
-    //     // Place some startup code here
-    // });
+    $(document).ready(function (event) {
+        // Place some startup code here
+    });
+
+    $(document).on({
+        click: function () {
+            // If there's an action with the given name, call it
+            if (typeof actions[event.target.dataset.action] === "function") {
+                actions[event.target.dataset.action].call(this, event);
+            }
+
+        },
+
+        keydown: function () {
+            // semantic annotation based on search items
+            if (event.key == 'Enter') {
+
+                var uriOPB, uriCHEBI, keyValue;
+                var searchTxt = document.getElementById("searchTxt").value;
+
+                // set local storage
+                sessionStorage.setItem('searchTxtContent', searchTxt);
+
+                // dictionary object
+                var dictionary = [
+                    {
+                        "key1": "flux", "key2": "",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
+                    },
+                    {
+                        "key1": "flux", "key2": "sodium",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+                    },
+                    {
+                        "key1": "flux", "key2": "hydrogen",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+                    },
+                    {
+                        "key1": "flux", "key2": "ammonium",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+                    },
+                    {
+                        "key1": "flux", "key2": "chloride",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+                    },
+                    {
+                        "key1": "flux", "key2": "potassium",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+                    },
+                    {
+                        "key1": "flux", "key2": "calcium",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+                    },
+                    {
+                        "key1": "flux", "key2": "IP3",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+                    },
+                    {
+                        "key1": "flux", "key2": "glucose",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+                    },
+                    {
+                        "key1": "flux", "key2": "lactate",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+                    },
+                    {
+                        "key1": "flux", "key2": "aldosterone",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
+                    },
+                    {
+                        "key1": "flux", "key2": "thiazide",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
+                    },
+                    {
+                        "key1": "flux", "key2": "ATP",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
+                    },
+                    {
+                        "key1": "concentration", "key2": "sodium",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "hydrogen",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "ammonium",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "chloride",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "potassium",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "calcium",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "IP3",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "ATP",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "glucose",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "lactate",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "aldosterone",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "thiazide",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
+                    }
+                ];
+
+                for (var i = 0; i < dictionary.length; i++) {
+                    var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
+                        key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
+
+                    if (key1 != -1 && key2 != -1) {
+                        uriOPB = dictionary[i].opb;
+                        uriCHEBI = dictionary[i].chebi;
+                        keyValue = dictionary[i].key1;
+                    }
+                }
+
+                showLoading("#searchList");
+
+                modelEntity = [];
+                biologicalMeaning = [];
+                speciesList = [];
+                geneList = [];
+                proteinList = [];
+                head = [];
+                filterModelEntity = [];
+
+                id = 0; // id to index each Model_entity
+
+                mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
+            }
+        }
+    });
 
     var isExist = function (element) {
         // console.log("element: ", element);
@@ -7819,10 +8057,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
             console.log("search event: ", event);
 
-            if (event.srcElement.className == "checkbox") {
+            if (event.target.className == "checkbox") {
 
-                if (event.srcElement.checked) {
-                    var idWithStr = event.srcElement.id;
+                if (event.target.checked) {
+                    var idWithStr = event.target.id;
                     var index = idWithStr.search("#");
                     var workspaceName = idWithStr.slice(0, index);
 
@@ -7843,29 +8081,29 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             console.log("model event: ", event);
 
             // select one by one
-            if (event.srcElement.className == "attribute") {
+            if (event.target.className == "attribute") {
 
-                if (event.srcElement.checked) {
+                if (event.target.checked) {
 
-                    if (!isExist(event.srcElement.value)) {
-                        templistOfModel.push(event.srcElement.value);
+                    if (!isExist(event.target.value)) {
+                        templistOfModel.push(event.target.value);
 
                         // for making visualization graph
-                        modelEntityNameArray.push(event.srcElement.value);
-                        modelEntityFullNameArray.push(event.srcElement.value);
+                        modelEntityNameArray.push(event.target.value);
+                        modelEntityFullNameArray.push(event.target.value);
                     }
                 }
                 else {
-                    var pos = templistOfModel.indexOf(event.srcElement.value);
+                    var pos = templistOfModel.indexOf(event.target.value);
                     templistOfModel.splice(pos, 1);
 
                     // for making visualization graph
-                    var pos2 = modelEntityNameArray.indexOf(event.srcElement.value);
+                    var pos2 = modelEntityNameArray.indexOf(event.target.value);
                     modelEntityNameArray.splice(pos2, 1);
                     modelEntityFullNameArray.splice(pos2, 1);
                 }
 
-                var idWithStr = event.srcElement.id;
+                var idWithStr = event.target.id;
                 var index = idWithStr.search("#");
                 var workspaceName = idWithStr.slice(0, index);
 
@@ -7874,9 +8112,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             }
 
             // select all
-            if (event.srcElement.className == "attributeAll") {
+            if (event.target.className == "attributeAll") {
 
-                if (event.srcElement.checked == true) {
+                if (event.target.checked == true) {
                     for (var i = 0; i < $('.attribute').length; i++) {
                         $('.attribute')[i].checked = true;
 
@@ -7941,359 +8179,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#listDiscovery");
     };
-
-    // Event invocation to SEARCH, MODEL
-    document.addEventListener('click', function (event) {
-        // If there's an action with the given name, call it
-        if (typeof actions[event.srcElement.dataset.action] === "function") {
-            actions[event.srcElement.dataset.action].call(this, event);
-        }
-    })
-
-    // $(document).click(function (event) {
-    //     // If there's an action with the given name, call it
-    //     if (typeof actions[event.srcElement.dataset.action] === "function") {
-    //         actions[event.srcElement.dataset.action].call(this, event);
-    //     }
-    // })
-
-    // semantic annotation based on search items
-    $(document).keydown(function (event) {
-        if (event.key == 'Enter') {
-
-            var uriOPB, uriCHEBI, keyValue;
-            var searchTxt = document.getElementById("searchTxt").value;
-
-            // set local storage
-            sessionStorage.setItem('searchTxtContent', searchTxt);
-
-            // dictionary object
-            var dictionary = [
-                {
-                    "key1": "flux", "key2": "",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
-                },
-                {
-                    "key1": "flux", "key2": "sodium",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
-                },
-                {
-                    "key1": "flux", "key2": "hydrogen",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
-                },
-                {
-                    "key1": "flux", "key2": "ammonium",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
-                },
-                {
-                    "key1": "flux", "key2": "chloride",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
-                },
-                {
-                    "key1": "flux", "key2": "potassium",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
-                },
-                {
-                    "key1": "flux", "key2": "calcium",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-                },
-                {
-                    "key1": "flux", "key2": "IP3",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-                },
-                {
-                    "key1": "flux", "key2": "glucose",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-                },
-                {
-                    "key1": "flux", "key2": "lactate",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-                },
-                {
-                    "key1": "flux", "key2": "aldosterone",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-                },
-                {
-                    "key1": "flux", "key2": "thiazide",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-                },
-                {
-                    "key1": "flux", "key2": "ATP",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-                },
-                {
-                    "key1": "concentration", "key2": "",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
-                },
-                {
-                    "key1": "concentration", "key2": "sodium",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
-                },
-                {
-                    "key1": "concentration", "key2": "hydrogen",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
-                },
-                {
-                    "key1": "concentration", "key2": "ammonium",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
-                },
-                {
-                    "key1": "concentration", "key2": "chloride",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
-                },
-                {
-                    "key1": "concentration", "key2": "potassium",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
-                },
-                {
-                    "key1": "concentration", "key2": "calcium",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-                },
-                {
-                    "key1": "concentration", "key2": "IP3",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-                },
-                {
-                    "key1": "concentration", "key2": "ATP",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-                },
-                {
-                    "key1": "concentration", "key2": "glucose",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-                },
-                {
-                    "key1": "concentration", "key2": "lactate",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-                },
-                {
-                    "key1": "concentration", "key2": "aldosterone",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-                },
-                {
-                    "key1": "concentration", "key2": "thiazide",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-                }
-            ];
-
-            for (var i = 0; i < dictionary.length; i++) {
-                var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
-                    key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
-
-                if (key1 != -1 && key2 != -1) {
-                    uriOPB = dictionary[i].opb;
-                    uriCHEBI = dictionary[i].chebi;
-                    keyValue = dictionary[i].key1;
-                }
-            }
-
-            showLoading("#searchList");
-
-            modelEntity = [];
-            biologicalMeaning = [];
-            speciesList = [];
-            geneList = [];
-            proteinList = [];
-            head = [];
-            filterModelEntity = [];
-
-            id = 0; // id to index each Model_entity
-
-            mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
-        }
-    })
-
-    // semantic annotation based on search items
-    // document.addEventListener('keydown', function (event) {
-    //     if (event.key == 'Enter') {
-    //
-    //         var uriOPB, uriCHEBI, keyValue;
-    //         var searchTxt = document.getElementById("searchTxt").value;
-    //
-    //         // set local storage
-    //         sessionStorage.setItem('searchTxtContent', searchTxt);
-    //
-    //         // dictionary object
-    //         var dictionary = [
-    //             {
-    //                 "key1": "flux", "key2": "",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "sodium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "hydrogen",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "ammonium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "chloride",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "potassium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "calcium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "IP3",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "glucose",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "lactate",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "aldosterone",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "thiazide",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "ATP",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "sodium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "hydrogen",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "ammonium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "chloride",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "potassium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "calcium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "IP3",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "ATP",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "glucose",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "lactate",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "aldosterone",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "thiazide",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-    //             }
-    //         ];
-    //
-    //         for (var i = 0; i < dictionary.length; i++) {
-    //             var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
-    //                 key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
-    //
-    //             if (key1 != -1 && key2 != -1) {
-    //                 uriOPB = dictionary[i].opb;
-    //                 uriCHEBI = dictionary[i].chebi;
-    //                 keyValue = dictionary[i].key1;
-    //             }
-    //         }
-    //
-    //         showLoading("#searchList");
-    //
-    //         modelEntity = [];
-    //         biologicalMeaning = [];
-    //         speciesList = [];
-    //         geneList = [];
-    //         proteinList = [];
-    //         head = [];
-    //         filterModelEntity = [];
-    //
-    //         id = 0; // id to index each Model_entity
-    //
-    //         mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
-    //     }
-    // })
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
 
@@ -8661,16 +8546,16 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     // Toggle table column in Model discovery
     mainUtils.toggleColHtml = function () {
 
-        if (event.srcElement.checked == false) {
-            var id = event.srcElement.id;
+        if (event.target.checked == false) {
+            var id = event.target.id;
 
             console.log("id: ", id);
 
             $('td:nth-child(' + id + '),th:nth-child(' + id + ')').hide();
         }
 
-        if (event.srcElement.checked == true) {
-            var id = event.srcElement.id;
+        if (event.target.checked == true) {
+            var id = event.target.id;
 
             console.log("id: ", id);
 
@@ -8681,16 +8566,16 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     // Toggle table column in Load model
     mainUtils.toggleColModelHtml = function () {
 
-        if (event.srcElement.checked == false) {
-            var id = event.srcElement.id;
+        if (event.target.checked == false) {
+            var id = event.target.id;
 
             console.log("id: ", id);
 
             $('td:nth-child(' + id + '),th:nth-child(' + id + ')').hide();
         }
 
-        if (event.srcElement.checked == true) {
-            var id = event.srcElement.id;
+        if (event.target.checked == true) {
+            var id = event.target.id;
 
             console.log("id: ", id);
 
@@ -8703,9 +8588,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         var tempstr = [];
 
-        if (event.srcElement.checked == true) {
+        if (event.target.checked == true) {
 
-            var id = event.srcElement.id;
+            var id = event.target.id;
             for (var i = 1; i < $('table tr').length; i++) {
 
                 tempstr = $('table tr')[i].childNodes[2].id.split(',');
@@ -8724,10 +8609,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             }
         }
 
-        if (event.srcElement.checked == false) {
+        if (event.target.checked == false) {
 
             var tempstr = [];
-            var id = event.srcElement.id;
+            var id = event.target.id;
 
             str = uniqueifySrcSnkMed(str); // remove duplicate
             str.splice(str.indexOf(id), 1); // delete id

@@ -74,9 +74,188 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     };
 
     // On page load (before img or CSS)
-    // $(document).ready(function (event) {
-    //     // Place some startup code here
-    // });
+    $(document).ready(function (event) {
+        // Place some startup code here
+    });
+
+    $(document).on({
+        click: function () {
+            // If there's an action with the given name, call it
+            if (typeof actions[event.target.dataset.action] === "function") {
+                actions[event.target.dataset.action].call(this, event);
+            }
+
+        },
+
+        keydown: function () {
+            // semantic annotation based on search items
+            if (event.key == 'Enter') {
+
+                var uriOPB, uriCHEBI, keyValue;
+                var searchTxt = document.getElementById("searchTxt").value;
+
+                // set local storage
+                sessionStorage.setItem('searchTxtContent', searchTxt);
+
+                // dictionary object
+                var dictionary = [
+                    {
+                        "key1": "flux", "key2": "",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
+                    },
+                    {
+                        "key1": "flux", "key2": "sodium",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+                    },
+                    {
+                        "key1": "flux", "key2": "hydrogen",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+                    },
+                    {
+                        "key1": "flux", "key2": "ammonium",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+                    },
+                    {
+                        "key1": "flux", "key2": "chloride",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+                    },
+                    {
+                        "key1": "flux", "key2": "potassium",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+                    },
+                    {
+                        "key1": "flux", "key2": "calcium",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+                    },
+                    {
+                        "key1": "flux", "key2": "IP3",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+                    },
+                    {
+                        "key1": "flux", "key2": "glucose",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+                    },
+                    {
+                        "key1": "flux", "key2": "lactate",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+                    },
+                    {
+                        "key1": "flux", "key2": "aldosterone",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
+                    },
+                    {
+                        "key1": "flux", "key2": "thiazide",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
+                    },
+                    {
+                        "key1": "flux", "key2": "ATP",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
+                    },
+                    {
+                        "key1": "concentration", "key2": "sodium",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "hydrogen",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "ammonium",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "chloride",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "potassium",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "calcium",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "IP3",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "ATP",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "glucose",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "lactate",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "aldosterone",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
+                    },
+                    {
+                        "key1": "concentration", "key2": "thiazide",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>",
+                        "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
+                    }
+                ];
+
+                for (var i = 0; i < dictionary.length; i++) {
+                    var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
+                        key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
+
+                    if (key1 != -1 && key2 != -1) {
+                        uriOPB = dictionary[i].opb;
+                        uriCHEBI = dictionary[i].chebi;
+                        keyValue = dictionary[i].key1;
+                    }
+                }
+
+                showLoading("#searchList");
+
+                modelEntity = [];
+                biologicalMeaning = [];
+                speciesList = [];
+                geneList = [];
+                proteinList = [];
+                head = [];
+                filterModelEntity = [];
+
+                id = 0; // id to index each Model_entity
+
+                mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
+            }
+        }
+    });
 
     var isExist = function (element) {
         // console.log("element: ", element);
@@ -109,10 +288,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
             console.log("search event: ", event);
 
-            if (event.srcElement.className == "checkbox") {
+            if (event.target.className == "checkbox") {
 
-                if (event.srcElement.checked) {
-                    var idWithStr = event.srcElement.id;
+                if (event.target.checked) {
+                    var idWithStr = event.target.id;
                     var index = idWithStr.search("#");
                     var workspaceName = idWithStr.slice(0, index);
 
@@ -133,29 +312,29 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             console.log("model event: ", event);
 
             // select one by one
-            if (event.srcElement.className == "attribute") {
+            if (event.target.className == "attribute") {
 
-                if (event.srcElement.checked) {
+                if (event.target.checked) {
 
-                    if (!isExist(event.srcElement.value)) {
-                        templistOfModel.push(event.srcElement.value);
+                    if (!isExist(event.target.value)) {
+                        templistOfModel.push(event.target.value);
 
                         // for making visualization graph
-                        modelEntityNameArray.push(event.srcElement.value);
-                        modelEntityFullNameArray.push(event.srcElement.value);
+                        modelEntityNameArray.push(event.target.value);
+                        modelEntityFullNameArray.push(event.target.value);
                     }
                 }
                 else {
-                    var pos = templistOfModel.indexOf(event.srcElement.value);
+                    var pos = templistOfModel.indexOf(event.target.value);
                     templistOfModel.splice(pos, 1);
 
                     // for making visualization graph
-                    var pos2 = modelEntityNameArray.indexOf(event.srcElement.value);
+                    var pos2 = modelEntityNameArray.indexOf(event.target.value);
                     modelEntityNameArray.splice(pos2, 1);
                     modelEntityFullNameArray.splice(pos2, 1);
                 }
 
-                var idWithStr = event.srcElement.id;
+                var idWithStr = event.target.id;
                 var index = idWithStr.search("#");
                 var workspaceName = idWithStr.slice(0, index);
 
@@ -164,9 +343,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             }
 
             // select all
-            if (event.srcElement.className == "attributeAll") {
+            if (event.target.className == "attributeAll") {
 
-                if (event.srcElement.checked == true) {
+                if (event.target.checked == true) {
                     for (var i = 0; i < $('.attribute').length; i++) {
                         $('.attribute')[i].checked = true;
 
@@ -231,359 +410,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#listDiscovery");
     };
-
-    // Event invocation to SEARCH, MODEL
-    document.addEventListener('click', function (event) {
-        // If there's an action with the given name, call it
-        if (typeof actions[event.srcElement.dataset.action] === "function") {
-            actions[event.srcElement.dataset.action].call(this, event);
-        }
-    })
-
-    // $(document).click(function (event) {
-    //     // If there's an action with the given name, call it
-    //     if (typeof actions[event.srcElement.dataset.action] === "function") {
-    //         actions[event.srcElement.dataset.action].call(this, event);
-    //     }
-    // })
-
-    // semantic annotation based on search items
-    $(document).keydown(function (event) {
-        if (event.key == 'Enter') {
-
-            var uriOPB, uriCHEBI, keyValue;
-            var searchTxt = document.getElementById("searchTxt").value;
-
-            // set local storage
-            sessionStorage.setItem('searchTxtContent', searchTxt);
-
-            // dictionary object
-            var dictionary = [
-                {
-                    "key1": "flux", "key2": "",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
-                },
-                {
-                    "key1": "flux", "key2": "sodium",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
-                },
-                {
-                    "key1": "flux", "key2": "hydrogen",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
-                },
-                {
-                    "key1": "flux", "key2": "ammonium",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
-                },
-                {
-                    "key1": "flux", "key2": "chloride",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
-                },
-                {
-                    "key1": "flux", "key2": "potassium",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
-                },
-                {
-                    "key1": "flux", "key2": "calcium",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-                },
-                {
-                    "key1": "flux", "key2": "IP3",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-                },
-                {
-                    "key1": "flux", "key2": "glucose",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-                },
-                {
-                    "key1": "flux", "key2": "lactate",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-                },
-                {
-                    "key1": "flux", "key2": "aldosterone",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-                },
-                {
-                    "key1": "flux", "key2": "thiazide",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-                },
-                {
-                    "key1": "flux", "key2": "ATP",
-                    "opb": "<http://identifiers.org/opb/OPB_00593>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-                },
-                {
-                    "key1": "concentration", "key2": "",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
-                },
-                {
-                    "key1": "concentration", "key2": "sodium",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
-                },
-                {
-                    "key1": "concentration", "key2": "hydrogen",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
-                },
-                {
-                    "key1": "concentration", "key2": "ammonium",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
-                },
-                {
-                    "key1": "concentration", "key2": "chloride",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
-                },
-                {
-                    "key1": "concentration", "key2": "potassium",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
-                },
-                {
-                    "key1": "concentration", "key2": "calcium",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-                },
-                {
-                    "key1": "concentration", "key2": "IP3",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-                },
-                {
-                    "key1": "concentration", "key2": "ATP",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-                },
-                {
-                    "key1": "concentration", "key2": "glucose",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-                },
-                {
-                    "key1": "concentration", "key2": "lactate",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-                },
-                {
-                    "key1": "concentration", "key2": "aldosterone",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-                },
-                {
-                    "key1": "concentration", "key2": "thiazide",
-                    "opb": "<http://identifiers.org/opb/OPB_00340>",
-                    "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-                }
-            ];
-
-            for (var i = 0; i < dictionary.length; i++) {
-                var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
-                    key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
-
-                if (key1 != -1 && key2 != -1) {
-                    uriOPB = dictionary[i].opb;
-                    uriCHEBI = dictionary[i].chebi;
-                    keyValue = dictionary[i].key1;
-                }
-            }
-
-            showLoading("#searchList");
-
-            modelEntity = [];
-            biologicalMeaning = [];
-            speciesList = [];
-            geneList = [];
-            proteinList = [];
-            head = [];
-            filterModelEntity = [];
-
-            id = 0; // id to index each Model_entity
-
-            mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
-        }
-    })
-
-    // semantic annotation based on search items
-    // document.addEventListener('keydown', function (event) {
-    //     if (event.key == 'Enter') {
-    //
-    //         var uriOPB, uriCHEBI, keyValue;
-    //         var searchTxt = document.getElementById("searchTxt").value;
-    //
-    //         // set local storage
-    //         sessionStorage.setItem('searchTxtContent', searchTxt);
-    //
-    //         // dictionary object
-    //         var dictionary = [
-    //             {
-    //                 "key1": "flux", "key2": "",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "sodium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "hydrogen",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "ammonium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "chloride",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "potassium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "calcium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "IP3",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "glucose",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "lactate",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "aldosterone",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "thiazide",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-    //             },
-    //             {
-    //                 "key1": "flux", "key2": "ATP",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00593>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "sodium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26708>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "hydrogen",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:49637>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "ammonium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "chloride",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "potassium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:26216>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "calcium",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "IP3",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "ATP",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "glucose",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "lactate",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "aldosterone",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-    //             },
-    //             {
-    //                 "key1": "concentration", "key2": "thiazide",
-    //                 "opb": "<http://identifiers.org/opb/OPB_00340>",
-    //                 "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-    //             }
-    //         ];
-    //
-    //         for (var i = 0; i < dictionary.length; i++) {
-    //             var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
-    //                 key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
-    //
-    //             if (key1 != -1 && key2 != -1) {
-    //                 uriOPB = dictionary[i].opb;
-    //                 uriCHEBI = dictionary[i].chebi;
-    //                 keyValue = dictionary[i].key1;
-    //             }
-    //         }
-    //
-    //         showLoading("#searchList");
-    //
-    //         modelEntity = [];
-    //         biologicalMeaning = [];
-    //         speciesList = [];
-    //         geneList = [];
-    //         proteinList = [];
-    //         head = [];
-    //         filterModelEntity = [];
-    //
-    //         id = 0; // id to index each Model_entity
-    //
-    //         mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
-    //     }
-    // })
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
 
@@ -951,16 +777,16 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     // Toggle table column in Model discovery
     mainUtils.toggleColHtml = function () {
 
-        if (event.srcElement.checked == false) {
-            var id = event.srcElement.id;
+        if (event.target.checked == false) {
+            var id = event.target.id;
 
             console.log("id: ", id);
 
             $('td:nth-child(' + id + '),th:nth-child(' + id + ')').hide();
         }
 
-        if (event.srcElement.checked == true) {
-            var id = event.srcElement.id;
+        if (event.target.checked == true) {
+            var id = event.target.id;
 
             console.log("id: ", id);
 
@@ -971,16 +797,16 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     // Toggle table column in Load model
     mainUtils.toggleColModelHtml = function () {
 
-        if (event.srcElement.checked == false) {
-            var id = event.srcElement.id;
+        if (event.target.checked == false) {
+            var id = event.target.id;
 
             console.log("id: ", id);
 
             $('td:nth-child(' + id + '),th:nth-child(' + id + ')').hide();
         }
 
-        if (event.srcElement.checked == true) {
-            var id = event.srcElement.id;
+        if (event.target.checked == true) {
+            var id = event.target.id;
 
             console.log("id: ", id);
 
@@ -993,9 +819,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
         var tempstr = [];
 
-        if (event.srcElement.checked == true) {
+        if (event.target.checked == true) {
 
-            var id = event.srcElement.id;
+            var id = event.target.id;
             for (var i = 1; i < $('table tr').length; i++) {
 
                 tempstr = $('table tr')[i].childNodes[2].id.split(',');
@@ -1014,10 +840,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             }
         }
 
-        if (event.srcElement.checked == false) {
+        if (event.target.checked == false) {
 
             var tempstr = [];
-            var id = event.srcElement.id;
+            var id = event.target.id;
 
             str = uniqueifySrcSnkMed(str); // remove duplicate
             str.splice(str.indexOf(id), 1); // delete id
