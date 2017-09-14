@@ -1107,6 +1107,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 // exceptional case: one flux is chosen
                 if (membrane.length <= 1) {
                     // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
+                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
                     // console.log("membrane.length <= 1 source_fma2: ", source_fma2);
                     // console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
                     // console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
@@ -1135,9 +1136,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 return;
             }
 
+            // TODO: For cotransporter - how to get CHEBI terms?
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
+                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?source_chebi ' +
                 'WHERE { ' +
                 '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
                 '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
@@ -1145,6 +1147,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
                 '?source_entity ro:part_of ?source_part_of_entity. ' +
                 '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
+                '?source_entity semsim:hasPhysicalDefinition ?source_chebi. ' +
                 '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
                 '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
                 '?sink_entity ro:part_of ?sink_part_of_entity. ' +
@@ -1159,7 +1162,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
-                    // console.log("jsonObjFlux: ", jsonObjFlux);
+                    console.log("jsonObjFlux: ", jsonObjFlux);
 
                     for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
 

@@ -4,6 +4,7 @@
 var solutesBouncing = require("./solutesBouncing.js").solutesBouncing;
 var getTextWidth = require("../utils/misc.js").getTextWidth;
 var uniqueify = require("../utils/misc.js").uniqueify;
+var uniqueifyjsonFlux = require("../utils/misc.js").uniqueifyjsonFlux;
 var sendPostRequest = require("../libs/ajax-utils.js").sendPostRequest;
 var sendGetRequest = require("../libs/ajax-utils.js").sendGetRequest;
 var showLoading = require("../utils/misc.js").showLoading;
@@ -1380,6 +1381,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             // case 1
             if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
+
+                console.log("case 1: ");
+
                 var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                 linewithlineg[i] = lineg.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -6544,10 +6548,24 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // existing apical or basolateral membrane in PMR
     var relatedMembrane = function (workspaceName, membrane, membraneName) {
-        var query = 'SELECT ?cellmlmodel ?located_in ' +
+        // var query = 'SELECT ?cellmlmodel ?located_in ' +
+        //     'WHERE { GRAPH ?g { ' +
+        //     '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> <' + membrane + '>. ' +
+        //     '}}'
+
+        // TODO: static sodium URI - see ?sodium_chebi in index.js
+        // TODO: change arrow and variable name in epithelial platform
+        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+            'PREFIX dcterms: <http://purl.org/dc/terms/>' +
+            'SELECT ?cellmlmodel ?Model_entity ' +
             'WHERE { GRAPH ?g { ' +
             '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> <' + membrane + '>. ' +
-            '}}'
+            '?entity semsim:hasPhysicalDefinition <http://identifiers.org/chebi/CHEBI:26708>. ' +
+            '?source semsim:hasPhysicalEntityReference ?entity. ' +
+            '?process semsim:hasSourceParticipant ?source. ' +
+            '?property semsim:physicalPropertyOf ?process. ' +
+            '?Model_entity semsim:isComputationalComponentFor ?property.' +
+            '}}';
 
         sendPostRequest(
             endpoint,
@@ -6556,6 +6574,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 console.log("jsonRelatedMembrane: ", jsonRelatedMembrane);
 
+                var tempmembraneModel = [];
                 for (var i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
                     for (var j = 0; j < organ[organIndex].key.length; j++) {
                         // parsing
@@ -6567,10 +6586,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                         break;
                     }
+
+                    tempmembraneModel.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
                 }
 
                 membraneModel = uniqueify(membraneModel);
                 // console.log("membraneModel: ", membraneModel);
+
+                // find and make model_entity#component.variable
+                tempmembraneModel = uniqueify(tempmembraneModel);
+                for (var i = 0; i < membraneModel.length; i++) {
+                    for (var j = 0; j < tempmembraneModel.length; j++) {
+                        var kModel = tempmembraneModel[j];
+                        var indexOfHash = kModel.search("#");
+                        kModel = kModel.slice(0, indexOfHash);
+                        if (membraneModel[i] == kModel) {
+                            membraneModel[i] = tempmembraneModel[j];
+                        }
+                    }
+                }
 
                 relatedMembraneModel(workspaceName, membraneName);
 
@@ -6578,15 +6612,22 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     }
 
     var relatedMembraneModel = function (workspaceName, membraneName) {
+
+        if (membraneModel[idMembrane] != undefined) {
+            var indexOfHash = membraneModel[idMembrane].search("#");
+            var tempmembraneModel = membraneModel[idMembrane].slice(0, indexOfHash);
+        }
+
         var query = 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
             'PREFIX dcterms: <http://purl.org/dc/terms/>' +
             'SELECT ?Protein ?URI ' +
             'WHERE { GRAPH ?g { ' +
-            '<' + membraneModel[idMembrane] + '#Protein> dcterms:description ?Protein . ' +
-            '<' + membraneModel[idMembrane] + '#Protein> ro:hasPhysicalDefinition ?URI . ' +
+            '<' + tempmembraneModel + '#Protein> dcterms:description ?Protein . ' +
+            '<' + tempmembraneModel + '#Protein> ro:hasPhysicalDefinition ?URI . ' +
             '}}'
 
-        console.log("membraneModel[idMembrane]: ", membraneModel[idMembrane]);
+        console.log("membraneModel: ", membraneModel[idMembrane]);
+        console.log("tempmembraneModel: ", tempmembraneModel);
 
         sendPostRequest(
             endpoint,
@@ -6595,14 +6636,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 console.log("jsonRelatedMembraneModel: ", jsonRelatedMembraneModel);
 
-                // TODO: membraneModel[idMembrane] has cellml model name without component and
-                // TODO: variable name which can not make an object similar to membrane in index.js.
-                // TODO: find out how to integrate this: membraneModel[idMembrane]#component.variable
                 var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                     'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
                     'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
                     'WHERE { ' +
-                    '<' + source_name + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                    '<' + membraneModel[idMembrane] + '> semsim:isComputationalComponentFor ?model_prop. ' +
                     '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
                     '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
                     '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
@@ -6640,11 +6678,33 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 med_fma: jsonObjFlux.results.bindings[0].med_entity_uri.value
                             });
 
-                            membraneModelID.push([
-                                jsonObjFlux.results.bindings[0].source_fma.value,
-                                jsonObjFlux.results.bindings[0].sink_fma.value,
-                                jsonObjFlux.results.bindings[0].med_entity_uri.value
-                            ]);
+                            var circleID = $(cthis).prop("id").split(",");
+                            var indexOfHash = membraneModel[idMembrane].search("#"),
+                                srctext = membraneModel[idMembrane].slice(indexOfHash + 1),
+                                indexOfdot = srctext.indexOf('.');
+
+                            srctext = srctext.slice(indexOfdot + 1);
+
+                            var tempjsonObjFlux = uniqueifyjsonFlux(jsonObjFlux.results.bindings);
+
+                            console.log("tempjsonObjFlux: ", tempjsonObjFlux);
+
+                            // For now consider only single flux
+                            if (circleID[1] == "") {
+                                membraneModelID.push([
+                                    membraneModel[idMembrane],
+                                    circleID[1],
+                                    srctext,
+                                    circleID[3],
+                                    srctext,
+                                    circleID[5],
+                                    tempjsonObjFlux[0].source_fma.value,
+                                    tempjsonObjFlux[0].source_fma.value,
+                                    tempjsonObjFlux[0].sink_fma.value,
+                                    tempjsonObjFlux[0].sink_fma.value
+                                    // jsonObjFlux.results.bindings[0].med_entity_uri.value
+                                ]);
+                            }
                         }
 
                         console.log("membraneObject: ", membraneObject);
@@ -6652,7 +6712,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         // console.log("membraneModel.length: ", membraneModel.length);
                         console.log("membraneModelID: ", membraneModelID);
 
-                        idMembrane++;
+                        if (membraneModel[idMembrane] != undefined)
+                            idMembrane++;
 
                         if (idMembrane == membraneModel.length) {
                             idMembrane = 0;
@@ -6997,6 +7058,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 else
                     circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "lightgreen");
                 // }
+
+                // TODO: change line arrow and text
+                console.log("cthis, linewithlineg, and linewithtextg: ", cthis, linewithlineg, linewithtextg);
+                var circleID = $(cthis).prop("id").split(",");
+                linewithtextg[i].text(circleID[2]);
 
                 // Reinitialise to store fluxes/models in next iteration
                 membraneModelValue = [];

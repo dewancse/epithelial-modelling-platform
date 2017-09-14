@@ -140,6 +140,22 @@ function uniqueifySVG(es) {
     return retval;
 }
 
+// Remove duplicate links
+function uniqueifyjsonFlux(es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j].source_fma.value === e.source_fma.value &&
+                retval[j].sink_fma.value === e.sink_fma.value)
+                return;
+        }
+
+        if (e.source_fma.value != e.sink_fma.value)
+            retval.push(e);
+    });
+    return retval;
+}
+
 // Create anchor tag
 var createAnchor = function (value) {
     var aText = $("<a/>");
@@ -186,6 +202,7 @@ exports.uniqueifySrcSnkMed = uniqueifySrcSnkMed;
 exports.uniqueifyModelEntity = uniqueifyModelEntity;
 exports.uniqueifyEpithelial = uniqueifyEpithelial;
 exports.uniqueifySVG = uniqueifySVG;
+exports.uniqueifyjsonFlux = uniqueifyjsonFlux;
 exports.createAnchor = createAnchor;
 exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
