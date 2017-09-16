@@ -1027,7 +1027,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         return tempBasolateral.indexOf(item) == pos;
                     })
 
-                    console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
+                    // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
 
                     var NHE3 = "http://purl.obolibrary.org/obo/PR_P26433";
                     for (var i = 0; i < tempProtein.length; i++) {
