@@ -3296,6 +3296,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                         membraneTransporter += label.innerHTML;
                                     }
+
+                                    membraneTransporter += label.innerHTML;
                                 }
 
                                 // Alternative model
@@ -3509,6 +3511,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("cthis and $(cthis): ", cthis, $(cthis));
                 console.log("win AFTER save clicked: ", win);
 
+                console.log("input ID: ", win[0].children[1].children[0].children[9].getElementsByTagName("input"));
+
                 // checkbox!!
                 if (win[0].children[1].children[0].children[9] != undefined) {
                     for (var i = 0; i < win[0].children[1].children[0].children[9].getElementsByTagName("input").length; i++) {
@@ -3581,179 +3585,179 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var circleID = $(cthis).prop("id").split(",");
                 linewithtextg[i].text(circleID[2]);
 
-                if ($(cthis).attr("membrane") == apicalID) {
-                    var pindex = $(cthis).attr("index"),
-                        tempcthis = cthis,
-                        templine = linewithlineg[pindex],
-                        temptext = linewithtextg[pindex];
-
-                    console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
-
-                    circlewithlineg.splice(pindex, 1);
-                    linewithlineg.splice(pindex, 1);
-                    linewithtextg.splice(pindex, 1);
-
-                    circlewithlineg.push(d3.select(tempcthis));
-                    linewithlineg.push(templine);
-                    linewithtextg.push(temptext);
-
-                    console.log("circle, line, text: ", circlewithlineg.length, linewithlineg.length, linewithtextg.length);
-
-                    // TODO: change id as well
-                    circlewithlineg[circlewithlineg.length - 1]
-                        .attr("index", circlewithlineg.length - 1)
-                        .attr("membrane", basolateralID);
-
-                    linewithlineg[linewithlineg.length - 1].attr("id", "linewithlineg" + linewithlineg.length - 1);
-                    linewithtextg[linewithtextg.length - 1].attr("id", "linewithtextg" + linewithtextg.length - 1);
-
-                    console.log("pindex: ", pindex);
-
-                    for (var i = 0; i < circlewithlineg.length; i++) {
-                        circlewithlineg[i].attr("index", i);
-                        linewithlineg[i].attr("id", "linewithlineg" + i);
-                        linewithtextg[i].attr("id", "linewithtextg" + i);
-
-                        if (circlewithlineg[i].attr("membrane") == basolateralID) continue;
-
-                        if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
-                            dy[i] = dy[i] - ydistance;
-                            circlewithlineg[i]
-                                .transition()
-                                .delay(1000)
-                                .duration(1000)
-                                .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
-                                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                                .attr("index", i);
-                        }
-                        else {
-                            circlewithlineg[i]
-                                .transition()
-                                .delay(1000)
-                                .duration(1000)
-                                .attr("cy", dy[i])
-                                .attr("index", i);
-                        }
-
-                        linewithtextg[i]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("y", dytext[i]);
-
-                        linewithlineg[i]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("y1", dy1line[i])
-                            .attr("y2", dy2line[i]);
-
-                        console.log("apical transition");
-                    }
-
-                    console.log("circlewithlineg AFTER: ", circlewithlineg);
-                    console.log("linewithlineg AFTER: ", linewithlineg);
-                    console.log("linewithtextg AFTER: ", linewithtextg);
-
-                    yvalue -= ydistance;
-                    cyvalue -= ydistance;
-
-                    yvalueb += ydistance;
-                    cyvalueb += ydistance;
-                }
-                else {
-                    var pindex = $(cthis).attr("index"),
-                        tempcthis = cthis,
-                        templine = linewithlineg[pindex],
-                        temptext = linewithtextg[pindex];
-
-                    console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
-
-                    var apicalcounter = 0;
-                    for (var i = 0; i < circlewithlineg.length; i++) {
-                        if (circlewithlineg[i].attr("membrane") == apicalID) {
-                            apicalcounter++;
-                        }
-                    }
-
-                    console.log("apicalcounter: ", apicalcounter);
-
-                    for (var i = 0; i < circlewithlineg.length; i++) {
-                        if (i == apicalcounter) {
-                            circlewithlineg.splice(i, 1, d3.select(tempcthis));
-                            linewithlineg.splice(i, 1, templine);
-                            linewithtextg.splice(i, 1, temptext);
-
-                            console.log("apicalcounter: ", apicalcounter);
-
-                            // TODO: change id as well
-                            circlewithlineg[i]
-                                .attr("index", i)
-                                .attr("membrane", apicalID);
-
-                            linewithlineg[i].attr("id", "linewithlineg" + i);
-                            linewithtextg[i].attr("id", "linewithtextg" + i);
-
-                            break;
-                        }
-                    }
-
-                    console.log("circle, line, text: ", circlewithlineg, linewithlineg, linewithtextg);
-                    console.log("pindex BASO: ", pindex);
-
-                    ++pindex;
-                    for (var i = pindex; i < circlewithlineg.length; i++) {
-                        circlewithlineg[i].attr("index", i);
-                        linewithlineg[i].attr("id", "linewithlineg" + i);
-                        linewithtextg[i].attr("id", "linewithtextg" + i);
-
-                        dy[i] = dy[i] - ydistance;
-                        if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
-                            circlewithlineg[i]
-                                .transition()
-                                .delay(1000)
-                                .duration(1000)
-                                .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
-                                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                                .attr("index", i);
-                        }
-                        else {
-                            circlewithlineg[i]
-                                .transition()
-                                .delay(1000)
-                                .duration(1000)
-                                .attr("cy", dy[i])
-                                .attr("index", i);
-
-                            console.log("basolateral transition circle: ", circlewithlineg[i]);
-                        }
-
-                        linewithtextg[i]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("y", dytext[i] - ydistance);
-
-                        linewithlineg[i]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("y1", dy1line[i] - ydistance)
-                            .attr("y2", dy2line[i] - ydistance);
-
-                        console.log("basolateral transition");
-                    }
-
-                    console.log("circlewithlineg AFTER: ", circlewithlineg);
-                    console.log("linewithlineg AFTER: ", linewithlineg);
-                    console.log("linewithtextg AFTER: ", linewithtextg);
-
-                    yvalue += ydistance;
-                    cyvalue += ydistance;
-
-                    yvalueb -= ydistance;
-                    cyvalueb -= ydistance;
-                }
+                // if ($(cthis).attr("membrane") == apicalID) {
+                //     var pindex = $(cthis).attr("index"),
+                //         tempcthis = cthis,
+                //         templine = linewithlineg[pindex],
+                //         temptext = linewithtextg[pindex];
+                //
+                //     console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
+                //
+                //     circlewithlineg.splice(pindex, 1);
+                //     linewithlineg.splice(pindex, 1);
+                //     linewithtextg.splice(pindex, 1);
+                //
+                //     circlewithlineg.push(d3.select(tempcthis));
+                //     linewithlineg.push(templine);
+                //     linewithtextg.push(temptext);
+                //
+                //     console.log("circle, line, text: ", circlewithlineg.length, linewithlineg.length, linewithtextg.length);
+                //
+                //     // TODO: change id as well
+                //     circlewithlineg[circlewithlineg.length - 1]
+                //         .attr("index", circlewithlineg.length - 1)
+                //         .attr("membrane", basolateralID);
+                //
+                //     linewithlineg[linewithlineg.length - 1].attr("id", "linewithlineg" + linewithlineg.length - 1);
+                //     linewithtextg[linewithtextg.length - 1].attr("id", "linewithtextg" + linewithtextg.length - 1);
+                //
+                //     console.log("pindex: ", pindex);
+                //
+                //     for (var i = 0; i < circlewithlineg.length; i++) {
+                //         circlewithlineg[i].attr("index", i);
+                //         linewithlineg[i].attr("id", "linewithlineg" + i);
+                //         linewithtextg[i].attr("id", "linewithtextg" + i);
+                //
+                //         if (circlewithlineg[i].attr("membrane") == basolateralID) continue;
+                //
+                //         if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
+                //             dy[i] = dy[i] - ydistance;
+                //             circlewithlineg[i]
+                //                 .transition()
+                //                 .delay(1000)
+                //                 .duration(1000)
+                //                 .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
+                //                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                //                 .attr("index", i);
+                //         }
+                //         else {
+                //             circlewithlineg[i]
+                //                 .transition()
+                //                 .delay(1000)
+                //                 .duration(1000)
+                //                 .attr("cy", dy[i])
+                //                 .attr("index", i);
+                //         }
+                //
+                //         linewithtextg[i]
+                //             .transition()
+                //             .delay(1000)
+                //             .duration(1000)
+                //             .attr("y", dytext[i]);
+                //
+                //         linewithlineg[i]
+                //             .transition()
+                //             .delay(1000)
+                //             .duration(1000)
+                //             .attr("y1", dy1line[i])
+                //             .attr("y2", dy2line[i]);
+                //
+                //         console.log("apical transition");
+                //     }
+                //
+                //     console.log("circlewithlineg AFTER: ", circlewithlineg);
+                //     console.log("linewithlineg AFTER: ", linewithlineg);
+                //     console.log("linewithtextg AFTER: ", linewithtextg);
+                //
+                //     yvalue -= ydistance;
+                //     cyvalue -= ydistance;
+                //
+                //     yvalueb += ydistance;
+                //     cyvalueb += ydistance;
+                // }
+                // else {
+                //     var pindex = $(cthis).attr("index"),
+                //         tempcthis = cthis,
+                //         templine = linewithlineg[pindex],
+                //         temptext = linewithtextg[pindex];
+                //
+                //     console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
+                //
+                //     var apicalcounter = 0;
+                //     for (var i = 0; i < circlewithlineg.length; i++) {
+                //         if (circlewithlineg[i].attr("membrane") == apicalID) {
+                //             apicalcounter++;
+                //         }
+                //     }
+                //
+                //     console.log("apicalcounter: ", apicalcounter);
+                //
+                //     for (var i = 0; i < circlewithlineg.length; i++) {
+                //         if (i == apicalcounter) {
+                //             circlewithlineg.splice(i, 1, d3.select(tempcthis));
+                //             linewithlineg.splice(i, 1, templine);
+                //             linewithtextg.splice(i, 1, temptext);
+                //
+                //             console.log("apicalcounter: ", apicalcounter);
+                //
+                //             // TODO: change id as well
+                //             circlewithlineg[i]
+                //                 .attr("index", i)
+                //                 .attr("membrane", apicalID);
+                //
+                //             linewithlineg[i].attr("id", "linewithlineg" + i);
+                //             linewithtextg[i].attr("id", "linewithtextg" + i);
+                //
+                //             break;
+                //         }
+                //     }
+                //
+                //     console.log("circle, line, text: ", circlewithlineg, linewithlineg, linewithtextg);
+                //     console.log("pindex BASO: ", pindex);
+                //
+                //     ++pindex;
+                //     for (var i = pindex; i < circlewithlineg.length; i++) {
+                //         circlewithlineg[i].attr("index", i);
+                //         linewithlineg[i].attr("id", "linewithlineg" + i);
+                //         linewithtextg[i].attr("id", "linewithtextg" + i);
+                //
+                //         dy[i] = dy[i] - ydistance;
+                //         if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
+                //             circlewithlineg[i]
+                //                 .transition()
+                //                 .delay(1000)
+                //                 .duration(1000)
+                //                 .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
+                //                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                //                 .attr("index", i);
+                //         }
+                //         else {
+                //             circlewithlineg[i]
+                //                 .transition()
+                //                 .delay(1000)
+                //                 .duration(1000)
+                //                 .attr("cy", dy[i])
+                //                 .attr("index", i);
+                //
+                //             console.log("basolateral transition circle: ", circlewithlineg[i]);
+                //         }
+                //
+                //         linewithtextg[i]
+                //             .transition()
+                //             .delay(1000)
+                //             .duration(1000)
+                //             .attr("y", dytext[i] - ydistance);
+                //
+                //         linewithlineg[i]
+                //             .transition()
+                //             .delay(1000)
+                //             .duration(1000)
+                //             .attr("y1", dy1line[i] - ydistance)
+                //             .attr("y2", dy2line[i] - ydistance);
+                //
+                //         console.log("basolateral transition");
+                //     }
+                //
+                //     console.log("circlewithlineg AFTER: ", circlewithlineg);
+                //     console.log("linewithlineg AFTER: ", linewithlineg);
+                //     console.log("linewithtextg AFTER: ", linewithtextg);
+                //
+                //     yvalue += ydistance;
+                //     cyvalue += ydistance;
+                //
+                //     yvalueb -= ydistance;
+                //     cyvalueb -= ydistance;
+                // }
 
                 // Reinitialise to store fluxes/models in next iteration
                 membraneModelValue = [];

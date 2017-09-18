@@ -462,74 +462,88 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 }
 
                 var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                var query = 'SELECT ?Species ' + 'WHERE ' +
-                    '{ ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
+                model = model + "#" + model.slice(0, model.indexOf('.'));
+
+                var query = 'SELECT ?Protein ' +
+                    'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }';
 
                 // Species
                 sendPostRequest(
                     endpoint,
                     query,
-                    function (jsonSpecies) {
+                    function (jsonProteinUri) {
 
-                        var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                        var query = 'SELECT ?Gene ' + 'WHERE ' +
-                            '{ ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
+                        // pig SGLT2 (PR_P31636) is missing in protein ontology
+                        // Write a test case for unsuccessful OLS query and handle this issue as undefined
+                        // Just assign mouse species for the time being
+                        var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
+                        var endpointproteinOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pr_uri;
 
-                        // Gene
-                        sendPostRequest(
-                            endpoint,
-                            query,
-                            function (jsonGene) {
+                        sendGetRequest(
+                            endpointproteinOLS,
+                            function (jsonProtein) {
 
-                                var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                                var query = 'SELECT ?Protein ' + 'WHERE ' +
-                                    '{ ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
+                                var endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
 
-                                // Protein
-                                sendPostRequest(
-                                    endpoint,
-                                    query,
-                                    function (jsonProtein) {
+                                sendGetRequest(
+                                    endpointgeneOLS,
+                                    function (jsonGene) {
 
-                                        // model and biological meaning
-                                        modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
-                                        biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
+                                        var endpointspeciesOLS = jsonGene._embedded.terms[0]._links.only_in_taxon.href;
 
-                                        // species
-                                        if (jsonSpecies.results.bindings.length == 0)
-                                            speciesList.push("Undefined");
-                                        else
-                                            speciesList.push(jsonSpecies.results.bindings[0].Species.value);
+                                        sendGetRequest(
+                                            endpointspeciesOLS,
+                                            function (jsonSpecies) {
 
-                                        // gene
-                                        if (jsonGene.results.bindings.length == 0)
-                                            geneList.push("Undefined");
-                                        else
-                                            geneList.push(jsonGene.results.bindings[0].Gene.value);
+                                                // model and biological meaning
+                                                modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
+                                                biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
 
-                                        // protein
-                                        if (jsonProtein.results.bindings.length == 0)
-                                            proteinList.push("Undefined");
-                                        else
-                                            proteinList.push(jsonProtein.results.bindings[0].Protein.value);
+                                                // species
+                                                if (jsonSpecies._embedded.terms.length == 0)
+                                                    speciesList.push("Undefined");
+                                                else
+                                                    speciesList.push(jsonSpecies._embedded.terms[0].label);
 
-                                        head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
+                                                // gene
+                                                if (jsonGene._embedded.terms.length == 0)
+                                                    geneList.push("Undefined");
+                                                else {
+                                                    var geneName = jsonGene._embedded.terms[0].label;
+                                                    var indexOfParen = geneName.indexOf('(');
+                                                    geneName = geneName.slice(0, indexOfParen - 1);
+                                                    geneList.push(geneName);
+                                                }
 
-                                        mainUtils.showDiscoverModels(
-                                            head,
-                                            modelEntity,
-                                            biologicalMeaning,
-                                            speciesList,
-                                            geneList,
-                                            proteinList);
+                                                // protein
+                                                if (jsonProtein._embedded.terms.length == 0)
+                                                    proteinList.push("Undefined");
+                                                else {
+                                                    var proteinName = jsonProtein._embedded.terms[0].label;
+                                                    var indexOfParen = proteinName.indexOf('(');
+                                                    proteinName = proteinName.slice(0, indexOfParen - 1);
+                                                    proteinList.push(proteinName);
+                                                }
 
-                                        id++; // increment index of modelEntity
+                                                head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
-                                        if (id == jsonModel.results.bindings.length) {
-                                            return;
-                                        }
+                                                mainUtils.showDiscoverModels(
+                                                    head,
+                                                    modelEntity,
+                                                    biologicalMeaning,
+                                                    speciesList,
+                                                    geneList,
+                                                    proteinList);
 
-                                        mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue); // callback
+                                                id++; // increment index of modelEntity
+
+                                                if (id == jsonModel.results.bindings.length) {
+                                                    return;
+                                                }
+
+                                                mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue); // callback
+                                            },
+                                            true);
                                     },
                                     true);
                             },
@@ -954,7 +968,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         console.log("loadEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
 
         var concentration_fma = [], source_fma = [], sink_fma = [], med_fma = [], med_pr = [];
-        var source_fma2 = [], sink_fma2 = [];
+        var source_fma2 = [], sink_fma2 = [], solute_chebi = [];
 
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var basolateralID = "http://identifiers.org/fma/FMA:84669";
@@ -1032,6 +1046,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     var NHE3 = "http://purl.obolibrary.org/obo/PR_P26433";
                     for (var i = 0; i < tempProtein.length; i++) {
 
+                        // Temp solution to skip making cotransporter in NHE3
                         if (tempProtein[i] == NHE3) continue;
 
                         // cotransporter in apical membrane
@@ -1139,7 +1154,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             // TODO: For cotransporter - how to get CHEBI terms?
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?source_chebi ' +
+                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ' +
                 'WHERE { ' +
                 '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
                 '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
@@ -1147,7 +1162,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
                 '?source_entity ro:part_of ?source_part_of_entity. ' +
                 '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-                '?source_entity semsim:hasPhysicalDefinition ?source_chebi. ' +
+                '?source_entity semsim:hasPhysicalDefinition ?solute_chebi. ' +
                 '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
                 '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
                 '?sink_entity ro:part_of ?sink_part_of_entity. ' +
@@ -1162,9 +1177,19 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
-                    console.log("jsonObjFlux: ", jsonObjFlux);
+                    console.log("jsonObjFluxIndex: ", jsonObjFlux);
 
                     for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
+
+                        if (jsonObjFlux.results.bindings[i].solute_chebi == undefined)
+                            solute_chebi.push("");
+                        else
+                            solute_chebi.push(
+                                {
+                                    name: modelEntityFullNameArray[index],
+                                    fma: jsonObjFlux.results.bindings[i].solute_chebi.value
+                                }
+                            );
 
                         if (jsonObjFlux.results.bindings[i].source_fma == undefined)
                             source_fma.push("");
@@ -1211,6 +1236,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     }
 
                     // remove duplicate fma
+                    solute_chebi = uniqueifyEpithelial(solute_chebi);
                     source_fma = uniqueifyEpithelial(source_fma);
                     sink_fma = uniqueifyEpithelial(sink_fma);
                     med_pr = uniqueifyEpithelial(med_pr);
@@ -1253,6 +1279,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                     if (med_pr[0] == undefined) { // temp solution
                                         membrane.push({
+                                            solute_chebi: solute_chebi[0].fma,
                                             source_text: srctext,
                                             source_fma: source_fma[0].fma,
                                             source_name: source_fma[0].name,
@@ -1266,6 +1293,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                     }
                                     else {
                                         membrane.push({
+                                            solute_chebi: solute_chebi[0].fma,
                                             source_text: srctext,
                                             source_fma: source_fma[0].fma,
                                             source_name: source_fma[0].name,
@@ -1301,6 +1329,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                         if (med_pr[i] == undefined) { // temp solution
                                             membrane.push({
+                                                solute_chebi: solute_chebi[i].fma,
                                                 source_text: srctext,
                                                 source_fma: source_fma[i].fma,
                                                 source_name: source_fma[i].name,
@@ -1314,6 +1343,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                         }
                                         else {
                                             membrane.push({
+                                                solute_chebi: solute_chebi[i].fma,
                                                 source_text: srctext,
                                                 source_fma: source_fma[i].fma,
                                                 source_name: source_fma[i].name,

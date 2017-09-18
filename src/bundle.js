@@ -136,12 +136,14 @@ var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
     var head = [];
 
     // Getting first 2 head title, not i < jsonModel.head.vars.length
-    for (var i = 0; i < 2; i++)
-        head.push(jsonModel.head.vars[i]);
+    // for (var i = 0; i < 2; i++)
+    //     head.push(jsonModel.head.vars[i]);
 
-    head.push(jsonSpecies.head.vars[0]);
-    head.push(jsonGene.head.vars[0]);
-    head.push(jsonProtein.head.vars[0]);
+    head.push("Model_entity");
+    head.push("Biological_meaning");
+    head.push("Species");
+    head.push("Gene");
+    head.push("Protein");
 
     return head;
 }
@@ -3655,6 +3657,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                         membraneTransporter += label.innerHTML;
                                     }
+
+                                    membraneTransporter += label.innerHTML;
                                 }
 
                                 // Alternative model
@@ -3868,6 +3872,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("cthis and $(cthis): ", cthis, $(cthis));
                 console.log("win AFTER save clicked: ", win);
 
+                console.log("input ID: ", win[0].children[1].children[0].children[9].getElementsByTagName("input"));
+
                 // checkbox!!
                 if (win[0].children[1].children[0].children[9] != undefined) {
                     for (var i = 0; i < win[0].children[1].children[0].children[9].getElementsByTagName("input").length; i++) {
@@ -3940,179 +3946,179 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var circleID = $(cthis).prop("id").split(",");
                 linewithtextg[i].text(circleID[2]);
 
-                if ($(cthis).attr("membrane") == apicalID) {
-                    var pindex = $(cthis).attr("index"),
-                        tempcthis = cthis,
-                        templine = linewithlineg[pindex],
-                        temptext = linewithtextg[pindex];
-
-                    console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
-
-                    circlewithlineg.splice(pindex, 1);
-                    linewithlineg.splice(pindex, 1);
-                    linewithtextg.splice(pindex, 1);
-
-                    circlewithlineg.push(d3.select(tempcthis));
-                    linewithlineg.push(templine);
-                    linewithtextg.push(temptext);
-
-                    console.log("circle, line, text: ", circlewithlineg.length, linewithlineg.length, linewithtextg.length);
-
-                    // TODO: change id as well
-                    circlewithlineg[circlewithlineg.length - 1]
-                        .attr("index", circlewithlineg.length - 1)
-                        .attr("membrane", basolateralID);
-
-                    linewithlineg[linewithlineg.length - 1].attr("id", "linewithlineg" + linewithlineg.length - 1);
-                    linewithtextg[linewithtextg.length - 1].attr("id", "linewithtextg" + linewithtextg.length - 1);
-
-                    console.log("pindex: ", pindex);
-
-                    for (var i = 0; i < circlewithlineg.length; i++) {
-                        circlewithlineg[i].attr("index", i);
-                        linewithlineg[i].attr("id", "linewithlineg" + i);
-                        linewithtextg[i].attr("id", "linewithtextg" + i);
-
-                        if (circlewithlineg[i].attr("membrane") == basolateralID) continue;
-
-                        if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
-                            dy[i] = dy[i] - ydistance;
-                            circlewithlineg[i]
-                                .transition()
-                                .delay(1000)
-                                .duration(1000)
-                                .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
-                                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                                .attr("index", i);
-                        }
-                        else {
-                            circlewithlineg[i]
-                                .transition()
-                                .delay(1000)
-                                .duration(1000)
-                                .attr("cy", dy[i])
-                                .attr("index", i);
-                        }
-
-                        linewithtextg[i]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("y", dytext[i]);
-
-                        linewithlineg[i]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("y1", dy1line[i])
-                            .attr("y2", dy2line[i]);
-
-                        console.log("apical transition");
-                    }
-
-                    console.log("circlewithlineg AFTER: ", circlewithlineg);
-                    console.log("linewithlineg AFTER: ", linewithlineg);
-                    console.log("linewithtextg AFTER: ", linewithtextg);
-
-                    yvalue -= ydistance;
-                    cyvalue -= ydistance;
-
-                    yvalueb += ydistance;
-                    cyvalueb += ydistance;
-                }
-                else {
-                    var pindex = $(cthis).attr("index"),
-                        tempcthis = cthis,
-                        templine = linewithlineg[pindex],
-                        temptext = linewithtextg[pindex];
-
-                    console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
-
-                    var apicalcounter = 0;
-                    for (var i = 0; i < circlewithlineg.length; i++) {
-                        if (circlewithlineg[i].attr("membrane") == apicalID) {
-                            apicalcounter++;
-                        }
-                    }
-
-                    console.log("apicalcounter: ", apicalcounter);
-
-                    for (var i = 0; i < circlewithlineg.length; i++) {
-                        if (i == apicalcounter) {
-                            circlewithlineg.splice(i, 1, d3.select(tempcthis));
-                            linewithlineg.splice(i, 1, templine);
-                            linewithtextg.splice(i, 1, temptext);
-
-                            console.log("apicalcounter: ", apicalcounter);
-
-                            // TODO: change id as well
-                            circlewithlineg[i]
-                                .attr("index", i)
-                                .attr("membrane", apicalID);
-
-                            linewithlineg[i].attr("id", "linewithlineg" + i);
-                            linewithtextg[i].attr("id", "linewithtextg" + i);
-
-                            break;
-                        }
-                    }
-
-                    console.log("circle, line, text: ", circlewithlineg, linewithlineg, linewithtextg);
-                    console.log("pindex BASO: ", pindex);
-
-                    ++pindex;
-                    for (var i = pindex; i < circlewithlineg.length; i++) {
-                        circlewithlineg[i].attr("index", i);
-                        linewithlineg[i].attr("id", "linewithlineg" + i);
-                        linewithtextg[i].attr("id", "linewithtextg" + i);
-
-                        dy[i] = dy[i] - ydistance;
-                        if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
-                            circlewithlineg[i]
-                                .transition()
-                                .delay(1000)
-                                .duration(1000)
-                                .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
-                                .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                                .attr("index", i);
-                        }
-                        else {
-                            circlewithlineg[i]
-                                .transition()
-                                .delay(1000)
-                                .duration(1000)
-                                .attr("cy", dy[i])
-                                .attr("index", i);
-
-                            console.log("basolateral transition circle: ", circlewithlineg[i]);
-                        }
-
-                        linewithtextg[i]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("y", dytext[i] - ydistance);
-
-                        linewithlineg[i]
-                            .transition()
-                            .delay(1000)
-                            .duration(1000)
-                            .attr("y1", dy1line[i] - ydistance)
-                            .attr("y2", dy2line[i] - ydistance);
-
-                        console.log("basolateral transition");
-                    }
-
-                    console.log("circlewithlineg AFTER: ", circlewithlineg);
-                    console.log("linewithlineg AFTER: ", linewithlineg);
-                    console.log("linewithtextg AFTER: ", linewithtextg);
-
-                    yvalue += ydistance;
-                    cyvalue += ydistance;
-
-                    yvalueb -= ydistance;
-                    cyvalueb -= ydistance;
-                }
+                // if ($(cthis).attr("membrane") == apicalID) {
+                //     var pindex = $(cthis).attr("index"),
+                //         tempcthis = cthis,
+                //         templine = linewithlineg[pindex],
+                //         temptext = linewithtextg[pindex];
+                //
+                //     console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
+                //
+                //     circlewithlineg.splice(pindex, 1);
+                //     linewithlineg.splice(pindex, 1);
+                //     linewithtextg.splice(pindex, 1);
+                //
+                //     circlewithlineg.push(d3.select(tempcthis));
+                //     linewithlineg.push(templine);
+                //     linewithtextg.push(temptext);
+                //
+                //     console.log("circle, line, text: ", circlewithlineg.length, linewithlineg.length, linewithtextg.length);
+                //
+                //     // TODO: change id as well
+                //     circlewithlineg[circlewithlineg.length - 1]
+                //         .attr("index", circlewithlineg.length - 1)
+                //         .attr("membrane", basolateralID);
+                //
+                //     linewithlineg[linewithlineg.length - 1].attr("id", "linewithlineg" + linewithlineg.length - 1);
+                //     linewithtextg[linewithtextg.length - 1].attr("id", "linewithtextg" + linewithtextg.length - 1);
+                //
+                //     console.log("pindex: ", pindex);
+                //
+                //     for (var i = 0; i < circlewithlineg.length; i++) {
+                //         circlewithlineg[i].attr("index", i);
+                //         linewithlineg[i].attr("id", "linewithlineg" + i);
+                //         linewithtextg[i].attr("id", "linewithtextg" + i);
+                //
+                //         if (circlewithlineg[i].attr("membrane") == basolateralID) continue;
+                //
+                //         if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
+                //             dy[i] = dy[i] - ydistance;
+                //             circlewithlineg[i]
+                //                 .transition()
+                //                 .delay(1000)
+                //                 .duration(1000)
+                //                 .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
+                //                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                //                 .attr("index", i);
+                //         }
+                //         else {
+                //             circlewithlineg[i]
+                //                 .transition()
+                //                 .delay(1000)
+                //                 .duration(1000)
+                //                 .attr("cy", dy[i])
+                //                 .attr("index", i);
+                //         }
+                //
+                //         linewithtextg[i]
+                //             .transition()
+                //             .delay(1000)
+                //             .duration(1000)
+                //             .attr("y", dytext[i]);
+                //
+                //         linewithlineg[i]
+                //             .transition()
+                //             .delay(1000)
+                //             .duration(1000)
+                //             .attr("y1", dy1line[i])
+                //             .attr("y2", dy2line[i]);
+                //
+                //         console.log("apical transition");
+                //     }
+                //
+                //     console.log("circlewithlineg AFTER: ", circlewithlineg);
+                //     console.log("linewithlineg AFTER: ", linewithlineg);
+                //     console.log("linewithtextg AFTER: ", linewithtextg);
+                //
+                //     yvalue -= ydistance;
+                //     cyvalue -= ydistance;
+                //
+                //     yvalueb += ydistance;
+                //     cyvalueb += ydistance;
+                // }
+                // else {
+                //     var pindex = $(cthis).attr("index"),
+                //         tempcthis = cthis,
+                //         templine = linewithlineg[pindex],
+                //         temptext = linewithtextg[pindex];
+                //
+                //     console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
+                //
+                //     var apicalcounter = 0;
+                //     for (var i = 0; i < circlewithlineg.length; i++) {
+                //         if (circlewithlineg[i].attr("membrane") == apicalID) {
+                //             apicalcounter++;
+                //         }
+                //     }
+                //
+                //     console.log("apicalcounter: ", apicalcounter);
+                //
+                //     for (var i = 0; i < circlewithlineg.length; i++) {
+                //         if (i == apicalcounter) {
+                //             circlewithlineg.splice(i, 1, d3.select(tempcthis));
+                //             linewithlineg.splice(i, 1, templine);
+                //             linewithtextg.splice(i, 1, temptext);
+                //
+                //             console.log("apicalcounter: ", apicalcounter);
+                //
+                //             // TODO: change id as well
+                //             circlewithlineg[i]
+                //                 .attr("index", i)
+                //                 .attr("membrane", apicalID);
+                //
+                //             linewithlineg[i].attr("id", "linewithlineg" + i);
+                //             linewithtextg[i].attr("id", "linewithtextg" + i);
+                //
+                //             break;
+                //         }
+                //     }
+                //
+                //     console.log("circle, line, text: ", circlewithlineg, linewithlineg, linewithtextg);
+                //     console.log("pindex BASO: ", pindex);
+                //
+                //     ++pindex;
+                //     for (var i = pindex; i < circlewithlineg.length; i++) {
+                //         circlewithlineg[i].attr("index", i);
+                //         linewithlineg[i].attr("id", "linewithlineg" + i);
+                //         linewithtextg[i].attr("id", "linewithtextg" + i);
+                //
+                //         dy[i] = dy[i] - ydistance;
+                //         if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
+                //             circlewithlineg[i]
+                //                 .transition()
+                //                 .delay(1000)
+                //                 .duration(1000)
+                //                 .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
+                //                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                //                 .attr("index", i);
+                //         }
+                //         else {
+                //             circlewithlineg[i]
+                //                 .transition()
+                //                 .delay(1000)
+                //                 .duration(1000)
+                //                 .attr("cy", dy[i])
+                //                 .attr("index", i);
+                //
+                //             console.log("basolateral transition circle: ", circlewithlineg[i]);
+                //         }
+                //
+                //         linewithtextg[i]
+                //             .transition()
+                //             .delay(1000)
+                //             .duration(1000)
+                //             .attr("y", dytext[i] - ydistance);
+                //
+                //         linewithlineg[i]
+                //             .transition()
+                //             .delay(1000)
+                //             .duration(1000)
+                //             .attr("y1", dy1line[i] - ydistance)
+                //             .attr("y2", dy2line[i] - ydistance);
+                //
+                //         console.log("basolateral transition");
+                //     }
+                //
+                //     console.log("circlewithlineg AFTER: ", circlewithlineg);
+                //     console.log("linewithlineg AFTER: ", linewithlineg);
+                //     console.log("linewithtextg AFTER: ", linewithtextg);
+                //
+                //     yvalue += ydistance;
+                //     cyvalue += ydistance;
+                //
+                //     yvalueb -= ydistance;
+                //     cyvalueb -= ydistance;
+                // }
 
                 // Reinitialise to store fluxes/models in next iteration
                 membraneModelValue = [];
@@ -5004,74 +5010,88 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 }
 
                 var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                var query = 'SELECT ?Species ' + 'WHERE ' +
-                    '{ ' + '<' + model + '#Species> <http://purl.org/dc/terms/description> ?Species.' + '}';
+                model = model + "#" + model.slice(0, model.indexOf('.'));
+
+                var query = 'SELECT ?Protein ' +
+                    'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }';
 
                 // Species
                 sendPostRequest(
                     endpoint,
                     query,
-                    function (jsonSpecies) {
+                    function (jsonProteinUri) {
 
-                        var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                        var query = 'SELECT ?Gene ' + 'WHERE ' +
-                            '{ ' + '<' + model + '#Gene> <http://purl.org/dc/terms/description> ?Gene.' + '}';
+                        // pig SGLT2 (PR_P31636) is missing in protein ontology
+                        // Write a test case for unsuccessful OLS query and handle this issue as undefined
+                        // Just assign mouse species for the time being
+                        var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
+                        var endpointproteinOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pr_uri;
 
-                        // Gene
-                        sendPostRequest(
-                            endpoint,
-                            query,
-                            function (jsonGene) {
+                        sendGetRequest(
+                            endpointproteinOLS,
+                            function (jsonProtein) {
 
-                                var model = parseModelName(jsonModel.results.bindings[id].Model_entity.value);
-                                var query = 'SELECT ?Protein ' + 'WHERE ' +
-                                    '{ ' + '<' + model + '#Protein> <http://purl.org/dc/terms/description> ?Protein.' + '}';
+                                var endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
 
-                                // Protein
-                                sendPostRequest(
-                                    endpoint,
-                                    query,
-                                    function (jsonProtein) {
+                                sendGetRequest(
+                                    endpointgeneOLS,
+                                    function (jsonGene) {
 
-                                        // model and biological meaning
-                                        modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
-                                        biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
+                                        var endpointspeciesOLS = jsonGene._embedded.terms[0]._links.only_in_taxon.href;
 
-                                        // species
-                                        if (jsonSpecies.results.bindings.length == 0)
-                                            speciesList.push("Undefined");
-                                        else
-                                            speciesList.push(jsonSpecies.results.bindings[0].Species.value);
+                                        sendGetRequest(
+                                            endpointspeciesOLS,
+                                            function (jsonSpecies) {
 
-                                        // gene
-                                        if (jsonGene.results.bindings.length == 0)
-                                            geneList.push("Undefined");
-                                        else
-                                            geneList.push(jsonGene.results.bindings[0].Gene.value);
+                                                // model and biological meaning
+                                                modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
+                                                biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
 
-                                        // protein
-                                        if (jsonProtein.results.bindings.length == 0)
-                                            proteinList.push("Undefined");
-                                        else
-                                            proteinList.push(jsonProtein.results.bindings[0].Protein.value);
+                                                // species
+                                                if (jsonSpecies._embedded.terms.length == 0)
+                                                    speciesList.push("Undefined");
+                                                else
+                                                    speciesList.push(jsonSpecies._embedded.terms[0].label);
 
-                                        head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
+                                                // gene
+                                                if (jsonGene._embedded.terms.length == 0)
+                                                    geneList.push("Undefined");
+                                                else {
+                                                    var geneName = jsonGene._embedded.terms[0].label;
+                                                    var indexOfParen = geneName.indexOf('(');
+                                                    geneName = geneName.slice(0, indexOfParen - 1);
+                                                    geneList.push(geneName);
+                                                }
 
-                                        mainUtils.showDiscoverModels(
-                                            head,
-                                            modelEntity,
-                                            biologicalMeaning,
-                                            speciesList,
-                                            geneList,
-                                            proteinList);
+                                                // protein
+                                                if (jsonProtein._embedded.terms.length == 0)
+                                                    proteinList.push("Undefined");
+                                                else {
+                                                    var proteinName = jsonProtein._embedded.terms[0].label;
+                                                    var indexOfParen = proteinName.indexOf('(');
+                                                    proteinName = proteinName.slice(0, indexOfParen - 1);
+                                                    proteinList.push(proteinName);
+                                                }
 
-                                        id++; // increment index of modelEntity
+                                                head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
 
-                                        if (id == jsonModel.results.bindings.length) {
-                                            return;
-                                        }
+                                                mainUtils.showDiscoverModels(
+                                                    head,
+                                                    modelEntity,
+                                                    biologicalMeaning,
+                                                    speciesList,
+                                                    geneList,
+                                                    proteinList);
 
-                                        mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue); // callback
+                                                id++; // increment index of modelEntity
+
+                                                if (id == jsonModel.results.bindings.length) {
+                                                    return;
+                                                }
+
+                                                mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue); // callback
+                                            },
+                                            true);
                                     },
                                     true);
                             },
@@ -5496,7 +5516,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         console.log("loadEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
 
         var concentration_fma = [], source_fma = [], sink_fma = [], med_fma = [], med_pr = [];
-        var source_fma2 = [], sink_fma2 = [];
+        var source_fma2 = [], sink_fma2 = [], solute_chebi = [];
 
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var basolateralID = "http://identifiers.org/fma/FMA:84669";
@@ -5574,6 +5594,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     var NHE3 = "http://purl.obolibrary.org/obo/PR_P26433";
                     for (var i = 0; i < tempProtein.length; i++) {
 
+                        // Temp solution to skip making cotransporter in NHE3
                         if (tempProtein[i] == NHE3) continue;
 
                         // cotransporter in apical membrane
@@ -5681,7 +5702,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             // TODO: For cotransporter - how to get CHEBI terms?
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?source_chebi ' +
+                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ' +
                 'WHERE { ' +
                 '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
                 '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
@@ -5689,7 +5710,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
                 '?source_entity ro:part_of ?source_part_of_entity. ' +
                 '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-                '?source_entity semsim:hasPhysicalDefinition ?source_chebi. ' +
+                '?source_entity semsim:hasPhysicalDefinition ?solute_chebi. ' +
                 '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
                 '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
                 '?sink_entity ro:part_of ?sink_part_of_entity. ' +
@@ -5704,9 +5725,19 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
-                    console.log("jsonObjFlux: ", jsonObjFlux);
+                    console.log("jsonObjFluxIndex: ", jsonObjFlux);
 
                     for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
+
+                        if (jsonObjFlux.results.bindings[i].solute_chebi == undefined)
+                            solute_chebi.push("");
+                        else
+                            solute_chebi.push(
+                                {
+                                    name: modelEntityFullNameArray[index],
+                                    fma: jsonObjFlux.results.bindings[i].solute_chebi.value
+                                }
+                            );
 
                         if (jsonObjFlux.results.bindings[i].source_fma == undefined)
                             source_fma.push("");
@@ -5753,6 +5784,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     }
 
                     // remove duplicate fma
+                    solute_chebi = uniqueifyEpithelial(solute_chebi);
                     source_fma = uniqueifyEpithelial(source_fma);
                     sink_fma = uniqueifyEpithelial(sink_fma);
                     med_pr = uniqueifyEpithelial(med_pr);
@@ -5795,6 +5827,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                     if (med_pr[0] == undefined) { // temp solution
                                         membrane.push({
+                                            solute_chebi: solute_chebi[0].fma,
                                             source_text: srctext,
                                             source_fma: source_fma[0].fma,
                                             source_name: source_fma[0].name,
@@ -5808,6 +5841,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                     }
                                     else {
                                         membrane.push({
+                                            solute_chebi: solute_chebi[0].fma,
                                             source_text: srctext,
                                             source_fma: source_fma[0].fma,
                                             source_name: source_fma[0].name,
@@ -5843,6 +5877,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                         if (med_pr[i] == undefined) { // temp solution
                                             membrane.push({
+                                                solute_chebi: solute_chebi[i].fma,
                                                 source_text: srctext,
                                                 source_fma: source_fma[i].fma,
                                                 source_name: source_fma[i].name,
@@ -5856,6 +5891,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                         }
                                         else {
                                             membrane.push({
+                                                solute_chebi: solute_chebi[i].fma,
                                                 source_text: srctext,
                                                 source_fma: source_fma[i].fma,
                                                 source_name: source_fma[i].name,

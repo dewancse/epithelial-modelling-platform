@@ -64,12 +64,14 @@ var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
     var head = [];
 
     // Getting first 2 head title, not i < jsonModel.head.vars.length
-    for (var i = 0; i < 2; i++)
-        head.push(jsonModel.head.vars[i]);
+    // for (var i = 0; i < 2; i++)
+    //     head.push(jsonModel.head.vars[i]);
 
-    head.push(jsonSpecies.head.vars[0]);
-    head.push(jsonGene.head.vars[0]);
-    head.push(jsonProtein.head.vars[0]);
+    head.push("Model_entity");
+    head.push("Biological_meaning");
+    head.push("Species");
+    head.push("Gene");
+    head.push("Protein");
 
     return head;
 }
