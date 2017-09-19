@@ -3920,10 +3920,39 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         }
                     });
 
+                    // mapping
+                    var connectionObj = [];
+                    for (var i = 0; i < membrane.length; i++) {
+                        for (var j = i + 1; j < membrane.length; j++) {
+                            if (membrane[i].source_fma === membrane[j].source_fma &&
+                                membrane[i].sink_fma === membrane[j].sink_fma) {
+
+                                var cellmlEntity1 = membrane[i].source_name,
+                                    cellmlEntity2 = membrane[j].source_name,
+                                    indexOfHash1 = cellmlEntity1.search("#"),
+                                    compandVar1 = cellmlEntity1.slice(indexOfHash1 + 1),
+                                    indexOfHash2 = cellmlEntity2.search("#"),
+                                    compandVar2 = cellmlEntity2.slice(indexOfHash2 + 1);
+
+                                console.log("cellmlEntity: ", cellmlEntity1, cellmlEntity2);
+
+                                connectionObj.push(
+                                    {
+                                        "component_1": compandVar1.slice(0, compandVar1.indexOf('.')),
+                                        "component_2": compandVar2.slice(0, compandVar2.indexOf('.')),
+                                        "variable_1": compandVar1.slice(compandVar1.indexOf('.') + 1),
+                                        "variable_2": compandVar2.slice(compandVar2.indexOf('.') + 1)
+                                    }
+                                );
+                            }
+                        }
+                    }
+
                     modelJSON.push(
                         {"namespaces": namespaces},
                         {"units": unitsObj},
-                        {"component": compVarObj}
+                        {"component": compVarObj},
+                        {"connection": connectionObj}
                     );
 
                     console.log("model: ", modelJSON);
@@ -3936,6 +3965,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             false);
     }
 
+    console.log("membrane: ", membrane);
     createJSON();
 
     // build the start arrow.
