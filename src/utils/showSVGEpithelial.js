@@ -2707,6 +2707,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 var indexOfHash = cellmlModel.search("#");
                                 cellmlModel = cellmlModel.slice(0, indexOfHash);
 
+                                cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
+
+                                console.log("cellmlModel: ", cellmlModel);
+
                                 if (circleID[1] != "") {
                                     var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Species ?Gene ' +
                                         'WHERE { GRAPH ?g { ' +
@@ -2718,12 +2722,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         '}}'
                                 }
                                 else {
-                                    var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Species ?Gene ' +
+                                    // var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Species ?Gene ' +
+                                    //     'WHERE { GRAPH ?g { ' +
+                                    //     '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+                                    //     '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
+                                    //     '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
+                                    //     '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
+                                    //     '}}'
+
+                                    var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
                                         'WHERE { GRAPH ?g { ' +
-                                        '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+                                        '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
                                         '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
-                                        '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
-                                        '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
                                         '}}'
                                 }
 
@@ -2743,13 +2753,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         else
                                             biological_meaning2 = "";
 
-                                        speciesName = jsonModel.results.bindings[0].Species.value;
-                                        geneName = jsonModel.results.bindings[0].Gene.value;
+                                        speciesName = "Mus Muculus"; // jsonModel.results.bindings[0].Species.value;
+                                        geneName = "SLC9A"; // jsonModel.results.bindings[0].Gene.value;
 
                                         var query = 'SELECT ?cellmlmodel ' +
                                             'WHERE { GRAPH ?g { ' +
-                                            '?cellmlmodel <http://purl.org/dc/terms/description> "' + proteinName + '". ' +
+                                            '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#modelOf> <' + proteinName + '> . ' +
                                             '}}'
+
+                                        console.log("query: ", query);
 
                                         sendPostRequest(
                                             endpoint,
@@ -2760,7 +2772,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                                 var query = 'SELECT ?located_in ' +
                                                     'WHERE { GRAPH ?g { ' +
-                                                    '<' + cellmlModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
+                                                    '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
                                                     '}}'
 
                                                 // location of that cellml model
@@ -2921,7 +2933,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var relatedCellmlModel = function (relatedModel, alternativeCellmlArray, membrane) {
         var query = 'SELECT ?Protein ?workspaceName ' +
             'WHERE { GRAPH ?workspaceName { ' +
-            '<' + relatedModel[idProtein] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+            '<' + relatedModel[idProtein] + '#Protein> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
             '}}'
 
         sendPostRequest(
@@ -2952,7 +2964,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         var query = 'SELECT ?Protein ?URI ?workspaceName ' +
             'WHERE { GRAPH ?workspaceName { ' +
-            '<' + alternativeCellmlArray[idAltProtein] + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+            '<' + alternativeCellmlArray[idAltProtein] + '#Protein> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
             '<' + alternativeCellmlArray[idAltProtein] + '#Protein> <http://www.obofoundry.org/ro/ro.owl#hasPhysicalDefinition> ?URI . ' +
             '}}'
 
@@ -3135,13 +3147,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             var tempmembraneModel = membraneModel[idMembrane].slice(0, indexOfHash);
         }
 
+        console.log("tempmembraneModel: ", tempmembraneModel, membraneModel);
+
         var query = 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
             'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-            'SELECT ?Protein ?URI ' +
-            'WHERE { GRAPH ?g { ' +
-            '<' + tempmembraneModel + '#Protein> dcterms:description ?Protein . ' +
-            '<' + tempmembraneModel + '#Protein> ro:hasPhysicalDefinition ?URI . ' +
-            '}}'
+            'SELECT ?Protein ' +
+            'WHERE { ' +
+            '<' + tempmembraneModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
+            '}'
 
         console.log("membraneModel: ", membraneModel[idMembrane]);
         console.log("tempmembraneModel: ", tempmembraneModel);
@@ -3183,7 +3196,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 protein: jsonRelatedMembraneModel.results.bindings[0].Protein.value,
                                 // uri1 is the dragged circle
                                 uri1: combinedMembrane[0].med_pr,
-                                uri2: jsonRelatedMembraneModel.results.bindings[0].URI.value,
                                 medfma: combinedMembrane[0].med_fma,
                                 similar: 0 // initial percent
                             });
@@ -3827,6 +3839,104 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         $this.window = $($this.selector);
         $this.setHeader($this.options.header);
     }
+
+    var xmlIndex = 0, modelJSON = [], unitsObj = [], compVarObj = [];
+    var createJSON = function () {
+        var modelEntity = membrane[xmlIndex].source_name,
+            indexOfHash = modelEntity.search("#"),
+            componentandVariable = modelEntity.slice(indexOfHash + 1, modelEntity.length);
+
+        var componentName = componentandVariable.slice(0, componentandVariable.indexOf('.'));
+
+        // id
+        var indexOfCellml = modelEntity.search(".cellml"),
+            workspaceName = 267; // modelEntity.slice(0, indexOfCellml);
+
+        var vEndPoint = "https://models.physiomeproject.org/workspace" + "/" + workspaceName + "/" + "rawfile" +
+            "/" + "HEAD" + "/" + modelEntity;
+
+        sendGetRequest(
+            vEndPoint,
+            function (str) {
+                var xml = str,
+                    xmlDoc = $.parseXML(xml),
+                    $xml = $(xmlDoc);
+
+                $xml.find("component").each(function (index, xmlElem) {
+                    if ($(xmlElem).attr("name") == componentName) {
+                        $(xmlElem).find("variable").each(function (index, xmlElemVar) {
+                            if ($(xmlElemVar).attr("cmeta:id") == componentandVariable) {
+                                compVarObj.push(
+                                    {
+                                        "component": $(xmlElem).attr("name"),
+                                        "variable": {
+                                            "cmeta:id": $(xmlElemVar).attr("cmeta:id"),
+                                            "initial_value": $(xmlElemVar).attr("initial_value"),
+                                            "variable_name": $(xmlElemVar).attr("name"),
+                                            "public_interface": $(xmlElemVar).attr("public_interface"),
+                                            "units": $(xmlElemVar).attr("units")
+                                        }
+                                    }
+                                );
+
+                                $xml.find("units").each(function (index, xmlElemUnit) {
+                                    if ($(xmlElemUnit).attr("name") == $(xmlElemVar).attr("units")) {
+                                        var temp = [];
+                                        temp.push({"name": $(xmlElemUnit).attr("name")});
+                                        // Iterate over sub unit elements
+                                        $(xmlElemUnit).find("unit").each(function (index, xmlElemSubUnit) {
+                                            var subtemp = [];
+                                            for (var i = 0; i < $(xmlElemSubUnit)[0].attributes.length; i++) {
+                                                subtemp.push(
+                                                    {
+                                                        "nodeName": $(xmlElemSubUnit)[0].attributes[i].nodeName,
+                                                        "nodeValue": $(xmlElemSubUnit)[0].attributes[i].nodeValue
+                                                    }
+                                                )
+                                            }
+
+                                            temp.push(subtemp);
+                                        });
+
+                                        unitsObj.push(temp);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
+                xmlIndex++;
+                if (xmlIndex == membrane.length) {
+
+                    var namespaces = "";
+                    $xml.find("model").each(function (index, xmlElemModel) {
+                        console.log("xmlElemModel: ", xmlElemModel);
+                        console.log("$(xmlElemModel): ", $(xmlElemModel));
+                        for (var i = 0; i < $(xmlElemModel)[0].attributes.length; i++) {
+                            namespaces += $(xmlElemModel)[0].attributes[i].nodeName + "=" +
+                                '"' + $(xmlElemModel)[0].attributes[i].nodeValue + '"';
+                            namespaces += " ";
+                        }
+                    });
+
+                    modelJSON.push(
+                        {"namespaces": namespaces},
+                        {"units": unitsObj},
+                        {"component": compVarObj}
+                    );
+
+                    console.log("model: ", modelJSON);
+
+                    return;
+                }
+
+                createJSON(); // callback
+            },
+            false);
+    }
+
+    createJSON();
 
     // build the start arrow.
     svg.append("svg:defs")
