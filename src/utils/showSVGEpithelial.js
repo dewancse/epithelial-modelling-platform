@@ -2761,7 +2761,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                             '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#modelOf> <' + proteinName + '> . ' +
                                             '}}'
 
-                                        console.log("query: ", query);
+                                        // console.log("query: ", query);
 
                                         sendPostRequest(
                                             endpoint,
@@ -2931,9 +2931,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // related kidney, lungs, etc model
     var relatedCellmlModel = function (relatedModel, alternativeCellmlArray, membrane) {
+        
+        var indexOfcellml = relatedModel[idProtein].search(".cellml");
+        var modelname = relatedModel[idProtein].slice(0, indexOfcellml);
+
+        modelname = relatedModel[idProtein] + "#" + modelname;
+
         var query = 'SELECT ?Protein ?workspaceName ' +
             'WHERE { GRAPH ?workspaceName { ' +
-            '<' + relatedModel[idProtein] + '#Protein> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
+            '<' + modelname + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
             '}}'
 
         sendPostRequest(
@@ -2962,10 +2968,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
     var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
-        var query = 'SELECT ?Protein ?URI ?workspaceName ' +
+        var indexOfcellml = alternativeCellmlArray[idAltProtein].search(".cellml");
+        var modelname = alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
+
+        modelname = alternativeCellmlArray[idAltProtein] + "#" + modelname;
+
+        var query = 'SELECT ?Protein ?workspaceName ' +
             'WHERE { GRAPH ?workspaceName { ' +
-            '<' + alternativeCellmlArray[idAltProtein] + '#Protein> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-            '<' + alternativeCellmlArray[idAltProtein] + '#Protein> <http://www.obofoundry.org/ro/ro.owl#hasPhysicalDefinition> ?URI . ' +
+            '<' + modelname + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
             '}}'
 
         sendPostRequest(
@@ -2987,7 +2997,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             // console.log("jsonAltProtein INSIDE callOLS: ", jsonAltProtein);
 
                             workspaceName = jsonAltProtein.results.bindings[0].workspaceName.value;
-                            var URI = jsonAltProtein.results.bindings[0].URI.value;
+                            var URI = jsonAltProtein.results.bindings[0].Protein.value;
                             var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeCellmlArray[idAltProtein];
 
                             var endpointOLS = "https://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + URI;
@@ -3077,10 +3087,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // existing apical or basolateral membrane in PMR
     var relatedMembrane = function (workspaceName, membrane, membraneName) {
-        // var query = 'SELECT ?cellmlmodel ?located_in ' +
-        //     'WHERE { GRAPH ?g { ' +
-        //     '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> <' + membrane + '>. ' +
-        //     '}}'
 
         // TODO: static sodium URI - see ?sodium_chebi in index.js
         // TODO: change arrow and variable name in epithelial platform
@@ -3120,7 +3126,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 }
 
                 membraneModel = uniqueify(membraneModel);
-                // console.log("membraneModel: ", membraneModel);
+                console.log("membraneModel: ", membraneModel);
 
                 // find and make model_entity#component.variable
                 tempmembraneModel = uniqueify(tempmembraneModel);
@@ -3147,7 +3153,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             var tempmembraneModel = membraneModel[idMembrane].slice(0, indexOfHash);
         }
 
-        console.log("tempmembraneModel: ", tempmembraneModel, membraneModel);
+        var indexOfcellml = tempmembraneModel.search(".cellml");
+        var modelname = tempmembraneModel.slice(0, indexOfcellml);
+
+        tempmembraneModel = tempmembraneModel + "#" + modelname;
+
+        console.log("tempmembraneModel: ", tempmembraneModel);
+        console.log("membraneModel: ", membraneModel);
 
         var query = 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
             'PREFIX dcterms: <http://purl.org/dc/terms/>' +
@@ -3155,9 +3167,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             'WHERE { ' +
             '<' + tempmembraneModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
             '}'
-
-        console.log("membraneModel: ", membraneModel[idMembrane]);
-        console.log("tempmembraneModel: ", tempmembraneModel);
 
         sendPostRequest(
             endpoint,
@@ -3236,7 +3245,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             }
                         }
 
-                        console.log("membraneObject: ", membraneObject);
+                        // console.log("membraneObject: ", membraneObject);
                         // console.log("idMembrane: ", idMembrane);
                         // console.log("membraneModel.length: ", membraneModel.length);
                         console.log("membraneModelID: ", membraneModelID);
@@ -3308,8 +3317,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                         membraneTransporter += label.innerHTML;
                                     }
-
-                                    membraneTransporter += label.innerHTML;
                                 }
 
                                 // Alternative model
@@ -3593,9 +3600,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 // }
 
                 // TODO: change line arrow and text
-                console.log("cthis, linewithlineg, and linewithtextg: ", cthis, linewithlineg, linewithtextg);
+                console.log("cthis: ", cthis);
+                console.log("linewithlineg: ", linewithlineg);
+                console.log("linewithtextg: ", linewithtextg);
+
                 var circleID = $(cthis).prop("id").split(",");
-                linewithtextg[i].text(circleID[2]);
+                console.log("circleID: ", circleID);
+                // Don't know why did I write this?
+                // linewithtextg[i].text(circleID[2]);
 
                 // if ($(cthis).attr("membrane") == apicalID) {
                 //     var pindex = $(cthis).attr("index"),
