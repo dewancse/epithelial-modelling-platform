@@ -476,7 +476,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                 model = model + "#" + model.slice(0, model.indexOf('.'));
 
-                console.log("model#: ", model);
+                // console.log("model#: ", model);
 
                 var query = 'SELECT ?Protein ' +
                     'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }';
@@ -521,7 +521,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                                 // console.log("jsonSpecies: ", jsonSpecies);
 
-                                                console.log("jsonModel: ", jsonModel);
+                                                // console.log("jsonModel: ", jsonModel);
 
                                                 // model and biological meaning
                                                 modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);

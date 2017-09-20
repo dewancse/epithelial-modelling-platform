@@ -780,9 +780,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         return checkBox;
     }
 
-    var div = d3.select("#svgVisualize").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    // var div = d3.select("#svgVisualize").append("div")
+    //     .attr("class", "tooltip")
+    //     .style("opacity", 0);
 
     var state = 0;
     $(document).on({
@@ -842,6 +842,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         else source_name2 = "";
 
         var mediator_fma = combinedMembrane[i].med_fma;
+        var mediator_pr = combinedMembrane[i].med_pr;
 
         var textvalue = combinedMembrane[i].source_text;
         var textvalue2 = combinedMembrane[i].source_text2;
@@ -907,7 +908,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -1044,7 +1046,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -1181,7 +1184,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -1318,7 +1322,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -1438,7 +1443,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -1535,7 +1541,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -1652,7 +1659,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -1789,7 +1797,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -1926,7 +1935,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -2063,7 +2073,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -2183,7 +2194,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -2280,7 +2292,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         return [
                             source_name, source_name2,
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
-                            src_fma, src_fma2, snk_fma, snk_fma2
+                            src_fma, src_fma2, snk_fma, snk_fma2,
+                            mediator_fma, mediator_pr
                         ];
                     })
                     .attr("index", tempID)
@@ -2437,6 +2450,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         cthis = this; // remember to debug cthis!!
 
+        // console.log("cthis in dragcircleline: ", cthis);
         // console.log("index: ", icircleGlobal);
 
         var dx = d3.event.dx;
@@ -2700,7 +2714,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 showLoading("#modalBody");
 
                                 var circleID = $(cthis).prop("id").split(",");
-                                console.log("circleID: ", circleID);
+                                console.log("circleID in myWelcomeModal: ", circleID);
 
                                 // parsing
                                 cellmlModel = circleID[0];
@@ -2931,7 +2945,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     // related kidney, lungs, etc model
     var relatedCellmlModel = function (relatedModel, alternativeCellmlArray, membrane) {
-        
+
         var indexOfcellml = relatedModel[idProtein].search(".cellml");
         var modelname = relatedModel[idProtein].slice(0, indexOfcellml);
 
@@ -2968,10 +2982,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
     var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
-        var indexOfcellml = alternativeCellmlArray[idAltProtein].search(".cellml");
-        var modelname = alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
+        if(alternativeCellmlArray[idAltProtein] != undefined){
+            var indexOfcellml = alternativeCellmlArray[idAltProtein].search(".cellml");
+            var modelname = alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
 
-        modelname = alternativeCellmlArray[idAltProtein] + "#" + modelname;
+            modelname = alternativeCellmlArray[idAltProtein] + "#" + modelname;
+        }
+        else{
+            modelname = "";
+        }
 
         var query = 'SELECT ?Protein ?workspaceName ' +
             'WHERE { GRAPH ?workspaceName { ' +
@@ -3239,8 +3258,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                     tempjsonObjFlux[0].source_fma.value,
                                     tempjsonObjFlux[0].source_fma.value,
                                     tempjsonObjFlux[0].sink_fma.value,
-                                    tempjsonObjFlux[0].sink_fma.value
-                                    // jsonObjFlux.results.bindings[0].med_entity_uri.value
+                                    tempjsonObjFlux[0].sink_fma.value,
+                                    jsonObjFlux.results.bindings[0].med_entity_uri.value, // med_fma
+                                    jsonObjFlux.results.bindings[1].med_entity_uri.value // med_pr
                                 ]);
                             }
                         }
@@ -3530,6 +3550,29 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("cthis and $(cthis): ", cthis, $(cthis));
                 console.log("win AFTER save clicked: ", win);
 
+                var tempIndex = 0;
+                var filter = function (membraneID) {
+                    var circleID = $(cthis).prop("id").split(",");
+                    for (var i = 0; i < membrane.length; i++) {
+                        console.log("Inside filter: ", membrane[i].source_name, circleID[0]);
+                        if (membrane[i].source_name == circleID[0]) {
+                            membrane[i].med_fma = membraneID;
+                            tempIndex = i;
+                            return;
+                        }
+                    }
+                }
+
+                // apicalID -> basolateralID
+                if ($(cthis).attr("membrane") == apicalID) {
+                    $(cthis).attr("membrane", basolateralID);
+                    filter(basolateralID); // membrane attr
+                }
+                else {
+                    $(cthis).attr("membrane", apicalID);
+                    filter(apicalID); // membrane attr
+                }
+
                 console.log("input ID: ", win[0].children[1].children[0].children[9].getElementsByTagName("input"));
 
                 // checkbox!!
@@ -3599,13 +3642,45 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "lightgreen");
                 // }
 
+                // change circle's membrane id
+                if ($(cthis).attr("membrane") == basolateralID) {
+                    var indexOfMembrane = $(cthis).prop('id').search(apicalID);
+                    var str = $(cthis).prop('id');
+
+                    str = str.substr(0, indexOfMembrane) +
+                        basolateralID +
+                        str.substr(indexOfMembrane + apicalID.length, str.length);
+
+                    $(cthis).attr("id", str);
+                }
+                else {
+                    var indexOfMembrane = $(cthis).prop('id').search(basolateralID);
+                    var str = $(cthis).prop('id');
+
+                    str = str.substr(0, indexOfMembrane) +
+                        apicalID +
+                        str.substr(indexOfMembrane + basolateralID.length, str.length);
+
+                    $(cthis).attr("id", str);
+                }
+
+                var circleID = $(cthis).prop("id").split(",");
+                console.log("circleID: ", circleID);
+
+                // change source_name in membrane array
+                membrane[tempIndex].source_name = circleID[0];
+
+                // JSON to make a new cellml model
+                console.log("membrane: ", membrane);
+                xmlIndex = 0;
+                createJSON();
+
                 // TODO: change line arrow and text
                 console.log("cthis: ", cthis);
                 console.log("linewithlineg: ", linewithlineg);
                 console.log("linewithtextg: ", linewithtextg);
 
-                var circleID = $(cthis).prop("id").split(",");
-                console.log("circleID: ", circleID);
+
                 // Don't know why did I write this?
                 // linewithtextg[i].text(circleID[2]);
 
@@ -3937,7 +4012,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     for (var i = 0; i < membrane.length; i++) {
                         for (var j = i + 1; j < membrane.length; j++) {
                             if (membrane[i].source_fma === membrane[j].source_fma &&
-                                membrane[i].sink_fma === membrane[j].sink_fma) {
+                                membrane[i].sink_fma === membrane[j].sink_fma &&
+                                membrane[i].med_fma === membrane[j].med_fma) {
 
                                 var cellmlEntity1 = membrane[i].source_name,
                                     cellmlEntity2 = membrane[j].source_name,
