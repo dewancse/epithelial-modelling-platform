@@ -2982,13 +2982,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
     var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
-        if(alternativeCellmlArray[idAltProtein] != undefined){
+        if (alternativeCellmlArray[idAltProtein] != undefined) {
             var indexOfcellml = alternativeCellmlArray[idAltProtein].search(".cellml");
             var modelname = alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
 
             modelname = alternativeCellmlArray[idAltProtein] + "#" + modelname;
         }
-        else{
+        else {
             modelname = "";
         }
 
@@ -3567,13 +3567,40 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 if ($(cthis).attr("membrane") == apicalID) {
                     $(cthis).attr("membrane", basolateralID);
                     filter(basolateralID); // membrane attr
+
+                    var indexOfMembrane = $(cthis).prop('id').search(apicalID);
+                    var strid = $(cthis).prop('id');
+
+                    console.log("current if: ", strid, indexOfMembrane);
+
+                    strid = strid.substr(0, indexOfMembrane) +
+                        basolateralID +
+                        strid.substr(indexOfMembrane + apicalID.length, strid.length);
+
+                    console.log("current if: ", strid);
+
+                    $(cthis).attr("id", strid);
                 }
                 else {
                     $(cthis).attr("membrane", apicalID);
                     filter(apicalID); // membrane attr
+
+                    var indexOfMembrane = $(cthis).prop('id').search(basolateralID);
+                    var strid = $(cthis).prop('id');
+
+                    console.log("current: ", strid, indexOfMembrane);
+
+                    strid = strid.substr(0, indexOfMembrane) +
+                        apicalID +
+                        strid.substr(indexOfMembrane + basolateralID.length, strid.length);
+
+                    console.log("current: ", strid);
+
+                    $(cthis).attr("id", strid);
                 }
 
                 console.log("input ID: ", win[0].children[1].children[0].children[9].getElementsByTagName("input"));
+                console.log("input ID children[0]: ", win[0].children[1].children[0]);
 
                 // checkbox!!
                 if (win[0].children[1].children[0].children[9] != undefined) {
@@ -3642,33 +3669,64 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "lightgreen");
                 // }
 
-                // change circle's membrane id
-                if ($(cthis).attr("membrane") == basolateralID) {
-                    var indexOfMembrane = $(cthis).prop('id').search(apicalID);
-                    var str = $(cthis).prop('id');
-
-                    str = str.substr(0, indexOfMembrane) +
-                        basolateralID +
-                        str.substr(indexOfMembrane + apicalID.length, str.length);
-
-                    $(cthis).attr("id", str);
-                }
-                else {
-                    var indexOfMembrane = $(cthis).prop('id').search(basolateralID);
-                    var str = $(cthis).prop('id');
-
-                    str = str.substr(0, indexOfMembrane) +
-                        apicalID +
-                        str.substr(indexOfMembrane + basolateralID.length, str.length);
-
-                    $(cthis).attr("id", str);
-                }
+                // TODO: change circle's membrane id
+                // if ($(cthis).attr("membrane") == basolateralID) {
+                //     var indexOfMembrane = $(cthis).prop('id').search(apicalID);
+                //     var strid = $(cthis).prop('id');
+                //
+                //     console.log("current if: ", strid, indexOfMembrane);
+                //
+                //     if (indexOfMembrane == -1) {
+                //         indexOfMembrane = $(cthis).prop('id').search(basolateralID);
+                //         strid = strid.substr(0, indexOfMembrane) +
+                //             apicalID +
+                //             strid.substr(indexOfMembrane + basolateralID.length, strid.length);
+                //
+                //     }
+                //     else {
+                //         strid = strid.substr(0, indexOfMembrane) +
+                //             basolateralID +
+                //             strid.substr(indexOfMembrane + apicalID.length, strid.length);
+                //     }
+                //
+                //     console.log("current if: ", strid);
+                //
+                //     $(cthis).attr("id", strid);
+                // }
+                // else {
+                //
+                //     console.log("current: ", $(cthis).attr("membrane"));
+                //
+                //     var indexOfMembrane = $(cthis).prop('id').search(basolateralID);
+                //     var strid = $(cthis).prop('id');
+                //
+                //     console.log("current: ", strid, indexOfMembrane);
+                //
+                //     if (indexOfMembrane == -1) {
+                //         indexOfMembrane = $(cthis).prop('id').search(apicalID);
+                //
+                //         strid = strid.substr(0, indexOfMembrane) +
+                //             basolateralID +
+                //             strid.substr(indexOfMembrane + apicalID.length, strid.length);
+                //     }
+                //     else {
+                //         strid = strid.substr(0, indexOfMembrane) +
+                //             apicalID +
+                //             strid.substr(indexOfMembrane + basolateralID.length, strid.length);
+                //
+                //     }
+                //
+                //     console.log("current: ", strid);
+                //
+                //     $(cthis).attr("id", strid);
+                // }
 
                 var circleID = $(cthis).prop("id").split(",");
                 console.log("circleID: ", circleID);
 
                 // change source_name in membrane array
                 membrane[tempIndex].source_name = circleID[0];
+                tempIndex = 0;
 
                 // JSON to make a new cellml model
                 console.log("membrane: ", membrane);
