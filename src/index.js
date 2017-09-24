@@ -1408,6 +1408,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                         medfmatext = parserFmaNameText(med_fma[0]), // get this from OLS
                                         temp_med_pr;
 
+                                    // TODO: ??
                                     // No mediator protein in NHE3, SGLT models
                                     if (med_pr[0] == undefined)
                                         temp_med_pr = undefined;
