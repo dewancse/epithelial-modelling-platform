@@ -465,6 +465,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             query,
             function (jsonModel) {
 
+                // console.log("jsonModel in index.js: ", jsonModel);
+
                 if (jsonModel.results.bindings.length == 0) {
                     mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
                     return;
@@ -1087,14 +1089,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var basolateralID = "http://identifiers.org/fma/FMA:84669";
         var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
         var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
-        var leakID = "http://identifiers.org/go/GO:0022840";
 
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
 
-        // making cotransporter from the RDF graph using SPARQL
+        // making cotransporter from RDF graph using SPARQL
         mainUtils.makecotransporter = function (membrane1, membrane2) {
-            // query for finding fluxes to make a cotransporter
+            // query to find fluxes in order to make a cotransporter
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
                 'SELECT ?med_entity_uri ?med_entity_uriCl ' +
@@ -1117,10 +1118,11 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObj) {
 
-                    // console.log("jsonObj: ", jsonObj);
+                    // console.log("jsonObj in makecotransporter: ", jsonObj);
 
                     var tempProtein = [], tempApical = [], tempBasolateral = [];
 
+                    // med_fma and med_pr returns in jsonObj
                     for (var m = 0; m < jsonObj.results.bindings.length; m++) {
                         var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
                         var tmpApi = jsonObj.results.bindings[m].med_entity_uri.value;
@@ -1139,79 +1141,88 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         }
                     }
 
-                    // remove duplicate of protein ID
+                    // remove duplicate protein ID
                     tempProtein = tempProtein.filter(function (item, pos) {
                         return tempProtein.indexOf(item) == pos;
                     })
 
-                    // remove duplicate of fma ID
                     tempApical = tempApical.filter(function (item, pos) {
                         return tempApical.indexOf(item) == pos;
                     })
 
-                    // remove duplicate of fma ID
                     tempBasolateral = tempBasolateral.filter(function (item, pos) {
                         return tempBasolateral.indexOf(item) == pos;
                     })
 
                     // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
 
-                    var NHE3 = "http://purl.obolibrary.org/obo/PR_P26433";
+                    var membraneOBJ = {
+                        solute_chebi: membrane1.solute_chebi,
+                        source_name: membrane1.source_name,
+                        sink_name: membrane1.sink_name,
+                        med_text: membrane1.med_text,
+                        med_fma: membrane1.med_fma,
+                        med_pr: membrane1.med_pr,
+                        source_text: membrane1.source_text,
+                        source_fma: membrane1.source_fma,
+                        sink_text: membrane1.sink_text,
+                        sink_fma: membrane1.sink_fma,
+                        solute_chebi2: membrane2.solute_chebi,
+                        source_name2: membrane2.source_name,
+                        sink_name2: membrane2.sink_name,
+                        med_text2: membrane2.med_text,
+                        med_fma2: membrane2.med_fma,
+                        med_pr2: membrane2.med_pr,
+                        source_text2: membrane2.source_text,
+                        source_fma2: membrane2.source_fma,
+                        sink_text2: membrane2.sink_text,
+                        sink_fma2: membrane2.sink_fma
+                    }
+
                     for (var i = 0; i < tempProtein.length; i++) {
-
-                        // Temp solution to skip making cotransporter in NHE3
-                        if (tempProtein[i] == NHE3) continue;
-
                         // cotransporter in apical membrane
                         if (tempProtein.length != 0 && tempApical.length != 0) {
-                            apicalMembrane.push(
-                                {
-                                    source_name: membrane1.source_name,
-                                    sink_name: membrane1.sink_name,
-                                    med_text: membrane1.med_text,
-                                    med_fma: membrane1.med_fma,
-                                    med_pr: membrane1.med_pr,
-                                    source_text: membrane1.source_text,
-                                    source_fma: membrane1.source_fma,
-                                    sink_text: membrane1.sink_text,
-                                    sink_fma: membrane1.sink_fma,
-                                    source_name2: membrane2.source_name,
-                                    sink_name2: membrane2.sink_name,
-                                    med_text2: membrane2.med_text,
-                                    med_fma2: membrane2.med_fma,
-                                    med_pr2: membrane2.med_pr,
-                                    source_text2: membrane2.source_text,
-                                    source_fma2: membrane2.source_fma,
-                                    sink_text2: membrane2.sink_text,
-                                    sink_fma2: membrane2.sink_fma
-                                });
+                            apicalMembrane.push(membraneOBJ);
                         }
 
                         // cotransporter in basolateral membrane
                         if (tempProtein.length != 0 && tempBasolateral.length != 0) {
-                            basolateralMembrane.push(
-                                {
-                                    source_name: membrane1.source_name,
-                                    sink_name: membrane1.sink_name,
-                                    med_text: membrane1.med_text,
-                                    med_fma: membrane1.med_fma,
-                                    med_pr: membrane1.med_pr,
-                                    source_text: membrane1.source_text,
-                                    source_fma: membrane1.source_fma,
-                                    sink_text: membrane1.sink_text,
-                                    sink_fma: membrane1.sink_fma,
-                                    source_name2: membrane2.source_name,
-                                    sink_name2: membrane2.sink_name,
-                                    med_text2: membrane2.med_text,
-                                    med_fma2: membrane2.med_fma,
-                                    med_pr2: membrane2.med_pr,
-                                    source_text2: membrane2.source_text,
-                                    source_fma2: membrane2.source_fma,
-                                    sink_text2: membrane2.sink_text,
-                                    sink_fma2: membrane2.sink_fma
-                                });
+                            basolateralMembrane.push(membraneOBJ);
                         }
                     }
+
+                    // same solute cotransporter in apical membrane
+                    if (membrane1.med_fma == apicalID && membrane2.med_fma == apicalID &&
+                        membrane1.med_pr == membrane2.med_pr &&
+                        membrane1.source_name == membrane2.source_name) {
+                        apicalMembrane.push(membraneOBJ);
+                    }
+
+                    // same solute cotransporter in basolateral membrane
+                    if (membrane1.med_fma == basolateralID && membrane2.med_fma == basolateralID &&
+                        membrane1.med_pr == membrane2.med_pr &&
+                        membrane1.source_name == membrane2.source_name) {
+                        basolateralMembrane.push(membraneOBJ);
+                    }
+
+                    // TODO: sample object attributes name to make it user-friendly
+                    // TODO: apply this also in the membrane object below
+                    // membrane.push({
+                    //     solute_chebi: solute_chebi[i].fma,
+                    //     solute_text: solutetext,
+                    //     solute_chebi2: solute_chebi2[0].fma,
+                    //     solute_text2: solutetext2,
+                    //     variable_text: srctext,
+                    //     variable_text2: srctext2,
+                    //     source_fma: source_fma[i].fma,
+                    //     source_fma2: source_fma2[i].fma,
+                    //     sink_fma: sink_fma[i].fma,
+                    //     sink_fma2: sink_fma2[i].fma,
+                    //     model_entity: source_fma[i].name,
+                    //     prev_model_entity: sink_fma[i].name,
+                    //     med_fma: med_fma[i].fma,
+                    //     med_pr: med_pr[i].fma
+                    // });
 
                     counter++;
 
@@ -1225,14 +1236,15 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                             membrane);
                     }
                 },
-                true);
+                true
+            );
         };
 
         mainUtils.srcDescMediatorOfFluxes = function () {
 
             if (index == modelEntityFullNameArray.length) {
 
-                // exceptional case: one flux is chosen
+                // special case: one flux is chosen
                 if (membrane.length <= 1) {
                     // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
                     // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
@@ -1290,7 +1302,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
-                    console.log("jsonObjFluxIndex: ", jsonObjFlux);
+                    console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                     for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
 
@@ -1303,6 +1315,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                     fma: jsonObjFlux.results.bindings[i].solute_chebi.value
                                 }
                             );
+
+                        // case for solute_chebi2
 
                         if (jsonObjFlux.results.bindings[i].source_fma == undefined)
                             source_fma.push("");
@@ -1330,8 +1344,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         }
                         else {
                             var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
-                            if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1 ||
-                                temp.indexOf(leakID) != -1) {
+                            if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
                                 med_pr.push({
                                     name: modelEntityFullNameArray[index],
                                     fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
@@ -1370,6 +1383,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         query2,
                         function (jsonObjCon) {
 
+                            console.log("jsonObjCon in index.js: ", jsonObjCon);
+
                             for (var i = 0; i < jsonObjCon.results.bindings.length; i++) {
                                 if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
                                     concentration_fma.push("");
@@ -1384,46 +1399,45 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                             index++;
 
-                            if (source_fma.length != 0) {
-                                if (source_fma.length == 1) {
-                                    var srctext = parserFmaNameText(source_fma[0]);
-                                    var snktext = parserFmaNameText(sink_fma[0]);
-                                    var medfmatext = parserFmaNameText(med_fma[0]);
+                            if (source_fma.length != 0) { // flux
 
-                                    if (med_pr[0] == undefined) { // temp solution
-                                        membrane.push({
-                                            solute_chebi: solute_chebi[0].fma,
-                                            source_text: srctext,
-                                            source_fma: source_fma[0].fma,
-                                            source_name: source_fma[0].name,
-                                            sink_text: snktext,
-                                            sink_fma: sink_fma[0].fma,
-                                            sink_name: sink_fma[0].name,
-                                            med_text: medfmatext,
-                                            med_fma: med_fma[0].fma,
-                                            med_pr: undefined
-                                        });
-                                    }
-                                    else {
-                                        membrane.push({
-                                            solute_chebi: solute_chebi[0].fma,
-                                            source_text: srctext,
-                                            source_fma: source_fma[0].fma,
-                                            source_name: source_fma[0].name,
-                                            sink_text: snktext,
-                                            sink_fma: sink_fma[0].fma,
-                                            sink_name: sink_fma[0].name,
-                                            med_text: medfmatext,
-                                            med_fma: med_fma[0].fma,
-                                            med_pr: med_pr[0].fma
-                                        });
-                                    }
+                                if (source_fma.length == 1) { // transporter (single flux)
+
+                                    var srctext = parserFmaNameText(source_fma[0]), // get this from OLS
+                                        snktext = parserFmaNameText(sink_fma[0]), // get this from OLS
+                                        medfmatext = parserFmaNameText(med_fma[0]), // get this from OLS
+                                        temp_med_pr;
+
+                                    // No mediator protein in NHE3, SGLT models
+                                    if (med_pr[0] == undefined)
+                                        temp_med_pr = undefined;
+                                    else
+                                        temp_med_pr = med_pr[0].fma;
+
+                                    membrane.push({
+                                        solute_chebi: solute_chebi[0].fma,
+                                        source_text: srctext,
+                                        source_fma: source_fma[0].fma,
+                                        source_name: source_fma[0].name,
+                                        sink_text: snktext,
+                                        sink_fma: sink_fma[0].fma,
+                                        sink_name: sink_fma[0].name,
+                                        med_text: medfmatext,
+                                        med_fma: med_fma[0].fma,
+                                        med_pr: temp_med_pr
+                                    });
 
                                     source_fma2.push(source_fma[0]);
                                     sink_fma2.push(sink_fma[0]);
-                                } else {
-                                    // Swap if source and sink faces same direction
+
+                                }
+                                else { // same solute co-transporter
+
+                                    // Swap if source and sink have same direction
                                     if (source_fma[0].fma == sink_fma[0].fma) {
+
+                                        console.log("inside same faces", source_fma[0], sink_fma[0]);
+
                                         var tempFMA = sink_fma[0].fma,
                                             tempName = sink_fma[0].name;
 
@@ -1434,40 +1448,28 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                     }
 
                                     for (var i = 0; i < source_fma.length; i++) {
-                                        var srctext = parserFmaNameText(source_fma[i]);
-                                        var snktext = parserFmaNameText(sink_fma[i]);
+                                        var srctext = parserFmaNameText(source_fma[i]),
+                                            snktext = parserFmaNameText(sink_fma[i]),
+                                            medfmatext, temp_med_pr;
 
-                                        if (med_fma[i] != undefined)
-                                            var medfmatext = parserFmaNameText(med_fma[i]);
+                                        if (med_pr[i] == undefined)
+                                            temp_med_pr = undefined;
+                                        else
+                                            temp_med_pr = med_pr[0].fma;
 
-                                        if (med_pr[i] == undefined) { // temp solution
-                                            membrane.push({
-                                                solute_chebi: solute_chebi[i].fma,
-                                                source_text: srctext,
-                                                source_fma: source_fma[i].fma,
-                                                source_name: source_fma[i].name,
-                                                sink_text: snktext,
-                                                sink_fma: sink_fma[i].fma,
-                                                sink_name: sink_fma[i].name,
-                                                med_text: medfmatext,
-                                                med_fma: undefined, // med_fma[i].fma,
-                                                med_pr: undefined
-                                            });
-                                        }
-                                        else {
-                                            membrane.push({
-                                                solute_chebi: solute_chebi[i].fma,
-                                                source_text: srctext,
-                                                source_fma: source_fma[i].fma,
-                                                source_name: source_fma[i].name,
-                                                sink_text: snktext,
-                                                sink_fma: sink_fma[i].fma,
-                                                sink_name: sink_fma[i].name,
-                                                med_text: medfmatext,
-                                                med_fma: med_fma[i].fma,
-                                                med_pr: med_pr[i].fma
-                                            });
-                                        }
+                                        // TODO: change object attributes (see above)
+                                        membrane.push({
+                                            solute_chebi: solute_chebi[0].fma,
+                                            source_text: srctext,
+                                            source_fma: source_fma[i].fma,
+                                            source_name: source_fma[i].name,
+                                            sink_text: snktext,
+                                            sink_fma: sink_fma[i].fma,
+                                            sink_name: sink_fma[i].name,
+                                            med_text: medfmatext,
+                                            med_fma: med_fma[0].fma,
+                                            med_pr: temp_med_pr
+                                        });
 
                                         source_fma2.push(source_fma[i]);
                                         sink_fma2.push(sink_fma[i]);
@@ -1479,6 +1481,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                             sink_fma = [];
                             med_fma = [];
                             med_pr = [];
+                            solute_chebi = [];
 
                             mainUtils.srcDescMediatorOfFluxes(); // callback
                         },
