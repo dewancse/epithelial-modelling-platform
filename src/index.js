@@ -436,15 +436,15 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             if (keyValue == "flux") {
                 var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                     'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-                    'SELECT ?Model_entity ?Biological_meaning ' +
-                    'WHERE { ' +
+                    'SELECT DISTINCT ?g ?Model_entity ?Biological_meaning ' +
+                    'WHERE { GRAPH ?g { ' +
                     '?entity semsim:hasPhysicalDefinition ' + uriCHEBI + '. ' +
                     '?source semsim:hasPhysicalEntityReference ?entity. ' +
                     '?process semsim:hasSourceParticipant ?source. ' +
                     '?property semsim:physicalPropertyOf ?process. ' +
                     '?Model_entity semsim:isComputationalComponentFor ?property. ' +
                     '?Model_entity dcterms:description ?Biological_meaning.' +
-                    '}'
+                    '}}'
             }
             else {
                 var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
@@ -499,7 +499,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
                         var endpointproteinOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pr_uri;
 
-
                         sendGetRequest(
                             endpointproteinOLS,
                             function (jsonProtein) {
@@ -515,7 +514,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                         // console.log("jsonGene: ", jsonGene);
 
-                                        var endpointspeciesOLS = jsonGene._embedded.terms[0]._links.only_in_taxon.href;
+                                        if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
+                                            var endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
 
                                         sendGetRequest(
                                             endpointspeciesOLS,
@@ -581,21 +581,23 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     },
                     true);
             },
-            true
-        );
+            true);
     }
 
     // TODO: make a common table platform for all functions
-    // Show semantic annotation extracted from PMR
+    // Show discovered models from PMR
     mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
-        // Search result does not match
+        // Empty search result
         if (head.length == 0) {
-            $("#searchList").html("<section class='container-fluid'><label><br>No Search Results!</label></section>");
+            $("#searchList").html(
+                "<section class='container-fluid'><label><br>No Search Results!</label></section>"
+            );
+
             return;
         }
 
-        // Empty space for a new search result
+        // Reinitialize for a new search result
         $("#searchList").html("");
 
         var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
@@ -604,9 +606,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var thead = $("<thead/>"), tr = $("<tr/>");
         for (var i = 0; i < head.length; i++) {
             // Empty header for checkbox column
-            if (i == 0) {
+            if (i == 0)
                 tr.append($("<th/>").append(""));
-            }
 
             tr.append($("<th/>").append(head[i]));
         }
@@ -622,9 +623,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
             for (var j = 0; j < temp.length; j++) {
                 if (j == 0) {
-                    tr.append($("<td/>").append($('<label/>')
-                        .html('<input id="' + modelEntity[i] + '" type="checkbox" ' +
-                            'data-action="search" value="' + modelEntity[i] + '" class="checkbox">')));
+                    tr.append($("<td/>")
+                        .append($('<label/>')
+                            .html('<input id="' + modelEntity[i] + '" type="checkbox" ' +
+                                'data-action="search" value="' + modelEntity[i] + '" class="checkbox">')));
                 }
 
                 if (j == 1)
@@ -639,15 +641,11 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         table.append(tbody);
         $("#searchList").append(table);
 
-        // Fill in the search attribute value
+        // Fill in search attribute value
         $("#searchTxt").attr("value", sessionStorage.getItem('searchTxtContent'));
 
-        // SET main content in the local storage
+        // SET main content in local storage
         sessionStorage.setItem('searchListContent', $("#main-content").html());
-
-        // Reinitialize so that last workspace does not appear in the Load Models
-        // page when clicked from Model Discovery and Epithelial Model Platform page
-        // mainUtils.workspaceName = "";
     }
 
     // Load the view
@@ -692,135 +690,116 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     // Load the model
     mainUtils.loadModelHtml = function () {
 
-        var cellmlModel = mainUtils.workspaceName;
+        var model = mainUtils.workspaceName;
         var tempidWithStr = mainUtils.tempidWithStr;
+        model = model + "#" + model.slice(0, model.indexOf('.'));
+        var index = $.inArray(tempidWithStr, modelEntity);
 
-        cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
+        console.log("model and tempidWithStr in loadModelHtml: ", model, tempidWithStr);
+        var query = 'SELECT ?Compartment ' +
+            'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }';
 
-        console.log("cellmlModel in loadModelHtml: ", cellmlModel, tempidWithStr);
-
-        var query = 'SELECT ?Protein ' +
-            'WHERE { ' + '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }';
-
-        // console.log("query: ", query);
-
-        // Species
         sendPostRequest(
             endpoint,
             query,
-            function (jsonProteinUri) {
+            function (jsonObjComp) {
+                var query = 'SELECT ?Located_in ' +
+                    'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in. }';
 
-                // console.log("jsonProteinUri: ", jsonProteinUri);
-
-                // pig SGLT2 (PR_P31636) is missing in protein ontology
-                // Write a test case for unsuccessful OLS query and handle this issue as undefined
-                // Just assign mouse species for the time being
-                var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                var endpointproteinOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pr_uri;
-
-                sendGetRequest(
-                    endpointproteinOLS,
-                    function (jsonProtein) {
-
-                        // console.log("jsonProtein: ", jsonProtein);
-
-                        if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
-                            var endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
-
+                sendPostRequest(
+                    endpoint,
+                    query,
+                    function (jsonObjLoc) {
+                        // showLoading("#main-content");
                         sendGetRequest(
-                            endpointgeneOLS,
-                            function (jsonGene) {
+                            modelHtml,
+                            function (modelHtmlContent) {
+                                $("#main-content").html(modelHtmlContent);
 
-                                // console.log("jsonGene: ", jsonGene);
+                                var tempComp = "", counterOLS = 0;
+                                for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
+                                    var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
+                                    var indexofColon = fma_uri.indexOf('FMA:');
+                                    fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
 
-                                var endpointspeciesOLS = jsonGene._embedded.terms[0]._links.only_in_taxon.href;
+                                    var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=" + fma_uri;
+                                    sendGetRequest(
+                                        endpointOLS,
+                                        function (jsonObjOLS) {
+                                            counterOLS++;
+                                            tempComp += jsonObjOLS._embedded.terms[0].label;
+                                            if (counterOLS < jsonObjComp.results.bindings.length)
+                                                tempComp += ", ";
+                                            else
+                                                tempComp += "";
 
-                                sendGetRequest(
-                                    endpointspeciesOLS,
-                                    function (jsonSpecies) {
+                                            if (counterOLS == jsonObjComp.results.bindings.length) {
+                                                var tempLoc = "", counterOLSLoc = 0;
+                                                for (var i = 0; i < jsonObjLoc.results.bindings.length; i++) {
+                                                    var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
+                                                    var indexofColon = fma_uri.indexOf('FMA:');
+                                                    fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
 
-                                        // console.log("jsonSpecies: ", jsonSpecies);
+                                                    var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=" + fma_uri;
+                                                    sendGetRequest(
+                                                        endpointOLS,
+                                                        function (jsonObjOLSLoc) {
+                                                            counterOLSLoc++;
+                                                            tempLoc += jsonObjOLSLoc._embedded.terms[0].label;
+                                                            if (counterOLSLoc < jsonObjLoc.results.bindings.length)
+                                                                tempLoc += ", ";
+                                                            else
+                                                                tempLoc += "";
 
-                                        // model and biological meaning
-                                        var tempmodelEntity, tempspecies, tempgene, tempprotein, tempcompartment;
-                                        tempmodelEntity = tempidWithStr;
+                                                            if (counterOLSLoc == jsonObjLoc.results.bindings.length) {
+                                                                var jsonObj = {
+                                                                    "Model_entity": tempidWithStr,
+                                                                    "Protein": proteinList[index],
+                                                                    "Species": speciesList[index],
+                                                                    "Gene": geneList[index],
+                                                                    "Compartment": tempComp,
+                                                                    "Located_in": tempLoc
+                                                                }
 
-                                        // species
-                                        if (jsonSpecies._embedded.terms.length == 0)
-                                            tempspecies = "Undefined";
-                                        else
-                                            tempspecies = jsonSpecies._embedded.terms[0].label;
-
-                                        // gene
-                                        if (jsonGene._embedded.terms.length == 0)
-                                            tempgene = "Undefined";
-                                        else {
-                                            var geneName = jsonGene._embedded.terms[0].label;
-                                            var indexOfParen = geneName.indexOf('(');
-                                            geneName = geneName.slice(0, indexOfParen - 1);
-                                            tempgene = geneName;
-                                        }
-
-                                        // protein
-                                        if (jsonProtein._embedded.terms.length == 0)
-                                            tempprotein = "Undefined";
-                                        else {
-                                            var proteinName = jsonProtein._embedded.terms[0].label;
-                                            var indexOfParen = proteinName.indexOf('(');
-                                            proteinName = proteinName.slice(0, indexOfParen - 1);
-                                            tempprotein = proteinName;
-                                        }
-
-                                        var compartment = "undefined";
-
-                                        // showLoading("#main-content");
-                                        sendGetRequest(
-                                            modelHtml,
-                                            function (modelHtmlContent) {
-                                                $("#main-content").html(modelHtmlContent);
-
-                                                var jsonObj = {
-                                                    "Model_entity": tempmodelEntity,
-                                                    "Protein": tempprotein,
-                                                    "Species": tempspecies,
-                                                    "Gene": tempgene,
-                                                    "Compartment": tempcompartment
+                                                                // console.log("jsonObj in loadModelHtml: ", jsonObj);
+                                                                mainUtils.showModel(jsonObj);
+                                                            }
+                                                        },
+                                                        true);
                                                 }
-
-                                                mainUtils.showModel(jsonObj);
-                                            },
-                                            false);
-
-                                        // Switch from current active button to models button
-                                        var activeItem = "#" + activeMenu();
-                                        switchMenuToActive(activeItem, "#listModels");
-                                    },
-                                    true);
+                                            }
+                                        },
+                                        true);
+                                }
                             },
-                            true);
+                            false);
                     },
                     true);
             },
             true);
+
+        // Switch from current active button to models button
+        var activeItem = "#" + activeMenu();
+        switchMenuToActive(activeItem, "#listModels");
     };
 
-    // TODO: move to utils directory
-    // Show selected items in a table
+// TODO: move to utils directory
+// Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
         console.log("showModel: ", jsonObj);
 
+        var head = ["Model_entity", "Protein", "Species", "Gene", "Compartment", "Located_in"];
         var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
-
-        var head = ["Model_entity", "Protein", "Species", "Gene", "Compartment"];
 
         // Table header
         var thead = $("<thead/>"), tr = $("<tr/>");
         for (var i = 0; i < head.length; i++) {
             if (i == 0) {
-                tr.append($("<th/>").append($("<label/>")
-                    .html('<input id="' + head[0] + '" type="checkbox" name="attributeAll" ' +
-                        'class="attributeAll" data-action="model" value="' + head[0] + '" >')));
+                tr.append($("<th/>")
+                    .append($("<label/>")
+                        .html('<input id="' + head[0] + '" type="checkbox" name="attributeAll" ' +
+                            'class="attributeAll" data-action="model" value="' + head[0] + '" >')));
             }
 
             tr.append($("<th/>").append(head[i]));
@@ -838,48 +817,35 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     'name="attribute" class="attribute" data-action="model" value="' + modelEntityName + '" >'));
             }
 
-            if (head[i] == "Compartment") {
-                var compartment = "";
-                // for (var c = 0; c < jsonObj.results.bindings.length; c++) {
-                //     if (c == 0)
-                //         compartment += jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
-                //     else
-                //         compartment += "," + jsonObj.results.bindings[c][jsonObj.head.vars[i]].value;
-                // }
-
-                model.push(compartment);
+            if (head[i] == "Model_entity") {
+                model.push(modelEntityName);
             }
-            else {
-                if (head[i] == "Model_entity") {
-                    model.push(modelEntityName);
-                }
-                else
-                    model.push(jsonObj[head[i]]);
-            }
+            else
+                model.push(jsonObj[head[i]]);
         }
 
         // 1D to 2D array
         while (model.length) {
-            model2DArray.push(model.splice(0, 6)); // 5 + 1 (checkbox) header elemenet
+            model2DArray.push(model.splice(0, 7)); // 6 + 1 (checkbox) header elemenet
         }
 
         console.log("model and model2DArray: ", model, model2DArray);
 
         // Table body
         var tbody = $("<tbody/>"), td = [];
-        for (var ix = 0; ix < model2DArray.length; ix++) {
+        for (var i = 0; i < model2DArray.length; i++) {
             var tr = $("<tr/>");
             // +1 for adding checkbox column
             for (var j = 0; j < head.length + 1; j++) {
                 td[j] = $("<td/>");
                 if (j == 0)
-                    td[j].append(model2DArray[ix][j]);
+                    td[j].append(model2DArray[i][j]);
                 else
-                    td[j].append(model2DArray[ix][j]);
+                    td[j].append(model2DArray[i][j]);
 
                 // Id for each row
                 if (j == 1)
-                    tr.attr("id", model2DArray[ix][j]);
+                    tr.attr("id", model2DArray[i][j]);
 
                 tr.append(td[j]);
             }
@@ -897,13 +863,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 $('table tr td label')[i].firstChild.checked = false;
             }
         }
-
-        // Reinitialize so that last workspace does not appear in the Load Models
-        // page when clicked from Model Discovery and Epithelial Model Platform page
-        // mainUtils.workspaceName = "";
     };
 
-    // Toggle table column in Model discovery
+// Toggle table column in Model discovery
     mainUtils.toggleColHtml = function () {
 
         if (event.target.checked == false) {
@@ -923,7 +885,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    // Toggle table column in Load model
+// Toggle table column in Load model
     mainUtils.toggleColModelHtml = function () {
 
         if (event.target.checked == false) {
@@ -943,7 +905,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    // Filter search results
+// Filter search results
     mainUtils.filterSearchHtml = function () {
 
         var tempstr = [];
@@ -1000,7 +962,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     };
 
-    // TODO: move to utils directory
+// TODO: move to utils directory
     mainUtils.deleteRowModelHtml = function () {
 
         // Un-check header checkbox if body is empty
@@ -1039,7 +1001,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         // TODO: click when empty loadmodel table!! Fix this!!
     };
 
-    // Load the SVG model
+// Load the SVG model
     mainUtils.loadSVGModelHtml = function () {
 
         sendGetRequest(
@@ -1053,7 +1015,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             false);
     };
 
-    // Load the epithelial
+// Load the epithelial
     mainUtils.loadEpithelialHtml = function () {
 
         sendGetRequest(
@@ -1122,7 +1084,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                     var tempProtein = [], tempApical = [], tempBasolateral = [];
 
-                    // med_fma and med_pr returns in jsonObj
+                    // loop to iterate over med_fma and med_pr in jsonObj
                     for (var m = 0; m < jsonObj.results.bindings.length; m++) {
                         var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
                         var tmpApi = jsonObj.results.bindings[m].med_entity_uri.value;
@@ -1276,7 +1238,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 return;
             }
 
-            // TODO: For cotransporter - how to get CHEBI terms?
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
                 'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ' +
@@ -1302,21 +1263,14 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
-                    console.log("jsonObjFlux in index.js: ", jsonObjFlux);
+                    // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                     for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
 
                         if (jsonObjFlux.results.bindings[i].solute_chebi == undefined)
                             solute_chebi.push("");
                         else
-                            solute_chebi.push(
-                                {
-                                    name: modelEntityFullNameArray[index],
-                                    fma: jsonObjFlux.results.bindings[i].solute_chebi.value
-                                }
-                            );
-
-                        // case for solute_chebi2
+                            solute_chebi.push({fma: jsonObjFlux.results.bindings[i].solute_chebi.value});
 
                         if (jsonObjFlux.results.bindings[i].source_fma == undefined)
                             source_fma.push("");
@@ -1383,7 +1337,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         query2,
                         function (jsonObjCon) {
 
-                            console.log("jsonObjCon in index.js: ", jsonObjCon);
+                            // console.log("jsonObjCon in index.js: ", jsonObjCon);
 
                             for (var i = 0; i < jsonObjCon.results.bindings.length; i++) {
                                 if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
@@ -1408,7 +1362,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                         medfmatext = parserFmaNameText(med_fma[0]), // get this from OLS
                                         temp_med_pr;
 
-                                    // TODO: ??
                                     // No mediator protein in NHE3, SGLT models
                                     if (med_pr[0] == undefined)
                                         temp_med_pr = undefined;
@@ -1437,7 +1390,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                     // Swap if source and sink have same direction
                                     if (source_fma[0].fma == sink_fma[0].fma) {
 
-                                        console.log("inside same faces", source_fma[0], sink_fma[0]);
+                                        // console.log("inside same faces", source_fma[0], sink_fma[0]);
 
                                         var tempFMA = sink_fma[0].fma,
                                             tempName = sink_fma[0].name;
@@ -1494,7 +1447,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         mainUtils.srcDescMediatorOfFluxes();
     };
 
-    // Expose utility to the global object
+// Expose utility to the global object
     global.$mainUtils = mainUtils;
 
-})(window);
+})
+(window);
