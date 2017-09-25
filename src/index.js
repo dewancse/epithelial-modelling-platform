@@ -695,7 +695,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         model = model + "#" + model.slice(0, model.indexOf('.'));
         var index = $.inArray(tempidWithStr, modelEntity);
 
-        console.log("model and tempidWithStr in loadModelHtml: ", model, tempidWithStr);
+        // console.log("model and tempidWithStr in loadModelHtml: ", model, tempidWithStr);
         var query = 'SELECT ?Compartment ' +
             'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }';
 
@@ -1126,6 +1126,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         med_text: membrane1.med_text,
                         med_fma: membrane1.med_fma,
                         med_pr: membrane1.med_pr,
+                        med_pr_text: membrane1.med_pr_text,
+                        med_pr_text_syn: membrane1.med_pr_text_syn,
                         source_text: membrane1.source_text,
                         source_fma: membrane1.source_fma,
                         sink_text: membrane1.sink_text,
@@ -1137,6 +1139,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         med_text2: membrane2.med_text,
                         med_fma2: membrane2.med_fma,
                         med_pr2: membrane2.med_pr,
+                        med_pr_text2: membrane2.med_pr_text,
+                        med_pr_text_syn2: membrane2.med_pr_text_syn,
                         source_text2: membrane2.source_text,
                         source_fma2: membrane2.source_fma,
                         sink_text2: membrane2.sink_text,
@@ -1240,9 +1244,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 return;
             }
 
+
+            var model = parseModelName(modelEntityFullNameArray[index]);
+            model = model + "#" + model.slice(0, model.indexOf('.'));
+
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ' +
+                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?protein ' +
                 'WHERE { ' +
                 '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
                 '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
@@ -1258,6 +1266,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
                 '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
                 '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
+                '<' + model + '>  <http://www.obofoundry.org/ro/ro.owl#modelOf> ?protein. ' +
                 '}'
 
             sendPostRequest(
@@ -1265,7 +1274,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
-                    // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
+                    console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                     var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
                     var indexofColon = chebi_uri.indexOf('CHEBI:');
@@ -1276,12 +1285,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         endpointOLS,
                         function (jsonObjOLSChebi) {
 
+                            // Name of a solute CHEBI from OLS
                             for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
                                 var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
-                                    solute_chebi_fma;
+                                    solute_chebi_name;
                                 for (var m = 0; m < temparr.length; m++) {
                                     if (temparr[m].slice(-1) == '+' || temparr[m].slice(-1) == '-') {
-                                        solute_chebi_fma = temparr[m];
+                                        solute_chebi_name = temparr[m];
                                         break;
                                     }
                                 }
@@ -1291,7 +1301,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                 else
                                     solute_chebi.push(
                                         {
-                                            name: solute_chebi_fma,
+                                            name: solute_chebi_name,
                                             fma: jsonObjFlux.results.bindings[i].solute_chebi.value
                                         }
                                     );
@@ -1324,6 +1334,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                     var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
                                     if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
                                         med_pr.push({
+                                            // name of med_pr from OLS
                                             name: modelEntityFullNameArray[index],
                                             fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
                                         });
@@ -1360,110 +1371,157 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                 endpoint,
                                 query2,
                                 function (jsonObjCon) {
-
                                     // console.log("jsonObjCon in index.js: ", jsonObjCon);
+                                    // console.log("med_pr[0] in index.js: ", med_pr[0]);
 
-                                    for (var i = 0; i < jsonObjCon.results.bindings.length; i++) {
-                                        if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
-                                            concentration_fma.push("");
-                                        else
-                                            concentration_fma.push(
-                                                {
-                                                    name: modelEntityFullNameArray[index],
-                                                    fma: jsonObjCon.results.bindings[i].concentration_fma.value
-                                                }
-                                            );
+                                    var medURI, endpointOLS;
+                                    if (med_pr[0] == undefined)
+                                        medURI = jsonObjFlux.results.bindings[0].protein.value;
+                                    else
+                                        medURI = med_pr[0].fma;
+
+                                    if (medURI.indexOf(partOfCHEBIUri) != -1) {
+                                        var indexofColon = medURI.indexOf('CHEBI:');
+                                        chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
+                                        endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                     }
+                                    else
+                                        endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + medURI;
 
-                                    index++;
+                                    sendGetRequest(
+                                        endpointOLS,
+                                        function (jsonObjOLSMedPr) {
 
-                                    if (source_fma.length != 0) { // flux
+                                            console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr);
 
-                                        if (source_fma.length == 1) { // transporter (single flux)
-
-                                            var srctext = parserFmaNameText(source_fma[0]), // get this from OLS
-                                                snktext = parserFmaNameText(sink_fma[0]), // get this from OLS
-                                                medfmatext = parserFmaNameText(med_fma[0]), // get this from OLS
-                                                temp_med_pr;
-
-                                            // No mediator protein in NHE3, SGLT models
-                                            if (med_pr[0] == undefined)
-                                                temp_med_pr = undefined;
-                                            else
-                                                temp_med_pr = med_pr[0].fma;
-
-                                            membrane.push({
-                                                solute_chebi: solute_chebi[0].fma,
-                                                solute_text: solute_chebi[0].name,
-                                                source_text: srctext,
-                                                source_fma: source_fma[0].fma,
-                                                source_name: source_fma[0].name,
-                                                sink_text: snktext,
-                                                sink_fma: sink_fma[0].fma,
-                                                sink_name: sink_fma[0].name,
-                                                med_text: medfmatext,
-                                                med_fma: med_fma[0].fma,
-                                                med_pr: temp_med_pr
-                                            });
-
-                                            source_fma2.push(source_fma[0]);
-                                            sink_fma2.push(sink_fma[0]);
-
-                                        }
-                                        else { // same solute co-transporter
-
-                                            // Swap if source and sink have same direction
-                                            if (source_fma[0].fma == sink_fma[0].fma) {
-
-                                                // console.log("inside same faces", source_fma[0], sink_fma[0]);
-
-                                                var tempFMA = sink_fma[0].fma,
-                                                    tempName = sink_fma[0].name;
-
-                                                sink_fma[0].fma = sink_fma[1].fma;
-                                                sink_fma[0].name = sink_fma[1].name;
-                                                sink_fma[1].fma = tempFMA;
-                                                sink_fma[1].name = tempName;
-                                            }
-
-                                            for (var i = 0; i < source_fma.length; i++) {
-                                                var srctext = parserFmaNameText(source_fma[i]),
-                                                    snktext = parserFmaNameText(sink_fma[i]),
-                                                    medfmatext, temp_med_pr;
-
-                                                if (med_pr[i] == undefined)
-                                                    temp_med_pr = undefined;
+                                            for (var i = 0; i < jsonObjCon.results.bindings.length; i++) {
+                                                if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
+                                                    concentration_fma.push("");
                                                 else
-                                                    temp_med_pr = med_pr[0].fma;
-
-                                                // TODO: change object attributes (see above)
-                                                membrane.push({
-                                                    solute_chebi: solute_chebi[0].fma,
-                                                    solute_text: solute_chebi[0].name,
-                                                    source_text: srctext,
-                                                    source_fma: source_fma[i].fma,
-                                                    source_name: source_fma[i].name,
-                                                    sink_text: snktext,
-                                                    sink_fma: sink_fma[i].fma,
-                                                    sink_name: sink_fma[i].name,
-                                                    med_text: medfmatext,
-                                                    med_fma: med_fma[0].fma,
-                                                    med_pr: temp_med_pr
-                                                });
-
-                                                source_fma2.push(source_fma[i]);
-                                                sink_fma2.push(sink_fma[i]);
+                                                    concentration_fma.push(
+                                                        {
+                                                            name: modelEntityFullNameArray[index],
+                                                            fma: jsonObjCon.results.bindings[i].concentration_fma.value
+                                                        }
+                                                    );
                                             }
-                                        }
-                                    }
 
-                                    source_fma = [];
-                                    sink_fma = [];
-                                    med_fma = [];
-                                    med_pr = [];
-                                    solute_chebi = [];
+                                            index++;
 
-                                    mainUtils.srcDescMediatorOfFluxes(); // callback
+                                            if (source_fma.length != 0) { // flux
+
+                                                if (source_fma.length == 1) { // transporter (single flux)
+
+                                                    var srctext = parserFmaNameText(source_fma[0]), // get this from OLS
+                                                        snktext = parserFmaNameText(sink_fma[0]), // get this from OLS
+                                                        medfmatext = parserFmaNameText(med_fma[0]), // get this from OLS
+                                                        temp_med_pr, med_pr_text_syn;
+
+                                                    // No mediator protein in NHE3, SGLT models
+                                                    if (med_pr[0] == undefined)
+                                                        temp_med_pr = undefined;
+                                                    else
+                                                        temp_med_pr = med_pr[0].fma;
+
+                                                    var tempvar;
+                                                    if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
+                                                        // med_pr_text_syn = undefined;
+                                                        med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
+                                                    }
+
+                                                    else {
+                                                        tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
+                                                        med_pr_text_syn = tempvar[0].toUpperCase();
+                                                    }
+
+                                                    membrane.push({
+                                                        solute_chebi: solute_chebi[0].fma,
+                                                        solute_text: solute_chebi[0].name,
+                                                        source_text: srctext,
+                                                        source_fma: source_fma[0].fma,
+                                                        source_name: source_fma[0].name,
+                                                        sink_text: snktext,
+                                                        sink_fma: sink_fma[0].fma,
+                                                        sink_name: sink_fma[0].name,
+                                                        med_text: medfmatext,
+                                                        med_fma: med_fma[0].fma,
+                                                        med_pr: temp_med_pr,
+                                                        med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
+                                                        med_pr_text_syn: med_pr_text_syn
+                                                    });
+
+                                                    source_fma2.push(source_fma[0]);
+                                                    sink_fma2.push(sink_fma[0]);
+
+                                                }
+                                                else { // same solute co-transporter
+
+                                                    // Swap if source and sink have same direction
+                                                    if (source_fma[0].fma == sink_fma[0].fma) {
+
+                                                        // console.log("inside same faces", source_fma[0], sink_fma[0]);
+
+                                                        var tempFMA = sink_fma[0].fma,
+                                                            tempName = sink_fma[0].name;
+
+                                                        sink_fma[0].fma = sink_fma[1].fma;
+                                                        sink_fma[0].name = sink_fma[1].name;
+                                                        sink_fma[1].fma = tempFMA;
+                                                        sink_fma[1].name = tempName;
+                                                    }
+
+                                                    for (var i = 0; i < source_fma.length; i++) {
+                                                        var srctext = parserFmaNameText(source_fma[i]),
+                                                            snktext = parserFmaNameText(sink_fma[i]),
+                                                            medfmatext, temp_med_pr, med_pr_text_syn;
+
+                                                        if (med_pr[i] == undefined)
+                                                            temp_med_pr = undefined;
+                                                        else
+                                                            temp_med_pr = med_pr[0].fma;
+
+                                                        var tempvar;
+                                                        if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
+                                                            // med_pr_text_syn = undefined;
+                                                            med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
+                                                        }
+                                                        else {
+                                                            tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
+                                                            med_pr_text_syn = tempvar[0].toUpperCase();
+                                                        }
+
+                                                        // TODO: change object attributes (see above)
+                                                        membrane.push({
+                                                            solute_chebi: solute_chebi[0].fma,
+                                                            solute_text: solute_chebi[0].name,
+                                                            source_text: srctext,
+                                                            source_fma: source_fma[i].fma,
+                                                            source_name: source_fma[i].name,
+                                                            sink_text: snktext,
+                                                            sink_fma: sink_fma[i].fma,
+                                                            sink_name: sink_fma[i].name,
+                                                            med_text: medfmatext,
+                                                            med_fma: med_fma[0].fma,
+                                                            med_pr: temp_med_pr,
+                                                            med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
+                                                            med_pr_text_syn: med_pr_text_syn
+                                                        });
+
+                                                        source_fma2.push(source_fma[i]);
+                                                        sink_fma2.push(sink_fma[i]);
+                                                    }
+                                                }
+                                            }
+
+                                            source_fma = [];
+                                            sink_fma = [];
+                                            med_fma = [];
+                                            med_pr = [];
+                                            solute_chebi = [];
+
+                                            mainUtils.srcDescMediatorOfFluxes(); // callback
+                                        },
+                                        true);
                                 },
                                 true);
                         },
@@ -1478,5 +1536,4 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 // Expose utility to the global object
     global.$mainUtils = mainUtils;
 
-})
-(window);
+})(window);

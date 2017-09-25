@@ -203,7 +203,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     sink_name: membrane[i].sink_name,
                     med_text: membrane[i].med_text,
                     med_fma: membrane[i].med_fma,
-                    med_pr: membrane[i].med_pr
+                    med_pr: membrane[i].med_pr,
+                    med_pr_text: membrane[i].med_pr_text,
+                    med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
 
             membrane[i].source_text2 = "channel";
@@ -232,7 +234,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     sink_name: membrane[i].sink_name,
                     med_text: membrane[i].med_text,
                     med_fma: membrane[i].med_fma,
-                    med_pr: membrane[i].med_pr
+                    med_pr: membrane[i].med_pr,
+                    med_pr_text: membrane[i].med_pr_text,
+                    med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
 
             membrane[i].source_text2 = "channel";
@@ -260,7 +264,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     sink_name: membrane[i].sink_name,
                     med_text: membrane[i].med_text,
                     med_fma: membrane[i].med_fma,
-                    med_pr: membrane[i].med_pr
+                    med_pr: membrane[i].med_pr,
+                    med_pr_text: membrane[i].med_pr_text,
+                    med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
 
             membrane[i].source_text2 = "diffusive channel";
@@ -292,7 +298,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     sink_name: membrane[i].sink_name,
                     med_text: membrane[i].med_text,
                     med_fma: membrane[i].med_fma,
-                    med_pr: membrane[i].med_pr
+                    med_pr: membrane[i].med_pr,
+                    med_pr_text: membrane[i].med_pr_text,
+                    med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
         }
 
@@ -316,7 +324,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     sink_name: membrane[i].sink_name,
                     med_text: membrane[i].med_text,
                     med_fma: membrane[i].med_fma,
-                    med_pr: membrane[i].med_pr
+                    med_pr: membrane[i].med_pr,
+                    med_pr_text: membrane[i].med_pr_text,
+                    med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
         }
     }
@@ -655,7 +665,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     };
 
     for (var i = 0; i < combinedMembrane.length; i++) {
-        var textvaluechk = combinedMembrane[i].source_text + " " + combinedMembrane[i].source_text2;
+        // var textvaluechk = combinedMembrane[i].source_text + " " + combinedMembrane[i].source_text2;
+        var textvaluechk = combinedMembrane[i].med_pr_text;
+        var indexOfParen = textvaluechk.indexOf('(');
+        textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + ' (' + combinedMembrane[i].med_pr_text_syn + ')';
 
         checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
         checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
@@ -863,6 +876,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         var mediator_fma = combinedMembrane[i].med_fma;
         var mediator_pr = combinedMembrane[i].med_pr;
+        var mediator_pr_text = combinedMembrane[i].med_pr_text;
+        var mediator_pr_text_syn = combinedMembrane[i].med_pr_text_syn;
 
         var solute_chebi = combinedMembrane[i].solute_chebi;
         var solute_chebi2 = combinedMembrane[i].solute_chebi2;
@@ -935,7 +950,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -1074,7 +1090,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -1213,7 +1230,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -1352,7 +1370,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -1474,7 +1493,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -1569,7 +1589,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -1684,7 +1705,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -1823,7 +1845,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -1962,7 +1985,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -2101,7 +2125,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -2223,7 +2248,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
@@ -2318,7 +2344,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             textvalue, textvalue2, snk_textvalue, snk_textvalue2,
                             src_fma, src_fma2, snk_fma, snk_fma2,
                             mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_text, solute_text2
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
                         ];
                     })
                     .attr("index", tempID)
