@@ -637,7 +637,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         yvalueb = yrect + 10 + 50, // initial distance 50
         cyvalueb = yrect + 10 + 50, // initial distance 50
 
-        circlewithlineg = [], linewithlineg = [], linewithlineg2 = [],
+        circlewithlineg = [], circlewithtext = [],
+        linewithlineg = [], linewithlineg2 = [],
         linewithtextg = [], linewithtextg2 = [], polygon = [];
 
     // TODO: does not work for bi-directional arrow, Fix this
@@ -937,7 +938,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     })
                     .attr("font-family", "Times New Roman")
                     .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
                     .attr("fill", "red")
                     .attr("cursor", "pointer")
                     .text(solute_text);
@@ -986,6 +986,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
+
+                // protein name inside this circle
+                circlewithtext[i] = linegcircle.append("text")
+                    .attr("id", "circlewithtext" + tempID)
+                    .attr("x", function (d) {
+                        dx[i] = d.x;
+                        return d.x - 15;
+                    })
+                    .attr("y", function (d) {
+                        dy[i] = d.y;
+                        return d.y + 23;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("fontWeight", "bold")
+                    .attr("cursor", "move")
+                    .text(mediator_pr_text_syn);
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
@@ -1064,7 +1081,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-start", "url(#start)")
                     .attr("cursor", "pointer");
 
-                var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10, y: yvalue + 5}]);
+                var linegtext = lineg.append("g").data([{x: xvalue - 30, y: yvalue + 5}]);
                 linewithtextg[i] = linegtext.append("text")
                     .attr("id", "linewithtextg" + tempID)
                     .attr("x", function (d) {
@@ -1126,6 +1143,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
+
+                // protein name inside this circle
+                circlewithtext[i] = linegcircle.append("text")
+                    .attr("id", "circlewithtext" + tempID)
+                    .attr("x", function (d) {
+                        dx[i] = d.x;
+                        return d.x - 15;
+                    })
+                    .attr("y", function (d) {
+                        dy[i] = d.y;
+                        return d.y + 23;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("fontWeight", "bold")
+                    .attr("cursor", "move")
+                    .text(mediator_pr_text_syn);
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
@@ -1267,6 +1301,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
 
+                // protein name inside this circle
+                circlewithtext[i] = linegcircle.append("text")
+                    .attr("id", "circlewithtext" + tempID)
+                    .attr("x", function (d) {
+                        dx[i] = d.x;
+                        return d.x - 15;
+                    })
+                    .attr("y", function (d) {
+                        dy[i] = d.y;
+                        return d.y + 23;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("fontWeight", "bold")
+                    .attr("cursor", "move")
+                    .text(mediator_pr_text_syn);
+
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
                     linewithlineg2[i] = lineg2.append("line")
@@ -1344,7 +1395,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-start", "url(#start)")
                     .attr("cursor", "pointer");
 
-                var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10, y: yvalue + 5}]);
+                var linegtext = lineg.append("g").data([{x: xvalue - 30, y: yvalue + 5}]);
                 linewithtextg[i] = linegtext.append("text")
                     .attr("id", "linewithtextg" + tempID)
                     .attr("x", function (d) {
@@ -1406,6 +1457,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
+
+                // protein name inside this circle
+                circlewithtext[i] = linegcircle.append("text")
+                    .attr("id", "circlewithtext" + tempID)
+                    .attr("x", function (d) {
+                        dx[i] = d.x;
+                        return d.x - 15;
+                    })
+                    .attr("y", function (d) {
+                        dy[i] = d.y;
+                        return d.y + 23;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("fontWeight", "bold")
+                    .attr("cursor", "move")
+                    .text(mediator_pr_text_syn);
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue, y: yvalue + radius * 2}]);
@@ -1484,6 +1552,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-end", "url(#end)")
                     .attr("cursor", "pointer");
 
+                var linegtext = polygong.append("g").data([{x: xvalue + polygonlineLen + 10, y: yvalue + 5}]);
+                linewithtextg[i] = linegtext.append("text")
+                    .attr("id", "linewithtextg" + tempID)
+                    .attr("x", function (d) {
+                        dxtext[i] = d.x;
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        dytext[i] = d.y;
+                        return d.y;
+                    })
+                    .attr("font-family", "Times New Roman")
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("cursor", "pointer")
+                    .text(solute_text);
+
                 // Polygon
                 circlewithlineg[i] = polygong.append("g").append("polygon")
                     .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
@@ -1532,10 +1617,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
 
-                var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
-
-                linewithtextg[i] = polygontext.append("text")
-                    .attr("id", "linewithtextg" + tempID)
+                // text inside polygon
+                var polygontext = polygong.append("g").data([{x: xvalue + 12, y: yvalue + 4}]);
+                circlewithtext[i] = polygontext.append("text")
+                    .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
                         dxtext[i] = d.x;
                         return d.x;
@@ -1544,10 +1629,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         dytext[i] = d.y;
                         return d.y;
                     })
-                    .attr("font-size", "12px")
+                    .attr("font-size", "10px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
-                    .text(solute_text);
+                    .text(mediator_pr_text_syn);
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -1580,6 +1665,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-start", "url(#start)")
                     .attr("cursor", "pointer");
 
+                var linegtext = polygong.append("g").data([{x: xvalue - 30, y: yvalue + 5}]);
+                linewithtextg[i] = linegtext.append("text")
+                    .attr("id", "linewithtextg" + tempID)
+                    .attr("x", function (d) {
+                        dxtext[i] = d.x;
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        dytext[i] = d.y;
+                        return d.y;
+                    })
+                    .attr("font-family", "Times New Roman")
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("cursor", "pointer")
+                    .text(solute_text);
+
                 // Polygon
                 circlewithlineg[i] = polygong.append("g").append("polygon")
                     .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
@@ -1628,10 +1730,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
 
-                var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5, y: yvalue + 5}]);
-
-                linewithtextg[i] = polygontext.append("text")
-                    .attr("id", "linewithtextg" + tempID)
+                // text inside polygon
+                var polygontext = polygong.append("g").data([{x: xvalue + 12, y: yvalue + 4}]);
+                circlewithtext[i] = polygontext.append("text")
+                    .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
                         dxtext[i] = d.x;
                         return d.x;
@@ -1640,10 +1742,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         dytext[i] = d.y;
                         return d.y;
                     })
-                    .attr("font-size", "12px")
+                    .attr("font-size", "10px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
-                    .text(solute_text);
+                    .text(mediator_pr_text_syn);
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -1695,7 +1797,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("font-weight", "bold")
                     .attr("fill", "red")
                     .attr("cursor", "pointer")
-                    .text(textvalue);
+                    .text(solute_text);
 
                 var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
                 circlewithlineg[i] = linegcircle.append("circle")
@@ -1741,6 +1843,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
+
+                // protein name inside this circle
+                circlewithtext[i] = linegcircle.append("text")
+                    .attr("id", "circlewithtext" + tempID)
+                    .attr("x", function (d) {
+                        dx[i] = d.x;
+                        return d.x - 15;
+                    })
+                    .attr("y", function (d) {
+                        dy[i] = d.y;
+                        return d.y + 23;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("fontWeight", "bold")
+                    .attr("cursor", "move")
+                    .text(mediator_pr_text_syn);
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
@@ -1785,7 +1904,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("font-weight", "bold")
                         .attr("fill", "red")
                         .attr("cursor", "pointer")
-                        .text(textvalue2);
+                        .text(solute_text2);
                 }
 
                 // increment y-axis of line and circle
@@ -1819,7 +1938,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-start", "url(#start)")
                     .attr("cursor", "pointer");
 
-                var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
+                var linegtext = lineg.append("g").data([{x: xvalue - 30 + width, y: yvalueb + 5}]);
                 linewithtextg[i] = linegtext.append("text")
                     .attr("id", "linewithtextg" + tempID)
                     .attr("x", function (d) {
@@ -1835,7 +1954,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("font-weight", "bold")
                     .attr("fill", "red")
                     .attr("cursor", "pointer")
-                    .text(textvalue);
+                    .text(solute_text);
 
                 var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
                 circlewithlineg[i] = linegcircle.append("circle")
@@ -1882,6 +2001,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
 
+                // protein name inside this circle
+                circlewithtext[i] = linegcircle.append("text")
+                    .attr("id", "circlewithtext" + tempID)
+                    .attr("x", function (d) {
+                        dx[i] = d.x;
+                        return d.x - 15;
+                    })
+                    .attr("y", function (d) {
+                        dy[i] = d.y;
+                        return d.y + 23;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("fontWeight", "bold")
+                    .attr("cursor", "move")
+                    .text(mediator_pr_text_syn);
+
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
                     linewithlineg2[i] = lineg2.append("line")
@@ -1925,7 +2061,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("font-weight", "bold")
                         .attr("fill", "red")
                         .attr("cursor", "pointer")
-                        .text(textvalue2);
+                        .text(solute_text2);
                 }
 
                 // increment y-axis of line and circle
@@ -1975,7 +2111,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("font-weight", "bold")
                     .attr("fill", "red")
                     .attr("cursor", "pointer")
-                    .text(textvalue);
+                    .text(solute_text);
 
                 var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
                 circlewithlineg[i] = linegcircle.append("circle")
@@ -2021,6 +2157,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
+
+                // protein name inside this circle
+                circlewithtext[i] = linegcircle.append("text")
+                    .attr("id", "circlewithtext" + tempID)
+                    .attr("x", function (d) {
+                        dx[i] = d.x;
+                        return d.x - 15;
+                    })
+                    .attr("y", function (d) {
+                        dy[i] = d.y;
+                        return d.y + 23;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("fontWeight", "bold")
+                    .attr("cursor", "move")
+                    .text(mediator_pr_text_syn);
 
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
@@ -2065,7 +2218,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("font-weight", "bold")
                         .attr("fill", "red")
                         .attr("cursor", "pointer")
-                        .text(textvalue2);
+                        .text(solute_text2);
                 }
 
                 // increment y-axis of line and circle
@@ -2099,7 +2252,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-start", "url(#start)")
                     .attr("cursor", "pointer");
 
-                var linegtext = lineg.append("g").data([{x: xvalue - textWidth - 10 + width, y: yvalueb + 5}]);
+                var linegtext = lineg.append("g").data([{x: xvalue - 30 + width, y: yvalueb + 5}]);
                 linewithtextg[i] = linegtext.append("text")
                     .attr("id", "linewithtextg" + tempID)
                     .attr("x", function (d) {
@@ -2115,7 +2268,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("font-weight", "bold")
                     .attr("fill", "red")
                     .attr("cursor", "pointer")
-                    .text(textvalue);
+                    .text(solute_text);
 
                 var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
                 circlewithlineg[i] = linegcircle.append("circle")
@@ -2162,6 +2315,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
 
+                // protein name inside this circle
+                circlewithtext[i] = linegcircle.append("text")
+                    .attr("id", "circlewithtext" + tempID)
+                    .attr("x", function (d) {
+                        dx[i] = d.x;
+                        return d.x - 15;
+                    })
+                    .attr("y", function (d) {
+                        dy[i] = d.y;
+                        return d.y + 23;
+                    })
+                    .attr("font-size", "12px")
+                    .attr("fill", "red")
+                    .attr("fontWeight", "bold")
+                    .attr("cursor", "move")
+                    .text(mediator_pr_text_syn);
+
                 if (textvalue2 != "single flux") {
                     var lineg2 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius * 2}]);
                     linewithlineg2[i] = lineg2.append("line")
@@ -2205,7 +2375,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("font-weight", "bold")
                         .attr("fill", "red")
                         .attr("cursor", "pointer")
-                        .text(textvalue2);
+                        .text(solute_text2);
                 }
 
                 // increment y-axis of line and circle
@@ -2239,6 +2409,24 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-start", "url(#start)")
                     .attr("cursor", "pointer");
 
+                var linegtext = polygong.append("g").data([{x:  xvalue - 30 + width, y: yvalueb + 5}]);
+                linewithtextg[i] = linegtext.append("text")
+                    .attr("id", "linewithtextg" + tempID)
+                    .attr("x", function (d) {
+                        dxtext[i] = d.x;
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        dytext[i] = d.y;
+                        return d.y;
+                    })
+                    .attr("font-family", "Times New Roman")
+                    .attr("font-size", "12px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "red")
+                    .attr("cursor", "pointer")
+                    .text(solute_text);
+
                 // Polygon
                 circlewithlineg[i] = polygong.append("g").append("polygon")
                     .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
@@ -2287,10 +2475,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
 
-                var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
-
-                linewithtextg[i] = polygontext.append("text")
-                    .attr("id", "linewithtextg" + tempID)
+                var polygontext = polygong.append("g").data([{x: xvalue + 12 + width, y: yvalueb + 4}]);
+                circlewithtext[i] = polygontext.append("text")
+                    .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
                         dxtext[i] = d.x;
                         return d.x;
@@ -2299,10 +2486,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         dytext[i] = d.y;
                         return d.y;
                     })
-                    .attr("font-size", "12px")
+                    .attr("font-size", "10px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
-                    .text(solute_text);
+                    .text(mediator_pr_text_syn);
 
                 // increment y-axis of line and circle
                 yvalueb += ydistance;
@@ -2335,6 +2522,24 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("marker-end", "url(#end)")
                     .attr("cursor", "pointer");
 
+                var linegtext = polygong.append("g").data([{x: xvalue + lineLen + 10 + width, y: yvalueb + 5}]);
+                linewithtextg[i] = linegtext.append("text")
+                    .attr("id", "linewithtextg" + tempID)
+                    .attr("x", function (d) {
+                        dxtext[i] = d.x;
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        dytext[i] = d.y;
+                        return d.y;
+                    })
+                    .attr("font-family", "Times New Roman")
+                    .attr("font-size", "12px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "red")
+                    .attr("cursor", "pointer")
+                    .text(solute_text);
+
                 // Polygon
                 circlewithlineg[i] = polygong.append("g").append("polygon")
                     .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
@@ -2383,10 +2588,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             .style("top", (d3.event.pageY - 28) + "px");
                     });
 
-                var polygontext = polygong.append("g").data([{x: xvalue + 20 - 5 + width, y: yvalueb + 5}]);
-
-                linewithtextg[i] = polygontext.append("text")
-                    .attr("id", "linewithtextg" + tempID)
+                var polygontext = polygong.append("g").data([{x: xvalue + 12 + width, y: yvalueb + 4}]);
+                circlewithtext[i] = polygontext.append("text")
+                    .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
                         dxtext[i] = d.x;
                         return d.x;
@@ -2395,7 +2599,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         dytext[i] = d.y;
                         return d.y;
                     })
-                    .attr("font-size", "12px")
+                    .attr("font-size", "10px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
                     .text(solute_text);
@@ -2445,7 +2649,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .style("top", (d3.event.pageY - 28) + "px");
                 });
 
-            var linetextg = lineg.append("g").data([{x: xpvalue + textWidth + 10, y: ypvalue}]);
+            var linetextg = lineg.append("g").data([{x: xpvalue + 20, y: ypvalue}]);
             linewithlineg[i] = linetextg.append("line")
                 .attr("id", "linewithlineg" + tempID)
                 .attr("index", tempID)
@@ -2531,6 +2735,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             d3.select(this).attr("points", points);
+        }
+
+        if (circlewithtext[icircleGlobal] != undefined) {
+            // text inside circle
+            circlewithtext[icircleGlobal]
+                .attr("x", parseFloat(d3.select("#" + "circlewithtext" + icircleGlobal).attr("x")) + dx)
+                .attr("y", parseFloat(d3.select("#" + "circlewithtext" + icircleGlobal).attr("y")) + dy);
         }
 
         if (linewithlineg[icircleGlobal] != undefined) {

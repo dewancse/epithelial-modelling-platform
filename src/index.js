@@ -1080,7 +1080,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObj) {
 
-                    // console.log("jsonObj in makecotransporter: ", jsonObj);
+                    console.log("jsonObj in makecotransporter: ", jsonObj);
 
                     var tempProtein = [], tempApical = [], tempBasolateral = [];
 
@@ -1104,6 +1104,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     }
 
                     // remove duplicate protein ID
+                    // TODO: probably no need to do this!
                     tempProtein = tempProtein.filter(function (item, pos) {
                         return tempProtein.indexOf(item) == pos;
                     })
@@ -1116,7 +1117,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         return tempBasolateral.indexOf(item) == pos;
                     })
 
-                    // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
+                    console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
 
                     var membraneOBJ = {
                         solute_chebi: membrane1.solute_chebi,
@@ -1146,6 +1147,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         sink_text2: membrane2.sink_text,
                         sink_fma2: membrane2.sink_fma
                     }
+
+                    console.log("tempprotein: ", tempProtein);
 
                     for (var i = 0; i < tempProtein.length; i++) {
                         // cotransporter in apical membrane
