@@ -1198,6 +1198,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     counter++;
 
                     if (counter == iteration(membrane.length)) {
+
+                        console.log("membrane: ", membrane);
+
                         showsvgEpithelial(
                             concentration_fma,
                             source_fma2,
@@ -1277,7 +1280,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObjFlux) {
 
-                    console.log("jsonObjFlux in index.js: ", jsonObjFlux);
+                    // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                     var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
                     var indexofColon = chebi_uri.indexOf('CHEBI:');
@@ -1395,7 +1398,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                         endpointOLS,
                                         function (jsonObjOLSMedPr) {
 
-                                            console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr);
+                                            // console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr);
 
                                             for (var i = 0; i < jsonObjCon.results.bindings.length; i++) {
                                                 if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
@@ -1458,6 +1461,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                                 }
                                                 else { // same solute co-transporter
+
+                                                    // console.log("ELSE source_fma.length == 1");
+                                                    // console.log("modelEntity: ", modelEntity);
+                                                    // console.log("biologicalMeaning: ", biologicalMeaning);
+                                                    // console.log("speciesList: ", speciesList);
+                                                    // console.log("geneList: ", geneList);
+                                                    // console.log("proteinList: ", proteinList);
 
                                                     // Swap if source and sink have same direction
                                                     if (source_fma[0].fma == sink_fma[0].fma) {
