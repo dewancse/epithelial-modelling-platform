@@ -1151,6 +1151,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     console.log("tempprotein: ", tempProtein);
 
                     for (var i = 0; i < tempProtein.length; i++) {
+
+                        console.log("tempprotein inside: ", tempProtein);
+
                         // cotransporter in apical membrane
                         if (tempProtein.length != 0 && tempApical.length != 0) {
                             apicalMembrane.push(membraneOBJ);
@@ -1166,6 +1169,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     if (membrane1.med_fma == apicalID && membrane2.med_fma == apicalID &&
                         membrane1.med_pr == membrane2.med_pr &&
                         membrane1.source_name == membrane2.source_name) {
+
+                        console.log("tempprotein inside same solute: ", tempProtein);
+
                         apicalMembrane.push(membraneOBJ);
                     }
 
@@ -1215,41 +1221,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         };
 
         mainUtils.srcDescMediatorOfFluxes = function () {
-
-            if (index == modelEntityFullNameArray.length) {
-
-                // special case: one flux is chosen
-                if (membrane.length <= 1) {
-                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
-                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
-                    // console.log("membrane.length <= 1 source_fma2: ", source_fma2);
-                    // console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
-                    // console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
-                    // console.log("membrane.length <= 1 basolateralMembrane: ", basolateralMembrane);
-                    // console.log("membrane.length <= 1 membrane: ", membrane);
-
-                    showsvgEpithelial(
-                        concentration_fma,
-                        source_fma2,
-                        sink_fma2,
-                        apicalMembrane,
-                        basolateralMembrane,
-                        membrane);
-                }
-                else {
-
-                    console.log("membrane.length >= 1 membrane: ", membrane);
-
-                    for (var i = 0; i < membrane.length; i++) {
-                        for (var j = i + 1; j < membrane.length; j++) {
-                            mainUtils.makecotransporter(membrane[i], membrane[j]);
-                        }
-                    }
-                }
-
-                return;
-            }
-
 
             var model = parseModelName(modelEntityFullNameArray[index]);
             model = model + "#" + model.slice(0, model.indexOf('.'));
@@ -1377,7 +1348,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                 endpoint,
                                 query2,
                                 function (jsonObjCon) {
-                                    // console.log("jsonObjCon in index.js: ", jsonObjCon);
+                                    console.log("jsonObjCon in index.js: ", jsonObjCon);
                                     // console.log("med_pr[0] in index.js: ", med_pr[0]);
 
                                     var medURI, endpointOLS;
@@ -1532,7 +1503,41 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                             med_pr = [];
                                             solute_chebi = [];
 
-                                            mainUtils.srcDescMediatorOfFluxes(); // callback
+                                            if (index == modelEntityFullNameArray.length) {
+
+                                                // special case: one flux is chosen
+                                                if (membrane.length <= 1) {
+                                                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
+                                                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
+                                                    // console.log("membrane.length <= 1 source_fma2: ", source_fma2);
+                                                    // console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
+                                                    // console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
+                                                    // console.log("membrane.length <= 1 basolateralMembrane: ", basolateralMembrane);
+                                                    // console.log("membrane.length <= 1 membrane: ", membrane);
+
+                                                    showsvgEpithelial(
+                                                        concentration_fma,
+                                                        source_fma2,
+                                                        sink_fma2,
+                                                        apicalMembrane,
+                                                        basolateralMembrane,
+                                                        membrane);
+                                                }
+                                                else {
+
+                                                    console.log("membrane.length >= 1 membrane: ", membrane);
+
+                                                    for (var i = 0; i < membrane.length; i++) {
+                                                        for (var j = i + 1; j < membrane.length; j++) {
+                                                            mainUtils.makecotransporter(membrane[i], membrane[j]);
+                                                        }
+                                                    }
+                                                }
+
+                                                return;
+                                            }
+                                            else
+                                                mainUtils.srcDescMediatorOfFluxes(); // callback
                                         },
                                         true);
                                 },

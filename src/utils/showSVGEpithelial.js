@@ -3244,7 +3244,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                         if (jsonProtein.results.bindings.length != 0) {
                             // relatedModelValue.push(jsonProtein.results.bindings[0].Protein.value);
-                            relatedModelValue.push(jsonPr._embedded.terms[0].label);
+                            relatedModelValue.push({
+                                protein: jsonProtein.results.bindings[0].Protein.value,
+                                prname: jsonPr._embedded.terms[0].label
+                            });
                             relatedModelID.push(relatedModel[idProtein]);
                             workspaceName = jsonProtein.results.bindings[0].workspaceName.value;
                         }
@@ -3310,18 +3313,20 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             // console.log("jsonAltProtein INSIDE callOLS: ", jsonAltProtein);
 
                             workspaceName = jsonAltProtein.results.bindings[0].workspaceName.value;
-                            var URI = jsonAltProtein.results.bindings[0].Protein.value;
-                            var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeCellmlArray[idAltProtein];
+                            var pruri = jsonAltProtein.results.bindings[0].Protein.value;
+                            var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeCellmlArray[idAltProtein];
 
-                            var endpointOLS = "https://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + URI;
+                            var endpointOLS = "https://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pruri;
 
                             sendGetRequest(
                                 endpointOLS,
                                 function (jsonOLSObj) {
                                     var label = document.createElement('label');
-                                    label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '" type="checkbox" ' +
-                                        'value="' + alternativeCellmlArray[idAltProtein] + '">' +
-                                        '<a href="' + workspaceURI + '" target="_blank">' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
+                                    label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '" ' +
+                                        'type="checkbox" value="' + alternativeCellmlArray[idAltProtein] + '">' +
+                                        '<a href="' + workspaceuri + '" target="_blank" ' +
+                                        'data-toggle="tooltip" data-placement="right" ' +
+                                        'title="' + pruri + '">' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
 
                                     altCellmlModel += label.innerHTML;
 
@@ -3589,7 +3594,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                     var msg2 = "<p><b>" + proteinText + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
                                         "<b>" + loc + "</b><\p>";
 
-                                    var model = "<p><b>Model: </b>" + $(cthis).prop("id").split(",")[0] + "</p>";
+                                    var workspaceuri = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                        "rawfile" + "/" + "HEAD" + "/" + $(cthis).prop("id").split(",")[0];
+
+                                    var model = "<b>Model: </b><a href='" + workspaceuri + "' target='_blank " +
+                                        "data-toggle='tooltip' data-placement='right' " +
+                                        "title='" + proteinText + "'>" + $(cthis).prop("id").split(",")[0] + "</a>";
+
                                     var biological = "<p><b>Biological Meaning: </b>" + biological_meaning + "</p>";
 
                                     if (biological_meaning2 != "")
@@ -3597,7 +3608,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                     var species = "<p><b>Species: </b>" + speciesName + "</p>";
                                     var gene = "<p><b>Gene: </b>" + geneName + "</p>";
-                                    var protein = "<p><b>Protein: </b>" + proteinText + "</p>";
+                                    var protein = "<p data-toggle='tooltip' data-placement='right' title='" + proteinName + "'>" +
+                                        "<b>Protein: </b>" + proteinText + "</p>";
 
                                     // Related apical or basolateral model
                                     var dataJSON = [];
@@ -3640,10 +3652,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         }
                                         else {
                                             for (var i = 0; i < membraneModelValue.length; i++) {
+                                                var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
+
                                                 var label = document.createElement('label');
-                                                label.innerHTML = '<br><input id="' + membraneModelID[i] + '" type="checkbox" ' +
-                                                    'value="' + membraneModelValue[i].prname + '">' +
-                                                    '' + membraneModelValue[i].prname + '</label>';
+                                                label.innerHTML = '<br><input id="' + membraneModelID[i] + '" ' +
+                                                    'type="checkbox" value="' + membraneModelValue[i].prname + '">' +
+                                                    '<a href="' + workspaceuri + '" target="_blank" ' +
+                                                    'data-toggle="tooltip" data-placement="right" ' +
+                                                    'title="' + membraneModelValue[i].protein + '">' + membraneModelValue[i].prname + '</a></label>';
 
                                                 membraneTransporter += label.innerHTML;
                                             }
@@ -3668,13 +3684,16 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         else {
                                             for (var i = 0; i < relatedModelValue.length; i++) {
 
-                                                if (proteinName == relatedModelValue[i])
+                                                if (proteinName == relatedModelValue[i].protein)
                                                     continue;
 
-                                                var workspaceURI = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + relatedModelID[i];
+                                                var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + relatedModelID[i];
 
                                                 var label = document.createElement('label');
-                                                label.innerHTML = '<br><a href="' + workspaceURI + '" target="_blank"> ' + relatedModelValue[i] + '</a></label>';
+                                                label.innerHTML = '<br><a href="' + workspaceuri + '" target="_blank" ' +
+                                                    'data-toggle="tooltip" data-placement="right" ' +
+                                                    'title="' + relatedModelValue[i].protein + '">' + relatedModelValue[i].prname + '' +
+                                                    '</a></label>';
 
                                                 relatedOrganModels += label.innerHTML;
                                             }
@@ -3708,7 +3727,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 relatedMembraneModel(workspaceName, membraneName);
 
                             }, true);
-
                     },
                     true);
             },
@@ -3753,6 +3771,16 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .duration(1000)
                 .attr("cx", dx[icircleGlobal])
                 .attr("cy", dy[icircleGlobal]);
+        }
+
+        // text inside circle
+        if (circlewithtext[icircleGlobal] != undefined) {
+            circlewithtext[icircleGlobal]
+                .transition()
+                .delay(1000)
+                .duration(1000)
+                .attr("x", dx[icircleGlobal] - 15)
+                .attr("y", dy[icircleGlobal] + 23);
         }
 
         if (linewithlineg2[icircleGlobal] != undefined) {
@@ -3822,8 +3850,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
             var win = $('.modal-content', $this.selector);
 
+            var someText = "A recommender system or a recommendation system (sometimes replacing " +
+                "\nsystem with a synonym such as platform or engine) is a subclass of information " +
+                "\nfiltering system that seeks to predict the rating or preference that a user " +
+                "\nwould give to an item.";
+
+            var headerHtml = '<div class="modal-header">' +
+                '<h4 class="modal-title" data-toggle="tooltip" data-placement="right" title="' + someText + '" lang="de">' +
+                '</h4></div>'
+
             if ($this.options.header) {
-                win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
+                // win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
+                win.append(headerHtml);
 
                 if ($this.options.closeButton) {
                     win.find('.modal-header').prepend('<button type="button" ' +
