@@ -41,12 +41,12 @@ circle {
 
 div.tooltip {
     position: absolute;
-    text-align: center;
-    width: 80px;
-    height: 25px;
-    padding: 2px;
+    text-align: left;
+    width: 180px;
+    height: 65px;
+    padding: 5px;
     font: 12px sans-serif;
-    background: lightblue; // #e9efec;
+    background: lightblue;
     border: 0px;
     border-radius: 8px;
 }

@@ -1348,7 +1348,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                 endpoint,
                                 query2,
                                 function (jsonObjCon) {
-                                    console.log("jsonObjCon in index.js: ", jsonObjCon);
+                                    // console.log("jsonObjCon in index.js: ", jsonObjCon);
                                     // console.log("med_pr[0] in index.js: ", med_pr[0]);
 
                                     var medURI, endpointOLS;

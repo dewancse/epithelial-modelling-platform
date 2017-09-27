@@ -814,9 +814,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         return checkBox;
     }
 
-    // var div = d3.select("#svgVisualize").append("div")
-    //     .attr("class", "tooltip")
-    //     .style("opacity", 0);
+    var div = d3.select("#svgVisualize").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
     var state = 0;
     $(document).on({
@@ -968,7 +968,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -979,12 +979,20 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
+                        console.log("d3.mouse(this): ", d3.select(this), d3.mouse(this)[0], d3.mouse(this)[1]);
+
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -1125,7 +1133,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -1137,11 +1145,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -1282,7 +1296,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -1294,11 +1308,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -1439,7 +1459,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("fill", "lightgreen")
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -1451,11 +1471,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -1598,7 +1624,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -1610,11 +1636,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // text inside polygon
@@ -1711,7 +1743,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -1723,11 +1755,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // text inside polygon
@@ -1825,7 +1863,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("fill", "orange")
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -1837,11 +1875,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -1982,7 +2026,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("fill", "orange")
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -1994,11 +2038,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -2139,7 +2189,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("fill", "orange")
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -2151,11 +2201,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -2296,7 +2352,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("fill", "orange")
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -2308,11 +2364,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -2456,7 +2518,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -2468,11 +2530,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 var polygontext = polygong.append("g").data([{x: xvalue + 12 + width, y: yvalueb + 4}]);
@@ -2569,7 +2637,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
                     .attr("cursor", "move")
-                    .on("mouseover click", function () {
+                    .on("mouseover", function () {
                         div.style("display", "inline");
                         div.transition()
                             .duration(200)
@@ -2581,11 +2649,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '&nbsp;&nbsp;' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                            .style("left", (d3.event.pageX) + "px")
-                            .style("top", (d3.event.pageY - 28) + "px");
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 var polygontext = polygong.append("g").data([{x: xvalue + 12 + width, y: yvalueb + 4}]);
@@ -2630,7 +2704,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("fill", "red")
                 .attr("cursor", "move")
                 .text(solute_text)
-                .on("mouseover click", function () {
+                .on("mouseover", function () {
                     div.style("display", "inline");
                     div.transition()
                         .duration(200)
@@ -2642,11 +2716,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                     div.html(
-                        '<a href="' + tempworkspace + '" target="_blank"><img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                        '&nbsp;&nbsp;' +
-                        '<a href="https://sed-ml.github.io/index.html" target="_blank"><img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>')
-                        .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
+                        '<b>CellML </b> ' +
+                        '<a href="' + tempworkspace + '" target="_blank">' +
+                        '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                        '<br/>' +
+                        '<b>SEDML </b> ' +
+                        '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                        '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                        '<br/>' +
+                        '<b>Click middle mouse to close</b>')
+                        .style("left", d3.mouse(this)[0] + 140 + "px")
+                        .style("top", d3.mouse(this)[1] + 90 + "px");
                 });
 
             var linetextg = lineg.append("g").data([{x: xpvalue + 20, y: ypvalue}]);
