@@ -1225,34 +1225,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     });
 
-    function mouseclick(id, thiscircle) {
-        div.style("display", "inline");
-        div.transition()
-            .duration(200)
-            .style("opacity", 1);
-
-        //var id = d3.select(this)._groups[0][0].id,
-        var indexOfComma = id.indexOf(','),
-            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-        console.log("d3.mouse(this): ", thiscircle, thiscircle[0], thiscircle[1]);
-
-        div.html(
-            '<b>CellML </b> ' +
-            '<a href="' + tempworkspace + '" target="_blank">' +
-            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-            '<br/>' +
-            '<b>SEDML </b> ' +
-            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-            '<br/>' +
-            '<b>Click middle mouse to close</b>')
-            .style("left", thiscircle[0] + 140 + "px")
-            .style("top", thiscircle[1] + 90 + "px");
-    }
-
-
     // apical, basolateral, and paracellular membrane
     for (var i = 0; i < combinedMembrane.length; i++) {
         source_name = combinedMembrane[i].source_name;
@@ -1358,31 +1330,28 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
                     .on("mouseover", function () {
-                        mouseclick(d3.select(this)._groups[0][0].id, d3.select(this));
-                        // div.style("display", "inline");
-                        // div.transition()
-                        //     .duration(200)
-                        //     .style("opacity", 1);
-                        //
-                        // var id = d3.select(this)._groups[0][0].id,
-                        //     indexOfComma = id.indexOf(','),
-                        //     tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                        //         "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-                        //
-                        // console.log("d3.mouse(this): ", d3.select(this), d3.mouse(this)[0], d3.mouse(this)[1]);
-                        //
-                        // div.html(
-                        //     '<b>CellML </b> ' +
-                        //     '<a href="' + tempworkspace + '" target="_blank">' +
-                        //     '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                        //     '<br/>' +
-                        //     '<b>SEDML </b> ' +
-                        //     '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                        //     '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                        //     '<br/>' +
-                        //     '<b>Click middle mouse to close</b>')
-                        //     .style("left", d3.mouse(this)[0] + 140 + "px")
-                        //     .style("top", d3.mouse(this)[1] + 90 + "px");
+                        div.style("display", "inline");
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        var id = d3.select(this)._groups[0][0].id,
+                            indexOfComma = id.indexOf(','),
+                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                        div.html(
+                            '<b>CellML </b> ' +
+                            '<a href="' + tempworkspace + '" target="_blank">' +
+                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>SEDML </b> ' +
+                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
+                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
+                            '<br/>' +
+                            '<b>Click middle mouse to close</b>')
+                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
                 // protein name inside this circle
@@ -4203,7 +4172,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             true);
     }
 
-// utility function
+    // utility function
     var moveBack = function () {
         if (linewithlineg[icircleGlobal] != undefined) {
             linewithlineg[icircleGlobal]
@@ -4274,7 +4243,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-// utility function
+    // utility function
     var membraneColorBack = function () {
         for (var i = 0; i < $("line").length; i++) {
             if ($("line")[i].id == $(cthis).attr("membrane") && i == 0) {
@@ -4487,6 +4456,174 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("membrane: ", membrane);
                 xmlIndex = 0;
                 createJSON();
+
+                if ($(cthis).attr("membrane") == apicalID) {
+                    linebasolateral
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .style("stroke", "orange");
+
+                    // line 1
+                    dx1line[icircleGlobal] = xvalue + width;
+                    dy1line[icircleGlobal] = yvalueb;
+                    dx2line[icircleGlobal] = xvalue + width + lineLen;
+                    dy2line[icircleGlobal] = yvalueb;
+                    linewithlineg[icircleGlobal]
+                        .attr("x1", dx1line[icircleGlobal])
+                        .attr("y1", dy1line[icircleGlobal])
+                        .attr("x2", dx2line[icircleGlobal])
+                        .attr("y2", dy2line[icircleGlobal])
+
+                    // text 1
+                    dxtext[icircleGlobal] = xvalue + lineLen + 10 + width;
+                    dytext[icircleGlobal] = yvalueb + 5;
+                    linewithtextg[icircleGlobal]
+                        .attr("x", dxtext[icircleGlobal])
+                        .attr("y", dytext[icircleGlobal])
+
+                    // circle
+                    dx[icircleGlobal] = cxvalue + width;
+                    dy[icircleGlobal] = cyvalueb + radius;
+                    circlewithlineg[icircleGlobal]
+                        .attr("cx", dx[icircleGlobal])
+                        .attr("cy", dy[icircleGlobal])
+                        .attr("membrane", icircleGlobal)
+                        .attr("located_in", icircleGlobal)
+
+                    // increment y-axis of line and circle
+                    yvalueb += ydistance;
+                    cyvalueb += ydistance;
+
+                    // decrement y-axis of line and circle
+                    yvalue -= ydistance;
+                    cyvalue -= ydistance;
+
+                    for (var i = 0; i < circlewithlineg.length; i++) {
+                        if (circlewithlineg[i].attr("membrane") == apicalID) {
+                            // line 1
+                            dy1line[i] = linewithlineg[i].attr("y1") - ydistance;
+                            dy2line[i] = linewithlineg[i].attr("y2") - ydistance;
+                            linewithlineg[i]
+                            // .transition()
+                            // .delay(1000)
+                            // .duration(1000)
+                                .attr("y1", dy1line[i])
+                                .attr("y2", dy2line[i])
+
+                            // text 1
+                            dytext[i] = linewithtextg[i].attr("y") - ydistance;
+                            linewithtextg[i]
+                            // .transition()
+                            // .delay(1000)
+                            // .duration(1000)
+                                .attr("y", dytext[i])
+
+                            if (circlewithlineg[i]._groups[0][0].tagName == "circle") {
+                                dy[i] = circlewithlineg[i].attr("cy") - ydistance;
+                                circlewithlineg[i]
+                                // .transition()
+                                // .delay(1000)
+                                // .duration(1000)
+                                    .attr("cy", dy[i]);
+                            }
+
+                            if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
+                                dy[i] = circlewithlineg[i].attr("cy") - ydistance;
+                                circlewithlineg[i]
+                                // .transition()
+                                // .delay(1000)
+                                // .duration(1000)
+                                    .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")")
+                                    .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
+                            }
+                        }
+                    }
+                }
+                else {
+                    lineapical
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .style("stroke", "green");
+
+                    // line 1
+                    dx1line[icircleGlobal] = xvalue;
+                    dy1line[icircleGlobal] = yvalue;
+                    dx2line[icircleGlobal] = xvalue + lineLen;
+                    dy2line[icircleGlobal] = yvalue;
+                    linewithlineg[icircleGlobal]
+                        .attr("x1", dx1line[icircleGlobal])
+                        .attr("y1", dy1line[icircleGlobal])
+                        .attr("x2", dx2line[icircleGlobal])
+                        .attr("y2", dy2line[icircleGlobal])
+
+                    // text 1
+                    dxtext[icircleGlobal] = xvalue + lineLen + 10;
+                    dytext[icircleGlobal] = yvalue + 5;
+                    linewithtextg[icircleGlobal]
+                        .attr("x", dxtext[icircleGlobal])
+                        .attr("y", dytext[icircleGlobal])
+
+                    // circle
+                    dx[icircleGlobal] = cxvalue;
+                    dy[icircleGlobal] = cyvalue + radius;
+                    circlewithlineg[icircleGlobal]
+                        .attr("cx", dx[icircleGlobal])
+                        .attr("cy", dy[icircleGlobal])
+                        .attr("membrane", apicalID)
+                        .attr("located_in", apicalID)
+
+                    // increment y-axis of line and circle
+                    yvalue += ydistance;
+                    cyvalue += ydistance;
+
+                    // decrement y-axis of line and circle
+                    yvalueb -= ydistance;
+                    cyvalueb -= ydistance;
+
+                    for (var i = 0; i < circlewithlineg.length; i++) {
+                        if (circlewithlineg[i].attr("membrane") == basolateralID) {
+                            // line 1
+                            dy1line[i] = linewithlineg[i].attr("y1") - ydistance;
+                            dy2line[i] = linewithlineg[i].attr("y2") - ydistance;
+                            linewithlineg[i]
+                            // .transition()
+                            // .delay(1000)
+                            // .duration(1000)
+                                .attr("y1", dy1line[i])
+                                .attr("y2", dy2line[i])
+
+                            // text 1
+                            dytext[i] = linewithtextg[i].attr("y") - ydistance;
+                            linewithtextg[i]
+                            // .transition()
+                            // .delay(1000)
+                            // .duration(1000)
+                                .attr("y", dytext[i])
+
+                            console.log("Hello: ", circlewithlineg[i]._groups[0][0], circlewithlineg[i]);
+                            if (circlewithlineg[i]._groups[0][0].tagName == "circle") {
+                                dy[i] = circlewithlineg[i].attr("cy") - ydistance;
+                                circlewithlineg[i]
+                                // .transition()
+                                // .delay(1000)
+                                // .duration(1000)
+                                    .attr("cy", dy[i]);
+                            }
+
+                            if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
+                                dy[i] = circlewithlineg[i].attr("cy") - ydistance;
+                                circlewithlineg[i]
+                                // .transition()
+                                // .delay(1000)
+                                // .duration(1000)
+                                    .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")")
+                                    .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
+                            }
+                        }
+                    }
+                }
 
                 // reinitialize for next dragged circle
                 idProtein = 0;
@@ -4873,7 +5010,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     console.log("membrane: ", membrane);
     createJSON();
 
-// build the start arrow.
+    // build the start arrow.
     svg.append("svg:defs")
         .selectAll("marker")
         .data(["start"])      // Different link/path types can be defined here
@@ -4888,7 +5025,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-// build the starttop arrow.
+    // build the starttop arrow.
     svg.append("svg:defs")
         .selectAll("marker")
         .data(["starttop"])      // Different link/path types can be defined here
@@ -4903,7 +5040,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-// build the end arrow.
+    // build the end arrow.
     svg.append("svg:defs").selectAll("marker")
         .data(["end"])      // Different link/path types can be defined here
         .enter().append("svg:marker")    // This section adds in the arrows
@@ -4917,7 +5054,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-// Utility for marker direction
+    // Utility for marker direction
     function markerDir(selection) {
         console.log("selection: ", selection);
 
