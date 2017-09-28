@@ -497,7 +497,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         // Write a test case for unsuccessful OLS query and handle this issue as undefined
                         // Just assign mouse species for the time being
                         var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                        var endpointproteinOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pr_uri;
+                        var endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
 
                         sendGetRequest(
                             endpointproteinOLS,
@@ -720,9 +720,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                 for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
                                     var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
                                     var indexofColon = fma_uri.indexOf('FMA:');
-                                    fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
 
-                                    var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=" + fma_uri;
+                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
                                     sendGetRequest(
                                         endpointOLS,
                                         function (jsonObjOLS) {
@@ -738,9 +739,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                 for (var i = 0; i < jsonObjLoc.results.bindings.length; i++) {
                                                     var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
                                                     var indexofColon = fma_uri.indexOf('FMA:');
-                                                    fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
 
-                                                    var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=" + fma_uri;
+                                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
                                                     sendGetRequest(
                                                         endpointOLS,
                                                         function (jsonObjOLSLoc) {
@@ -1257,7 +1259,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     var indexofColon = chebi_uri.indexOf('CHEBI:');
                     chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
-                    var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                     sendGetRequest(
                         endpointOLS,
                         function (jsonObjOLSChebi) {
@@ -1360,10 +1362,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                     if (medURI.indexOf(partOfCHEBIUri) != -1) {
                                         var indexofColon = medURI.indexOf('CHEBI:');
                                         chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
-                                        endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                     }
                                     else
-                                        endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + medURI;
+                                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
 
                                     sendGetRequest(
                                         endpointOLS,

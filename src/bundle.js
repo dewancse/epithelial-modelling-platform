@@ -1187,42 +1187,42 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             // 1 => left click, 2 => middle click, 3 => right click
             if (event.which == 2)
                 div.style("display", "none");
-        },
-
-        click: function () {
-            // Change marker direction and text position
-            if (event.target.localName == "line" && event.target.nodeName == "line") {
-
-                // marker direction
-                var id = event.srcElement.id;
-                markerDir(id);
-
-                // text position
-                var idText = event.srcElement.nextSibling.firstChild.id;
-                var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
-                var textWidth = getTextWidth(textContent, 12);
-                if (state == 0) {
-                    d3.select("#" + idText + "")
-                        .transition()
-                        .delay(1000)
-                        .duration(1000)
-                        .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
-                        .attr("y", event.srcElement.y1.baseVal.value + 5);
-
-                    state = 1;
-                }
-                else {
-                    d3.select("#" + idText + "")
-                        .transition()
-                        .delay(1000)
-                        .duration(1000)
-                        .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
-                        .attr("y", event.srcElement.y1.baseVal.value + 5);
-
-                    state = 0;
-                }
-            }
         }
+        // ,
+        // click: function () {
+        //     // Change marker direction and text position
+        //     if (event.target.localName == "line" && event.target.nodeName == "line") {
+        //
+        //         // marker direction
+        //         var id = event.srcElement.id;
+        //         markerDir(id);
+        //
+        //         // text position
+        //         var idText = event.srcElement.nextSibling.firstChild.id;
+        //         var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
+        //         var textWidth = getTextWidth(textContent, 12);
+        //         if (state == 0) {
+        //             d3.select("#" + idText + "")
+        //                 .transition()
+        //                 .delay(1000)
+        //                 .duration(1000)
+        //                 .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
+        //                 .attr("y", event.srcElement.y1.baseVal.value + 5);
+        //
+        //             state = 1;
+        //         }
+        //         else {
+        //             d3.select("#" + idText + "")
+        //                 .transition()
+        //                 .delay(1000)
+        //                 .duration(1000)
+        //                 .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
+        //                 .attr("y", event.srcElement.y1.baseVal.value + 5);
+        //
+        //             state = 0;
+        //         }
+        //     }
+        // }
     });
 
     // apical, basolateral, and paracellular membrane
@@ -3248,16 +3248,22 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             var lineb_id = $($("line")[mindex]).prop("id");
             var circle_id = $(this).prop("id");
 
-            if ((cx >= lineb_x && cx <= lineb_x + 1) &&
-                (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+            // if ((cx >= lineb_x && cx <= lineb_x + 1) &&
+            //     (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+            //     $($("line")[mindex]).css("stroke", "red");
+
+            if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
                 $($("line")[mindex]).css("stroke", "red");
 
                 var tempYvalue;
                 if (mindex == 1) tempYvalue = yvalueb;
                 else tempYvalue = yvalue;
 
-                if ((cx >= lineb_x && cx <= lineb_x + 5) &&
-                    (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
+                // if ((cx >= lineb_x && cx <= lineb_x + 5) &&
+                //     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
+                //     $($("line")[mindex]).css("stroke", "yellow");
+
+                if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
                     $($("line")[mindex]).css("stroke", "yellow");
                 }
             }
@@ -3295,15 +3301,19 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             var lineb_id = $($("line")[mindex]).prop("id");
             var circle_id = $(cthis).prop("id");
 
-            if ((cx >= lineb_x && cx <= lineb_x + 1) &&
-                (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+            // if ((cx >= lineb_x && cx <= lineb_x + 1) &&
+            //     (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+
+            if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
 
                 var tempYvalue;
                 if (mindex == 1) tempYvalue = yvalueb;
                 else tempYvalue = yvalue;
 
-                if ((cx >= lineb_x && cx <= lineb_x + 5) &&
-                    (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
+                // if ((cx >= lineb_x && cx <= lineb_x + 5) &&
+                //     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
+
+                if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
 
                     $($("line")[mindex]).css("stroke", "yellow");
 
@@ -3437,7 +3447,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         console.log("jsonModel: ", jsonModel);
 
                                         proteinName = jsonModel.results.bindings[0].Protein.value;
-                                        var endpointprOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + proteinName;
+                                        var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + proteinName;
 
                                         sendGetRequest(
                                             endpointprOLS,
@@ -3674,7 +3684,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 }
 
                 // console.log("jsonProtein.results.bindings: ", jsonProtein.results.bindings);
-                var endpointprOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" +
+                var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
                     jsonProtein.results.bindings[0].Protein.value;
 
                 sendGetRequest(
@@ -3933,7 +3943,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 console.log("jsonRelatedMembraneModel: ", jsonRelatedMembraneModel);
 
-                var endpointprOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" +
+                var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
                     jsonRelatedMembraneModel.results.bindings[0].Protein.value;
 
                 sendGetRequest(
@@ -4269,6 +4279,158 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
+    var circleRearrange = function () {
+        // initial values for apical
+        var cyinitial = 213.3333282470703,
+            dy1lineinitial = 193.3333282470703,
+            dy1lineinitial2 = 233.3333282470703,
+            dytextinitial = 198.3333282470703,
+            dytextinitial2 = 237.3333282470703;
+        for (var i = 0; i < circlewithlineg.length; i++) {
+            if (circlewithlineg[i].attr("membrane") == apicalID) {
+                // line 1
+                dy1line[i] = dy1lineinitial;
+                dy2line[i] = dy1lineinitial;
+                linewithlineg[i]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("y1", dy1line[i])
+                    .attr("y2", dy2line[i])
+
+                // text 1
+                dytext[i] = dytextinitial;
+                linewithtextg[i]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("y", dytext[i])
+
+                if (linewithlineg2[i] != undefined) {
+
+                    console.log("apical !!!");
+
+                    // line 2
+                    dy1line2[i] = dy1lineinitial2;
+                    dy2line2[i] = dy1lineinitial2;
+                    linewithlineg2[i]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("y1", dy1line2[i])
+                        .attr("y2", dy2line2[i])
+
+                    // text 2
+                    dytext2[i] = dytextinitial2;
+                    linewithtextg2[i]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("y", dytext2[i])
+                }
+
+                if (circlewithlineg[i]._groups[0][0].tagName == "circle") {
+                    dy[i] = cyinitial;
+                    circlewithlineg[i]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("cy", dy[i]);
+                }
+
+                if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
+                    dy[i] = cyinitial;
+                    circlewithlineg[i]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")")
+                        .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
+                }
+
+                cyinitial += ydistance;
+                dy1lineinitial += ydistance;
+                dy1lineinitial2 += ydistance;
+                dytextinitial += ydistance;
+                dytextinitial2 += ydistance;
+            }
+        }
+
+        // initial values for basolateral
+        var cyinitialb = 213.3333282470703,
+            dy1lineinitialb = 193.3333282470703,
+            dy1lineinitialb2 = 233.3333282470703,
+            dytextinitialb = 198.3333282470703,
+            dytextinitialb2 = 237.3333282470703;
+        for (var i = 0; i < circlewithlineg.length; i++) {
+            if (circlewithlineg[i].attr("membrane") == basolateralID) {
+                // line 1
+                dy1line[i] = dy1lineinitialb;
+                dy2line[i] = dy1lineinitialb;
+                linewithlineg[i]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("y1", dy1line[i])
+                    .attr("y2", dy2line[i])
+
+                // text 1
+                dytext[i] = dytextinitialb;
+                linewithtextg[i]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("y", dytext[i])
+
+                if (linewithlineg2[i] != undefined) {
+                    // line 2
+                    dy1line2[i] = dy1lineinitialb2;
+                    dy2line2[i] = dy1lineinitialb2;
+                    linewithlineg2[i]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("y1", dy1line2[i])
+                        .attr("y2", dy2line2[i])
+
+                    // text 2
+                    dytext2[i] = dytextinitialb2;
+                    linewithtextg2[i]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("y", dytext2[i])
+                }
+
+                if (circlewithlineg[i]._groups[0][0].tagName == "circle") {
+                    dy[i] = cyinitialb;
+                    circlewithlineg[i]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("cy", dy[i]);
+                }
+
+                if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
+                    dy[i] = cyinitialb;
+                    circlewithlineg[i]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")")
+                        .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
+                }
+
+                // decrement y-axis of line and circle
+                cyinitialb += ydistance;
+                dy1lineinitialb += ydistance;
+                dy1lineinitialb2 += ydistance;
+                dytextinitialb += ydistance;
+                dytextinitialb2 += ydistance;
+            }
+        }
+    }
+
     var Modal = function (options) {
         var $this = this;
 
@@ -4457,6 +4619,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 xmlIndex = 0;
                 createJSON();
 
+                // TODO: circle placement and rearrangement
+                // TODO: membrane attr changed above, thus it affects here.
                 if ($(cthis).attr("membrane") == apicalID) {
                     linebasolateral
                         .transition()
@@ -4488,57 +4652,42 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     circlewithlineg[icircleGlobal]
                         .attr("cx", dx[icircleGlobal])
                         .attr("cy", dy[icircleGlobal])
-                        .attr("membrane", icircleGlobal)
-                        .attr("located_in", icircleGlobal)
+                        .attr("membrane", basolateralID)
 
-                    // increment y-axis of line and circle
-                    yvalueb += ydistance;
-                    cyvalueb += ydistance;
+                    if (linewithlineg2[icircleGlobal] != undefined) {
+                        // line 2
+                        dx1line2[icircleGlobal] = xvalue + width;
+                        dy1line2[icircleGlobal] = yvalueb + radius * 2;
+                        dx2line2[icircleGlobal] = xvalue + width + lineLen;
+                        dy2line2[icircleGlobal] = yvalueb + radius * 2;
+                        linewithlineg2[icircleGlobal]
+                            .attr("x1", dx1line2[icircleGlobal])
+                            .attr("y1", dy1line2[icircleGlobal])
+                            .attr("x2", dx2line2[icircleGlobal])
+                            .attr("y2", dy2line2[icircleGlobal])
+
+                        // text 2
+                        dxtext2[icircleGlobal] = xvalue + lineLen + 10 + width;
+                        dytext2[icircleGlobal] = yvalueb + radius * 2 + markerHeight;
+                        linewithtextg2[icircleGlobal]
+                            .attr("x", dxtext2[icircleGlobal])
+                            .attr("y", dytext2[icircleGlobal])
+                    }
 
                     // decrement y-axis of line and circle
                     yvalue -= ydistance;
                     cyvalue -= ydistance;
 
-                    for (var i = 0; i < circlewithlineg.length; i++) {
-                        if (circlewithlineg[i].attr("membrane") == apicalID) {
-                            // line 1
-                            dy1line[i] = linewithlineg[i].attr("y1") - ydistance;
-                            dy2line[i] = linewithlineg[i].attr("y2") - ydistance;
-                            linewithlineg[i]
-                            // .transition()
-                            // .delay(1000)
-                            // .duration(1000)
-                                .attr("y1", dy1line[i])
-                                .attr("y2", dy2line[i])
+                    // increment y-axis of line and circle
 
-                            // text 1
-                            dytext[i] = linewithtextg[i].attr("y") - ydistance;
-                            linewithtextg[i]
-                            // .transition()
-                            // .delay(1000)
-                            // .duration(1000)
-                                .attr("y", dytext[i])
+                    console.log("yvalueb cyvalueb: ", yvalueb, cyvalueb);
 
-                            if (circlewithlineg[i]._groups[0][0].tagName == "circle") {
-                                dy[i] = circlewithlineg[i].attr("cy") - ydistance;
-                                circlewithlineg[i]
-                                // .transition()
-                                // .delay(1000)
-                                // .duration(1000)
-                                    .attr("cy", dy[i]);
-                            }
+                    yvalueb += ydistance;
+                    cyvalueb += ydistance;
 
-                            if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
-                                dy[i] = circlewithlineg[i].attr("cy") - ydistance;
-                                circlewithlineg[i]
-                                // .transition()
-                                // .delay(1000)
-                                // .duration(1000)
-                                    .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")")
-                                    .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
-                            }
-                        }
-                    }
+                    console.log("After yvalueb cyvalueb: ", yvalueb, cyvalueb);
+
+                    circleRearrange();
                 }
                 else {
                     lineapical
@@ -4572,57 +4721,36 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("cx", dx[icircleGlobal])
                         .attr("cy", dy[icircleGlobal])
                         .attr("membrane", apicalID)
-                        .attr("located_in", apicalID)
 
-                    // increment y-axis of line and circle
-                    yvalue += ydistance;
-                    cyvalue += ydistance;
+                    if (linewithlineg2[icircleGlobal] != undefined) {
+                        // line 2
+                        dx1line2[icircleGlobal] = xvalue;
+                        dy1line2[icircleGlobal] = yvalue + radius * 2;
+                        dx2line2[icircleGlobal] = xvalue + lineLen;
+                        dy2line2[icircleGlobal] = yvalue + radius * 2;
+                        linewithlineg2[icircleGlobal]
+                            .attr("x1", dx1line2[icircleGlobal])
+                            .attr("y1", dy1line2[icircleGlobal])
+                            .attr("x2", dx2line2[icircleGlobal])
+                            .attr("y2", dy2line2[icircleGlobal])
+
+                        // text 2
+                        dxtext2[icircleGlobal] = xvalue + lineLen + 10;
+                        dytext2[icircleGlobal] = yvalue + radius * 2 + markerHeight;
+                        linewithtextg2[icircleGlobal]
+                            .attr("x", dxtext2[icircleGlobal])
+                            .attr("y", dytext2[icircleGlobal])
+                    }
 
                     // decrement y-axis of line and circle
                     yvalueb -= ydistance;
                     cyvalueb -= ydistance;
 
-                    for (var i = 0; i < circlewithlineg.length; i++) {
-                        if (circlewithlineg[i].attr("membrane") == basolateralID) {
-                            // line 1
-                            dy1line[i] = linewithlineg[i].attr("y1") - ydistance;
-                            dy2line[i] = linewithlineg[i].attr("y2") - ydistance;
-                            linewithlineg[i]
-                            // .transition()
-                            // .delay(1000)
-                            // .duration(1000)
-                                .attr("y1", dy1line[i])
-                                .attr("y2", dy2line[i])
+                    // increment y-axis of line and circle
+                    yvalue += ydistance;
+                    cyvalue += ydistance;
 
-                            // text 1
-                            dytext[i] = linewithtextg[i].attr("y") - ydistance;
-                            linewithtextg[i]
-                            // .transition()
-                            // .delay(1000)
-                            // .duration(1000)
-                                .attr("y", dytext[i])
-
-                            console.log("Hello: ", circlewithlineg[i]._groups[0][0], circlewithlineg[i]);
-                            if (circlewithlineg[i]._groups[0][0].tagName == "circle") {
-                                dy[i] = circlewithlineg[i].attr("cy") - ydistance;
-                                circlewithlineg[i]
-                                // .transition()
-                                // .delay(1000)
-                                // .duration(1000)
-                                    .attr("cy", dy[i]);
-                            }
-
-                            if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
-                                dy[i] = circlewithlineg[i].attr("cy") - ydistance;
-                                circlewithlineg[i]
-                                // .transition()
-                                // .delay(1000)
-                                // .duration(1000)
-                                    .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")")
-                                    .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
-                            }
-                        }
-                    }
+                    circleRearrange();
                 }
 
                 // reinitialize for next dragged circle
@@ -4637,180 +4765,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 // Don't know why did I write this?
                 linewithtextg[i].text(circleID[2]);
-
-                // if ($(cthis).attr("membrane") == apicalID) {
-                //     var pindex = $(cthis).attr("index"),
-                //         tempcthis = cthis,
-                //         templine = linewithlineg[pindex],
-                //         temptext = linewithtextg[pindex];
-                //
-                //     console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
-                //
-                //     circlewithlineg.splice(pindex, 1);
-                //     linewithlineg.splice(pindex, 1);
-                //     linewithtextg.splice(pindex, 1);
-                //
-                //     circlewithlineg.push(d3.select(tempcthis));
-                //     linewithlineg.push(templine);
-                //     linewithtextg.push(temptext);
-                //
-                //     console.log("circle, line, text: ", circlewithlineg.length, linewithlineg.length, linewithtextg.length);
-                //
-                //     // TODO: change id as well
-                //     circlewithlineg[circlewithlineg.length - 1]
-                //         .attr("index", circlewithlineg.length - 1)
-                //         .attr("membrane", basolateralID);
-                //
-                //     linewithlineg[linewithlineg.length - 1].attr("id", "linewithlineg" + linewithlineg.length - 1);
-                //     linewithtextg[linewithtextg.length - 1].attr("id", "linewithtextg" + linewithtextg.length - 1);
-                //
-                //     console.log("pindex: ", pindex);
-                //
-                //     for (var i = 0; i < circlewithlineg.length; i++) {
-                //         circlewithlineg[i].attr("index", i);
-                //         linewithlineg[i].attr("id", "linewithlineg" + i);
-                //         linewithtextg[i].attr("id", "linewithtextg" + i);
-                //
-                //         if (circlewithlineg[i].attr("membrane") == basolateralID) continue;
-                //
-                //         if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
-                //             dy[i] = dy[i] - ydistance;
-                //             circlewithlineg[i]
-                //                 .transition()
-                //                 .delay(1000)
-                //                 .duration(1000)
-                //                 .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
-                //                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                //                 .attr("index", i);
-                //         }
-                //         else {
-                //             circlewithlineg[i]
-                //                 .transition()
-                //                 .delay(1000)
-                //                 .duration(1000)
-                //                 .attr("cy", dy[i])
-                //                 .attr("index", i);
-                //         }
-                //
-                //         linewithtextg[i]
-                //             .transition()
-                //             .delay(1000)
-                //             .duration(1000)
-                //             .attr("y", dytext[i]);
-                //
-                //         linewithlineg[i]
-                //             .transition()
-                //             .delay(1000)
-                //             .duration(1000)
-                //             .attr("y1", dy1line[i])
-                //             .attr("y2", dy2line[i]);
-                //
-                //         console.log("apical transition");
-                //     }
-                //
-                //     console.log("circlewithlineg AFTER: ", circlewithlineg);
-                //     console.log("linewithlineg AFTER: ", linewithlineg);
-                //     console.log("linewithtextg AFTER: ", linewithtextg);
-                //
-                //     yvalue -= ydistance;
-                //     cyvalue -= ydistance;
-                //
-                //     yvalueb += ydistance;
-                //     cyvalueb += ydistance;
-                // }
-                // else {
-                //     var pindex = $(cthis).attr("index"),
-                //         tempcthis = cthis,
-                //         templine = linewithlineg[pindex],
-                //         temptext = linewithtextg[pindex];
-                //
-                //     console.log("tempcthis, templine, temptext: ", tempcthis, templine, temptext);
-                //
-                //     var apicalcounter = 0;
-                //     for (var i = 0; i < circlewithlineg.length; i++) {
-                //         if (circlewithlineg[i].attr("membrane") == apicalID) {
-                //             apicalcounter++;
-                //         }
-                //     }
-                //
-                //     console.log("apicalcounter: ", apicalcounter);
-                //
-                //     for (var i = 0; i < circlewithlineg.length; i++) {
-                //         if (i == apicalcounter) {
-                //             circlewithlineg.splice(i, 1, d3.select(tempcthis));
-                //             linewithlineg.splice(i, 1, templine);
-                //             linewithtextg.splice(i, 1, temptext);
-                //
-                //             console.log("apicalcounter: ", apicalcounter);
-                //
-                //             // TODO: change id as well
-                //             circlewithlineg[i]
-                //                 .attr("index", i)
-                //                 .attr("membrane", apicalID);
-                //
-                //             linewithlineg[i].attr("id", "linewithlineg" + i);
-                //             linewithtextg[i].attr("id", "linewithtextg" + i);
-                //
-                //             break;
-                //         }
-                //     }
-                //
-                //     console.log("circle, line, text: ", circlewithlineg, linewithlineg, linewithtextg);
-                //     console.log("pindex BASO: ", pindex);
-                //
-                //     ++pindex;
-                //     for (var i = pindex; i < circlewithlineg.length; i++) {
-                //         circlewithlineg[i].attr("index", i);
-                //         linewithlineg[i].attr("id", "linewithlineg" + i);
-                //         linewithtextg[i].attr("id", "linewithtextg" + i);
-                //
-                //         dy[i] = dy[i] - ydistance;
-                //         if (circlewithlineg[i]._groups[0][0].tagName == "polygon") {
-                //             circlewithlineg[i]
-                //                 .transition()
-                //                 .delay(1000)
-                //                 .duration(1000)
-                //                 .attr("transform", "translate(" + (dx[i] - 30) + "," + (dy[i] + 20) + ")")
-                //                 .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
-                //                 .attr("index", i);
-                //         }
-                //         else {
-                //             circlewithlineg[i]
-                //                 .transition()
-                //                 .delay(1000)
-                //                 .duration(1000)
-                //                 .attr("cy", dy[i])
-                //                 .attr("index", i);
-                //
-                //             console.log("basolateral transition circle: ", circlewithlineg[i]);
-                //         }
-                //
-                //         linewithtextg[i]
-                //             .transition()
-                //             .delay(1000)
-                //             .duration(1000)
-                //             .attr("y", dytext[i] - ydistance);
-                //
-                //         linewithlineg[i]
-                //             .transition()
-                //             .delay(1000)
-                //             .duration(1000)
-                //             .attr("y1", dy1line[i] - ydistance)
-                //             .attr("y2", dy2line[i] - ydistance);
-                //
-                //         console.log("basolateral transition");
-                //     }
-                //
-                //     console.log("circlewithlineg AFTER: ", circlewithlineg);
-                //     console.log("linewithlineg AFTER: ", linewithlineg);
-                //     console.log("linewithtextg AFTER: ", linewithtextg);
-                //
-                //     yvalue += ydistance;
-                //     cyvalue += ydistance;
-                //
-                //     yvalueb -= ydistance;
-                //     cyvalueb -= ydistance;
-                // }
 
                 // Reinitialise to store fluxes/models in next iteration
                 membraneModelValue = [];
@@ -5055,39 +5009,39 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .attr("d", "M0,-5L10,0L0,5");
 
     // Utility for marker direction
-    function markerDir(selection) {
-        console.log("selection: ", selection);
-
-        var mstart = d3.select("#" + selection + "")
-            ._groups[0][0]
-            .getAttribute("marker-start");
-
-        var mend = d3.select("#" + selection + "")
-            ._groups[0][0]
-            .getAttribute("marker-end");
-
-        if (mstart == "") {
-            d3.select("#" + selection + "")
-                .attr("marker-start", "url(#start)")
-                .attr("marker-end", "");
-        }
-        else {
-            d3.select("#" + selection + "")
-                .attr("marker-end", "url(#end)")
-                .attr("marker-start", "");
-        }
-
-        if (mend == "") {
-            d3.select("#" + selection + "")
-                .attr("marker-end", "url(#end)")
-                .attr("marker-start", "");
-        }
-        else {
-            d3.select("#" + selection + "")
-                .attr("marker-start", "url(#start)")
-                .attr("marker-end", "");
-        }
-    }
+    // function markerDir(selection) {
+    //     console.log("selection: ", selection);
+    //
+    //     var mstart = d3.select("#" + selection + "")
+    //         ._groups[0][0]
+    //         .getAttribute("marker-start");
+    //
+    //     var mend = d3.select("#" + selection + "")
+    //         ._groups[0][0]
+    //         .getAttribute("marker-end");
+    //
+    //     if (mstart == "") {
+    //         d3.select("#" + selection + "")
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("marker-end", "");
+    //     }
+    //     else {
+    //         d3.select("#" + selection + "")
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("marker-start", "");
+    //     }
+    //
+    //     if (mend == "") {
+    //         d3.select("#" + selection + "")
+    //             .attr("marker-end", "url(#end)")
+    //             .attr("marker-start", "");
+    //     }
+    //     else {
+    //         d3.select("#" + selection + "")
+    //             .attr("marker-start", "url(#start)")
+    //             .attr("marker-end", "");
+    //     }
+    // }
 }
 
 exports.showsvgEpithelial = showsvgEpithelial;
@@ -5866,7 +5820,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         // Write a test case for unsuccessful OLS query and handle this issue as undefined
                         // Just assign mouse species for the time being
                         var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                        var endpointproteinOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pr_uri;
+                        var endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
 
                         sendGetRequest(
                             endpointproteinOLS,
@@ -6089,9 +6043,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                 for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
                                     var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
                                     var indexofColon = fma_uri.indexOf('FMA:');
-                                    fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
 
-                                    var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=" + fma_uri;
+                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
                                     sendGetRequest(
                                         endpointOLS,
                                         function (jsonObjOLS) {
@@ -6107,9 +6062,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                 for (var i = 0; i < jsonObjLoc.results.bindings.length; i++) {
                                                     var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
                                                     var indexofColon = fma_uri.indexOf('FMA:');
-                                                    fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
 
-                                                    var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/fma/terms?iri=" + fma_uri;
+                                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
                                                     sendGetRequest(
                                                         endpointOLS,
                                                         function (jsonObjOLSLoc) {
@@ -6626,7 +6582,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     var indexofColon = chebi_uri.indexOf('CHEBI:');
                     chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
-                    var endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                     sendGetRequest(
                         endpointOLS,
                         function (jsonObjOLSChebi) {
@@ -6729,10 +6685,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                     if (medURI.indexOf(partOfCHEBIUri) != -1) {
                                         var indexofColon = medURI.indexOf('CHEBI:');
                                         chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
-                                        endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                     }
                                     else
-                                        endpointOLS = "http://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + medURI;
+                                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
 
                                     sendGetRequest(
                                         endpointOLS,
