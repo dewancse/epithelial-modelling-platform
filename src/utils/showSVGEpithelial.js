@@ -178,9 +178,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
     }
 
-    // TODO: now skipping source_name2, etc below, however, it is used to
-    // TODO: make cotransporters in the apical and basolateral membrane (see index.js)
-
     // TODO: Hard coded for Nachannel, Clchannel, Kchannel
     for (var i = 0; i < membrane.length; i++) {
         if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == Nachannel ||
@@ -826,42 +823,42 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             // 1 => left click, 2 => middle click, 3 => right click
             if (event.which == 2)
                 div.style("display", "none");
+        },
+
+        click: function () {
+            // Change marker direction and text position
+            if (event.target.localName == "line" && event.target.nodeName == "line") {
+
+                // marker direction
+                var id = event.srcElement.id;
+                markerDir(id);
+
+                // text position
+                var idText = event.srcElement.nextSibling.firstChild.id;
+                var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
+                var textWidth = getTextWidth(textContent, 12);
+                if (state == 0) {
+                    d3.select("#" + idText + "")
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
+                        .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                    state = 1;
+                }
+                else {
+                    d3.select("#" + idText + "")
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
+                        .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
+                        .attr("y", event.srcElement.y1.baseVal.value + 5);
+
+                    state = 0;
+                }
+            }
         }
-        // ,
-        // click: function () {
-        //     // Change marker direction and text position
-        //     if (event.target.localName == "line" && event.target.nodeName == "line") {
-        //
-        //         // marker direction
-        //         var id = event.srcElement.id;
-        //         markerDir(id);
-        //
-        //         // text position
-        //         var idText = event.srcElement.nextSibling.firstChild.id;
-        //         var textContent = event.srcElement.nextSibling.firstChild.innerHTML;
-        //         var textWidth = getTextWidth(textContent, 12);
-        //         if (state == 0) {
-        //             d3.select("#" + idText + "")
-        //                 .transition()
-        //                 .delay(1000)
-        //                 .duration(1000)
-        //                 .attr("x", event.srcElement.x1.baseVal.value - textWidth - 10)
-        //                 .attr("y", event.srcElement.y1.baseVal.value + 5);
-        //
-        //             state = 1;
-        //         }
-        //         else {
-        //             d3.select("#" + idText + "")
-        //                 .transition()
-        //                 .delay(1000)
-        //                 .duration(1000)
-        //                 .attr("x", event.srcElement.x1.baseVal.value + textWidth + 20)
-        //                 .attr("y", event.srcElement.y1.baseVal.value + 5);
-        //
-        //             state = 0;
-        //         }
-        //     }
-        // }
     });
 
     // apical, basolateral, and paracellular membrane
@@ -3052,24 +3049,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 console.log("cellmlModel: ", cellmlModel);
 
                                 if (circleID[1] != "") {
-                                    var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Species ?Gene ' +
+                                    var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
                                         'WHERE { GRAPH ?g { ' +
-                                        '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
+                                        '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
                                         '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
                                         '<' + circleID[1] + '> <http://purl.org/dc/terms/description> ?Biological_meaning2 . ' +
-                                        '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
-                                        '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
                                         '}}'
                                 }
                                 else {
-                                    // var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Species ?Gene ' +
-                                    //     'WHERE { GRAPH ?g { ' +
-                                    //     '<' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein . ' +
-                                    //     '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
-                                    //     '<' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species . ' +
-                                    //     '<' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene . ' +
-                                    //     '}}'
-
                                     var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
                                         'WHERE { GRAPH ?g { ' +
                                         '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
@@ -3374,12 +3361,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             '<' + modelname + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
             '}}'
 
-        // console.log("query: ", modelname, query);
-        // }
-        // else {
-        //     modelname = "";
-        // }
-
         sendPostRequest(
             endpoint,
             query,
@@ -3555,9 +3536,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var relatedMembraneModel = function (workspaceName, membraneName) {
 
+        var tempmembraneModel;
         if (membraneModel[idMembrane] != undefined) {
             var indexOfHash = membraneModel[idMembrane].search("#");
-            var tempmembraneModel = membraneModel[idMembrane].slice(0, indexOfHash);
+            tempmembraneModel = membraneModel[idMembrane].slice(0, indexOfHash);
         }
 
         var indexOfcellml = tempmembraneModel.search(".cellml");
@@ -3650,22 +3632,22 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         temp_med_pr = jsonObjFlux.results.bindings[1].med_entity_uri.value;
 
                                     // For now consider only single flux
-                                    if (circleID[1] == "") {
-                                        membraneModelID.push([
-                                            membraneModel[idMembrane],
-                                            circleID[1],
-                                            srctext,
-                                            circleID[3],
-                                            srctext,
-                                            circleID[5],
-                                            tempjsonObjFlux[0].source_fma.value,
-                                            tempjsonObjFlux[0].source_fma.value,
-                                            tempjsonObjFlux[0].sink_fma.value,
-                                            tempjsonObjFlux[0].sink_fma.value,
-                                            jsonObjFlux.results.bindings[0].med_entity_uri.value, // med_fma
-                                            temp_med_pr // med_pr
-                                        ]);
-                                    }
+                                    // if (circleID[1] == "") {
+                                    membraneModelID.push([
+                                        membraneModel[idMembrane],
+                                        circleID[1],
+                                        srctext,
+                                        circleID[3],
+                                        srctext,
+                                        circleID[5],
+                                        tempjsonObjFlux[0].source_fma.value,
+                                        tempjsonObjFlux[0].source_fma.value,
+                                        tempjsonObjFlux[0].sink_fma.value,
+                                        tempjsonObjFlux[0].sink_fma.value,
+                                        jsonObjFlux.results.bindings[0].med_entity_uri.value, // med_fma
+                                        temp_med_pr // med_pr
+                                    ]);
+                                    // }
                                 }
 
                                 // console.log("membraneObject: ", membraneObject);
@@ -4409,6 +4391,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 membraneModelValue = [];
                 altCellmlModel = "";
                 relatedModelValue = [];
+
+                relatedModel = [];
+                relatedModelID = [];
+                workspaceName = "";
+                membraneModel = [];
+                membraneModelID = [];
+                membraneObject = [];
             })
         };
 
@@ -4648,39 +4637,39 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .attr("d", "M0,-5L10,0L0,5");
 
     // Utility for marker direction
-    // function markerDir(selection) {
-    //     console.log("selection: ", selection);
-    //
-    //     var mstart = d3.select("#" + selection + "")
-    //         ._groups[0][0]
-    //         .getAttribute("marker-start");
-    //
-    //     var mend = d3.select("#" + selection + "")
-    //         ._groups[0][0]
-    //         .getAttribute("marker-end");
-    //
-    //     if (mstart == "") {
-    //         d3.select("#" + selection + "")
-    //             .attr("marker-start", "url(#start)")
-    //             .attr("marker-end", "");
-    //     }
-    //     else {
-    //         d3.select("#" + selection + "")
-    //             .attr("marker-end", "url(#end)")
-    //             .attr("marker-start", "");
-    //     }
-    //
-    //     if (mend == "") {
-    //         d3.select("#" + selection + "")
-    //             .attr("marker-end", "url(#end)")
-    //             .attr("marker-start", "");
-    //     }
-    //     else {
-    //         d3.select("#" + selection + "")
-    //             .attr("marker-start", "url(#start)")
-    //             .attr("marker-end", "");
-    //     }
-    // }
+    function markerDir(selection) {
+        console.log("selection: ", selection);
+
+        var mstart = d3.select("#" + selection + "")
+            ._groups[0][0]
+            .getAttribute("marker-start");
+
+        var mend = d3.select("#" + selection + "")
+            ._groups[0][0]
+            .getAttribute("marker-end");
+
+        if (mstart == "") {
+            d3.select("#" + selection + "")
+                .attr("marker-start", "url(#start)")
+                .attr("marker-end", "");
+        }
+        else {
+            d3.select("#" + selection + "")
+                .attr("marker-end", "url(#end)")
+                .attr("marker-start", "");
+        }
+
+        if (mend == "") {
+            d3.select("#" + selection + "")
+                .attr("marker-end", "url(#end)")
+                .attr("marker-start", "");
+        }
+        else {
+            d3.select("#" + selection + "")
+                .attr("marker-start", "url(#start)")
+                .attr("marker-end", "");
+        }
+    }
 }
 
 exports.showsvgEpithelial = showsvgEpithelial;
