@@ -3572,9 +3572,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                                                                         console.log("jsonCellmlModel: ", jsonCellmlModel);
 
-                                                                                        var alternativeCellmlArray = [];
+                                                                                        var alternativeCellmlArray = [],
+                                                                                            cellmlModel2 = cellmlModel,
+                                                                                            indexOfHash = cellmlModel2.search("#");
+                                                                                        cellmlModel2 = cellmlModel2.slice(0, indexOfHash);
                                                                                         for (var i = 0; i < relatedModel.length; i++) {
-                                                                                            if (relatedModel[i] != cellmlModel) {
+                                                                                            if (relatedModel[i] != cellmlModel2) {
                                                                                                 alternativeCellmlArray.push(relatedModel[i]);
                                                                                             }
                                                                                         }
@@ -3709,13 +3712,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
     var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
-        // console.log("alternativeCellmlArray: ", alternativeCellmlArray, membrane);
+        // console.log("alternativeCellmlArray: ", alternativeCellmlArray[idAltProtein], membrane, alternativeCellmlArray);
+        var modelname;
+        if (alternativeCellmlArray[idAltProtein] == undefined) {
+            modelname = undefined;
+        }
+        else {
+            var indexOfcellml = alternativeCellmlArray[idAltProtein].search(".cellml");
+            var modelname = alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
 
-        // if (alternativeCellmlArray[idAltProtein] != undefined) {
-        var indexOfcellml = alternativeCellmlArray[idAltProtein].search(".cellml");
-        var modelname = alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
-
-        modelname = alternativeCellmlArray[idAltProtein] + "#" + modelname;
+            modelname = alternativeCellmlArray[idAltProtein] + "#" + modelname;
+        }
 
         var query = 'SELECT ?Protein ?workspaceName ' +
             'WHERE { GRAPH ?workspaceName { ' +
@@ -3726,16 +3733,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             endpoint,
             query,
             function (jsonAltProtein) {
-
                 // console.log("jsonAltProtein: ", jsonAltProtein);
-
                 // console.log("jsonAltProtein OUTSIDE: ", jsonAltProtein);
+
                 var flagvar = true;
 
                 if (jsonAltProtein.results.bindings.length != 0) {
                     if (jsonAltProtein.results.bindings[0].Protein.value == proteinName) {
 
                         // console.log("jsonAltProtein INSIDE: ", jsonAltProtein);
+                        console.log("jsonAltProtein INSIDE: ", jsonAltProtein.results.bindings[0].Protein.value);
+
                         flagvar = false;
 
                         var callOLS = function () {
@@ -3838,7 +3846,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         console.log("relatedMembrane: ", workspaceName, membrane, membraneName);
         console.log("CHEBI: ", $(cthis).prop("id").split(","));
-        console.log("CHEBI: ", $(cthis).prop("id").split(",")[13]);
         // TODO: change arrow and variable name in epithelial platform
         if ($(cthis).prop("id").split(",")[13] == "") { // single flux
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
@@ -3871,8 +3878,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 '?Model_entity2 semsim:isComputationalComponentFor ?property2.' +
                 '}}';
         }
-
-        console.log("query: ", query);
 
         sendPostRequest(
             endpoint,
