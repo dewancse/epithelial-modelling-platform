@@ -550,25 +550,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     variable_text: membrane[i].variable_text,
                     source_fma: membrane[i].source_fma,
                     sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: "channel",
-                    solute_text2: "channel",
+                    solute_chebi2: "",
+                    solute_text2: "",
                     variable_text2: "channel",
-                    source_fma2: "channel",
-                    sink_fma2: "channel",
+                    source_fma2: "",
+                    sink_fma2: "",
                     model_entity: membrane[i].model_entity,
-                    model_entity2: membrane[i].model_entity2,
-                    sink_name: membrane[i].sink_name,
+                    model_entity2: "",
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
                     med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
-
-            membrane[i].solute_chebi2 = "channel";
-            membrane[i].solute_text2 = "channel";
-            membrane[i].variable_text2 = "channel";
-            membrane[i].source_fma2 = "channel";
-            membrane[i].sink_fma2 = "channel";
         }
 
         if (membrane[i].med_fma == basolateralID && (membrane[i].med_pr == Nachannel ||
@@ -580,24 +573,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     variable_text: membrane[i].variable_text,
                     source_fma: membrane[i].source_fma,
                     sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: "channel",
-                    solute_chebi2: "channel",
+                    solute_chebi2: "",
+                    solute_text2: "",
                     variable_text2: "channel",
-                    source_fma2: "channel",
-                    sink_fma2: "channel",
+                    source_fma2: "",
+                    sink_fma2: "",
                     model_entity: membrane[i].model_entity,
-                    model_entity2: membrane[i].model_entity2,
+                    model_entity2: "",
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
                     med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
-
-            membrane[i].solute_chebi2 = "channel";
-            membrane[i].solute_chebi2 = "channel";
-            membrane[i].variable_text2 = "channel";
-            membrane[i].source_fma2 = "channel";
-            membrane[i].sink_fma2 = "channel";
         }
 
         if (membrane[i].source_fma == luminalID && membrane[i].sink_fma == interstitialID) {
@@ -608,24 +595,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     variable_text: membrane[i].variable_text,
                     source_fma: membrane[i].source_fma,
                     sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: "diffusive channel",
-                    solute_text2: "diffusive channel",
+                    solute_chebi2: "",
+                    solute_text2: "",
                     variable_text2: "diffusive channel",
-                    source_fma2: "diffusive channel",
-                    sink_fma2: "diffusive channel",
+                    source_fma2: "",
+                    sink_fma2: "",
                     model_entity: membrane[i].model_entity,
-                    model_entity2: membrane[i].model_entity2,
+                    model_entity2: "",
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
                     med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
-
-            membrane[i].solute_chebi2 = "diffusive channel";
-            membrane[i].solute_text2 = "diffusive channel";
-            membrane[i].variable_text2 = "diffusive channel";
-            membrane[i].source_fma2 = "diffusive channel";
-            membrane[i].sink_fma2 = "diffusive channel";
         }
     }
 
@@ -640,13 +621,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     variable_text: membrane[i].variable_text,
                     source_fma: membrane[i].source_fma,
                     sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: membrane[i].solute_chebi2,
-                    solute_text2: membrane[i].solute_text2,
+                    solute_chebi2: "",
+                    solute_text2: "",
                     variable_text2: "single flux",
                     source_fma2: membrane[i].source_fma,
                     sink_fma2: membrane[i].sink_fma,
                     model_entity: membrane[i].model_entity,
-                    model_entity2: membrane[i].model_entity2,
+                    model_entity2: "",
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
@@ -663,13 +644,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     variable_text: membrane[i].variable_text,
                     source_fma: membrane[i].source_fma,
                     sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: membrane[i].solute_chebi2,
-                    solute_text2: membrane[i].solute_text2,
+                    solute_chebi2: "",
+                    solute_text2: "",
                     variable_text2: "single flux",
                     source_fma2: membrane[i].source_fma,
                     sink_fma2: membrane[i].sink_fma,
                     model_entity: membrane[i].model_entity,
-                    model_entity2: membrane[i].model_entity2,
+                    model_entity2: "",
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
@@ -677,8 +658,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 });
         }
     }
-
-    // Note: otherwise membrane array should have both directional fluxes (i.e., cotransporter)
 
     console.log("membrane: ", membrane);
     console.log("concentration_fma: ", concentration_fma);
@@ -1290,6 +1269,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
                 circlewithlineg[i] = linegcircle.append("circle")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -1453,6 +1438,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
                 circlewithlineg[i] = linegcircle.append("circle")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -1616,6 +1607,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
                 circlewithlineg[i] = linegcircle.append("circle")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -1779,6 +1776,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var linegcircle = lineg.append("g").data([{x: cxvalue, y: cyvalue}]);
                 circlewithlineg[i] = linegcircle.append("circle")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -1896,7 +1899,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // case 5
-            if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            if ((src_fma == luminalID && snk_fma == cytosolID) && (textvalue2 == "channel")) {
                 var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
                 linewithlineg[i] = polygong.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -1942,6 +1945,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithlineg[i] = polygong.append("g").append("polygon")
                     .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -2015,7 +2024,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // case 6
-            if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            if ((src_fma == cytosolID && snk_fma == luminalID) && (textvalue2 == "channel")) {
                 var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
                 linewithlineg[i] = polygong.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -2061,6 +2070,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithlineg[i] = polygong.append("g").append("polygon")
                     .attr("transform", "translate(" + (xvalue - 5) + "," + (yvalue - 30) + ")")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -2183,6 +2198,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
                 circlewithlineg[i] = linegcircle.append("circle")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -2346,6 +2367,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
                 circlewithlineg[i] = linegcircle.append("circle")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -2509,9 +2536,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
                 circlewithlineg[i] = linegcircle.append("circle")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
-                            textvalue, textvalue2, snk_textvalue, snk_textvalue2,
+                            textvalue, textvalue2,
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
@@ -2672,6 +2705,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 var linegcircle = lineg.append("g").data([{x: cxvalue + width, y: cyvalueb}]);
                 circlewithlineg[i] = linegcircle.append("circle")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -2789,7 +2828,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // case 5
-            if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            if ((src_fma == interstitialID && snk_fma == cytosolID) && (textvalue2 == "channel")) {
                 var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
                 linewithlineg[i] = polygong.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -2836,6 +2875,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithlineg[i] = polygong.append("g").append("polygon")
                     .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -2908,7 +2953,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // case 6
-            if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == "channel" && snk_fma2 == "channel")) {
+            if ((src_fma == cytosolID && snk_fma == interstitialID) && (textvalue2 == "channel")) {
                 var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
                 linewithlineg[i] = polygong.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -2955,6 +3000,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithlineg[i] = polygong.append("g").append("polygon")
                     .attr("transform", "translate(" + (xvalue - 5 + width) + "," + (yvalueb - 30) + ")")
                     .attr("id", function (d) {
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
                         return [
                             model_entity, model_entity2,
                             textvalue, textvalue2,
@@ -3072,7 +3123,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .style("top", d3.mouse(this)[1] + 90 + "px");
                 });
 
-            var linetextg = lineg.append("g").data([{x: xpvalue + 20, y: ypvalue}]);
+            var linetextg = lineg.append("g").data([{x: xpvalue + 25, y: ypvalue}]);
             linewithlineg[i] = linetextg.append("line")
                 .attr("id", "linewithlineg" + tempID)
                 .attr("index", tempID)
@@ -3383,6 +3434,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 m.show();
 
                                 showLoading("#modalBody");
+
+                                console.log("circleID in myWelcomeModal: ", $(cthis).prop("id"), $(cthis).prop("model_entity"));
+                                console.log("circleID in myWelcomeModal: ", $(cthis).attr("model_entity"));
 
                                 var circleID = $(cthis).prop("id").split(",");
                                 console.log("circleID in myWelcomeModal: ", circleID);
@@ -4200,7 +4254,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         circleID[10], // solute_chebi
                                         circleID[11], // solute_chebi2
                                         circleID[12], //solute_text
-                                        circleID[12], //solute_text2,
+                                        circleID[13], //solute_text2,
                                         circleID[14], //med_pr_text,
                                         circleID[15] //med_pr_text_syn
                                     ]);
