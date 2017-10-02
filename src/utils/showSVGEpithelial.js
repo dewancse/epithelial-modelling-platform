@@ -1025,6 +1025,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .text(solute_text2);
                 }
 
+                console.log("x,y,i apical: ", linewithtextg[i].attr("x"), linewithtextg[i].attr("y"), i);
+
                 // increment y-axis of line and circle
                 yvalue += ydistance;
                 cyvalue += ydistance;
@@ -2123,6 +2125,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .text(solute_text2);
                 }
 
+                console.log("x,y,i baso: ", linewithtextg[i].attr("x"), linewithtextg[i].attr("y"), i);
+
                 // increment y-axis of line and circle
                 yvalueb += ydistance;
                 cyvalueb += ydistance;
@@ -3074,9 +3078,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                                 showLoading("#modalBody");
 
-                                console.log("circleID in myWelcomeModal: ", $(cthis).prop("id"), $(cthis).prop("model_entity"));
-                                console.log("circleID in myWelcomeModal: ", $(cthis).attr("model_entity"));
-
                                 var circleID = $(cthis).prop("id").split(",");
                                 console.log("circleID in myWelcomeModal: ", circleID);
 
@@ -3757,6 +3758,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             console.log("outside modelbody!");
 
+            reinitVariable();
         })
 
         // return;
@@ -3870,7 +3872,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                         temp_med_pr = jsonObjFlux.results.bindings[1].med_entity_uri.value;
 
                                     var sourcefma2, sinkfma2;
-                                    if (circleID[i] == "") {
+                                    if (circleID[1] == "") {
                                         sourcefma2 = "";
                                         sinkfma2 = "";
                                     }
@@ -4256,13 +4258,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("second save button clicked!");
                 console.log("cthis and $(cthis): ", cthis, $(cthis));
                 console.log("win AFTER save clicked: ", win);
+                console.log("membrane: ", membrane);
+                console.log("combinedMembrane: ", combinedMembrane);
 
                 var tempIndex = 0;
                 var filter = function (membraneID) {
                     var circleID = $(cthis).prop("id").split(",");
-                    for (var i = 0; i < membrane.length; i++) {
-                        console.log("Inside filter: ", membrane[i].model_entity, circleID[0]);
-                        if (membrane[i].model_entity == circleID[0]) {
+                    for (var i = 0; i < combinedMembrane.length; i++) {
+                        console.log("Inside filter: ", combinedMembrane[i].model_entity, circleID[0]);
+                        if (combinedMembrane[i].model_entity == circleID[0]) {
                             // membrane[i].med_fma = membraneID;
                             tempIndex = i;
                             return;
@@ -4351,18 +4355,20 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("circleID: ", circleID);
 
                 // update source, sink, and med fma
-                membrane[tempIndex].model_entity = circleID[0];
+                combinedMembrane[tempIndex].model_entity = circleID[0];
 
                 // For now comment to know previous cellml model entity
                 // membrane[tempIndex].sink_name = circleID[1];
 
-                membrane[tempIndex].variable_text = circleID[2];
-                membrane[tempIndex].sink_text = circleID[4];
-
-                membrane[tempIndex].source_fma = circleID[4];
-                membrane[tempIndex].sink_fma = circleID[5];
-                membrane[tempIndex].med_pr = circleID[9];
-                membrane[tempIndex].med_fma = circleID[8];
+                combinedMembrane[tempIndex].variable_text = circleID[2];
+                combinedMembrane[tempIndex].source_fma = circleID[4];
+                combinedMembrane[tempIndex].sink_fma = circleID[5];
+                combinedMembrane[tempIndex].med_fma = circleID[8];
+                combinedMembrane[tempIndex].med_pr = circleID[9];
+                combinedMembrane[tempIndex].solute_chebi = circleID[10];
+                combinedMembrane[tempIndex].solute_text = circleID[12];
+                combinedMembrane[tempIndex].med_pr_text = circleID[14];
+                combinedMembrane[tempIndex].med_pr_text_syn = circleID[15];
 
                 // TODO: circle placement and rearrangement
                 // TODO: membrane attr changed above, thus it affects here.
@@ -4503,9 +4509,42 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("cthis: ", cthis);
                 console.log("linewithlineg: ", linewithlineg);
                 console.log("linewithtextg: ", linewithtextg);
+                console.log("circlewithlineg: ", circlewithlineg);
+                console.log("size: ", linewithlineg.length, linewithtextg.length, circlewithlineg.length);
+                console.log("size: ", dx1line.length, dy1line.length, dx2line.length, dy2line.length,
+                    dxtext.length, dytext.length, dx.length, dy.length);
 
-                // Don't know why did I write this?
-                linewithtextg[i].text(circleID[2]);
+                var tempCircleIndex = 0;
+                for (var m = 0; m < circlewithlineg.length; m++) {
+                    var cID = circlewithlineg[m].attr("id").split(",")[0];
+                    var tempModelEntity = $(cthis).prop("id").split(",")[0];
+                    console.log("Inside filter cID and tempModelEntity: ", cID, tempModelEntity);
+                    if (cID == tempModelEntity) {
+                        tempCircleIndex = m;
+                        break;
+                    }
+                }
+
+                if ((combinedMembrane[tempIndex].source_fma == interstitialID && combinedMembrane[tempIndex].sink_fma == cytosolID)) {
+                    console.log("linewithlineg[tempCircleIndex].attr(marker-end): ", linewithlineg[tempCircleIndex].attr("marker-end"));
+
+                    if (linewithlineg[tempCircleIndex].attr("marker-end") == "url(#end)") {
+                        // line marker
+                        linewithlineg[tempCircleIndex].attr("marker-end", null);
+                        linewithlineg[tempCircleIndex].attr("marker-start", "url(#start)");
+
+                        // text
+                        dxtext[tempCircleIndex] = dxtext[tempCircleIndex] - 90;
+                        linewithtextg[tempCircleIndex]
+                            .attr("x", dxtext[tempCircleIndex])
+                            .attr("y", dytext[tempCircleIndex])
+                            .text(membrane[tempCircleIndex].solute_text);
+                    }
+                }
+
+                console.log("linewithtextg x,y: ", linewithtextg[tempCircleIndex].attr("x"), linewithtextg[tempCircleIndex].attr("y"), tempIndex);
+                console.log("tempIndex, tempCircleIndex: ", tempIndex, tempCircleIndex);
+                console.log("dxtext,dytext: ", dxtext[tempCircleIndex], dytext[tempCircleIndex]);
 
                 // Reinitialise to store fluxes/models in next iteration
                 reinitVariable();
