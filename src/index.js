@@ -485,7 +485,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                 // console.log("query: ", query);
 
-                // Species
                 sendPostRequest(
                     endpoint,
                     query,
@@ -785,8 +784,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         switchMenuToActive(activeItem, "#listModels");
     };
 
-// TODO: move to utils directory
-// Show selected items in a table
+    // TODO: move to utils directory
+    // Show selected items in a table
     mainUtils.showModel = function (jsonObj) {
 
         // console.log("showModel: ", jsonObj);
@@ -867,7 +866,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-// Toggle table column in Model discovery
+    // Toggle table column in Model discovery
     mainUtils.toggleColHtml = function () {
 
         if (event.target.checked == false) {
@@ -887,7 +886,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-// Toggle table column in Load model
+    // Toggle table column in Load model
     mainUtils.toggleColModelHtml = function () {
 
         if (event.target.checked == false) {
@@ -907,7 +906,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-// Filter search results
+    // Filter search results
     mainUtils.filterSearchHtml = function () {
 
         var tempstr = [];
@@ -964,7 +963,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     };
 
-// TODO: move to utils directory
+    // TODO: move to utils directory
     mainUtils.deleteRowModelHtml = function () {
 
         // Un-check header checkbox if body is empty
@@ -1003,7 +1002,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         // TODO: click when empty loadmodel table!! Fix this!!
     };
 
-// Load the SVG model
+    // Load the SVG model
     mainUtils.loadSVGModelHtml = function () {
 
         sendGetRequest(
@@ -1017,7 +1016,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             false);
     };
 
-// Load the epithelial
+    // Load the epithelial
     mainUtils.loadEpithelialHtml = function () {
 
         sendGetRequest(
@@ -1082,7 +1081,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 query,
                 function (jsonObj) {
 
-                    console.log("jsonObj in makecotransporter: ", jsonObj);
+                    // console.log("jsonObj in makecotransporter: ", jsonObj);
 
                     var tempProtein = [], tempApical = [], tempBasolateral = [];
 
@@ -1119,42 +1118,32 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         return tempBasolateral.indexOf(item) == pos;
                     })
 
-                    console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
+                    // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
 
                     var membraneOBJ = {
                         solute_chebi: membrane1.solute_chebi,
                         solute_text: membrane1.solute_text,
-                        source_name: membrane1.source_name,
-                        sink_name: membrane1.sink_name,
-                        med_text: membrane1.med_text,
+                        model_entity: membrane1.model_entity,
                         med_fma: membrane1.med_fma,
                         med_pr: membrane1.med_pr,
                         med_pr_text: membrane1.med_pr_text,
                         med_pr_text_syn: membrane1.med_pr_text_syn,
-                        source_text: membrane1.source_text,
+                        variable_text: membrane1.variable_text,
                         source_fma: membrane1.source_fma,
-                        sink_text: membrane1.sink_text,
                         sink_fma: membrane1.sink_fma,
                         solute_chebi2: membrane2.solute_chebi,
                         solute_text2: membrane2.solute_text,
-                        source_name2: membrane2.source_name,
-                        sink_name2: membrane2.sink_name,
-                        med_text2: membrane2.med_text,
-                        med_fma2: membrane2.med_fma,
-                        med_pr2: membrane2.med_pr,
-                        med_pr_text2: membrane2.med_pr_text,
-                        med_pr_text_syn2: membrane2.med_pr_text_syn,
-                        source_text2: membrane2.source_text,
+                        model_entity2: membrane2.model_entity,
+                        variable_text2: membrane2.variable_text,
                         source_fma2: membrane2.source_fma,
-                        sink_text2: membrane2.sink_text,
                         sink_fma2: membrane2.sink_fma
                     }
 
-                    console.log("tempprotein: ", tempProtein);
+                    // console.log("tempprotein: ", tempProtein);
 
                     for (var i = 0; i < tempProtein.length; i++) {
 
-                        console.log("tempprotein inside: ", tempProtein);
+                        // console.log("tempprotein inside: ", tempProtein);
 
                         // cotransporter in apical membrane
                         if (tempProtein.length != 0 && tempApical.length != 0) {
@@ -1172,7 +1161,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         membrane1.med_pr == membrane2.med_pr &&
                         membrane1.source_name == membrane2.source_name) {
 
-                        console.log("tempprotein inside same solute: ", tempProtein);
+                        // console.log("tempprotein inside same solute: ", tempProtein);
 
                         apicalMembrane.push(membraneOBJ);
                     }
@@ -1183,25 +1172,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         membrane1.source_name == membrane2.source_name) {
                         basolateralMembrane.push(membraneOBJ);
                     }
-
-                    // TODO: sample object attributes name to make it user-friendly
-                    // TODO: apply this also in the membrane object below
-                    // membrane.push({
-                    //     solute_chebi: solute_chebi[i].fma,
-                    //     solute_text: solutetext,
-                    //     solute_chebi2: solute_chebi2[0].fma,
-                    //     solute_text2: solutetext2,
-                    //     variable_text: srctext,
-                    //     variable_text2: srctext2,
-                    //     source_fma: source_fma[i].fma,
-                    //     source_fma2: source_fma2[i].fma,
-                    //     sink_fma: sink_fma[i].fma,
-                    //     sink_fma2: sink_fma2[i].fma,
-                    //     model_entity: source_fma[i].name,
-                    //     prev_model_entity: sink_fma[i].name,
-                    //     med_fma: med_fma[i].fma,
-                    //     med_pr: med_pr[i].fma
-                    // });
 
                     counter++;
 
@@ -1392,8 +1362,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                 if (source_fma.length == 1) { // transporter (single flux)
 
                                                     var srctext = parserFmaNameText(source_fma[0]), // get this from OLS
-                                                        snktext = parserFmaNameText(sink_fma[0]), // get this from OLS
-                                                        medfmatext = parserFmaNameText(med_fma[0]), // get this from OLS
                                                         temp_med_pr, med_pr_text_syn;
 
                                                     // No mediator protein in NHE3, SGLT models
@@ -1416,13 +1384,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                     membrane.push({
                                                         solute_chebi: solute_chebi[0].fma,
                                                         solute_text: solute_chebi[0].name,
-                                                        source_text: srctext,
+                                                        variable_text: srctext,
                                                         source_fma: source_fma[0].fma,
-                                                        source_name: source_fma[0].name,
-                                                        sink_text: snktext,
+                                                        model_entity: source_fma[0].name,
                                                         sink_fma: sink_fma[0].fma,
-                                                        sink_name: sink_fma[0].name,
-                                                        med_text: medfmatext,
                                                         med_fma: med_fma[0].fma,
                                                         med_pr: temp_med_pr,
                                                         med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
@@ -1458,8 +1423,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                                     for (var i = 0; i < source_fma.length; i++) {
                                                         var srctext = parserFmaNameText(source_fma[i]),
-                                                            snktext = parserFmaNameText(sink_fma[i]),
-                                                            medfmatext, temp_med_pr, med_pr_text_syn;
+                                                            temp_med_pr, med_pr_text_syn;
 
                                                         if (med_pr[i] == undefined)
                                                             temp_med_pr = undefined;
@@ -1476,17 +1440,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                             med_pr_text_syn = tempvar[0].toUpperCase();
                                                         }
 
-                                                        // TODO: change object attributes (see above)
                                                         membrane.push({
                                                             solute_chebi: solute_chebi[0].fma,
                                                             solute_text: solute_chebi[0].name,
-                                                            source_text: srctext,
+                                                            variable_text: srctext,
                                                             source_fma: source_fma[i].fma,
-                                                            source_name: source_fma[i].name,
-                                                            sink_text: snktext,
+                                                            model_entity: source_fma[i].name,
                                                             sink_fma: sink_fma[i].fma,
-                                                            sink_name: sink_fma[i].name,
-                                                            med_text: medfmatext,
                                                             med_fma: med_fma[0].fma,
                                                             med_pr: temp_med_pr,
                                                             med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
@@ -1553,7 +1513,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         mainUtils.srcDescMediatorOfFluxes();
     };
 
-// Expose utility to the global object
+    // Expose utility to the global object
     global.$mainUtils = mainUtils;
 
 })(window);
