@@ -1063,12 +1063,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
                 'SELECT ?med_entity_uri ?med_entity_uriCl ' +
                 'WHERE { GRAPH ?Workspace { ' +
-                '<' + membrane1.source_name + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                '<' + membrane1.model_entity + '> semsim:isComputationalComponentFor ?model_prop. ' +
                 '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
                 '?model_proc semsim:hasMediatorParticipant ?model_medparticipant. ' +
                 '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. ' +
                 '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-                '<' + membrane2.source_name + '> semsim:isComputationalComponentFor ?model_propCl. ' +
+                '<' + membrane2.model_entity + '> semsim:isComputationalComponentFor ?model_propCl. ' +
                 '?model_propCl semsim:physicalPropertyOf ?model_procCl. ' +
                 '?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. ' +
                 '?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. ' +
@@ -1159,7 +1159,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     // same solute cotransporter in apical membrane
                     if (membrane1.med_fma == apicalID && membrane2.med_fma == apicalID &&
                         membrane1.med_pr == membrane2.med_pr &&
-                        membrane1.source_name == membrane2.source_name) {
+                        membrane1.model_entity == membrane2.model_entity) {
 
                         // console.log("tempprotein inside same solute: ", tempProtein);
 
@@ -1169,7 +1169,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     // same solute cotransporter in basolateral membrane
                     if (membrane1.med_fma == basolateralID && membrane2.med_fma == basolateralID &&
                         membrane1.med_pr == membrane2.med_pr &&
-                        membrane1.source_name == membrane2.source_name) {
+                        membrane1.model_entity == membrane2.model_entity) {
                         basolateralMembrane.push(membraneOBJ);
                     }
 
@@ -1188,8 +1188,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                             membrane);
                     }
                 },
-                true
-            );
+                true);
         };
 
         mainUtils.srcDescMediatorOfFluxes = function () {
