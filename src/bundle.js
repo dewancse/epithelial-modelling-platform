@@ -369,6 +369,8 @@ var uniqueifyjsonFlux = __webpack_require__(0).uniqueifyjsonFlux;
 var sendPostRequest = __webpack_require__(1).sendPostRequest;
 var sendGetRequest = __webpack_require__(1).sendGetRequest;
 var showLoading = __webpack_require__(0).showLoading;
+var uniqueifyEpithelial = __webpack_require__(0).uniqueifyEpithelial;
+var parserFmaNameText = __webpack_require__(0).parserFmaNameText;
 
 var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
 
@@ -394,7 +396,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
      * relatedModelID - relatedModel which have #protein
      * */
     var relatedModel = [], relatedModelValue = [], relatedModelID = [], workspaceName = "";
-    var membraneModel = [], membraneModelValue = [], membraneModelID = [], membraneObject = [];
+    var membraneModel = [], membraneModelValue = [], membraneModelID = [];
     var proteinName, proteinText, cellmlModel, biological_meaning, biological_meaning2, speciesName, geneName;
     var idProtein = 0, idAltProtein = 0, idMembrane = 0, loc, typeOfModel, altCellmlModel = "", cthis;
     var icircleGlobal, organIndex, model_entity, model_entity2;
@@ -3997,11 +3999,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
         console.log("relatedMembrane: ", workspaceName, membrane, membraneName);
         console.log("CHEBI: ", $(cthis).prop("id").split(","));
-        // TODO: change arrow and variable name in epithelial platform
+        // TODO: single flux may look for cotranssporters??
+        // TODO: so also give a solute chebi in the first query??
         if ($(cthis).prop("id").split(",")[11] == "") { // single flux
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-                'SELECT ?Model_entity ?med_pr_uri ' +
+                'SELECT ?Model_entity ' +
                 'WHERE { GRAPH ?g { ' +
                 '?entity semsim:hasPhysicalDefinition <' + $(cthis).prop("id").split(",")[10] + '>. ' +
                 '?source semsim:hasPhysicalEntityReference ?entity. ' +
@@ -4011,15 +4014,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 '?process semsim:hasMediatorParticipant ?model_medparticipant.' +
                 '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
                 '?med_entity semsim:hasPhysicalDefinition <' + membrane + '>.' +
-                '?process semsim:hasMediatorParticipant ?model_medparticipant2.' +
-                '?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2.' +
-                '?med_entity2 semsim:hasPhysicalDefinition ?med_pr_uri.' +
                 '}}';
         }
         else { // cotransporter
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-                'SELECT ?Model_entity ?Model_entity2 ?med_pr_uri ?med_pr_uri2 ' +
+                'SELECT ?Model_entity ?Model_entity2 ' +
                 'WHERE { GRAPH ?g { ' +
                 '?entity semsim:hasPhysicalDefinition <' + $(cthis).prop("id").split(",")[10] + '>. ' +
                 '?source semsim:hasPhysicalEntityReference ?entity. ' +
@@ -4029,20 +4029,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 '?process semsim:hasMediatorParticipant ?model_medparticipant.' +
                 '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
                 '?med_entity semsim:hasPhysicalDefinition <' + membrane + '>.' +
-                '?process semsim:hasMediatorParticipant ?model_medparticipant2.' +
-                '?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2.' +
-                '?med_entity2 semsim:hasPhysicalDefinition ?med_pr_uri.' +
                 '?entity2 semsim:hasPhysicalDefinition <' + $(cthis).prop("id").split(",")[11] + '>. ' +
                 '?source2 semsim:hasPhysicalEntityReference ?entity2. ' +
                 '?process2 semsim:hasSourceParticipant ?source2. ' +
                 '?property2 semsim:physicalPropertyOf ?process2. ' +
                 '?Model_entity2 semsim:isComputationalComponentFor ?property2.' +
-                '?process2 semsim:hasMediatorParticipant ?model_medparticipant3.' +
-                '?model_medparticipant3 semsim:hasPhysicalEntityReference ?med_entity3.' +
-                '?med_entity3 semsim:hasPhysicalDefinition <' + membrane + '>.' +
-                '?process2 semsim:hasMediatorParticipant ?model_medparticipant4.' +
-                '?model_medparticipant4 semsim:hasPhysicalEntityReference ?med_entity4.' +
-                '?med_entity4 semsim:hasPhysicalDefinition ?med_pr_uri2.' +
+                '?process2 semsim:hasMediatorParticipant ?model_medparticipant2.' +
+                '?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2.' +
+                '?med_entity2 semsim:hasPhysicalDefinition <' + membrane + '>.' +
                 '}}';
         }
 
@@ -4053,104 +4047,40 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 console.log("jsonRelatedMembrane: ", jsonRelatedMembrane);
 
-                var singleFluxList = [], cotransporterList = [],
-                    singleFluxMedPrList = [], cotransporterMedPrList = [];
+                var fluxList = [], cotransporterList = [];
                 for (var i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
-                    if ($(cthis).prop("id").split(",")[11] != "") { // cotransporter
 
-                        var cellmlmodel = jsonRelatedMembrane.results.bindings[i].Model_entity.value,
-                            indexOfHash = cellmlmodel.search("#"),
-                            cellmlmodel = cellmlmodel.slice(0, indexOfHash);
+                    fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
 
-                        var cellmlmodel2 = jsonRelatedMembrane.results.bindings[i].Model_entity2.value,
-                            indexOfHash2 = cellmlmodel2.search("#"),
-                            cellmlmodel2 = cellmlmodel2.slice(0, indexOfHash2);
-
-                        console.log(cellmlmodel, cellmlmodel2);
-                        if (cellmlmodel == cellmlmodel2) {
-                            cotransporterList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
-                            cotransporterList.push(jsonRelatedMembrane.results.bindings[i].Model_entity2.value);
-                            cotransporterMedPrList.push(jsonRelatedMembrane.results.bindings[i].med_pr_uri.value);
-                            cotransporterMedPrList.push(jsonRelatedMembrane.results.bindings[i].med_pr_uri2.value);
-                        }
-                        else {
-                            singleFluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
-                            singleFluxMedPrList.push(jsonRelatedMembrane.results.bindings[i].med_pr_uri.value);
-                        }
-                    }
-                    else {
-                        singleFluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
-                        singleFluxMedPrList.push(jsonRelatedMembrane.results.bindings[i].med_pr_uri.value);
+                    if ($(cthis).prop("id").split(",")[11] != "") {
+                        fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity2.value);
                     }
                 }
 
-                // redundant elem in single flux from cotansporter
-                for (var i = 0; i < cotransporterList.length; i++) {
-                    for (var j = 0; j < singleFluxList.length; j++) {
-                        if (cotransporterList[i] == singleFluxList[j])
-                            singleFluxList.splice(j, 1);
-                    }
-                }
-
-                for (var i = 0; i < cotransporterList.length; i++) {
-                    var cellmlmodel = cotransporterList[i],
+                fluxList = uniqueify(fluxList);
+                for (var i = 0; i < fluxList.length; i++) {
+                    var cellmlmodel = fluxList[i],
                         indexOfHash = cellmlmodel.search("#"),
                         name = cellmlmodel.slice(0, indexOfHash),
                         compvartext = cellmlmodel.slice(indexOfHash + 1),
                         indexOfdot = compvartext.indexOf("."),
                         text = compvartext.slice(indexOfdot + 1);
 
-                    for (var j = i + 1; j < cotransporterList.length; j++) {
-                        var cellmlmodel2 = cotransporterList[j],
+                    for (var j = i + 1; j < fluxList.length; j++) {
+                        var cellmlmodel2 = fluxList[j],
                             indexOfHash2 = cellmlmodel2.search("#"),
                             name2 = cellmlmodel2.slice(0, indexOfHash2),
                             compvartext2 = cellmlmodel2.slice(indexOfHash2 + 1),
                             indexOfdot2 = compvartext2.indexOf("."),
                             text2 = compvartext2.slice(indexOfdot2 + 1);
 
-                        console.log(indexOfdot2, name2, compvartext2, text2);
-
                         if (name == name2 && text == text2) {
-                            cotransporterList.splice(j, 1);
+                            fluxList.splice(j, 1);
                             break;
                         }
                     }
                 }
-
-                for (var i = 0; i < singleFluxList.length; i++) {
-                    var cellmlmodel = singleFluxList[i],
-                        indexOfHash = cellmlmodel.search("#"),
-                        name = cellmlmodel.slice(0, indexOfHash),
-                        compvartext = cellmlmodel.slice(indexOfHash + 1),
-                        indexOfdot = compvartext.indexOf("."),
-                        text = compvartext.slice(indexOfdot + 1);
-
-                    for (var j = i + 1; j < singleFluxList.length; j++) {
-                        var cellmlmodel2 = singleFluxList[j],
-                            indexOfHash2 = cellmlmodel2.search("#"),
-                            name2 = cellmlmodel2.slice(0, indexOfHash2),
-                            compvartext2 = cellmlmodel2.slice(indexOfHash2 + 1),
-                            indexOfdot2 = compvartext2.indexOf("."),
-                            text2 = compvartext2.slice(indexOfdot2 + 1);
-
-                        console.log(indexOfdot2, name2, compvartext2, text2);
-
-                        if (name == name2 && text == text2) {
-                            singleFluxList.splice(j, 1);
-                            break;
-                        }
-                    }
-                }
-
-                cotransporterList = uniqueify(cotransporterList);
-                cotransporterMedPrList = uniqueify(cotransporterMedPrList);
-                singleFluxList = uniqueify(singleFluxList);
-                singleFluxMedPrList = uniqueify(singleFluxMedPrList);
-
-                console.log("cotransporterList: ", cotransporterList);
-                console.log("cotransporterMedPrList: ", cotransporterMedPrList);
-                console.log("singleFluxList: ", singleFluxList);
-                console.log("singleFluxMedPrList: ", singleFluxMedPrList);
+                console.log("fluxList: ", fluxList);
 
                 var counter = 0;
                 // Utility to calculate number of iterations
@@ -4164,7 +4094,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 }
 
                 var validatecotransporter = function (membrane1, membrane2) {
-                    // query to find fluxes in order to make a cotransporter
                     var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                         'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
                         'SELECT ?med_entity_uri ?med_entity_uriCl ' +
@@ -4188,25 +4117,17 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         function (jsonObj) {
 
                             // console.log("jsonObj in makecotransporter: ", jsonObj);
-
-                            var tempProtein = [], tempApical = [], tempBasolateral = [];
-
-                            // loop to iterate over med_fma and med_pr in jsonObj
+                            var tempProtein = [], tempFMA = [];
                             for (var m = 0; m < jsonObj.results.bindings.length; m++) {
                                 var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
-                                var tmpApi = jsonObj.results.bindings[m].med_entity_uri.value;
-                                var tmpBas = jsonObj.results.bindings[m].med_entity_uri.value;
+                                var tmpFMA = jsonObj.results.bindings[m].med_entity_uri.value;
 
                                 if (tmpPro.indexOf("http://purl.obolibrary.org/obo/PR_") != -1) {
                                     tempProtein.push(jsonObj.results.bindings[m].med_entity_uri.value);
                                 }
 
-                                if (tmpApi.indexOf(apicalID) != -1) {
-                                    tempApical.push(jsonObj.results.bindings[m].med_entity_uri.value);
-                                }
-
-                                if (tmpBas.indexOf(basolateralID) != -1) {
-                                    tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                                if (tmpFMA.indexOf("http://identifiers.org/fma/FMA:") != -1) {
+                                    tempFMA.push(jsonObj.results.bindings[m].med_entity_uri.value);
                                 }
                             }
 
@@ -4215,46 +4136,39 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             tempProtein = tempProtein.filter(function (item, pos) {
                                 return tempProtein.indexOf(item) == pos;
                             })
-
-                            tempApical = tempApical.filter(function (item, pos) {
+                            tempFMA = tempFMA.filter(function (item, pos) {
                                 return tempApical.indexOf(item) == pos;
                             })
 
-                            tempBasolateral = tempBasolateral.filter(function (item, pos) {
-                                return tempBasolateral.indexOf(item) == pos;
-                            })
-
-                            // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
+                            console.log("temp protein, and fma: ", tempProtein, tempFMA);
 
                             for (var i = 0; i < tempProtein.length; i++) {
-
                                 // cotransporter
-                                if (tempProtein.length != 0 && tempApical.length != 0) {
+                                if (tempProtein.length != 0 && tempFMA.length != 0) {
                                     membraneModel.push({
                                         "model_entity": membrane1.model_entity,
                                         "model_entity2": membrane2.model_entity
                                     });
                                 }
 
-                                // cotransporter
-                                if (tempProtein.length != 0 && tempBasolateral.length != 0) {
-                                    membraneModel.push({
-                                        "model_entity": membrane1.model_entity,
-                                        "model_entity2": membrane2.model_entity
-                                    });
-                                }
+                                cotransporterList.push(membrane1.model_entity);
+                                cotransporterList.push(membrane2.model_entity);
+
+                                // delete
+                                fluxList.splice(fluxList.indexOf(membrane1.model_entity), 1);
+                                fluxList.splice(fluxList.indexOf(membrane2.model_entity), 1);
                             }
 
                             counter++;
-                            if (counter == iteration(cotransporterList.length)) {
-
-                                for (var i = 0; i < singleFluxList.length; i++) {
+                            if (counter == iteration(fluxList.length)) {
+                                for (var i = 0; i < fluxList.length; i++) {
                                     membraneModel.push({
-                                        "model_entity": singleFluxList[i],
+                                        "model_entity": fluxList[i],
                                         "model_entity2": ""
                                     });
                                 }
 
+                                console.log("fluxList: ", fluxList);
                                 console.log("membraneModel: ", membraneModel);
 
                                 relatedMembraneModel(workspaceName, membraneName, cotransporterList);
@@ -4263,9 +4177,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         true);
                 };
 
-                for (var i = 0; i < cotransporterList.length; i++) {
-                    for (var j = i + 1; j < cotransporterList.length; j++) {
-                        validatecotransporter(cotransporterList[i], cotransporterList[j]);
+                for (var i = 0; i < fluxList.length; i++) {
+                    for (var j = i + 1; j < fluxList.length; j++) {
+                        validatecotransporter(fluxList[i], fluxList[j]);
                     }
                 }
             },
@@ -4409,22 +4323,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         // return;
     }
 
-    var relatedMembraneModel = function (workspaceName, membraneName, cotransporterList) {
+    var source_fma = [], sink_fma = [], med_fma = [], med_pr = [], solute_chebi = [];
+    var source_fma2 = [], sink_fma2 = [], solute_chebi2 = [];
 
-        // var tempmembraneModel;
-        // if (membraneModel.length == 0)
-        //     tempmembraneModel = undefined;
-        // else {
-        //     if (membraneModel[idMembrane] != undefined) {
-        //         var indexOfHash = membraneModel[idMembrane].search("#");
-        //         tempmembraneModel = membraneModel[idMembrane].slice(0, indexOfHash);
-        //     }
-        //
-        //     var indexOfcellml = tempmembraneModel.search(".cellml");
-        //     var modelname = tempmembraneModel.slice(0, indexOfcellml);
-        //
-        //     tempmembraneModel = tempmembraneModel + "#" + modelname;
-        // }
+    var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
+    var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
+
+    var relatedMembraneModel = function (workspaceName, membraneName, cotransporterList) {
 
         var tempmembraneModel;
         if (membraneModel.length == 0)
@@ -4469,24 +4374,61 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     endpointprOLS,
                     function (jsonPr) {
 
-                        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                            'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                            'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
-                            'WHERE { ' +
-                            '<' + membraneModel[idMembrane].model_entity + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                            '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-                            '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-                            '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-                            '?source_entity ro:part_of ?source_part_of_entity. ' +
-                            '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-                            '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-                            '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-                            '?sink_entity ro:part_of ?sink_part_of_entity. ' +
-                            '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
-                            '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
-                            '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
-                            '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-                            '}'
+                        if (membraneModel[idMembrane].model_entity2 == "") {
+                            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                                'SELECT ?source_fma ?sink_fma ?med_entity_uri ' +
+                                'WHERE { ' +
+                                '<' + membraneModel[idMembrane].model_entity + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+                                '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
+                                '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
+                                '?source_entity ro:part_of ?source_part_of_entity. ' +
+                                '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
+                                '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
+                                '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
+                                '?sink_entity ro:part_of ?sink_part_of_entity. ' +
+                                '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
+                                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
+                                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
+                                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
+                                '}'
+                        }
+                        else {
+                            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
+                                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
+                                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?source_fma2 ?sink_fma2 ?med_entity_uri2 ?solute_chebi2 ' +
+                                'WHERE { ' +
+                                '<' + membraneModel[idMembrane].model_entity + '> semsim:isComputationalComponentFor ?model_prop. ' +
+                                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
+                                '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
+                                '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
+                                '?source_entity ro:part_of ?source_part_of_entity. ' +
+                                '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
+                                '?source_entity semsim:hasPhysicalDefinition ?solute_chebi. ' +
+                                '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
+                                '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
+                                '?sink_entity ro:part_of ?sink_part_of_entity. ' +
+                                '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
+                                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
+                                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
+                                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
+                                '<' + membraneModel[idMembrane].model_entity2 + '> semsim:isComputationalComponentFor ?model_prop2. ' +
+                                '?model_prop2 semsim:physicalPropertyOf ?model_proc2. ' +
+                                '?model_proc2 semsim:hasSourceParticipant ?model_srcparticipant2. ' +
+                                '?model_srcparticipant2 semsim:hasPhysicalEntityReference ?source_entity2. ' +
+                                '?source_entity2 ro:part_of ?source_part_of_entity2. ' +
+                                '?source_part_of_entity2 semsim:hasPhysicalDefinition ?source_fma2. ' +
+                                '?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi2. ' +
+                                '?model_proc2 semsim:hasSinkParticipant ?model_sinkparticipant2. ' +
+                                '?model_sinkparticipant2 semsim:hasPhysicalEntityReference ?sink_entity2. ' +
+                                '?sink_entity2 ro:part_of ?sink_part_of_entity2. ' +
+                                '?sink_part_of_entity2 semsim:hasPhysicalDefinition ?sink_fma2.' +
+                                '?model_proc2 semsim:hasMediatorParticipant ?model_medparticipant2.' +
+                                '?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2.' +
+                                '?med_entity2 semsim:hasPhysicalDefinition ?med_entity_uri2.' +
+                                '}'
+                        }
 
                         sendPostRequest(
                             endpoint,
@@ -4494,121 +4436,270 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             function (jsonObjFlux) {
                                 console.log("jsonObjFlux: ", jsonObjFlux);
 
-                                if (jsonRelatedMembraneModel.results.bindings.length != 0) {
+                                var endpointOLS;
+                                if (jsonObjFlux.results.bindings[0].solute_chebi == undefined) {
+                                    endpointOLS = undefined;
+                                }
+                                else {
+                                    var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
+                                    var indexofColon = chebi_uri.indexOf('CHEBI:');
+                                    chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
+                                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                }
 
-                                    membraneModelValue.push({
-                                        protein: jsonRelatedMembraneModel.results.bindings[0].Protein.value,
-                                        prname: jsonPr._embedded.terms[0].label,
-                                        // uri1 is the dragged circle
-                                        uri1: combinedMembrane[0].med_pr,
-                                        medfma: combinedMembrane[0].med_fma,
-                                        similar: 0 // initial percent
-                                    });
-                                    // membraneModeID.push(membraneModel[idMembrane]);
+                                sendGetRequest(
+                                    endpointOLS,
+                                    function (jsonObjOLSChebi) {
 
-                                    membraneObject.push({
-                                        source_fma: jsonObjFlux.results.bindings[0].source_fma.value,
-                                        sink_fma: jsonObjFlux.results.bindings[0].sink_fma.value,
-                                        med_fma: jsonObjFlux.results.bindings[0].med_entity_uri.value
-                                    });
-
-                                    var circleID = $(cthis).prop("id").split(",");
-                                    var indexOfHash = membraneModel[idMembrane].model_entity.search("#"),
-                                        variabletext = membraneModel[idMembrane].model_entity.slice(indexOfHash + 1),
-                                        indexOfdot = variabletext.indexOf('.');
-
-                                    variabletext = variabletext.slice(indexOfdot + 1);
-
-                                    var tempjsonObjFlux = uniqueifyjsonFlux(jsonObjFlux.results.bindings);
-
-                                    console.log("tempjsonObjFlux: ", tempjsonObjFlux);
-                                    console.log("circleID: ", circleID);
-
-                                    var sourcefma2, sinkfma2, modelentity2, variabletext2, solutechebi2, solutetext2;
-                                    if (tempjsonObjFlux.length == 1) {
-                                        sourcefma2 = "";
-                                        sinkfma2 = "";
-                                        modelentity2 = "";
-                                        variabletext2 = circleID[3];
-                                        solutechebi2 = "";
-                                        solutetext2 = "";
-                                    }
-                                    else {
-
-                                        // same solute - J_Na in mackenzie model
-                                        if (membraneModel[idMembrane].model_entity == membraneModel[idMembrane].model_entity2) {
-                                            sourcefma2 = tempjsonObjFlux[1].source_fma.value;
-                                            sinkfma2 = tempjsonObjFlux[1].sink_fma.value;
-                                            modelentity2 = membraneModel[idMembrane].model_entity2;
-                                            variabletext2 = variabletext;
-                                            solutechebi2 = circleID[10];
-                                            solutetext2 = circleID[12];
+                                        var endpointOLS2;
+                                        if (jsonObjFlux.results.bindings[0].solute_chebi2 == undefined) {
+                                            endpointOLS2 = undefined;
                                         }
                                         else {
-                                            sourcefma2 = tempjsonObjFlux[1].source_fma.value;
-                                            sinkfma2 = tempjsonObjFlux[1].sink_fma.value;
+                                            var chebi_uri2 = jsonObjFlux.results.bindings[0].solute_chebi2.value;
+                                            var indexofColon2 = chebi_uri2.indexOf('CHEBI:');
+                                            chebi_uri2 = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri2.slice(indexofColon2 + 6);
+
+                                            endpointOLS2 = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri2;
                                         }
-                                    }
 
-                                    var tempvar, med_pr_text_syn;
-                                    if (jsonPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
-                                        med_pr_text_syn = jsonPr._embedded.terms[0].annotation["id"][0].slice(3);
-                                    }
-                                    else {
-                                        tempvar = jsonPr._embedded.terms[0].annotation["has_related_synonym"];
-                                        med_pr_text_syn = tempvar[0].toUpperCase();
-                                    }
+                                        sendGetRequest(
+                                            endpointOLS2,
+                                            function (jsonObjOLSChebi2) {
 
-                                    // TODO: solute_text2
-                                    // var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
-                                    //     solute_chebi_name;
-                                    // for (var m = 0; m < temparr.length; m++) {
-                                    //     if (temparr[m].slice(-1) == '+' || temparr[m].slice(-1) == '-') {
-                                    //         solute_chebi_name = temparr[m];
-                                    //         break;
-                                    //     }
-                                    // }
+                                                for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
+                                                    // solute chebi
+                                                    var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
+                                                        solute_chebi_name;
+                                                    for (var m = 0; m < temparr.length; m++) {
+                                                        if (temparr[m].slice(-1) == '+' || temparr[m].slice(-1) == '-') {
+                                                            solute_chebi_name = temparr[m];
+                                                            break;
+                                                        }
+                                                    }
 
-                                    membraneModelID.push([
-                                        membraneModel[idMembrane].model_entity, // model_entity
-                                        modelentity2, // model_entity2
-                                        variabletext, // variable_text
-                                        variabletext2, // variable_text2
-                                        tempjsonObjFlux[0].source_fma.value,
-                                        tempjsonObjFlux[0].sink_fma.value,
-                                        sourcefma2,
-                                        sinkfma2,
-                                        jsonObjFlux.results.bindings[0].med_entity_uri.value, // med_fma
-                                        jsonRelatedMembraneModel.results.bindings[0].Protein.value, // med_pr
-                                        circleID[10], // solute_chebi
-                                        solutechebi2, // solute_chebi2
-                                        circleID[12], //solute_text
-                                        solutetext2, //solute_text2
-                                        jsonPr._embedded.terms[0].label, //med_pr_text,
-                                        med_pr_text_syn //med_pr_text_syn
-                                    ]);
-                                }
+                                                    if (jsonObjFlux.results.bindings[i].solute_chebi == undefined)
+                                                        solute_chebi.push("");
+                                                    else
+                                                        solute_chebi.push(
+                                                            {
+                                                                name: solute_chebi_name,
+                                                                uri: jsonObjFlux.results.bindings[i].solute_chebi.value
+                                                            }
+                                                        );
 
-                                // console.log("membraneObject: ", membraneObject);
-                                // console.log("idMembrane: ", idMembrane);
-                                // console.log("membraneModel.length: ", membraneModel.length);
-                                console.log("membraneModelID: ", membraneModelID);
+                                                    // solute chebi 2
+                                                    var temparr2 = jsonObjOLSChebi2._embedded.terms[0].annotation["has_related_synonym"],
+                                                        solute_chebi_name2;
+                                                    for (var m = 0; m < temparr2.length; m++) {
+                                                        if (temparr2[m].slice(-1) == '+' || temparr2[m].slice(-1) == '-') {
+                                                            solute_chebi_name2 = temparr2[m];
+                                                            break;
+                                                        }
+                                                    }
 
-                                if (membraneModel[idMembrane].model_entity != undefined)
-                                    idMembrane++;
+                                                    if (jsonObjFlux.results.bindings[i].solute_chebi2 == undefined)
+                                                        solute_chebi2.push("");
+                                                    else
+                                                        solute_chebi2.push(
+                                                            {
+                                                                name: solute_chebi_name2,
+                                                                uri: jsonObjFlux.results.bindings[i].solute_chebi2.value
+                                                            }
+                                                        );
 
-                                if (idMembrane == membraneModel.length) {
-                                    showModalWindow(workspaceName, membraneName);
-                                    return;
-                                }
+                                                    // source fma
+                                                    if (jsonObjFlux.results.bindings[i].source_fma == undefined)
+                                                        source_fma.push("");
+                                                    else
+                                                        source_fma.push({fma: jsonObjFlux.results.bindings[i].source_fma.value});
 
-                                relatedMembraneModel(workspaceName, membraneName, cotransporterList);
+                                                    // source fma 2
+                                                    if (jsonObjFlux.results.bindings[i].source_fma2 == undefined)
+                                                        source_fma2.push("");
+                                                    else
+                                                        source_fma2.push({fma2: jsonObjFlux.results.bindings[i].source_fma2.value});
 
+                                                    // sink fma
+                                                    if (jsonObjFlux.results.bindings[i].sink_fma == undefined)
+                                                        sink_fma.push("");
+                                                    else
+                                                        sink_fma.push({fma: jsonObjFlux.results.bindings[i].sink_fma.value});
+
+                                                    // sink fma 2
+                                                    if (jsonObjFlux.results.bindings[i].sink_fma2 == undefined)
+                                                        sink_fma2.push("");
+                                                    else
+                                                        sink_fma2.push({fma2: jsonObjFlux.results.bindings[i].sink_fma2.value});
+
+                                                    // med pr and fma
+                                                    if (jsonObjFlux.results.bindings[i].med_entity_uri == undefined) {
+                                                        med_pr.push("");
+                                                        med_fma.push("");
+                                                    }
+                                                    else {
+                                                        var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
+                                                        if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
+                                                            med_pr.push({
+                                                                // name of med_pr from OLS
+                                                                med_pr: jsonObjFlux.results.bindings[i].med_entity_uri.value
+                                                            });
+                                                        }
+                                                        else {
+                                                            med_fma.push({med_fma: jsonObjFlux.results.bindings[i].med_entity_uri.value});
+                                                        }
+                                                    }
+                                                }
+
+                                                // remove duplicate fma
+                                                solute_chebi = uniqueifyEpithelial(solute_chebi);
+                                                solute_chebi2 = uniqueifyEpithelial(solute_chebi2);
+                                                source_fma = uniqueifyEpithelial(source_fma);
+                                                sink_fma = uniqueifyEpithelial(sink_fma);
+                                                source_fma2 = uniqueifyEpithelial(source_fma2);
+                                                sink_fma2 = uniqueifyEpithelial(sink_fma2);
+                                                med_pr = uniqueifyEpithelial(med_pr);
+                                                med_fma = uniqueifyEpithelial(med_fma);
+
+                                                if (jsonRelatedMembraneModel.results.bindings.length != 0) {
+
+                                                    membraneModelValue.push({
+                                                        protein: jsonRelatedMembraneModel.results.bindings[0].Protein.value,
+                                                        prname: jsonPr._embedded.terms[0].label,
+                                                        // uri1 is the dragged circle
+                                                        uri1: combinedMembrane[0].med_pr,
+                                                        medfma: combinedMembrane[0].med_fma,
+                                                        similar: 0 // initial percent
+                                                    });
+                                                    // membraneModeID.push(membraneModel[idMembrane]);
+
+                                                    if (membraneModel[idMembrane].model_entity2 == "") {
+                                                        var circleID = $(cthis).prop("id").split(",");
+                                                        var indexOfHash = membraneModel[idMembrane].model_entity.search("#"),
+                                                            variabletext = membraneModel[idMembrane].model_entity.slice(indexOfHash + 1),
+                                                            indexOfdot = variabletext.indexOf('.');
+
+                                                        variabletext = variabletext.slice(indexOfdot + 1);
+
+                                                        var tempjsonObjFlux = uniqueifyjsonFlux(jsonObjFlux.results.bindings);
+
+                                                        console.log("tempjsonObjFlux: ", tempjsonObjFlux);
+                                                        console.log("circleID: ", circleID);
+
+                                                        var sourcefma2, sinkfma2, modelentity2, variabletext2,
+                                                            sourcefma, sinkfma, solutechebi2, solutetext2,
+                                                            solutechebi, solutetext;
+                                                        if (tempjsonObjFlux.length == 1) {
+                                                            modelentity2 = "";
+                                                            sourcefma = tempjsonObjFlux[0].source_fma.value;
+                                                            sinkfma = tempjsonObjFlux[0].sink_fma.value;
+                                                            sourcefma2 = "";
+                                                            sinkfma2 = "";
+                                                            variabletext2 = circleID[3];
+                                                            solutechebi = circleID[10];
+                                                            solutetext = circleID[12];
+                                                            solutechebi2 = "";
+                                                            solutetext2 = "";
+                                                        }
+                                                        else {
+                                                            // same solute - J_Na in mackenzie model
+                                                            if (tempjsonObjFlux.length == 2 && membraneModel[idMembrane].model_entity2 == "") {
+                                                                modelentity2 = membraneModel[idMembrane].model_entity;
+                                                                sourcefma = tempjsonObjFlux[0].source_fma.value;
+                                                                sinkfma = tempjsonObjFlux[0].sink_fma.value;
+                                                                sourcefma2 = tempjsonObjFlux[1].source_fma.value;
+                                                                sinkfma2 = tempjsonObjFlux[1].sink_fma.value;
+                                                                variabletext2 = variabletext;
+                                                                solutechebi = circleID[10];
+                                                                solutetext = circleID[12];
+                                                                solutechebi2 = circleID[10];
+                                                                solutetext2 = circleID[12];
+                                                            }
+                                                        }
+                                                    }
+                                                    else {
+                                                        // sourcefma2 = tempjsonObjFlux[1].source_fma.value;
+                                                        // sinkfma2 = tempjsonObjFlux[1].sink_fma.value;
+
+                                                        console.log("solute_chebi: ", solute_chebi);
+                                                        console.log("solute_chebi2: ", solute_chebi2);
+                                                        console.log("source_fma: ", source_fma);
+                                                        console.log("sink_fma: ", sink_fma);
+                                                        console.log("source_fma2: ", source_fma2);
+                                                        console.log("sink_fma2: ", sink_fma2);
+                                                        console.log("med_pr: ", med_pr);
+                                                        console.log("med_fma: ", med_fma);
+
+                                                        modelentity2 = membraneModel[idMembrane].model_entity2;
+                                                        sourcefma = source_fma[0].fma;
+                                                        sinkfma = sink_fma[0].fma;
+                                                        sourcefma2 = source_fma2[0].fma;
+                                                        sinkfma2 = sink_fma2[0].fma;
+                                                        variabletext = parserFmaNameText(source_fma[0]);
+                                                        variabletext2 = parserFmaNameText(source_fma2[0]);
+                                                        solutechebi = solute_chebi[0].uri;
+                                                        solutetext = solute_chebi[0].name;
+                                                        solutechebi2 = solute_chebi2[0].uri;
+                                                        solutetext2 = solute_chebi2[0].name;
+                                                    }
+                                                }
+
+                                                var tempvar, med_pr_text_syn;
+                                                if (jsonPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
+                                                    med_pr_text_syn = jsonPr._embedded.terms[0].annotation["id"][0].slice(3);
+                                                }
+                                                else {
+                                                    tempvar = jsonPr._embedded.terms[0].annotation["has_related_synonym"];
+                                                    med_pr_text_syn = tempvar[0].toUpperCase();
+                                                }
+
+                                                membraneModelID.push([
+                                                    membraneModel[idMembrane].model_entity, // model_entity
+                                                    modelentity2, // model_entity2
+                                                    variabletext, // variable_text
+                                                    variabletext2, // variable_text2
+                                                    sourcefma,
+                                                    sinkfma,
+                                                    sourcefma2,
+                                                    sinkfma2,
+                                                    jsonObjFlux.results.bindings[0].med_entity_uri.value, // med_fma
+                                                    jsonRelatedMembraneModel.results.bindings[0].Protein.value, // med_pr
+                                                    solutechebi, // solute_chebi
+                                                    solutechebi2, // solute_chebi2
+                                                    solutetext, //solute_text
+                                                    solutetext2, //solute_text2
+                                                    jsonPr._embedded.terms[0].label, //med_pr_text,
+                                                    med_pr_text_syn //med_pr_text_syn
+                                                ]);
+
+                                                solute_chebi = [];
+                                                solute_chebi2 = [];
+                                                source_fma = [];
+                                                sink_fma = [];
+                                                source_fma2 = [];
+                                                sink_fma2 = [];
+                                                med_pr = [];
+                                                med_fma = [];
+
+                                                // console.log("idMembrane: ", idMembrane);
+                                                // console.log("membraneModel.length: ", membraneModel.length);
+                                                console.log("membraneModelID: ", membraneModelID);
+
+                                                if (membraneModel[idMembrane].model_entity != undefined)
+                                                    idMembrane++;
+
+                                                if (idMembrane == membraneModel.length) {
+                                                    showModalWindow(workspaceName, membraneName);
+                                                    return;
+                                                }
+
+                                                relatedMembraneModel(workspaceName, membraneName, cotransporterList);
+
+                                            }, true);
+                                    }, true);
                             }, true);
-                    },
-                    true);
-            },
-            true);
+                    }, true);
+            }, true);
     }
 
     // utility function
@@ -4662,23 +4753,27 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
 
         if (linewithlineg2[icircleGlobal] != undefined) {
-            linewithlineg2[icircleGlobal]
-                .transition()
-                .delay(1000)
-                .duration(1000)
-                .attr("x1", dx1line2[icircleGlobal])
-                .attr("y1", dy1line2[icircleGlobal])
-                .attr("x2", dx2line2[icircleGlobal])
-                .attr("y2", dy2line2[icircleGlobal]);
+            if (linewithlineg2[icircleGlobal] != "") {
+                linewithlineg2[icircleGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x1", dx1line2[icircleGlobal])
+                    .attr("y1", dy1line2[icircleGlobal])
+                    .attr("x2", dx2line2[icircleGlobal])
+                    .attr("y2", dy2line2[icircleGlobal]);
+            }
         }
 
         if (linewithtextg2[icircleGlobal] != undefined) {
-            linewithtextg2[icircleGlobal]
-                .transition()
-                .delay(1000)
-                .duration(1000)
-                .attr("x", dxtext2[icircleGlobal])
-                .attr("y", dytext2[icircleGlobal]);
+            if (linewithtextg2[icircleGlobal] != "") {
+                linewithtextg2[icircleGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x", dxtext2[icircleGlobal])
+                    .attr("y", dytext2[icircleGlobal]);
+            }
         }
     }
 
@@ -4880,7 +4975,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         workspaceName = "";
         membraneModel = [];
         membraneModelID = [];
-        membraneObject = [];
     }
 
     var Modal = function (options) {
@@ -5693,7 +5787,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         $this.setHeader($this.options.header);
     }
 
-    // build the start arrow.
+// build the start arrow.
     svg.append("svg:defs")
         .selectAll("marker")
         .data(["start"])      // Different link/path types can be defined here
@@ -5708,7 +5802,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-    // build the starttop arrow.
+// build the starttop arrow.
     svg.append("svg:defs")
         .selectAll("marker")
         .data(["starttop"])      // Different link/path types can be defined here
@@ -5723,7 +5817,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-    // build the end arrow.
+// build the end arrow.
     svg.append("svg:defs").selectAll("marker")
         .data(["end"])      // Different link/path types can be defined here
         .enter().append("svg:marker")    // This section adds in the arrows
@@ -5737,7 +5831,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-    // Utility for marker direction
+// Utility for marker direction
     function markerDir(selection) {
         console.log("selection: ", selection);
 
