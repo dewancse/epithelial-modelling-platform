@@ -403,7 +403,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var line = [], mindex;
 
-    var dx = [], dy = [],
+    var dx = [], dy = [], dxcircletext = [], dycircletext = [],
         dxtext = [], dytext = [], dxtext2 = [], dytext2 = [],
         dx1line = [], dy1line = [], dx2line = [], dy2line = [],
         dx1line2 = [], dy1line2 = [], dx2line2 = [], dy2line2 = [];
@@ -567,7 +567,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             membrane[i].solute_chebi2 = "";
             membrane[i].solute_text2 = "";
-            membrane[i].variable_text2 = "";
+            membrane[i].variable_text2 = "channel";
             membrane[i].source_fma2 = "";
             membrane[i].sink_fma2 = "";
         }
@@ -1160,9 +1160,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         return checkBox;
     }
 
-    // var div = d3.select("#svgVisualize").append("div")
-    //     .attr("class", "tooltip")
-    //     .style("opacity", 0);
+    var div = d3.select("#svgVisualize").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
     var state = 0;
     $(document).on({
@@ -1347,11 +1347,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = linegcircle.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dx[i] = d.x;
+                        dxcircletext[i] = d.x - 15;
                         return d.x - 15;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y;
+                        dycircletext[i] = d.y + 23;
                         return d.y + 23;
                     })
                     .attr("font-size", "12px")
@@ -1527,11 +1527,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = linegcircle.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dx[i] = d.x;
+                        dxcircletext[i] = d.x - 15;
                         return d.x - 15;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y;
+                        dycircletext[i] = d.y + 23;
                         return d.y + 23;
                     })
                     .attr("font-size", "12px")
@@ -1707,11 +1707,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = linegcircle.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dx[i] = d.x;
+                        dxcircletext[i] = d.x - 15;
                         return d.x - 15;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y;
+                        dycircletext[i] = d.y + 23;
                         return d.y + 23;
                     })
                     .attr("font-size", "12px")
@@ -1887,11 +1887,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = linegcircle.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dx[i] = d.x;
+                        dxcircletext[i] = d.x - 15;
                         return d.x - 15;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y;
+                        dycircletext[i] = d.y + 23;
                         return d.y + 23;
                     })
                     .attr("font-size", "12px")
@@ -2070,17 +2070,26 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = polygontext.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dxtext[i] = d.x;
+                        dxcircletext[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
-                        dytext[i] = d.y;
+                        dycircletext[i] = d.y;
                         return d.y;
                     })
                     .attr("font-size", "10px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
                     .text(mediator_pr_text_syn);
+
+                linewithlineg2[i] = "";
+                linewithtextg2[i] = "";
+                dx1line2[i] = "";
+                dy1line2[i] = "";
+                dx2line2[i] = "";
+                dy2line2[i] = "";
+                dxtext2[i] = "";
+                dytext2[i] = "";
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -2195,17 +2204,26 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = polygontext.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dxtext[i] = d.x;
+                        dxcircletext[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
-                        dytext[i] = d.y;
+                        dycircletext[i] = d.y;
                         return d.y;
                     })
                     .attr("font-size", "10px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
                     .text(mediator_pr_text_syn);
+
+                linewithlineg2[i] = "";
+                linewithtextg2[i] = "";
+                dx1line2[i] = "";
+                dy1line2[i] = "";
+                dx2line2[i] = "";
+                dy2line2[i] = "";
+                dxtext2[i] = "";
+                dytext2[i] = "";
 
                 // increment y-axis of line and circle
                 yvalue += ydistance;
@@ -2320,11 +2338,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = linegcircle.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dx[i] = d.x;
+                        dxcircletext[i] = d.x - 15;
                         return d.x - 15;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y;
+                        dycircletext[i] = d.y + 23;
                         return d.y + 23;
                     })
                     .attr("font-size", "12px")
@@ -2500,11 +2518,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = linegcircle.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dx[i] = d.x;
+                        dxcircletext[i] = d.x - 15;
                         return d.x - 15;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y;
+                        dycircletext[i] = d.y + 23;
                         return d.y + 23;
                     })
                     .attr("font-size", "12px")
@@ -2680,11 +2698,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = linegcircle.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dx[i] = d.x;
+                        dxcircletext[i] = d.x - 15;
                         return d.x - 15;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y;
+                        dycircletext[i] = d.y + 23;
                         return d.y + 23;
                     })
                     .attr("font-size", "12px")
@@ -2860,11 +2878,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = linegcircle.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dx[i] = d.x;
+                        dxcircletext[i] = d.x - 15;
                         return d.x - 15;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y;
+                        dycircletext[i] = d.y + 23;
                         return d.y + 23;
                     })
                     .attr("font-size", "12px")
@@ -3043,17 +3061,26 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 circlewithtext[i] = polygontext.append("text")
                     .attr("id", "circlewithtext" + tempID)
                     .attr("x", function (d) {
-                        dxtext[i] = d.x;
+                        dxcircletext[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
-                        dytext[i] = d.y;
+                        dycircletext[i] = d.y;
                         return d.y;
                     })
                     .attr("font-size", "10px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
                     .text(mediator_pr_text_syn);
+
+                linewithlineg2[i] = "";
+                linewithtextg2[i] = "";
+                dx1line2[i] = "";
+                dy1line2[i] = "";
+                dx2line2[i] = "";
+                dy2line2[i] = "";
+                dxtext2[i] = "";
+                dytext2[i] = "";
 
                 // increment y-axis of line and circle
                 yvalueb += ydistance;
@@ -3166,19 +3193,45 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 var polygontext = polygong.append("g").data([{x: xvalue + 12 + width, y: yvalueb + 4}]);
                 circlewithtext[i] = polygontext.append("text")
-                    .attr("id", "circlewithtext" + tempID)
+                    .attr("id", function (d) {                 // .attr("id", "circlewithtext" + tempID)
+                        if (model_entity2 == "") {
+                            src_fma2 = "";
+                            snk_fma2 = "";
+                            combinedMembrane[i].source_fma2 = "";
+                            combinedMembrane[i].sink_fma2 = "";
+                        }
+                        return [
+                            model_entity, model_entity2,
+                            textvalue, textvalue2,
+                            src_fma, snk_fma, src_fma2, snk_fma2,
+                            mediator_fma, mediator_pr,
+                            solute_chebi, solute_chebi2, solute_text, solute_text2,
+                            mediator_pr_text, mediator_pr_text_syn
+                        ];
+                    })
+                    .attr("index", tempID)
+                    .attr("membrane", paracellularID)
                     .attr("x", function (d) {
-                        dxtext[i] = d.x;
+                        dxcircletext[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
-                        dytext[i] = d.y;
+                        dycircletext[i] = d.y;
                         return d.y;
                     })
                     .attr("font-size", "10px")
                     .attr("fill", "red")
                     .attr("cursor", "move")
                     .text(solute_text);
+
+                linewithlineg2[i] = "";
+                linewithtextg2[i] = "";
+                dx1line2[i] = "";
+                dy1line2[i] = "";
+                dx2line2[i] = "";
+                dy2line2[i] = "";
+                dxtext2[i] = "";
+                dytext2[i] = "";
 
                 // increment y-axis of line and circle
                 yvalueb += ydistance;
@@ -3191,7 +3244,24 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             var lineg = newg.append("g").data([{x: xpvalue, y: ypvalue + 5}]);
             circlewithlineg[i] = lineg.append("text") // linewithtextg
                 .attr("id", "linewithtextg" + tempID)
+                .attr("idParacellular", function (d) {
+                    if (model_entity2 == "") {
+                        src_fma2 = "";
+                        snk_fma2 = "";
+                        combinedMembrane[i].source_fma2 = "";
+                        combinedMembrane[i].sink_fma2 = "";
+                    }
+                    return [
+                        model_entity, model_entity2,
+                        textvalue, textvalue2,
+                        src_fma, snk_fma, src_fma2, snk_fma2,
+                        mediator_fma, mediator_pr,
+                        solute_chebi, solute_chebi2, solute_text, solute_text2,
+                        mediator_pr_text, mediator_pr_text_syn
+                    ];
+                })
                 .attr("index", tempID)
+                .attr("membrane", paracellularID)
                 .attr("x", function (d) {
                     dx[i] = d.x; // dxtext
                     return d.x;
@@ -3212,7 +3282,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .duration(200)
                         .style("opacity", 1);
 
-                    var id = d3.select(this)._groups[0][0].id,
+                    console.log("INSIDE PARACELLULAR: ", $(this).attr("idParacellular"));
+
+                    // var id = d3.select(this)._groups[0][0].id,
+                    var id = $(this).attr("idParacellular"),
                         indexOfComma = id.indexOf(','),
                         tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                             "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
@@ -3256,6 +3329,20 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .attr("marker-end", "url(#end)")
                 .attr("cursor", "move");
 
+            dxcircletext[i] = "";
+            dycircletext[i] = "";
+            linewithtextg[i] = "";
+            linewithlineg2[i] = "";
+            linewithtextg2[i] = "";
+            dx1line2[i] = "";
+            dy1line2[i] = "";
+            dx2line2[i] = "";
+            dy2line2[i] = "";
+            dxtext[i] = "";
+            dytext[i] = "";
+            dxtext2[i] = "";
+            dytext2[i] = "";
+
             ypvalue += ypdistance;
         }
     }
@@ -3268,6 +3355,16 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 break;
             }
             if ($("line")[i].id == membrane && i == 1) {
+                mindex = 0;
+                break;
+            }
+
+            // TODO: First condition always true!! change later
+            if (membrane == paracellularID && i == 0) {
+                mindex = 1;
+                break;
+            }
+            if (membrane == paracellularID && i == 1) {
                 mindex = 0;
                 break;
             }
@@ -3320,30 +3417,35 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
 
         if (circlewithtext[icircleGlobal] != undefined) {
-            // text inside circle
-            circlewithtext[icircleGlobal]
-                .attr("x", parseFloat(d3.select("#" + "circlewithtext" + icircleGlobal).attr("x")) + dx)
-                .attr("y", parseFloat(d3.select("#" + "circlewithtext" + icircleGlobal).attr("y")) + dy);
+            if (circlewithtext[icircleGlobal] != "") {
+                // text inside circle
+                circlewithtext[icircleGlobal]
+                    .attr("x", parseFloat(d3.select("#" + "circlewithtext" + icircleGlobal).attr("x")) + dx)
+                    .attr("y", parseFloat(d3.select("#" + "circlewithtext" + icircleGlobal).attr("y")) + dy);
+            }
         }
 
         if (linewithlineg[icircleGlobal] != undefined) {
-            // line 1
-            linewithlineg[icircleGlobal]
-                .attr("x1", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("x1")) + dx)
-                .attr("y1", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("y1")) + dy)
-                .attr("x2", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("x2")) + dx)
-                .attr("y2", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("y2")) + dy);
+            if (linewithlineg[icircleGlobal] != "") {
+                // line 1
+                linewithlineg[icircleGlobal]
+                    .attr("x1", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("x1")) + dx)
+                    .attr("y1", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("y1")) + dy)
+                    .attr("x2", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("x2")) + dx)
+                    .attr("y2", parseFloat(d3.select("#" + "linewithlineg" + icircleGlobal).attr("y2")) + dy);
+            }
         }
 
         if (linewithtextg[icircleGlobal] != undefined) {
-            // text 1
-            linewithtextg[icircleGlobal]
-                .attr("x", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("x")) + dx)
-                .attr("y", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("y")) + dy);
+            if (linewithtextg[icircleGlobal] != "") {
+                // text 1
+                linewithtextg[icircleGlobal]
+                    .attr("x", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("x")) + dx)
+                    .attr("y", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("y")) + dy);
+            }
         }
 
         if (linewithlineg2[icircleGlobal] != undefined) {
-
             if (linewithlineg2[icircleGlobal] != "") {
                 // line 2
                 linewithlineg2[icircleGlobal]
@@ -3355,7 +3457,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         }
 
         if (linewithtextg2[icircleGlobal] != undefined) {
-
             if (linewithtextg2[icircleGlobal] != "") {
                 // text 2
                 linewithtextg2[icircleGlobal]
@@ -3374,428 +3475,474 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 mindex = 0;
                 break;
             }
+
+            // TODO: First condition always true!! change later
+            if ($(this).attr("membrane") == paracellularID && i == 0) {
+                mindex = 1;
+                break;
+            }
+            if ($(this).attr("membrane") == paracellularID && i == 1) {
+                mindex = 0;
+                break;
+            }
         }
 
         // If paracellular's diffusive channel Then undefined
-        if ($("line")[mindex] != undefined) {
-            // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
-            var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
-            var lineb_y1 = $($("line")[mindex]).prop("y1").baseVal.value;
-            var lineb_y2 = $($("line")[mindex]).prop("y2").baseVal.value;
+        // if ($("line")[mindex] != undefined) {
+        // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
+        var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
+        var lineb_y1 = $($("line")[mindex]).prop("y1").baseVal.value;
+        var lineb_y2 = $($("line")[mindex]).prop("y2").baseVal.value;
 
-            var cx, cy;
-            if ($(this).prop("tagName") == "circle") {
-                cx = $(this).prop("cx").baseVal.value;
-                cy = $(this).prop("cy").baseVal.value;
-            }
+        var cx, cy;
+        if ($(this).prop("tagName") == "circle") {
+            cx = $(this).prop("cx").baseVal.value;
+            cy = $(this).prop("cy").baseVal.value;
+        }
 
-            if ($(this).prop("tagName") == "polygon") {
-                cx = event.x;
-                cy = event.y;
-            }
+        if ($(this).prop("tagName") == "polygon") {
+            cx = event.x;
+            cy = event.y;
+        }
 
-            var lineb_id = $($("line")[mindex]).prop("id");
-            var circle_id = $(this).prop("id");
+        // paracellular
+        if ($(this).prop("tagName") == "text") { // OR if ($(this).attr("membrane") == paracellularID) {}
+            cx = $(this).attr("x");
+            cy = $(this).attr("y");
+        }
 
-            // if ((cx >= lineb_x && cx <= lineb_x + 1) &&
-            //     (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
-            //     $($("line")[mindex]).css("stroke", "red");
+        var lineb_id = $($("line")[mindex]).prop("id");
+
+        var circle_id;
+        if ($(this).attr("membrane") == paracellularID) {
+            circle_id = $(this).attr("idParacellular");
+        }
+        else {
+            circle_id = $(this).prop("id");
+        }
+
+        // if ((cx >= lineb_x && cx <= lineb_x + 1) &&
+        //     (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+        //     $($("line")[mindex]).css("stroke", "red");
+
+        // console.log("drop cx, cy: ", cx, cy, lineb_x, circle_id, lineb_id);
+
+        if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
+            $($("line")[mindex]).css("stroke", "red");
+
+            var tempYvalue;
+            if (mindex == 1) tempYvalue = yvalueb;
+            else tempYvalue = yvalue;
+
+            // if ((cx >= lineb_x && cx <= lineb_x + 5) &&
+            //     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
+            //     $($("line")[mindex]).css("stroke", "yellow");
 
             if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
-                $($("line")[mindex]).css("stroke", "red");
-
-                var tempYvalue;
-                if (mindex == 1) tempYvalue = yvalueb;
-                else tempYvalue = yvalue;
-
-                // if ((cx >= lineb_x && cx <= lineb_x + 5) &&
-                //     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
-                //     $($("line")[mindex]).css("stroke", "yellow");
-
-                if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
-                    $($("line")[mindex]).css("stroke", "yellow");
-                }
-            }
-            else {
-                if (mindex == 1)
-                    $($("line")[mindex]).css("stroke", "orange");
-
-                else
-                    $($("line")[mindex]).css("stroke", "green");
+                $($("line")[mindex]).css("stroke", "yellow");
             }
         }
+        else {
+            if (mindex == 1)
+                $($("line")[mindex]).css("stroke", "orange");
+
+            else
+                $($("line")[mindex]).css("stroke", "green");
+        }
+        // }
     }
 
     function dragcircleendline(d) {
         initdragcircleandend();
 
         // If paracellular's diffusive channel Then undefined
-        if ($("line")[mindex] != undefined) {
-            // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
-            var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
-            var lineb_y1 = $($("line")[mindex]).prop("y1").baseVal.value;
-            var lineb_y2 = $($("line")[mindex]).prop("y2").baseVal.value;
+        // if ($("line")[mindex] != undefined) {
+        // detect basolateralMembrane - 0 apical, 1 basolateralMembrane, 3 cell junction
+        var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
+        // var lineb_y1 = $($("line")[mindex]).prop("y1").baseVal.value;
+        // var lineb_y2 = $($("line")[mindex]).prop("y2").baseVal.value;
 
-            var cx, cy;
-            if ($(cthis).prop("tagName") == "circle") {
-                cx = $(cthis).prop("cx").baseVal.value;
-                cy = $(cthis).prop("cy").baseVal.value;
-            }
+        var cx, cy;
+        if ($(cthis).prop("tagName") == "circle") {
+            cx = $(cthis).prop("cx").baseVal.value;
+            cy = $(cthis).prop("cy").baseVal.value;
+        }
 
-            if ($(cthis).prop("tagName") == "polygon") {
-                cx = event.x;
-                cy = event.y;
-            }
+        if ($(cthis).prop("tagName") == "polygon") {
+            cx = event.x;
+            cy = event.y;
+        }
 
-            var lineb_id = $($("line")[mindex]).prop("id");
-            var circle_id = $(cthis).prop("id");
+        // paracellular
+        if ($(cthis).prop("tagName") == "text") { // OR if ($(cthis).attr("membrane") == paracellularID) {}
+            cx = $(cthis).attr("x");
+            cy = $(cthis).attr("y");
+        }
 
-            // if ((cx >= lineb_x && cx <= lineb_x + 1) &&
-            //     (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+        var lineb_id = $($("line")[mindex]).prop("id");
+
+        var circle_id;
+        if ($(cthis).attr("membrane") == paracellularID) {
+            circle_id = $(cthis).attr("idParacellular");
+        }
+        else {
+            circle_id = $(cthis).prop("id");
+        }
+
+        // if ((cx >= lineb_x && cx <= lineb_x + 1) &&
+        //     (cy >= lineb_y1 && cy <= lineb_y2) && (lineb_id != circle_id)) {
+
+        if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
+
+            var tempYvalue;
+            if (mindex == 1) tempYvalue = yvalueb;
+            else tempYvalue = yvalue;
+
+            // if ((cx >= lineb_x && cx <= lineb_x + 5) &&
+            //     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
 
             if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
 
-                var tempYvalue;
-                if (mindex == 1) tempYvalue = yvalueb;
-                else tempYvalue = yvalue;
+                $($("line")[mindex]).css("stroke", "yellow");
 
-                // if ((cx >= lineb_x && cx <= lineb_x + 5) &&
-                //     (cy >= (tempYvalue + radius) && cy <= (tempYvalue + radius + 5)) && (lineb_id != circle_id)) {
+                var m = new welcomeModal({
+                    id: 'myWelcomeModal',
+                    header: 'Are you sure you want to move?',
+                    footer: 'My footer',
+                    footerCloseButton: 'No',
+                    footerSaveButton: 'Yes'
+                });
 
-                if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
+                $('#myWelcomeModal').modal({backdrop: 'static', keyboard: false});
+                m.show();
 
-                    $($("line")[mindex]).css("stroke", "yellow");
+                function welcomeModal(options) {
+                    var $this = this;
 
-                    var m = new welcomeModal({
-                        id: 'myWelcomeModal',
-                        header: 'Are you sure you want to move?',
-                        footer: 'My footer',
-                        footerCloseButton: 'No',
-                        footerSaveButton: 'Yes'
-                    });
+                    options = options ? options : {};
+                    $this.options = {};
+                    $this.options.header = options.header !== undefined ? options.header : false;
+                    $this.options.footer = options.footer !== undefined ? options.footer : false;
+                    $this.options.closeButton = options.closeButton !== undefined ? options.closeButton : true;
+                    $this.options.footerCloseButton = options.footerCloseButton !== undefined ? options.footerCloseButton : false;
+                    $this.options.footerSaveButton = options.footerSaveButton !== undefined ? options.footerSaveButton : false;
+                    $this.options.id = options.id !== undefined ? options.id : "myWelcomeModal";
 
-                    $('#myWelcomeModal').modal({backdrop: 'static', keyboard: false});
-                    m.show();
+                    /**
+                     * Append modal window html to body
+                     */
+                    $this.createModal = function () {
+                        $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
+                        $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
+                        var win = $('.modal-content', $this.selector);
 
-                    function welcomeModal(options) {
-                        var $this = this;
+                        if ($this.options.header) {
+                            win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
 
-                        options = options ? options : {};
-                        $this.options = {};
-                        $this.options.header = options.header !== undefined ? options.header : false;
-                        $this.options.footer = options.footer !== undefined ? options.footer : false;
-                        $this.options.closeButton = options.closeButton !== undefined ? options.closeButton : true;
-                        $this.options.footerCloseButton = options.footerCloseButton !== undefined ? options.footerCloseButton : false;
-                        $this.options.footerSaveButton = options.footerSaveButton !== undefined ? options.footerSaveButton : false;
-                        $this.options.id = options.id !== undefined ? options.id : "myWelcomeModal";
+                            if ($this.options.closeButton) {
+                                win.find('.modal-header').prepend('<button type="button" ' +
+                                    'class="close" data-dismiss="modal">&times;</button>');
+                            }
+                        }
 
-                        /**
-                         * Append modal window html to body
-                         */
-                        $this.createModal = function () {
-                            $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
-                            $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
-                            var win = $('.modal-content', $this.selector);
+                        if ($this.options.footer) {
+                            win.append('<div class="modal-footer"></div>');
 
-                            if ($this.options.header) {
-                                win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
-
-                                if ($this.options.closeButton) {
-                                    win.find('.modal-header').prepend('<button type="button" ' +
-                                        'class="close" data-dismiss="modal">&times;</button>');
-                                }
+                            if ($this.options.footerCloseButton) {
+                                win.find('.modal-footer').append('<a data-dismiss="modal" id="closeID" href="#" ' +
+                                    'class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
                             }
 
-                            if ($this.options.footer) {
-                                win.append('<div class="modal-footer"></div>');
+                            if ($this.options.footerSaveButton) {
+                                win.find('.modal-footer').append('<a data-dismiss="modal" id="saveID" href="#" ' +
+                                    'class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                            }
+                        }
 
-                                if ($this.options.footerCloseButton) {
-                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="closeID" href="#" ' +
-                                        'class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
-                                }
+                        // No button clicked!!
+                        $("#closeID").click(function (event) {
+                            console.log("No clicked!");
+                            console.log("first close button clicked!");
 
-                                if ($this.options.footerSaveButton) {
-                                    win.find('.modal-footer').append('<a data-dismiss="modal" id="saveID" href="#" ' +
-                                        'class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
-                                }
+                            moveBack();
+                            membraneColorBack();
+                        })
+
+                        // Yes button clicked!!
+                        $("#saveID").click(function (event) {
+
+                            console.log("Yes clicked!");
+                            console.log("first save button clicked!");
+
+                            var m = new Modal({
+                                id: 'myModal',
+                                header: 'Recommender System',
+                                footer: 'My footer',
+                                footerCloseButton: 'Close',
+                                footerSaveButton: 'Save'
+                            });
+
+                            $('#myModal').modal({backdrop: 'static', keyboard: false});
+                            m.getBody().html('<div id="modalBody"></div>');
+                            m.show();
+
+                            showLoading("#modalBody");
+
+                            var circleID;
+                            if ($(cthis).attr("membrane") == paracellularID) {
+                                circleID = $(cthis).attr("idParacellular").split(",");
+                            }
+                            else {
+                                circleID = $(cthis).prop("id").split(",");
                             }
 
-                            // No button clicked!!
-                            $("#closeID").click(function (event) {
-                                console.log("No clicked!");
-                                console.log("first close button clicked!");
+                            // var circleID = $(cthis).prop("id").split(",");
+                            console.log("circleID in myWelcomeModal: ", circleID);
 
-                                moveBack();
-                                membraneColorBack();
-                            })
+                            // parsing
+                            cellmlModel = circleID[0];
+                            var indexOfHash = cellmlModel.search("#");
+                            cellmlModel = cellmlModel.slice(0, indexOfHash);
 
-                            // Yes button clicked!!
-                            $("#saveID").click(function (event) {
+                            cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
 
-                                console.log("Yes clicked!");
-                                console.log("first save button clicked!");
+                            console.log("cellmlModel: ", cellmlModel);
 
-                                var m = new Modal({
-                                    id: 'myModal',
-                                    header: 'Recommender System',
-                                    footer: 'My footer',
-                                    footerCloseButton: 'Close',
-                                    footerSaveButton: 'Save'
-                                });
+                            if (circleID[1] != "") {
+                                var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
+                                    'WHERE { GRAPH ?g { ' +
+                                    '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
+                                    '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
+                                    '<' + circleID[1] + '> <http://purl.org/dc/terms/description> ?Biological_meaning2 . ' +
+                                    '}}'
+                            }
+                            else {
+                                var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
+                                    'WHERE { GRAPH ?g { ' +
+                                    '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
+                                    '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
+                                    '}}'
+                            }
 
-                                $('#myModal').modal({backdrop: 'static', keyboard: false});
-                                m.getBody().html('<div id="modalBody"></div>');
-                                m.show();
+                            // protein name
+                            sendPostRequest(
+                                endpoint,
+                                query,
+                                function (jsonModel) {
 
-                                showLoading("#modalBody");
+                                    console.log("jsonModel: ", jsonModel);
 
-                                var circleID = $(cthis).prop("id").split(",");
-                                console.log("circleID in myWelcomeModal: ", circleID);
+                                    proteinName = jsonModel.results.bindings[0].Protein.value;
+                                    var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + proteinName;
 
-                                // parsing
-                                cellmlModel = circleID[0];
-                                var indexOfHash = cellmlModel.search("#");
-                                cellmlModel = cellmlModel.slice(0, indexOfHash);
+                                    sendGetRequest(
+                                        endpointprOLS,
+                                        function (jsonPr) {
 
-                                cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
+                                            if (jsonPr._embedded.terms[0]._links.has_gene_template != undefined)
+                                                var endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
 
-                                console.log("cellmlModel: ", cellmlModel);
+                                            sendGetRequest(
+                                                endpointgeneOLS,
+                                                function (jsonGene) {
 
-                                if (circleID[1] != "") {
-                                    var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
-                                        'WHERE { GRAPH ?g { ' +
-                                        '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-                                        '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
-                                        '<' + circleID[1] + '> <http://purl.org/dc/terms/description> ?Biological_meaning2 . ' +
-                                        '}}'
-                                }
-                                else {
-                                    var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
-                                        'WHERE { GRAPH ?g { ' +
-                                        '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-                                        '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
-                                        '}}'
-                                }
+                                                    if (jsonPr._embedded.terms[0]._links.only_in_taxon != undefined)
+                                                        var endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
 
-                                // protein name
-                                sendPostRequest(
-                                    endpoint,
-                                    query,
-                                    function (jsonModel) {
+                                                    sendGetRequest(
+                                                        endpointspeciesOLS,
+                                                        function (jsonSpecies) {
 
-                                        console.log("jsonModel: ", jsonModel);
+                                                            proteinText = jsonPr._embedded.terms[0].label;
+                                                            var indexOfParen = proteinText.indexOf('(');
+                                                            proteinText = proteinText.slice(0, indexOfParen - 1);
+                                                            biological_meaning = jsonModel.results.bindings[0].Biological_meaning.value;
 
-                                        proteinName = jsonModel.results.bindings[0].Protein.value;
-                                        var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + proteinName;
+                                                            if (circleID[1] != "")
+                                                                biological_meaning2 = jsonModel.results.bindings[0].Biological_meaning2.value;
+                                                            else
+                                                                biological_meaning2 = "";
 
-                                        sendGetRequest(
-                                            endpointprOLS,
-                                            function (jsonPr) {
+                                                            speciesName = jsonSpecies._embedded.terms[0].label;
+                                                            geneName = jsonGene._embedded.terms[0].label;
+                                                            var indexOfParen = geneName.indexOf('(');
+                                                            geneName = geneName.slice(0, indexOfParen - 1);
 
-                                                if (jsonPr._embedded.terms[0]._links.has_gene_template != undefined)
-                                                    var endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
+                                                            var query = 'SELECT ?cellmlmodel ' +
+                                                                'WHERE { GRAPH ?g { ' +
+                                                                '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#modelOf> <' + proteinName + '> . ' +
+                                                                '}}'
 
-                                                sendGetRequest(
-                                                    endpointgeneOLS,
-                                                    function (jsonGene) {
+                                                            sendPostRequest(
+                                                                endpoint,
+                                                                query,
+                                                                function (jsonCellmlModel) {
 
-                                                        if (jsonPr._embedded.terms[0]._links.only_in_taxon != undefined)
-                                                            var endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
+                                                                    console.log("jsonCellmlModel: ", jsonCellmlModel);
 
-                                                        sendGetRequest(
-                                                            endpointspeciesOLS,
-                                                            function (jsonSpecies) {
+                                                                    var query = 'SELECT ?located_in ' +
+                                                                        'WHERE { GRAPH ?g { ' +
+                                                                        '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
+                                                                        '}}'
 
-                                                                proteinText = jsonPr._embedded.terms[0].label;
-                                                                var indexOfParen = proteinText.indexOf('(');
-                                                                proteinText = proteinText.slice(0, indexOfParen - 1);
-                                                                biological_meaning = jsonModel.results.bindings[0].Biological_meaning.value;
+                                                                    // location of that cellml model
+                                                                    sendPostRequest(
+                                                                        endpoint,
+                                                                        query,
+                                                                        function (jsonLocatedin) {
 
-                                                                if (circleID[1] != "")
-                                                                    biological_meaning2 = jsonModel.results.bindings[0].Biological_meaning2.value;
-                                                                else
-                                                                    biological_meaning2 = "";
+                                                                            console.log("jsonLocatedin: ", jsonLocatedin);
 
-                                                                speciesName = jsonSpecies._embedded.terms[0].label;
-                                                                geneName = jsonGene._embedded.terms[0].label;
-                                                                var indexOfParen = geneName.indexOf('(');
-                                                                geneName = geneName.slice(0, indexOfParen - 1);
+                                                                            var counter = 0;
+                                                                            // Type of model - kidney, lungs, etc
+                                                                            for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                                                                                for (var j = 0; j < organ.length; j++) {
+                                                                                    for (var k = 0; k < organ[j].key.length; k++) {
+                                                                                        if (jsonLocatedin.results.bindings[i].located_in.value == organ[j].key[k].key)
+                                                                                            counter++;
 
-                                                                var query = 'SELECT ?cellmlmodel ' +
-                                                                    'WHERE { GRAPH ?g { ' +
-                                                                    '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#modelOf> <' + proteinName + '> . ' +
-                                                                    '}}'
+                                                                                        if (counter == jsonLocatedin.results.bindings.length) {
+                                                                                            typeOfModel = organ[j].value;
+                                                                                            organIndex = j;
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                    if (counter == jsonLocatedin.results.bindings.length)
+                                                                                        break;
+                                                                                }
+                                                                                if (counter == jsonLocatedin.results.bindings.length)
+                                                                                    break;
+                                                                            }
 
-                                                                sendPostRequest(
-                                                                    endpoint,
-                                                                    query,
-                                                                    function (jsonCellmlModel) {
+                                                                            loc = "";
+                                                                            counter = 0;
+                                                                            // get locations of the above type of model
+                                                                            for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                                                                                for (var j = 0; j < organ[organIndex].key.length; j++) {
+                                                                                    if (jsonLocatedin.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
+                                                                                        loc += organ[organIndex].key[j].value;
 
-                                                                        console.log("jsonCellmlModel: ", jsonCellmlModel);
+                                                                                        if (i == jsonLocatedin.results.bindings.length - 1)
+                                                                                            loc += ".";
+                                                                                        else
+                                                                                            loc += ", ";
 
-                                                                        var query = 'SELECT ?located_in ' +
-                                                                            'WHERE { GRAPH ?g { ' +
-                                                                            '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
-                                                                            '}}'
+                                                                                        counter++;
+                                                                                    }
+                                                                                    if (counter == jsonLocatedin.results.bindings.length)
+                                                                                        break;
+                                                                                }
+                                                                                if (counter == jsonLocatedin.results.bindings.length)
+                                                                                    break;
+                                                                            }
 
-                                                                        // location of that cellml model
-                                                                        sendPostRequest(
-                                                                            endpoint,
-                                                                            query,
-                                                                            function (jsonLocatedin) {
+                                                                            // related cellml model, i.e. kidney, lungs, etc
+                                                                            var query = 'SELECT ?cellmlmodel ?located_in ' +
+                                                                                'WHERE { GRAPH ?g { ' +
+                                                                                '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
+                                                                                '}}'
 
-                                                                                console.log("jsonLocatedin: ", jsonLocatedin);
+                                                                            sendPostRequest(
+                                                                                endpoint,
+                                                                                query,
+                                                                                function (jsonRelatedModel) {
 
-                                                                                var counter = 0;
-                                                                                // Type of model - kidney, lungs, etc
-                                                                                for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                                                                                    for (var j = 0; j < organ.length; j++) {
-                                                                                        for (var k = 0; k < organ[j].key.length; k++) {
-                                                                                            if (jsonLocatedin.results.bindings[i].located_in.value == organ[j].key[k].key)
-                                                                                                counter++;
+                                                                                    console.log("jsonRelatedModel: ", jsonRelatedModel);
 
-                                                                                            if (counter == jsonLocatedin.results.bindings.length) {
-                                                                                                typeOfModel = organ[j].value;
-                                                                                                organIndex = j;
+                                                                                    for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
+                                                                                        for (var j = 0; j < organ[organIndex].key.length; j++) {
+                                                                                            if (jsonRelatedModel.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
+                                                                                                // parsing
+                                                                                                var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
+                                                                                                var indexOfHash = tempModel.search("#");
+                                                                                                tempModel = tempModel.slice(0, indexOfHash);
+
+                                                                                                relatedModel.push(tempModel);
+
                                                                                                 break;
                                                                                             }
                                                                                         }
-                                                                                        if (counter == jsonLocatedin.results.bindings.length)
-                                                                                            break;
                                                                                     }
-                                                                                    if (counter == jsonLocatedin.results.bindings.length)
-                                                                                        break;
-                                                                                }
 
-                                                                                loc = "";
-                                                                                counter = 0;
-                                                                                // get locations of the above type of model
-                                                                                for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                                                                                    for (var j = 0; j < organ[organIndex].key.length; j++) {
-                                                                                        if (jsonLocatedin.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
-                                                                                            loc += organ[organIndex].key[j].value;
+                                                                                    relatedModel = uniqueify(relatedModel);
 
-                                                                                            if (i == jsonLocatedin.results.bindings.length - 1)
-                                                                                                loc += ".";
-                                                                                            else
-                                                                                                loc += ", ";
+                                                                                    // kidney, lungs, heart, etc
+                                                                                    console.log("relatedModel: ", relatedModel);
 
-                                                                                            counter++;
+                                                                                    console.log("jsonCellmlModel: ", jsonCellmlModel);
+
+                                                                                    var alternativeCellmlArray = [],
+                                                                                        cellmlModel2 = cellmlModel,
+                                                                                        indexOfHash = cellmlModel2.search("#");
+                                                                                    cellmlModel2 = cellmlModel2.slice(0, indexOfHash);
+                                                                                    for (var i = 0; i < relatedModel.length; i++) {
+                                                                                        if (relatedModel[i] != cellmlModel2) {
+                                                                                            alternativeCellmlArray.push(relatedModel[i]);
                                                                                         }
-                                                                                        if (counter == jsonLocatedin.results.bindings.length)
-                                                                                            break;
                                                                                     }
-                                                                                    if (counter == jsonLocatedin.results.bindings.length)
-                                                                                        break;
-                                                                                }
 
-                                                                                // related cellml model, i.e. kidney, lungs, etc
-                                                                                var query = 'SELECT ?cellmlmodel ?located_in ' +
-                                                                                    'WHERE { GRAPH ?g { ' +
-                                                                                    '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
-                                                                                    '}}'
+                                                                                    relatedCellmlModel(
+                                                                                        relatedModel,
+                                                                                        alternativeCellmlArray,
+                                                                                        $(cthis).attr("membrane")
+                                                                                    );
 
-                                                                                sendPostRequest(
-                                                                                    endpoint,
-                                                                                    query,
-                                                                                    function (jsonRelatedModel) {
+                                                                                }, true);
+                                                                        }, true);
+                                                                }, true)
+                                                        },
+                                                        true);
+                                                },
+                                                true);
 
-                                                                                        console.log("jsonRelatedModel: ", jsonRelatedModel);
+                                        }, true);
 
-                                                                                        for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
-                                                                                            for (var j = 0; j < organ[organIndex].key.length; j++) {
-                                                                                                if (jsonRelatedModel.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
-                                                                                                    // parsing
-                                                                                                    var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
-                                                                                                    var indexOfHash = tempModel.search("#");
-                                                                                                    tempModel = tempModel.slice(0, indexOfHash);
+                                }, true);
 
-                                                                                                    relatedModel.push(tempModel);
+                            jQuery(window).trigger('resize');
+                        })
+                    };
 
-                                                                                                    break;
-                                                                                                }
-                                                                                            }
-                                                                                        }
+                    /**
+                     * Set header text. It makes sense only if the options.header is logical true.
+                     * @param {String} html New header text.
+                     */
+                    $this.setHeader = function (html) {
+                        $this.window.find('.modal-title').html(html);
+                    };
 
-                                                                                        relatedModel = uniqueify(relatedModel);
+                    /**
+                     * Show modal window
+                     */
+                    $this.show = function () {
+                        $this.window.modal('show');
+                    };
 
-                                                                                        // kidney, lungs, heart, etc
-                                                                                        console.log("relatedModel: ", relatedModel);
-
-                                                                                        console.log("jsonCellmlModel: ", jsonCellmlModel);
-
-                                                                                        var alternativeCellmlArray = [],
-                                                                                            cellmlModel2 = cellmlModel,
-                                                                                            indexOfHash = cellmlModel2.search("#");
-                                                                                        cellmlModel2 = cellmlModel2.slice(0, indexOfHash);
-                                                                                        for (var i = 0; i < relatedModel.length; i++) {
-                                                                                            if (relatedModel[i] != cellmlModel2) {
-                                                                                                alternativeCellmlArray.push(relatedModel[i]);
-                                                                                            }
-                                                                                        }
-
-                                                                                        relatedCellmlModel(
-                                                                                            relatedModel,
-                                                                                            alternativeCellmlArray,
-                                                                                            $(cthis).attr("membrane")
-                                                                                        );
-
-                                                                                    }, true);
-                                                                            }, true);
-                                                                    }, true)
-                                                            },
-                                                            true);
-                                                    },
-                                                    true);
-
-                                            }, true);
-
-                                    }, true);
-
-                                jQuery(window).trigger('resize');
-                            })
-                        };
-
-                        /**
-                         * Set header text. It makes sense only if the options.header is logical true.
-                         * @param {String} html New header text.
-                         */
-                        $this.setHeader = function (html) {
-                            $this.window.find('.modal-title').html(html);
-                        };
-
-                        /**
-                         * Show modal window
-                         */
-                        $this.show = function () {
-                            $this.window.modal('show');
-                        };
-
-                        $this.selector = "#" + $this.options.id;
-                        if (!$($this.selector).length) {
-                            $this.createModal();
-                        }
-
-                        $this.window = $($this.selector);
-                        $this.setHeader($this.options.header);
+                    $this.selector = "#" + $this.options.id;
+                    if (!$($this.selector).length) {
+                        $this.createModal();
                     }
-                }
-                else {
-                    moveBack();
 
-                    if (mindex == 1)
-                        linebasolateral.transition().delay(1000).duration(1000).style("stroke", "orange");
-                    else
-                        lineapical.transition().delay(1000).duration(1000).style("stroke", "green");
+                    $this.window = $($this.selector);
+                    $this.setHeader($this.options.header);
                 }
             }
             else {
+                moveBack();
+
                 if (mindex == 1)
-                    $($("line")[mindex]).css("stroke", "orange");
+                    linebasolateral.transition().delay(1000).duration(1000).style("stroke", "orange");
                 else
-                    $($("line")[mindex]).css("stroke", "green");
+                    lineapical.transition().delay(1000).duration(1000).style("stroke", "green");
             }
         }
+        else {
+            if (mindex == 1)
+                $($("line")[mindex]).css("stroke", "orange");
+            else
+                $($("line")[mindex]).css("stroke", "green");
+        }
+        // }
     }
 
     function dragcircleunchecked(d) {
@@ -3998,15 +4145,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var relatedMembrane = function (workspaceName, membrane, membraneName) {
 
         console.log("relatedMembrane: ", workspaceName, membrane, membraneName);
-        console.log("CHEBI: ", $(cthis).prop("id").split(","));
+
+        var circleID;
+        if ($(cthis).attr("membrane") == paracellularID) {
+            circleID = $(cthis).attr("idParacellular").split(",");
+            console.log("CHEBI: ", circleID);
+        }
+        else {
+            circleID = $(cthis).prop("id").split(",");
+            console.log("CHEBI: ", circleID);
+        }
+
         // TODO: single flux may look for cotranssporters??
         // TODO: so also give a solute chebi in the first query??
-        if ($(cthis).prop("id").split(",")[11] == "") { // single flux
+        if (circleID[11] == "") { // single flux
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
                 'SELECT ?Model_entity ' +
                 'WHERE { GRAPH ?g { ' +
-                '?entity semsim:hasPhysicalDefinition <' + $(cthis).prop("id").split(",")[10] + '>. ' +
+                '?entity semsim:hasPhysicalDefinition <' + circleID[10] + '>. ' +
                 '?source semsim:hasPhysicalEntityReference ?entity. ' +
                 '?process semsim:hasSourceParticipant ?source. ' +
                 '?property semsim:physicalPropertyOf ?process. ' +
@@ -4021,7 +4178,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 'PREFIX dcterms: <http://purl.org/dc/terms/>' +
                 'SELECT ?Model_entity ?Model_entity2 ' +
                 'WHERE { GRAPH ?g { ' +
-                '?entity semsim:hasPhysicalDefinition <' + $(cthis).prop("id").split(",")[10] + '>. ' +
+                '?entity semsim:hasPhysicalDefinition <' + circleID[10] + '>. ' +
                 '?source semsim:hasPhysicalEntityReference ?entity. ' +
                 '?process semsim:hasSourceParticipant ?source. ' +
                 '?property semsim:physicalPropertyOf ?process. ' +
@@ -4029,7 +4186,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 '?process semsim:hasMediatorParticipant ?model_medparticipant.' +
                 '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
                 '?med_entity semsim:hasPhysicalDefinition <' + membrane + '>.' +
-                '?entity2 semsim:hasPhysicalDefinition <' + $(cthis).prop("id").split(",")[11] + '>. ' +
+                '?entity2 semsim:hasPhysicalDefinition <' + circleID[11] + '>. ' +
                 '?source2 semsim:hasPhysicalEntityReference ?entity2. ' +
                 '?process2 semsim:hasSourceParticipant ?source2. ' +
                 '?property2 semsim:physicalPropertyOf ?process2. ' +
@@ -4052,7 +4209,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                     fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
 
-                    if ($(cthis).prop("id").split(",")[11] != "") {
+                    if (circleID[11] != "") {
                         fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity2.value);
                     }
                 }
@@ -4204,7 +4361,18 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 };
 
                 if (fluxList.length <= 1) {
-                    // do something!!
+                    console.log("fluxList.length <= 1");
+                    // make single flux in membraneModel
+                    membraneModel.push({
+                        "model_entity": fluxList[0],
+                        "model_entity2": ""
+                    });
+
+                    console.log("fluxList: ", fluxList);
+                    console.log("cotransporterList: ", cotransporterList);
+                    console.log("membraneModel: ", membraneModel);
+
+                    relatedMembraneModel(workspaceName, membraneName, cotransporterList);
                 }
                 else {
                     for (var i = 0; i < fluxList.length; i++) {
@@ -4220,15 +4388,23 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var showModalWindow = function (workspaceName, membraneName) {
         idMembrane = 0;
 
+        var circleID;
+        if ($(cthis).attr("membrane") == paracellularID) {
+            circleID = $(cthis).attr("idParacellular").split(",");
+        }
+        else {
+            circleID = $(cthis).prop("id").split(",");
+        }
+
         var msg2 = "<p><b>" + proteinText + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
             "<b>" + loc + "</b><\p>";
 
         var workspaceuri = "https://models.physiomeproject.org/workspace/267" + "/" +
-            "rawfile" + "/" + "HEAD" + "/" + $(cthis).prop("id").split(",")[0];
+            "rawfile" + "/" + "HEAD" + "/" + circleID[0];
 
         var model = "<b>Model: </b><a href='" + workspaceuri + "' target='_blank " +
             "data-toggle='tooltip' data-placement='right' " +
-            "title='" + proteinText + "'>" + $(cthis).prop("id").split(",")[0] + "</a>";
+            "title='" + proteinText + "'>" + circleID[0] + "</a>";
 
         var biological = "<p><b>Biological Meaning: </b>" + biological_meaning + "</p>";
 
@@ -4611,7 +4787,16 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                                         solutetext2, solutechebi, solutetext, indexOfdot, indexOfHash;
 
                                                     if (membraneModel[idMembrane].model_entity2 == "") {
-                                                        var circleID = $(cthis).prop("id").split(",");
+                                                        // var circleID = $(cthis).prop("id").split(",");
+
+                                                        var circleID;
+                                                        if ($(cthis).attr("membrane") == paracellularID) {
+                                                            circleID = $(cthis).attr("idParacellular").split(",");
+                                                        }
+                                                        else {
+                                                            circleID = $(cthis).prop("id").split(",");
+                                                        }
+
                                                         indexOfHash = membraneModel[idMembrane].model_entity.search("#");
                                                         variabletext = membraneModel[idMembrane].model_entity.slice(indexOfHash + 1);
                                                         indexOfdot = variabletext.indexOf('.');
@@ -4787,8 +4972,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 .transition()
                 .delay(1000)
                 .duration(1000)
-                .attr("x", dx[icircleGlobal] - 15)
-                .attr("y", dy[icircleGlobal] + 23);
+                .attr("x", dxcircletext[icircleGlobal]) // - 15)
+                .attr("y", dycircletext[icircleGlobal]); // + 23);
         }
 
         if (linewithlineg2[icircleGlobal] != undefined) {
@@ -5094,7 +5279,16 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 // Find dragged circle's index in the combinedMembrane
                 var tempIndex = 0;
                 var findIndexOfCombinedMembrane = function () {
-                    var circleID = $(cthis).prop("id").split(",");
+                    // var circleID = $(cthis).prop("id").split(",");
+
+                    var circleID;
+                    if ($(cthis).attr("membrane") == paracellularID) {
+                        circleID = $(cthis).attr("idParacellular").split(",");
+                    }
+                    else {
+                        circleID = $(cthis).prop("id").split(",");
+                    }
+
                     for (var i = 0; i < combinedMembrane.length; i++) {
                         console.log("Inside filter: ", combinedMembrane[i].model_entity, circleID[0]);
                         if (combinedMembrane[i].model_entity == circleID[0]) {
@@ -5153,6 +5347,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                             console.log("checked CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].checked);
                             console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
 
+                            // paracellular
+                            if ($(cthis).attr("membrane") == paracellularID) {
+                                $(cthis).attr("idParacellular", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
+                            }
+                            else {
+                                $(cthis).attr("id", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
+                            }
+
                             $(cthis).attr("id", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
                             // cthis.id = win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id;
                             console.log("cthis AFTER: ", cthis);
@@ -5181,18 +5383,15 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 membraneColorBack();
 
-                var index = d3.select(cthis)._groups[0][0].attributes[1].value;
-                var stylefill = d3.select(cthis)._groups[0][0].attributes[6].value;
+                // var circleID = $(cthis).prop("id").split(",");
+                var circleID;
+                if ($(cthis).attr("membrane") == paracellularID) {
+                    circleID = $(cthis).attr("idParacellular").split(",");
+                }
+                else {
+                    circleID = $(cthis).prop("id").split(",");
+                }
 
-                // channel in yellow color showing error - temp solution
-                // if (circlewithlineg[index] != undefined) {
-                if (stylefill == "lightgreen")
-                    circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "orange");
-                else
-                    circlewithlineg[index].transition().delay(1000).duration(1000).style("fill", "lightgreen");
-                // }
-
-                var circleID = $(cthis).prop("id").split(",");
                 console.log("circleID: ", circleID);
 
                 // update combinedMembrane, this will be sent to GMS to assemble and reproduce a new cellml model
@@ -5206,23 +5405,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 combinedMembrane[tempIndex].solute_text = circleID[12]; // solute text using the CHEBI uri from OLS
                 combinedMembrane[tempIndex].med_pr_text = circleID[14]; // mediator protein text using the mediator protein uri from OLS
                 combinedMembrane[tempIndex].med_pr_text_syn = circleID[15]; // synonym of a mediator protein text (e.g. NHE3, SGLT1) using the mediator protein uri from OLS
-
-                // if (circleID[1] != "") {
                 combinedMembrane[tempIndex].model_entity2 = circleID[1]; // cellml model entity => cotransporter or empty otherwise
                 combinedMembrane[tempIndex].variable_text2 = circleID[3]; // cellml variable name
                 combinedMembrane[tempIndex].source_fma2 = circleID[6]; // source FMA uri => cotransporter or empty otherwise
                 combinedMembrane[tempIndex].sink_fma2 = circleID[7]; // sink FMA uri => cotransporter or empty otherwise
                 combinedMembrane[tempIndex].solute_chebi2 = circleID[11]; // solute CHEBI uri
                 combinedMembrane[tempIndex].solute_text2 = circleID[13]; // solute text using the CHEBI uri from OLS
-                // }
-                // else {
-                //     combinedMembrane[tempIndex].model_entity2 = "";
-                //     combinedMembrane[tempIndex].variable_text2 = circleID[3];
-                //     combinedMembrane[tempIndex].source_fma2 = "";
-                //     combinedMembrane[tempIndex].sink_fma2 = "";
-                //     combinedMembrane[tempIndex].solute_chebi2 = "";
-                //     combinedMembrane[tempIndex].solute_text2 = "";
-                // }
 
                 // TODO: circle placement and rearrangement
                 // TODO: membrane attr changed above, thus it affects here.
@@ -5258,6 +5446,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("cx", dx[icircleGlobal])
                         .attr("cy", dy[icircleGlobal])
                         .attr("membrane", basolateralID)
+                        .attr("fill", "orange")
 
                     if (linewithlineg2[icircleGlobal] != undefined) {
 
@@ -5325,6 +5514,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("cx", dx[icircleGlobal])
                         .attr("cy", dy[icircleGlobal])
                         .attr("membrane", apicalID)
+                        .attr("fill", "lightgreen")
 
                     if (linewithlineg2[icircleGlobal] != undefined) {
 
@@ -5375,10 +5565,19 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("size dx dy: ", dx.length, dy.length);
 
                 // Find replaced circle's index in the circlewithlineg
-                var tempCircleIndex = 0;
+                var tempCircleIndex = 0, cID, tempModelEntity;
                 for (var m = 0; m < circlewithlineg.length; m++) {
-                    var cID = circlewithlineg[m].attr("id").split(",")[0],
+                    if ($(cthis).attr("membrane") == paracellularID) {
+                        cID = circlewithlineg[m].attr("idParacellular").split(",")[0];
+                        tempModelEntity = $(cthis).attr("idParacellular").split(",")[0];
+                    }
+                    else {
+                        cID = circlewithlineg[m].attr("id").split(",")[0];
                         tempModelEntity = $(cthis).prop("id").split(",")[0];
+                    }
+
+                    // var cID = circlewithlineg[m].attr("id").split(",")[0],
+                    //     tempModelEntity = $(cthis).prop("id").split(",")[0];
                     console.log("Inside filter cID and tempModelEntity: ", cID, tempModelEntity);
                     if (cID == tempModelEntity) {
                         tempCircleIndex = m;
