@@ -3305,6 +3305,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                             moveBack();
                             membraneColorBack();
+                            reinitVariable();
                         })
 
                         // Yes button clicked!!
@@ -4778,6 +4779,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
                 }
 
+                // circle text
+                dycircletext[i] = dy[i];
+                circlewithtext[i]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("y", dycircletext[i])
+
                 cyinitial += ydistance;
                 dy1lineinitial += ydistance;
                 dy1lineinitial2 += ydistance;
@@ -4853,6 +4862,14 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                         .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")")
                         .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30");
                 }
+
+                // circle text
+                dycircletext[i] = dy[i];
+                circlewithtext[i]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("y", dycircletext[i])
 
                 // decrement y-axis of line and circle
                 cyinitialb += ydistance;
@@ -4937,6 +4954,28 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
             console.log("win BEFORE close and save clicked: ", win);
 
+            // Find dragged circle's index in the combinedMembrane
+            var tempIndex = 0, circleIDIndex;
+            if ($(cthis).attr("membrane") == paracellularID) {
+                circleIDIndex = $(cthis).attr("idParacellular").split(",");
+            }
+            else {
+                circleIDIndex = $(cthis).prop("id").split(",");
+            }
+
+            var findIndexOfCombinedMembrane = function () {
+                for (var i = 0; i < combinedMembrane.length; i++) {
+                    console.log("Inside filter: ", combinedMembrane[i].model_entity, circleIDIndex[0]);
+                    if (combinedMembrane[i].model_entity == circleIDIndex[0]) {
+                        // combinedMembrane[i].med_fma = membraneID;
+                        tempIndex = i;
+                        return;
+                    }
+                }
+            }
+
+            findIndexOfCombinedMembrane(); // combinedMembrane attr
+
             // close button clicked!!
             $("#mcloseID").click(function (event) {
 
@@ -4945,6 +4984,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 moveBack();
                 membraneColorBack();
                 reinitVariable();
+
+                if (mindex == 1)
+                    linebasolateral.transition().delay(1000).duration(1000).style("stroke", "orange");
+                else
+                    lineapical.transition().delay(1000).duration(1000).style("stroke", "green");
             })
 
             // save button clicked!!
@@ -4955,31 +4999,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                 console.log("win AFTER save clicked: ", win);
                 console.log("membrane: ", membrane);
                 console.log("combinedMembrane: ", combinedMembrane);
-
-                // Find dragged circle's index in the combinedMembrane
-                var tempIndex = 0;
-                var findIndexOfCombinedMembrane = function () {
-                    // var circleID = $(cthis).prop("id").split(",");
-
-                    var circleID;
-                    if ($(cthis).attr("membrane") == paracellularID) {
-                        circleID = $(cthis).attr("idParacellular").split(",");
-                    }
-                    else {
-                        circleID = $(cthis).prop("id").split(",");
-                    }
-
-                    for (var i = 0; i < combinedMembrane.length; i++) {
-                        console.log("Inside filter: ", combinedMembrane[i].model_entity, circleID[0]);
-                        if (combinedMembrane[i].model_entity == circleID[0]) {
-                            // combinedMembrane[i].med_fma = membraneID;
-                            tempIndex = i;
-                            return;
-                        }
-                    }
-                }
-
-                findIndexOfCombinedMembrane(); // combinedMembrane attr
 
                 // checkbox!!
                 if (win[0].children[1].children[0].children[9] != undefined) {
@@ -5063,7 +5082,6 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 membraneColorBack();
 
-                // var circleID = $(cthis).prop("id").split(",");
                 var circleID;
                 if ($(cthis).attr("membrane") == paracellularID) {
                     circleID = $(cthis).attr("idParacellular").split(",");
@@ -5074,23 +5092,111 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                 console.log("circleID: ", circleID);
 
-                // update combinedMembrane, this will be sent to GMS to assemble and reproduce a new cellml model
-                combinedMembrane[tempIndex].model_entity = circleID[0]; // cellml model entity (e.g. weinstein_1995.cellml#NHE3.J_NHE3_Na)
-                combinedMembrane[tempIndex].variable_text = circleID[2]; // cellml variable name (e.g. J_NHE_Na)
-                combinedMembrane[tempIndex].source_fma = circleID[4]; // source FMA uri
-                combinedMembrane[tempIndex].sink_fma = circleID[5]; // sink FMA uri
-                combinedMembrane[tempIndex].med_fma = circleID[8]; // mediator FMA uri
-                combinedMembrane[tempIndex].med_pr = circleID[9]; // mediator protein uri
-                combinedMembrane[tempIndex].solute_chebi = circleID[10]; // solute CHEBI uri
-                combinedMembrane[tempIndex].solute_text = circleID[12]; // solute text using the CHEBI uri from OLS
-                combinedMembrane[tempIndex].med_pr_text = circleID[14]; // mediator protein text using the mediator protein uri from OLS
-                combinedMembrane[tempIndex].med_pr_text_syn = circleID[15]; // synonym of a mediator protein text (e.g. NHE3, SGLT1) using the mediator protein uri from OLS
-                combinedMembrane[tempIndex].model_entity2 = circleID[1]; // cellml model entity => cotransporter or empty otherwise
-                combinedMembrane[tempIndex].variable_text2 = circleID[3]; // cellml variable name
-                combinedMembrane[tempIndex].source_fma2 = circleID[6]; // source FMA uri => cotransporter or empty otherwise
-                combinedMembrane[tempIndex].sink_fma2 = circleID[7]; // sink FMA uri => cotransporter or empty otherwise
-                combinedMembrane[tempIndex].solute_chebi2 = circleID[11]; // solute CHEBI uri
-                combinedMembrane[tempIndex].solute_text2 = circleID[13]; // solute text using the CHEBI uri from OLS
+                var totalCheckboxes = $("input:checkbox").length,
+                    numberOfChecked = $("input:checkbox:checked").length,
+                    numberOfNotChecked = totalCheckboxes - numberOfChecked;
+
+                console.log("totalCheckboxes, numberOfChecked, numberNotChecked: ", totalCheckboxes, numberOfChecked, numberOfNotChecked);
+
+                if (totalCheckboxes == numberOfNotChecked) {
+                    console.log("totalCheckboxes, numberNotChecked: ", totalCheckboxes, numberOfNotChecked);
+                    console.log("circleID checkboxes: ", circleID[4], circleID[5], circleID[8]);
+
+                    console.log("tempIndex: ", tempIndex);
+
+                    // mediator FMA uri
+                    if (combinedMembrane[tempIndex].med_fma == apicalID) {
+                        circleID[8] = basolateralID;
+                        combinedMembrane[tempIndex].med_fma = basolateralID;
+
+                        // source and sink FMA uri
+                        if (combinedMembrane[tempIndex].source_fma == luminalID && combinedMembrane[tempIndex].sink_fma == cytosolID) {
+                            circleID[4] = cytosolID;
+                            combinedMembrane[tempIndex].source_fma = cytosolID;
+                            circleID[5] = interstitialID;
+                            combinedMembrane[tempIndex].sink_fma = interstitialID;
+                        }
+
+                        if (combinedMembrane[tempIndex].source_fma == cytosolID && combinedMembrane[tempIndex].sink_fma == luminalID) {
+                            circleID[4] = interstitialID;
+                            combinedMembrane[tempIndex].source_fma = interstitialID;
+                            circleID[5] = cytosolID;
+                            combinedMembrane[tempIndex].sink_fma = cytosolID;
+                        }
+
+                        // source2 and sink2 FMA uri
+                        if (combinedMembrane[tempIndex].source_fma2 != "" && combinedMembrane[tempIndex].sink_fma2 != "") {
+                            if (combinedMembrane[tempIndex].source_fma2 == luminalID && combinedMembrane[tempIndex].sink_fma2 == cytosolID) {
+                                circleID[6] = cytosolID;
+                                combinedMembrane[tempIndex].source_fma2 = cytosolID;
+                                circleID[7] = interstitialID;
+                                combinedMembrane[tempIndex].sink_fma2 = interstitialID;
+                            }
+
+                            if (combinedMembrane[tempIndex].source_fma2 == cytosolID && combinedMembrane[tempIndex].sink_fma2 == luminalID) {
+                                circleID[6] = interstitialID;
+                                combinedMembrane[tempIndex].source_fma2 = interstitialID;
+                                circleID[7] = cytosolID;
+                                combinedMembrane[tempIndex].sink_fma2 = cytosolID;
+                            }
+                        }
+                    }
+                    else {
+                        circleID[8] = apicalID;
+                        combinedMembrane[tempIndex].med_fma = apicalID;
+
+                        // source and sink FMA uri
+                        if (combinedMembrane[tempIndex].source_fma == cytosolID && combinedMembrane[tempIndex].sink_fma == interstitialID) {
+                            circleID[4] = luminalID;
+                            combinedMembrane[tempIndex].source_fma = luminalID;
+                            circleID[5] = cytosolID;
+                            combinedMembrane[tempIndex].sink_fma = cytosolID;
+                        }
+
+                        if (combinedMembrane[tempIndex].source_fma == interstitialID && combinedMembrane[tempIndex].sink_fma == cytosolID) {
+                            circleID[4] = cytosolID;
+                            combinedMembrane[tempIndex].source_fma = cytosolID;
+                            circleID[5] = luminalID;
+                            combinedMembrane[tempIndex].sink_fma = luminalID;
+                        }
+
+                        // source2 and sink2 FMA uri
+                        if (circleIDIndex[6] != "" && circleIDIndex[7] != "") {
+                            if (combinedMembrane[tempIndex].source_fma2 == cytosolID && combinedMembrane[tempIndex].sink_fma2 == interstitialID) {
+                                circleID[6] = luminalID;
+                                combinedMembrane[tempIndex].source_fma2 = luminalID;
+                                circleID[7] = cytosolID;
+                                combinedMembrane[tempIndex].sink_fma2 = cytosolID;
+                            }
+
+                            if (combinedMembrane[tempIndex].source_fma2 == interstitialID && combinedMembrane[tempIndex].sink_fma2 == cytosolID) {
+                                circleID[6] = cytosolID;
+                                combinedMembrane[tempIndex].source_fma2 = cytosolID;
+                                circleID[7] = luminalID;
+                                combinedMembrane[tempIndex].sink_fma2 = luminalID;
+                            }
+                        }
+                    }
+                }
+                else {
+                    // update combinedMembrane, this will be sent to GMS to assemble and reproduce a new cellml model
+                    combinedMembrane[tempIndex].model_entity = circleID[0]; // cellml model entity (e.g. weinstein_1995.cellml#NHE3.J_NHE3_Na)
+                    combinedMembrane[tempIndex].variable_text = circleID[2]; // cellml variable name (e.g. J_NHE_Na)
+                    combinedMembrane[tempIndex].source_fma = circleID[4]; // source FMA uri
+                    combinedMembrane[tempIndex].sink_fma = circleID[5]; // sink FMA uri
+                    combinedMembrane[tempIndex].med_fma = circleID[8]; // mediator FMA uri
+                    combinedMembrane[tempIndex].med_pr = circleID[9]; // mediator protein uri
+                    combinedMembrane[tempIndex].solute_chebi = circleID[10]; // solute CHEBI uri
+                    combinedMembrane[tempIndex].solute_text = circleID[12]; // solute text using the CHEBI uri from OLS
+                    combinedMembrane[tempIndex].med_pr_text = circleID[14]; // mediator protein text using the mediator protein uri from OLS
+                    combinedMembrane[tempIndex].med_pr_text_syn = circleID[15]; // synonym of a mediator protein text (e.g. NHE3, SGLT1) using the mediator protein uri from OLS
+                    combinedMembrane[tempIndex].model_entity2 = circleID[1]; // cellml model entity => cotransporter or empty otherwise
+                    combinedMembrane[tempIndex].variable_text2 = circleID[3]; // cellml variable name
+                    combinedMembrane[tempIndex].source_fma2 = circleID[6]; // source FMA uri => cotransporter or empty otherwise
+                    combinedMembrane[tempIndex].sink_fma2 = circleID[7]; // sink FMA uri => cotransporter or empty otherwise
+                    combinedMembrane[tempIndex].solute_chebi2 = circleID[11]; // solute CHEBI uri
+                    combinedMembrane[tempIndex].solute_text2 = circleID[13]; // solute text using the CHEBI uri from OLS
+                }
 
                 // TODO: circle placement and rearrangement
                 // TODO: membrane attr changed above, thus it affects here.
@@ -5132,6 +5238,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     dxcircletext[icircleGlobal] = dx[icircleGlobal] - 15;
                     // dycircletext[icircleGlobal] = dy[icircleGlobal] + 23;
                     circlewithtext[icircleGlobal]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
                         .attr("x", dxcircletext[icircleGlobal])
                         .attr("y", dycircletext[icircleGlobal])
 
@@ -5207,6 +5316,9 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     dxcircletext[icircleGlobal] = dx[icircleGlobal] - 15;
                     // dycircletext[icircleGlobal] = dy[icircleGlobal] + 23;
                     circlewithtext[icircleGlobal]
+                        .transition()
+                        .delay(1000)
+                        .duration(1000)
                         .attr("x", dxcircletext[icircleGlobal])
                         .attr("y", dycircletext[icircleGlobal])
 
@@ -5244,31 +5356,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                     circleRearrange();
                 }
 
-                // TODO: change line arrow and text
-                console.log("cthis: ", cthis);
-                console.log("linewithlineg: ", linewithlineg);
-                console.log("linewithtextg: ", linewithtextg);
-                console.log("circlewithlineg: ", circlewithlineg);
-                console.log("linewithlineg2: ", linewithlineg2);
-                console.log("linewithtextg2: ", linewithtextg2);
-                console.log("size linewithlineg linewithlineg2: ", linewithlineg.length, linewithlineg2.length);
-                console.log("size linewithtextg linewithtextg2: ", linewithtextg.length, linewithlineg2.length);
-                console.log("size circlewithlineg.length: ", circlewithlineg.length);
-                console.log("size dx1line dy1line dx2line dy2line: ", dx1line.length, dy1line.length, dx2line.length, dy2line.length);
-                console.log("size dx1line2 dy1line2 dx2line2 dy2line2: ", dx1line2.length, dy1line2.length, dx2line2.length, dy2line2.length);
-                console.log("size dxtext dytext dxtext2 dytext2: ", dxtext.length, dytext.length, dxtext2.length, dytext2.length);
-                console.log("size dx dy: ", dx.length, dy.length);
-
                 var sourcefma = combinedMembrane[tempIndex].source_fma,
                     sinkfma = combinedMembrane[tempIndex].sink_fma,
                     mediatorfma = combinedMembrane[tempIndex].med_fma,
                     sourcefma2 = combinedMembrane[tempIndex].source_fma2,
                     sinkfma2 = combinedMembrane[tempIndex].sink_fma2,
                     variable_text2 = combinedMembrane[tempIndex].variable_text2;
-
-                console.log("case before sourcefma, sinkfma: ", sourcefma, sinkfma);
-                console.log("case before mediatorfma: ", mediatorfma);
-                console.log("case before sourcefma2, sinkfma2, variable_text2: ", sourcefma2, sinkfma2, variable_text2);
 
                 if (mediatorfma == apicalID) {
 
@@ -5286,6 +5379,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 2
@@ -5303,6 +5398,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 3
@@ -5331,6 +5428,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 4
@@ -5361,6 +5460,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 5
@@ -5391,10 +5492,13 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
 
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 6
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && (sourcefma2 == luminalID && sinkfma2 == cytosolID)) {
+
+                        console.log("case 6 apical");
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(end)") {
                             // line marker
@@ -5420,6 +5524,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
                 }
 
@@ -5427,7 +5533,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
                     // case 1
                     if ((sourcefma == cytosolID && sinkfma == interstitialID) && variable_text2 == "single flux") {
-
+                        console.log("case 1");
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-start", null);
@@ -5439,6 +5545,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 2
@@ -5456,6 +5564,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 3
@@ -5484,6 +5594,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 4
@@ -5514,6 +5626,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 5
@@ -5543,6 +5657,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 6
@@ -5572,21 +5688,10 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
+
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
                 }
-
-                console.log("tempIndex, tempIndex: ", tempIndex, tempIndex);
-                console.log("linewithlineg x1,y1 x2,y2: ", linewithlineg[tempIndex].attr("x1"), linewithlineg[tempIndex].attr("y1"),
-                    linewithlineg[tempIndex].attr("x2"), linewithlineg[tempIndex].attr("y2"));
-                console.log("linewithtextg x,y: ", linewithtextg[tempIndex].attr("x"), linewithtextg[tempIndex].attr("y"));
-                console.log("dxtext,dytext: ", dxtext[tempIndex], dytext[tempIndex]);
-
-                console.log("circlewithlineg cx,cy: ", circlewithlineg[tempIndex].attr("cx"), circlewithlineg[tempIndex].attr("cy"));
-
-                console.log("linewithlineg2 x1,y1 x2,y2: ", linewithlineg2[tempIndex].attr("x1"), linewithlineg2[tempIndex].attr("y1"),
-                    linewithlineg2[tempIndex].attr("x2"), linewithlineg2[tempIndex].attr("y2"));
-                console.log("linewithtextg2 x,y: ", linewithtextg2[tempIndex].attr("x"), linewithtextg2[tempIndex].attr("y"));
-                console.log("dxtext2,dytext2: ", dxtext2[tempIndex], dytext2[tempIndex]);
 
                 // Reinitialise variables for next iteration
                 reinitVariable();
@@ -5655,7 +5760,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         $this.setHeader($this.options.header);
     }
 
-// build the start arrow.
+    // build the start arrow.
     svg.append("svg:defs")
         .selectAll("marker")
         .data(["start"])      // Different link/path types can be defined here
@@ -5670,7 +5775,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-// build the starttop arrow.
+    // build the starttop arrow.
     svg.append("svg:defs")
         .selectAll("marker")
         .data(["starttop"])      // Different link/path types can be defined here
@@ -5685,7 +5790,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-// build the end arrow.
+    // build the end arrow.
     svg.append("svg:defs").selectAll("marker")
         .data(["end"])      // Different link/path types can be defined here
         .enter().append("svg:marker")    // This section adds in the arrows
@@ -5699,7 +5804,7 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-// Utility for marker direction
+    // Utility for marker direction
     function markerDir(selection) {
         console.log("selection: ", selection);
 
