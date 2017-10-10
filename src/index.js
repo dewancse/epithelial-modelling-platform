@@ -29,6 +29,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     var svgmodelHtml = "./snippets/svgmodel.html";
     var svgepithelialHtml = "./snippets/svgepithelial.html";
 
+    var combinedMembrane = [];
+
     // namespace for utility
     var mainUtils = {};
 
@@ -296,7 +298,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     var workspaceName = idWithStr.slice(0, index);
 
                     var tempidWithStr = event.target.id;
-                    ;
 
                     mainUtils.workspaceName = workspaceName;
                     mainUtils.tempidWithStr = tempidWithStr;
@@ -308,8 +309,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     mainUtils.tempidWithStr = "";
                 }
             }
-
-
         },
 
         model: function (event) {
@@ -344,7 +343,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 var workspaceName = idWithStr.slice(0, index);
 
                 var tempidWithStr = event.target.id;
-                ;
 
                 // mainUtils.workspaceName.push(workspaceName);
                 mainUtils.workspaceName = workspaceName;
@@ -1177,15 +1175,43 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                     if (counter == iteration(membrane.length)) {
 
-                        console.log("membrane: ", membrane);
+                        console.log("membrane in index.js: ", membrane);
+                        console.log("apicalMembrane in index.js: ", apicalMembrane);
+                        console.log("basolateralMembrane in index.js: ", basolateralMembrane);
+
+                        for (var i = 0; i < membrane.length; i++) {
+                            for (var j = 0; j < modelEntityFullNameArray.length; j++) {
+                                if (membrane[i].model_entity == modelEntityFullNameArray[j]) {
+
+                                    // Remove from modelEntityFullNameArray
+                                    modelEntityFullNameArray.splice(j, 1);
+
+                                    // Remove from modelEntityNameArray
+                                    modelEntityNameArray.splice(j, 1);
+
+                                    // Remove from model2DArray
+                                    model2DArray.forEach(function (elem, index) {
+                                        if (membrane[i].model_entity == elem[1]) {
+                                            model2DArray.splice(index, 1);
+                                        }
+                                    })
+                                }
+                            }
+                        }
+
+                        console.log("model2DArr: ", model2DArray);
+                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
 
                         showsvgEpithelial(
+                            combinedMembrane,
                             concentration_fma,
                             source_fma2,
                             sink_fma2,
                             apicalMembrane,
                             basolateralMembrane,
-                            membrane);
+                            membrane
+                        );
                     }
                 },
                 true);
@@ -1468,15 +1494,33 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
                                                 // special case: one flux is chosen
                                                 if (membrane.length <= 1) {
-                                                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
-                                                    // console.log("membrane.length <= 1 concentration_fma: ", concentration_fma);
-                                                    // console.log("membrane.length <= 1 source_fma2: ", source_fma2);
-                                                    // console.log("membrane.length <= 1 sink_fma2: ", sink_fma2);
-                                                    // console.log("membrane.length <= 1 apicalMembrane: ", apicalMembrane);
-                                                    // console.log("membrane.length <= 1 basolateralMembrane: ", basolateralMembrane);
-                                                    // console.log("membrane.length <= 1 membrane: ", membrane);
+
+                                                    for (var i = 0; i < membrane.length; i++) {
+                                                        for (var j = 0; j < modelEntityFullNameArray.length; j++) {
+                                                            if (membrane[i].model_entity == modelEntityFullNameArray[j]) {
+
+                                                                // Remove from modelEntityFullNameArray
+                                                                modelEntityFullNameArray.splice(j, 1);
+
+                                                                // Remove from modelEntityNameArray
+                                                                modelEntityNameArray.splice(j, 1);
+
+                                                                // Remove from model2DArray
+                                                                model2DArray.forEach(function (elem, index) {
+                                                                    if (membrane[i].model_entity == elem[1]) {
+                                                                        model2DArray.splice(index, 1);
+                                                                    }
+                                                                })
+                                                            }
+                                                        }
+                                                    }
+
+                                                    console.log("model2DArr: ", model2DArray);
+                                                    console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                                    console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
 
                                                     showsvgEpithelial(
+                                                        combinedMembrane,
                                                         concentration_fma,
                                                         source_fma2,
                                                         sink_fma2,

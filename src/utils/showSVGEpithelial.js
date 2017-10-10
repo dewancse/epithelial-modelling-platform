@@ -9,9 +9,9 @@ var sendPostRequest = require("../libs/ajax-utils.js").sendPostRequest;
 var sendGetRequest = require("../libs/ajax-utils.js").sendGetRequest;
 var showLoading = require("../utils/misc.js").showLoading;
 var uniqueifyEpithelial = require("../utils/misc.js").uniqueifyEpithelial;
-var parserFmaNameText = require("../utils/misc.js").parserFmaNameText;
 
-var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apicalMembrane, basolateralMembrane, membrane) {
+var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
+                                  apicalMembrane, basolateralMembrane, membrane) {
 
     var apicalID = "http://identifiers.org/fma/FMA:84666";
     var basolateralID = "http://identifiers.org/fma/FMA:84669";
@@ -40,12 +40,12 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
     var idProtein = 0, idAltProtein = 0, idMembrane = 0, loc, typeOfModel, altCellmlModel = "", cthis;
     var icircleGlobal, organIndex, model_entity, model_entity2;
 
-    var line = [], mindex;
-
     var dx = [], dy = [], dxcircletext = [], dycircletext = [],
         dxtext = [], dytext = [], dxtext2 = [], dytext2 = [],
         dx1line = [], dy1line = [], dx2line = [], dy2line = [],
         dx1line2 = [], dy1line2 = [], dx2line2 = [], dy2line2 = [];
+
+    var line = [], mindex;
 
     var id = 0;
 
@@ -320,13 +320,11 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     console.log("membrane: ", membrane);
     console.log("concentration_fma: ", concentration_fma);
-    console.log("source_fma: ", source_fma);
-    console.log("sink_fma: ", sink_fma);
     console.log("apicalMembrane: ", apicalMembrane);
     console.log("basolateralMembrane: ", basolateralMembrane);
     console.log("paracellularMembrane: ", paracellularMembrane);
 
-    var combinedMembrane = [];
+    // var combinedMembrane = [];
 
     for (var i = 0; i < apicalMembrane.length; i++)
         combinedMembrane.push(apicalMembrane[i]);
@@ -348,11 +346,25 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
 
     var prevHeight = height;
 
-    if (apicalMembrane.length > basolateralMembrane.length && apicalMembrane.length > 4)
-        height += 50 * (apicalMembrane.length - 4);
+    var lengthOfApicalMem = 0, lengthOfBasoMem = 0;
+    for (var i = 0; i < combinedMembrane.length; i++) {
+        if (combinedMembrane[i].med_fma == apicalID)
+            lengthOfApicalMem++;
+        else if (combinedMembrane[i].med_fma == basolateralID)
+            lengthOfBasoMem++;
+    }
 
-    if (basolateralMembrane.length > apicalMembrane.length && basolateralMembrane.length > 4)
-        height += 50 * (basolateralMembrane.length - 4);
+    // if (apicalMembrane.length > basolateralMembrane.length && apicalMembrane.length > 4)
+    //     height += 50 * (apicalMembrane.length - 4);
+    //
+    // if (basolateralMembrane.length > apicalMembrane.length && basolateralMembrane.length > 4)
+    //     height += 50 * (basolateralMembrane.length - 4);
+
+    if (lengthOfApicalMem > lengthOfBasoMem && lengthOfApicalMem > 4)
+        height += 50 * (lengthOfApicalMem - 4);
+
+    if (lengthOfBasoMem > lengthOfApicalMem && lengthOfBasoMem > 4)
+        height += 50 * (lengthOfBasoMem - 4);
 
     if (prevHeight != height) {
         h += (height - prevHeight);
@@ -883,7 +895,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         /*  Apical Membrane */
         if (mediator_fma == apicalID) {
             // case 1
-            if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
+            if ((src_fma == luminalID && snk_fma == cytosolID) &&
+                ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == luminalID && snk_fma2 == cytosolID))) {
                 var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                 linewithlineg[i] = lineg.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -1062,7 +1075,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // case 2
-            if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
+            if ((src_fma == cytosolID && snk_fma == luminalID) &&
+                ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == cytosolID && snk_fma2 == luminalID))) {
                 var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                 linewithlineg[i] = lineg.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -1873,7 +1887,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
         /*  Basolateral Membrane */
         if (mediator_fma == basolateralID) {
             // case 1
-            if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
+            if ((src_fma == cytosolID && snk_fma == interstitialID) &&
+                ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == cytosolID && snk_fma2 == interstitialID))) {
                 var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                 linewithlineg[i] = lineg.append("line")
                     .attr("id", "linewithlineg" + tempID)
@@ -2053,7 +2068,8 @@ var showsvgEpithelial = function (concentration_fma, source_fma, sink_fma, apica
             }
 
             // case 2
-            if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
+            if ((src_fma == interstitialID && snk_fma == cytosolID) &&
+                ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == interstitialID && snk_fma2 == cytosolID))) {
                 var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                 linewithlineg[i] = lineg.append("line")
                     .attr("id", "linewithlineg" + tempID)
