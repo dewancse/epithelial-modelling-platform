@@ -1172,9 +1172,9 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
         return checkBox;
     }
 
-    var div = d3.select("#svgVisualize").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    // var div = d3.select("#svgVisualize").append("div")
+    //     .attr("class", "tooltip")
+    //     .style("opacity", 0);
 
     var state = 0;
     $(document).on({
@@ -7553,6 +7553,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
 
+        // remove visualized solutes in the next iteration in Load Model page
         var rmFromModelEntityFullNameArray = function (membrane, concentration_fma) {
             for (var i = 0; i < membrane.length; i++) {
                 for (var j = 0; j < modelEntityFullNameArray.length; j++) {

@@ -1057,6 +1057,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
 
+        // remove visualized solutes in the next iteration in Load Model page
         var rmFromModelEntityFullNameArray = function (membrane, concentration_fma) {
             for (var i = 0; i < membrane.length; i++) {
                 for (var j = 0; j < modelEntityFullNameArray.length; j++) {
