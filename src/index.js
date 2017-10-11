@@ -72,7 +72,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#help");
 
-        $("#main-content").html("... Help Page !!!");
+        $("#main-content").html("Documentation can be found at the " +
+            '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" target="_blank">Epithelial Modelling Platform</a>');
     };
 
     // On page load (before img or CSS)

@@ -1172,9 +1172,9 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
         return checkBox;
     }
 
-    // var div = d3.select("#svgVisualize").append("div")
-    //     .attr("class", "tooltip")
-    //     .style("opacity", 0);
+    var div = d3.select("#svgVisualize").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
     var state = 0;
     $(document).on({
@@ -6568,7 +6568,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#help");
 
-        $("#main-content").html("... Help Page !!!");
+        $("#main-content").html("Documentation can be found at the " +
+            '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" target="_blank">Epithelial Modelling Platform</a>');
     };
 
     // On page load (before img or CSS)
