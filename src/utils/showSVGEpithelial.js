@@ -191,24 +191,24 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
                     variable_text: membrane[i].variable_text,
                     source_fma: membrane[i].source_fma,
                     sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: "",
-                    solute_text2: "",
+                    solute_chebi2: "channel",
+                    solute_text2: "channel",
                     variable_text2: "channel",
-                    source_fma2: "",
-                    sink_fma2: "",
+                    source_fma2: "channel",
+                    sink_fma2: "channel",
                     model_entity: membrane[i].model_entity,
-                    model_entity2: "",
+                    model_entity2: "channel",
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
                     med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
 
-            membrane[i].solute_chebi2 = "";
-            membrane[i].solute_text2 = "";
+            membrane[i].solute_chebi2 = "channel";
+            membrane[i].solute_text2 = "channel";
             membrane[i].variable_text2 = "channel";
-            membrane[i].source_fma2 = "";
-            membrane[i].sink_fma2 = "";
+            membrane[i].source_fma2 = "channel";
+            membrane[i].sink_fma2 = "channel";
         }
 
         if (membrane[i].med_fma == basolateralID && (membrane[i].med_pr == Nachannel ||
@@ -220,24 +220,24 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
                     variable_text: membrane[i].variable_text,
                     source_fma: membrane[i].source_fma,
                     sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: "",
-                    solute_text2: "",
+                    solute_chebi2: "channel",
+                    solute_text2: "channel",
                     variable_text2: "channel",
-                    source_fma2: "",
-                    sink_fma2: "",
+                    source_fma2: "channel",
+                    sink_fma2: "channel",
                     model_entity: membrane[i].model_entity,
-                    model_entity2: "",
+                    model_entity2: "channel",
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
                     med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
 
-            membrane[i].solute_chebi2 = "";
-            membrane[i].solute_text2 = "";
+            membrane[i].solute_chebi2 = "channel";
+            membrane[i].solute_text2 = "channel";
             membrane[i].variable_text2 = "channel";
-            membrane[i].source_fma2 = "";
-            membrane[i].sink_fma2 = "";
+            membrane[i].source_fma2 = "channel";
+            membrane[i].sink_fma2 = "channel";
         }
 
         if (membrane[i].source_fma == luminalID && membrane[i].sink_fma == interstitialID) {
@@ -248,24 +248,24 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
                     variable_text: membrane[i].variable_text,
                     source_fma: membrane[i].source_fma,
                     sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: "",
-                    solute_text2: "",
+                    solute_chebi2: "diffusive channel",
+                    solute_text2: "diffusive channel",
                     variable_text2: "diffusive channel",
-                    source_fma2: "",
-                    sink_fma2: "",
+                    source_fma2: "diffusive channel",
+                    sink_fma2: "diffusive channel",
                     model_entity: membrane[i].model_entity,
-                    model_entity2: "",
+                    model_entity2: "diffusive channel",
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
                     med_pr_text_syn: membrane[i].med_pr_text_syn
                 });
 
-            membrane[i].solute_chebi2 = "";
-            membrane[i].solute_text2 = "";
+            membrane[i].solute_chebi2 = "diffusive channel";
+            membrane[i].solute_text2 = "diffusive channel";
             membrane[i].variable_text2 = "diffusive channel";
-            membrane[i].source_fma2 = "";
-            membrane[i].sink_fma2 = "";
+            membrane[i].source_fma2 = "diffusive channel";
+            membrane[i].sink_fma2 = "diffusive channel";
         }
     }
 
@@ -336,7 +336,7 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
     console.log("combinedMembrane: ", combinedMembrane);
 
     var g = $("#svgVisualize"),
-        wth = 1200,
+        wth = 2000, // 1200,
         hth = 900,
         width = 300,
         height = 400;
