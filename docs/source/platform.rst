@@ -14,4 +14,6 @@ polygons, where as diffusive fluxes in the paracellular pathway have been presen
 by an arrow. On the right side, we have generated checkboxes on the right side for each of the fluxes. 
 Modellers’ can drag and drop existing fluxes onto the other membrane. For example, modellers’ could drag 
 and drop the NaCl cotransporeter ontobasolateral membrane and afterwards this platform will render some 
-useful suggestion, which we call recommender system, discussed in the next section.    
+useful suggestion, which we call recommender system, discussed in the next section.
+
+.. image:: epithelial.png

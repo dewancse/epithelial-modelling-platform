@@ -7,3 +7,5 @@ such as CellML model entity – name of the model, component name, and variable 
 deposited in PMR for discovery; protein name; and species and gene used for models’ experiment. The view 
 option will provide detailed information of a specific model. If modellers are happy with their model, 
 they will click “Add to Model” and can come back here to discover new models.
+
+.. image:: modeldiscovery.png

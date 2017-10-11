@@ -6,4 +6,6 @@ screenshoot. We have provided here variou option for users to finalize their mdo
 more information, delete option to delete model(s) if they are not happy with, visualization option to 
 get a a comparison between the selected models here. In addition, we have provided compartment and location 
 for a quick view. If modellers’ are happy with the discovered models in this page, they will select models 
-and click the “Epithelial Platform” option to visualize these models as SVG. 
+and click the “Epithelial Platform” option to visualize these models as SVG.
+
+.. image:: loadmodel.png

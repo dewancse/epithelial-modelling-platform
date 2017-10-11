@@ -10,3 +10,5 @@ from various workspaces, and related kidney models. Tooltip options have been pr
 modellers’, as well as link to the CellML workspace to get a detailoed oveview of the model. Modellers’ could choose 
 one of the models here for a repalcement of the dragged model and this will be reflected in the SVG based platform. 
 Otherwise, modellers’ could simply click save option if they are happy with the dragged one on the opposite membrane.
+
+.. image:: recommender.png

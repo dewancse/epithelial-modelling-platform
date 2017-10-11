@@ -18,7 +18,6 @@ GMS will assemble these models and send back an URI with a new model.
    platform
    recommender
 
-
 Indices and tables
 ==================
 
