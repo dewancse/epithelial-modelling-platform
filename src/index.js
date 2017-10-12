@@ -73,7 +73,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         switchMenuToActive(activeItem, "#help");
 
         $("#main-content").html("Documentation can be found at the " +
-            '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" target="_blank">Epithelial Modelling Platform</a>');
+            '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" ' +
+            'target="_blank">Epithelial Modelling Platform</a>');
     };
 
     // On page load (before img or CSS)

@@ -4041,6 +4041,144 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
             true);
     }
 
+    // TODO: add this inside showModalWindow function
+    var proteinSimilarity = function () {
+        var PID = ["P11170", "P31636", "P26433", "Q62439"],
+            index = 0,
+            ProteinSeq = "",
+            requestData;
+
+        // https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=48923608
+        var WSDbfetchREST = function () {
+            var dbfectendpoint = "http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+
+            sendGetRequest(
+                dbfectendpoint,
+                function (psequence) {
+                    ProteinSeq += psequence;
+
+                    index++;
+                    if (index == PID.length) {
+                        console.log("ProteinSeq: ", ProteinSeq);
+
+                        requestData = {
+                            "sequence": ProteinSeq,
+                            "email": "dsar941@aucklanduni.ac.nz"
+                        }
+
+                        console.log("requestData: ", requestData);
+
+                        ClustaloREST();
+                        return;
+                    }
+
+                    WSDbfetchREST();
+                },
+                false);
+        }
+
+        WSDbfetchREST();
+
+        var baseUrl = 'https://www.ebi.ac.uk/Tools/services/rest/clustalo';
+
+        // https://www.ebi.ac.uk/seqdb/confluence/display/WEBSERVICES/clustalo_rest
+        var ClustaloREST = function () {
+
+            var requestUrl = baseUrl + '/run/';
+
+            sendPostRequest(
+                requestUrl,
+                requestData,
+                function (jobId) {
+                    console.log("jobId: ", jobId); // jobId
+
+                    var jobIdUrl = baseUrl + '/status/' + jobId;
+                    sendGetRequest(
+                        jobIdUrl,
+                        function (resultObj) {
+                            console.log("result: ", resultObj); // jobId status
+
+                            var pimUrl = baseUrl + '/result/' + jobId + '/pim';
+                            sendGetRequest(
+                                pimUrl,
+                                function (resultPM) {
+                                    console.log("resultPM: ", resultPM); // Identity Matrix
+                                },
+                                false
+                            )
+                        },
+                        false
+                    )
+                },
+                false);
+        }
+
+        var identityMatrix =
+            'resultPM:  #' +
+            '#' +
+            '#  Percent Identity  Matrix - created by Clustal2.1' +
+            '#' +
+            '#' +
+
+            '1: P11170      100.00   73.03   17.61   21.24' +
+            '2: P31636       73.03  100.00   17.47   23.05' +
+            '3: P26433       17.61   17.47  100.00   21.08' +
+            '4: Q62439       21.24   23.05   21.08  100.00';
+
+        // console.log("Identity Matrix: ", identityMatrix);
+
+        // Remove before '1:' in the Identity Matrix
+        var indexOfColon = identityMatrix.search("1:");
+        identityMatrix = identityMatrix.slice(indexOfColon + 1, identityMatrix.length);
+
+        // console.log("New Identity Matrix: ", identityMatrix);
+
+        // Include protein and make a 2D array
+        var matrixArray = identityMatrix.match(/[(\w)*\d\.]+/gi),
+            proteinIndex = [],
+            twoDMatrix = [];
+
+        console.log("matrixArray: ", matrixArray);
+
+        // proteinIndex consists of protein ID and index in the matrixArray
+        for (var i = 0; i < matrixArray.length; i++) {
+            if (matrixArray[i].charAt(0).match(/[A-Za-z]/gi)) {
+                proteinIndex.push([matrixArray[i], i]);
+            }
+        }
+
+        // 1D to 2D array
+        while (matrixArray.length) {
+            matrixArray.splice(0, 1); // remove protein ID
+            twoDMatrix.push(matrixArray.splice(0, proteinIndex.length));
+        }
+
+        // convert string to float
+        for (var i = 0; i < twoDMatrix.length; i++) {
+            for (var j = 0; j < twoDMatrix[i].length; j++) {
+                twoDMatrix[i][j] = parseFloat(twoDMatrix[i][j]);
+            }
+        }
+
+        console.log("twoDMatrix: ", twoDMatrix);
+
+        // extract combination of protein similarity from the 2D array (twoDMatrix)
+        var similarityOBJ = [];
+        for (var i = 0; i < twoDMatrix.length; i++) {
+            for (var j = 0; j < twoDMatrix.length; j++) {
+                if (i == j || j < i) continue;
+
+                similarityOBJ.push({
+                    "PID1": proteinIndex[i][0],
+                    "PID2": proteinIndex[j][0],
+                    "similarity": twoDMatrix[i][j]
+                })
+            }
+        }
+
+        console.log("similarityOBJ: ", similarityOBJ);
+    }
+
     var showModalWindow = function (workspaceName, membraneName) {
         idMembrane = 0;
 
