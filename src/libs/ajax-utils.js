@@ -58,7 +58,14 @@ function handleResponse(request, responseHandler, isJsonResponse) {
             responseHandler(request.responseText);
         }
     }
+
+    else if (request.readyState == 4) {
+        console.log("ERROR!");
+        console.error(request.responseText);
+    }
 }
 
 exports.sendGetRequest = sendGetRequest;
 exports.sendPostRequest = sendPostRequest;
+exports.getRequestObject = getRequestObject;
+exports.handleResponse = handleResponse;

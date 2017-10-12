@@ -350,10 +350,17 @@ function handleResponse(request, responseHandler, isJsonResponse) {
             responseHandler(request.responseText);
         }
     }
+
+    else if (request.readyState == 4) {
+        console.log("ERROR!");
+        console.error(request.responseText);
+    }
 }
 
 exports.sendGetRequest = sendGetRequest;
 exports.sendPostRequest = sendPostRequest;
+exports.getRequestObject = getRequestObject;
+exports.handleResponse = handleResponse;
 
 /***/ }),
 /* 2 */
@@ -370,6 +377,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 var sendGetRequest = __webpack_require__(1).sendGetRequest;
 var showLoading = __webpack_require__(0).showLoading;
 var uniqueifyEpithelial = __webpack_require__(0).uniqueifyEpithelial;
+var getRequestObject = __webpack_require__(1).getRequestObject;
+var handleResponse = __webpack_require__(1).handleResponse;
 
 var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
                                   apicalMembrane, basolateralMembrane, membrane) {
@@ -4402,6 +4411,167 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
             true);
     }
 
+    // TODO: add this inside showModalWindow function
+    var proteinSimilarity = function () {
+        var PID = ["P11170", "P31636", "P26433", "Q62439"],
+            index = 0,
+            ProteinSeq = "",
+            requestData;
+
+        // https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=48923608
+        var WSDbfetchREST = function () {
+            var dbfectendpoint = "http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+
+            sendGetRequest(
+                dbfectendpoint,
+                function (psequence) {
+                    ProteinSeq += psequence;
+
+                    index++;
+                    if (index == PID.length) {
+                        console.log("ProteinSeq: ", ProteinSeq);
+
+                        requestData = {
+                            "sequence": ProteinSeq,
+                            "email": "dsar941@aucklanduni.ac.nz"
+                        }
+
+                        console.log("requestData: ", requestData);
+
+                        ClustaloREST();
+                        return;
+                    }
+
+                    WSDbfetchREST();
+                },
+                false);
+        }
+
+        WSDbfetchREST();
+
+        var baseUrl = 'https://www.ebi.ac.uk/Tools/services/rest/clustalo';
+
+        // https://www.ebi.ac.uk/seqdb/confluence/display/WEBSERVICES/clustalo_rest
+        var ClustaloREST = function () {
+
+            var requestUrl = baseUrl + '/run/';
+
+            sendPostRequest(
+                requestUrl,
+                requestData,
+                function (jobId) {
+                    console.log("jobId: ", jobId); // jobId
+
+                    var jobIdUrl = baseUrl + '/status/' + jobId;
+                    sendGetRequest(
+                        jobIdUrl,
+                        function (resultObj) {
+                            console.log("result: ", resultObj); // jobId status
+
+                            var pimUrl = baseUrl + '/result/' + jobId + '/pim';
+                            sendGetRequest(
+                                pimUrl,
+                                function (resultPM) {
+                                    console.log("resultPM: ", resultPM); // Identity Matrix
+                                },
+                                false
+                            )
+                        },
+                        false
+                    )
+                },
+                false);
+        }
+
+        var identityMatrix =
+            'resultPM:  #' +
+            '#' +
+            '#  Percent Identity  Matrix - created by Clustal2.1' +
+            '#' +
+            '#' +
+
+            '1: P11170      100.00   73.03   17.61   21.24' +
+            '2: P31636       73.03  100.00   17.47   23.05' +
+            '3: P26433       17.61   17.47  100.00   21.08' +
+            '4: Q62439       21.24   23.05   21.08  100.00';
+
+        // console.log("Identity Matrix: ", identityMatrix);
+
+        // Remove before '1:' in the Identity Matrix
+        var indexOfColon = identityMatrix.search("1:");
+        identityMatrix = identityMatrix.slice(indexOfColon + 1, identityMatrix.length);
+
+        // console.log("New Identity Matrix: ", identityMatrix);
+
+        // Include protein and make a 2D array
+        var matrixArray = identityMatrix.match(/[(\w)*\d\.]+/gi),
+            proteinIndex = [],
+            twoDMatrix = [];
+
+        console.log("matrixArray: ", matrixArray);
+
+        // proteinIndex consists of protein ID and index in the matrixArray
+        for (var i = 0; i < matrixArray.length; i++) {
+            if (matrixArray[i].charAt(0).match(/[A-Za-z]/gi)) {
+                proteinIndex.push([matrixArray[i], i]);
+            }
+        }
+
+        // 1D to 2D array
+        while (matrixArray.length) {
+            matrixArray.splice(0, 1); // remove protein ID
+            twoDMatrix.push(matrixArray.splice(0, proteinIndex.length));
+        }
+
+        // convert string to float
+        for (var i = 0; i < twoDMatrix.length; i++) {
+            for (var j = 0; j < twoDMatrix[i].length; j++) {
+                twoDMatrix[i][j] = parseFloat(twoDMatrix[i][j]);
+            }
+        }
+
+        console.log("twoDMatrix: ", twoDMatrix);
+
+        // extract combination of protein similarity from the 2D array (twoDMatrix)
+        var similarityOBJ = [];
+        for (var i = 0; i < twoDMatrix.length; i++) {
+            for (var j = 0; j < twoDMatrix.length; j++) {
+                if (i == j || j < i) continue;
+
+                similarityOBJ.push({
+                    "PID1": proteinIndex[i][0],
+                    "PID2": proteinIndex[j][0],
+                    "similarity": twoDMatrix[i][j]
+                })
+            }
+        }
+
+        console.log("similarityOBJ: ", similarityOBJ);
+    }
+
+    var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
+        var request = getRequestObject();
+
+        request.onreadystatechange = function () {
+            handleResponse(request, responseHandler, isJsonResponse);
+        };
+
+        request.open("POST", requestUrl, true);
+
+        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        request.setRequestHeader("Accept", "text/plain");
+
+        var data = '';
+        for (var key in query) {
+            data += encodeURIComponent(key);
+            data += '=';
+            data += encodeURIComponent(query[key]);
+            data += '&';
+        }
+        console.log('data: ', data);
+        request.send(data); // for POST only
+    };
+
     var showModalWindow = function (workspaceName, membraneName) {
         idMembrane = 0;
 
@@ -4434,117 +4604,253 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
             "<b>Protein: </b>" + proteinText + "</p>";
 
         // Related apical or basolateral model
-        var dataJSON = [];
-        d3.json("protein_alignment.json", function (data) {
-            for (var i = 0; i < data.length; i++) {
-                dataJSON.push({
-                    pid1: data[i].pid1,
-                    pid2: data[i].pid2,
-                    name1: data[i].name1,
-                    name2: data[i].name2,
-                    uri1: data[i].uri1,
-                    uri2: data[i].uri2,
-                    similar: data[i].similar
-                })
-            }
+        var index = 0,
+            ProteinSeq = "",
+            requestData,
+            PID = [],
+            // PID = ["P11170", "P31636", "P26433", "Q62439", "Q9ET37", "P48764"],
+            baseUrl = 'https://www.ebi.ac.uk/Tools/services/rest/clustalo';
 
-            console.log("dataJSON: ", dataJSON);
+        for (var i = 0; i < membraneModelID.length; i++) {
+            PID.push(membraneModelID[i][15]); // PROTEIN id
+        }
 
-            for (var m = 0; m < membraneModelValue.length; m++) {
-                for (var n = 0; n < dataJSON.length; n++) {
-                    if (membraneModelValue[m].uri1 == dataJSON[n].uri1 &&
-                        membraneModelValue[m].uri2 == dataJSON[n].uri2) {
-                        membraneModelValue[m].similar = dataJSON[n].similar;
+        console.log("PID: ", PID);
+
+        // https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=48923608
+        var WSDbfetchREST = function () {
+
+            var dbfectendpoint = "http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+
+            sendGetRequest(
+                dbfectendpoint,
+                function (psequence) {
+                    ProteinSeq += psequence;
+
+                    index++;
+                    if (index == PID.length) {
+                        // console.log("ProteinSeq: ", ProteinSeq);
+
+                        requestData = {
+                            "sequence": ProteinSeq,
+                            "email": "dsar941@aucklanduni.ac.nz"
+                        }
+
+                        // console.log("requestData: ", requestData);
+
+                        // https://www.ebi.ac.uk/seqdb/confluence/display/WEBSERVICES/clustalo_rest
+                        var requestUrl = baseUrl + '/run/';
+
+                        sendEBIPostRequest(
+                            requestUrl,
+                            requestData,
+                            function (jobId) {
+                                console.log("jobId: ", jobId); // jobId
+
+                                var jobIdUrl = baseUrl + '/status/' + jobId;
+                                sendGetRequest(
+                                    jobIdUrl,
+                                    function (resultObj) {
+                                        console.log("result: ", resultObj); // jobId status
+
+                                        var pimUrl = baseUrl + '/result/' + jobId + '/pim';
+                                        sendGetRequest(
+                                            pimUrl,
+                                            function (identityMatrix) {
+
+                                                console.log("Identity Matrix: ", identityMatrix);
+
+                                                // var identityMatrix = 'Identity Matrix:  #' +
+                                                //     '#' +
+                                                //     '#  Percent Identity  Matrix - created by Clustal2.1' +
+                                                //     '#' +
+                                                //     '#' +
+                                                //     '1: sp|P11170|SC5A1_RABIT   100.00   73.03   18.47   20.34   67.38   17.34 ' +
+                                                //     '2: sp|P31636|SC5A4_PIG      73.03  100.00   18.55   22.09   78.96   17.83 ' +
+                                                //     '3: sp|P26433|SL9A3_RAT      18.47   18.55  100.00   18.14   16.77   89.49 ' +
+                                                //     '4: tr|Q62439|Q62439_MOUSE   20.34   22.09   18.14  100.00   20.71   19.58 ' +
+                                                //     '5: sp|Q9ET37|S5A4A_MOUSE    67.38   78.96   16.77   20.71  100.00   16.06 ' +
+                                                //     '6: sp|P48764|SL9A3_HUMAN    17.34   17.83   89.49   19.58   16.06  100.00 ';
+
+                                                var indexOfColon = identityMatrix.search("1:");
+
+                                                console.log("index1stBar: ", identityMatrix.slice(indexOfColon - 1, identityMatrix.length));
+                                                identityMatrix = identityMatrix.slice(indexOfColon - 1, identityMatrix.length);
+
+                                                console.log("New Identity Matrix: ", identityMatrix);
+
+                                                var matrixArray = identityMatrix.match(/[(\w\:)*\d\.]+/gi),
+                                                    proteinIndex = [],
+                                                    twoDMatrix = [];
+
+                                                console.log("matrixArray: ", matrixArray);
+
+                                                for (var i = 0; i < matrixArray.length; i = i + PID.length + 3) // +3 for digit:, PID, and Genes and Species
+                                                    matrixArray.splice(i, 1);
+
+                                                for (var i = 0; i < matrixArray.length; i = i + PID.length + 2) // +2 for PID and Genes and Species
+                                                    matrixArray.splice(i, 1);
+
+                                                for (var i = 1; i < matrixArray.length; i = i + PID.length + 1) // +1 for PID
+                                                    matrixArray.splice(i, 1);
+
+                                                console.log("matrixArray: ", matrixArray);
+
+                                                for (var i = 0; i < matrixArray.length; i++) {
+                                                    if (matrixArray[i].charAt(0).match(/[A-Za-z]/gi)) {
+                                                        proteinIndex.push([matrixArray[i], i]);
+                                                    }
+                                                }
+
+                                                console.log("proteinIndex: ", proteinIndex);
+
+                                                // 1D to 2D array
+                                                while (matrixArray.length) {
+                                                    matrixArray.splice(0, 1); // remove protein ID
+                                                    twoDMatrix.push(matrixArray.splice(0, proteinIndex.length));
+                                                }
+
+                                                for (var i = 0; i < twoDMatrix.length; i++) {
+                                                    for (var j = 0; j < twoDMatrix[i].length; j++) {
+                                                        twoDMatrix[i][j] = parseFloat(twoDMatrix[i][j]);
+                                                    }
+                                                }
+
+                                                console.log("twoDMatrix: ", twoDMatrix);
+
+                                                var similarityOBJ = [];
+                                                for (var i = 0; i < twoDMatrix.length; i++) {
+                                                    for (var j = 0; j < twoDMatrix.length; j++) {
+                                                        if (i == j || j < i) continue;
+
+                                                        similarityOBJ.push({
+                                                            "PID1": proteinIndex[i][0],
+                                                            "PID2": proteinIndex[j][0],
+                                                            "similarity": twoDMatrix[i][j]
+                                                        })
+                                                    }
+                                                }
+
+                                                console.log("similarityOBJ: ", similarityOBJ);
+                                                console.log("membraneModelValue: ", membraneModelValue);
+
+                                                var indexOfPR = proteinName.search("PR_"),
+                                                    draggedProteinID = proteinName.slice(indexOfPR + 3, proteinName.length);
+
+                                                console.log("draggedProteinID: ", draggedProteinID);
+
+                                                for (var m = 0; m < membraneModelValue.length; m++) {
+                                                    for (var n = 0; n < similarityOBJ.length; n++) {
+                                                        if ((membraneModelValue[m].pid == similarityOBJ[n].PID1 &&
+                                                            draggedProteinID == similarityOBJ[n].PID2) ||
+                                                            (membraneModelValue[m].pid == similarityOBJ[n].PID2 &&
+                                                            draggedProteinID == similarityOBJ[n].PID1)) {
+                                                            membraneModelValue[m].similar = similarityOBJ[n].similarity;
+                                                        }
+                                                    }
+                                                }
+
+                                                console.log("membraneModelValue: ", membraneModelValue);
+
+                                                // Descending sorting
+                                                membraneModelValue.sort(function (a, b) {
+                                                    return b.similarity - a.similarity;
+                                                });
+
+                                                console.log("AFTER membraneModelValue: ", membraneModelValue);
+                                                console.log("AFTER membraneModelId: ", membraneModelID);
+
+                                                var membraneTransporter = "<p><b>" + membraneName + " model</b>";
+                                                if (membraneModelValue.length == 0) {
+                                                    membraneTransporter += "<br>Not Exist";
+                                                }
+                                                else {
+                                                    for (var i = 0; i < membraneModelValue.length; i++) {
+                                                        var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
+
+                                                        var label = document.createElement('label');
+                                                        label.innerHTML = '<br><input id="' + membraneModelID[i] + '" ' +
+                                                            'type="checkbox" value="' + membraneModelValue[i].prname + '">' +
+                                                            '<a href="' + workspaceuri + '" target="_blank" ' +
+                                                            'data-toggle="tooltip" data-placement="right" ' +
+                                                            'title="' + membraneModelValue[i].protein + '">' + membraneModelValue[i].prname + '</a></label>';
+
+                                                        membraneTransporter += label.innerHTML;
+                                                    }
+                                                }
+
+                                                // Alternative model
+                                                var alternativeModel = "<p><b>Alternative model of " + proteinText + "</b>";
+                                                // console.log("Alternative model: ", altCellmlModel);
+                                                if (altCellmlModel == "") {
+                                                    alternativeModel += "<br>Not Exist";
+                                                }
+                                                else {
+                                                    alternativeModel += "</b>" + altCellmlModel + "</p>";
+                                                }
+
+                                                // related organ models (kidney, lungs, etc) in PMR
+                                                var relatedOrganModels = "<p><b>" + typeOfModel + " model in PMR</b>";
+                                                // console.log("related kidney model: ", relatedModelValue, relatedOrganModels);
+                                                if (relatedModelValue.length == 1) { // includes own protein name
+                                                    relatedOrganModels += "<br>Not Exist";
+                                                }
+                                                else {
+                                                    for (var i = 0; i < relatedModelValue.length; i++) {
+
+                                                        if (proteinName == relatedModelValue[i].protein)
+                                                            continue;
+
+                                                        var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + relatedModelID[i];
+
+                                                        var label = document.createElement('label');
+                                                        label.innerHTML = '<br><a href="' + workspaceuri + '" target="_blank" ' +
+                                                            'data-toggle="tooltip" data-placement="right" ' +
+                                                            'title="' + relatedModelValue[i].protein + '">' + relatedModelValue[i].prname + '' +
+                                                            '</a></label>';
+
+                                                        relatedOrganModels += label.innerHTML;
+                                                    }
+                                                }
+
+                                                $('#modalBody').empty();
+
+                                                $('#modalBody')
+                                                    .append(msg2)
+                                                    .append(model)
+                                                    .append(biological)
+                                                    .append(species)
+                                                    .append(gene)
+                                                    .append(protein);
+
+                                                var msg3 = "<br><p><b>Recommendations/suggestions based on existing models in PMR<b><\p>";
+
+                                                $('#modalBody')
+                                                    .append(msg3)
+                                                    .append(membraneTransporter)
+                                                    .append(alternativeModel)
+                                                    .append(relatedOrganModels);
+
+                                                console.log("outside modelbody!");
+
+                                                reinitVariable();
+
+                                            },
+                                            false);
+                                    },
+                                    false);
+                            },
+                            false);
+
+                        return;
                     }
-                }
-            }
 
-            console.log("membraneModelValue: ", membraneModelValue);
+                    WSDbfetchREST();
+                },
+                false);
+        }
 
-            // Descending sorting
-            membraneModelValue.sort(function (a, b) {
-                return b.similar - a.similar;
-            });
-
-            console.log("AFTER membraneModelValue: ", membraneModelValue);
-
-            var membraneTransporter = "<p><b>" + membraneName + " model</b>";
-            if (membraneModelValue.length == 0) {
-                membraneTransporter += "<br>Not Exist";
-            }
-            else {
-                for (var i = 0; i < membraneModelValue.length; i++) {
-                    var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
-
-                    var label = document.createElement('label');
-                    label.innerHTML = '<br><input id="' + membraneModelID[i] + '" ' +
-                        'type="checkbox" value="' + membraneModelValue[i].prname + '">' +
-                        '<a href="' + workspaceuri + '" target="_blank" ' +
-                        'data-toggle="tooltip" data-placement="right" ' +
-                        'title="' + membraneModelValue[i].protein + '">' + membraneModelValue[i].prname + '</a></label>';
-
-                    membraneTransporter += label.innerHTML;
-                }
-            }
-
-            // Alternative model
-            var alternativeModel = "<p><b>Alternative model of " + proteinText + "</b>";
-            // console.log("Alternative model: ", altCellmlModel);
-            if (altCellmlModel == "") {
-                alternativeModel += "<br>Not Exist";
-            }
-            else {
-                alternativeModel += "</b>" + altCellmlModel + "</p>";
-            }
-
-            // related organ models (kidney, lungs, etc) in PMR
-            var relatedOrganModels = "<p><b>" + typeOfModel + " model in PMR</b>";
-            // console.log("related kidney model: ", relatedModelValue, relatedOrganModels);
-            if (relatedModelValue.length == 1) { // includes own protein name
-                relatedOrganModels += "<br>Not Exist";
-            }
-            else {
-                for (var i = 0; i < relatedModelValue.length; i++) {
-
-                    if (proteinName == relatedModelValue[i].protein)
-                        continue;
-
-                    var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + relatedModelID[i];
-
-                    var label = document.createElement('label');
-                    label.innerHTML = '<br><a href="' + workspaceuri + '" target="_blank" ' +
-                        'data-toggle="tooltip" data-placement="right" ' +
-                        'title="' + relatedModelValue[i].protein + '">' + relatedModelValue[i].prname + '' +
-                        '</a></label>';
-
-                    relatedOrganModels += label.innerHTML;
-                }
-            }
-
-            $('#modalBody').empty();
-
-            $('#modalBody')
-                .append(msg2)
-                .append(model)
-                .append(biological)
-                .append(species)
-                .append(gene)
-                .append(protein);
-
-            var msg3 = "<br><p><b>Recommendations/suggestions based on existing models in PMR<b><\p>";
-
-            $('#modalBody')
-                .append(msg3)
-                .append(membraneTransporter)
-                .append(alternativeModel)
-                .append(relatedOrganModels);
-
-            console.log("outside modelbody!");
-
-            reinitVariable();
-        })
-
-        // return;
+        WSDbfetchREST();
     }
 
     var source_fma = [], sink_fma = [], med_fma = [], med_pr = [], solute_chebi = [];
@@ -4793,8 +5099,12 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
 
                                                 if (jsonRelatedMembraneModel.results.bindings.length != 0) {
 
+                                                    var indexOfPR = combinedMembrane[0].med_pr.search("PR_"),
+                                                        PID = combinedMembrane[0].med_pr.slice(indexOfPR + 3, combinedMembrane[0].med_pr.length);
+
                                                     membraneModelValue.push({
                                                         protein: jsonRelatedMembraneModel.results.bindings[0].Protein.value,
+                                                        pid: PID,
                                                         prname: jsonPr._embedded.terms[0].label,
                                                         // uri1 is the dragged circle
                                                         uri1: combinedMembrane[0].med_pr,
@@ -6569,7 +6879,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         switchMenuToActive(activeItem, "#help");
 
         $("#main-content").html("Documentation can be found at the " +
-            '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" target="_blank">Epithelial Modelling Platform</a>');
+            '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" ' +
+            'target="_blank">Epithelial Modelling Platform</a>');
     };
 
     // On page load (before img or CSS)
