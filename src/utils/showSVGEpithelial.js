@@ -4042,7 +4042,7 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
             },
             true);
     }
-    
+
     var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
         var request = getRequestObject();
 
@@ -4111,6 +4111,13 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
 
         console.log("PID: ", PID);
 
+        // TODO: if PID is empty, i.e. no related baso or apical membrane, then add the dragged
+        // TODO: protein Id in PID. After having the sequence, append a "0" digit after the protein Id in the
+        // TODO: result. e.g. >sp|P11170"0"|SC5A1_RABIT ...And we will get 100 percent matching.
+        // TODO: Make a comparison at the end that if 100 percent then "Not exist".
+
+        //TODO: how to deal with running time issue?
+
         // https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=48923608
         var WSDbfetchREST = function () {
 
@@ -4133,6 +4140,7 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
                         // console.log("requestData: ", requestData);
 
                         // https://www.ebi.ac.uk/seqdb/confluence/display/WEBSERVICES/clustalo_rest
+
                         var requestUrl = baseUrl + '/run/';
 
                         sendEBIPostRequest(
@@ -4248,7 +4256,7 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
 
                                                 // Descending sorting
                                                 membraneModelValue.sort(function (a, b) {
-                                                    return b.similarity - a.similarity;
+                                                    return b.similar - a.similar;
                                                 });
 
                                                 console.log("AFTER membraneModelValue: ", membraneModelValue);
