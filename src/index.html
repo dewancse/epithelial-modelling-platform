@@ -21,47 +21,75 @@
 
 <body>
 
-<nav class="navbar navbar-default">
+<header>
+    <nav id="header-nav" class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="#" onclick="$mainUtils.loadHomeHtml();">
+                    <div id="logo-img"></div>
+                </a>
+
+                <button id="navbarToggle" type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#collapsable-nav" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <div id="collapsable-nav" class="collapse navbar-collapse">
+                <ul id="ulistItems" class="nav navbar-nav navbar-right">
+                    <li id="listDiscovery">
+                        <a href="#" onclick="$mainUtils.loadSearchHtml();">MODEL DISCOVERY</a>
+                    </li>
+                    <li id="listModels">
+                        <a href="#" onclick="$mainUtils.loadModelHtml();">LOAD MODELS</a>
+                    </li>
+                    <li id="help">
+                        <a href="#" onclick="$mainUtils.loadHelp();">DOCUMENTATION</a>
+                    </li>
+                </ul><!-- #nav-list -->
+            </div><!-- .collapse .navbar-collapse -->
+        </div><!-- .container -->
+    </nav><!-- #header-nav -->
+</header>
+<hr/>
+
+<div id="main-content" class="container"></div>
+
+<footer class="panel-footer">
     <div class="container">
-        <div class="navbar-header">
-            <a id="header" class="navbar-brand">Epithelial Modelling Platform</a>
+        <div class="row">
+            <section class="col-sm-8">
+                <a href="http://physiomeproject.org/" target="_blank"><span id="footer-physiome">Physiome</span></a>
+                <a href="http://www.vph-institute.org/" target="_blank"><span id="footer-vph">VPH</span></a>
+                <a href="https://www.cellml.org/" target="_blank"><span id="footer-cellml">CellML</span></a>
+                <a href="https://models.physiomeproject.org/welcome" target="_blank"><span
+                        id="footer-pmr">PMR</span></a>
+            </section>
+            <section class="col-sm-4">
+                <div class="text-right"><span id="footer-copyright">&copy; Epithelial Modelling Platform 2017</span>
+                </div>
+            </section>
         </div>
     </div>
-    <ul id="ulistItems" class="nav nav-tabs container">
-        <li id="listHome" role="presentation" class="active">
-            <a href="#" onclick="$mainUtils.loadHomeHtml();">Home</a>
-        </li>
-        <li id="listDiscovery" role="presentation">
-            <a href="#" onclick="$mainUtils.loadSearchHtml();">Model Discovery</a>
-        </li>
-        <li id="listModels" role="presentation">
-            <a href="#" onclick="$mainUtils.loadModelHtml();">Load Models</a>
-        </li>
-        <li id="help" role="presentation">
-            <a href="#" onclick="$mainUtils.loadHelp();">Documentation</a>
-        </li>
-    </ul>
-</nav>
+</footer>
 
-<div class="row">
-    <div id="main-content" class="container"></div>
-</div>
-
-<div id="mocha" class="container"></div>
-
+<!--<div id="mocha" class="container"></div>-->
 <!-- home scripts -->
 <script src="bundle.js"></script>
-<script src="../tests/test_harness.js"></script>
+<!--<script src="../tests/test_harness.js"></script>-->
 
-<script>
-    // mocha run
-    if (window.mochaPhantomJS) {
-        mochaPhantomJS.run();
-    }
-    else {
-        mocha.run();
-    }
-</script>
+<!--<script>-->
+<!--// mocha run-->
+<!--if (window.mochaPhantomJS) {-->
+<!--mochaPhantomJS.run();-->
+<!--}-->
+<!--else {-->
+<!--mocha.run();-->
+<!--}-->
+<!--</script>-->
 
 </body>
 </html>

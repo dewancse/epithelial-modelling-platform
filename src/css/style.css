@@ -1,16 +1,129 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+body {
+    font-size: 12px;
+    color: #fff;
+    background-color: #fff;
+    font-family: 'Arial', sans-serif;
 }
 
-#header {
-    font-size: medium;
+/** HEADER **/
+#header-nav {
+    background-color: #fff;
+    border-radius: 0;
+    border: 0;
 }
 
-.navbtn {
+#logo-img {
+    background: url('../img/EMP-logo.png') no-repeat;
     width: 250px;
+    height: 60px;
+    margin: 12px 15px 10px 0;
 }
+
+#ulistItems {
+    margin-top: 10px;
+}
+
+#ulistItems a {
+    color: #000;
+    font-weight: bold;
+    text-align: center;
+}
+
+#ulistItems a:hover {
+    background: #E7E7E7;
+}
+
+/* END HEADER */
+
+/* LEAD */
+#lead-msg {
+    background-position: center;
+    background-color: #fff;
+    color: #0a565c;
+    text-align: center;
+    width: 800px;
+    font-style: italic;
+    font-weight: bold;
+    font-family: 'Calibri', sans-serif;
+}
+
+/* END LEAD */
+
+/* CAROUSAL */
+.carousel-inner > .item > img {
+    margin: 0 auto;
+}
+
+.carousel-caption {
+    color: darkred;
+}
+
+/* END CAROUSAL */
+
+/* FOOTER */
+.panel-footer {
+    margin-top: 10px;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    background-color: #fff;
+    border-top: 0;
+}
+
+.panel-footer div.row {
+    margin-bottom: 15px;
+}
+
+#footer-cellml, #footer-pmr, #footer-physiome, #footer-vph, #footer-copyright {
+    color: #000;
+    font-family: Arial;
+    font-weight: bold;
+    padding-right: 1.2em;
+    font-size: 1.1em;
+}
+
+/* END FOOTER */
+
+#discover-cellml, #model-overlap, #platform, #recommender, #physiome, #vph {
+    height: 25px;
+    width: 100%;
+    position: relative;
+    /*border: 2px solid #3F0C1F;*/
+    overflow: hidden;
+}
+
+#discover-cellml span, #model-overlap span, #platform span, #recommender span, #physiome span, #vph span {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    text-align: left;
+    font-size: 1.2em;
+    font-weight: bold;
+    background-color: #fff;
+    color: orange;
+}
+
+#sub-discover-cellml span, #sub-model-overlap span, #sub-platform span, #sub-recommender span, #sub-physiome span, #sub-vph span {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    text-align: left;
+    background-color: #fff;
+    color: #000000;
+    font-size: 12px;
+    font-family: 'Arial', sans-serif;
+}
+
+#sub-discover-cellml, #sub-model-overlap, #sub-platform, #sub-recommender, #sub-physiome, #sub-vph {
+    height: 120px;
+    width: 100%;
+    position: relative;
+    /*border: 2px solid #3F0C1F;*/
+    overflow: hidden;
+}
+
+/* END HOME PAGE */
 
 .graph {
     padding: 10px;

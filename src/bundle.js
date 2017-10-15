@@ -6699,6 +6699,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
+    var homeHtml = "./snippets/home.html";
     var viewHtml = "./snippets/view.html";
     var modelHtml = "./snippets/model.html";
     var searchHtml = "./snippets/search.html";
@@ -6737,10 +6738,16 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
     mainUtils.loadHomeHtml = function () {
         // Switch from current active button to home button
-        var activeItem = "#" + activeMenu();
-        switchMenuToActive(activeItem, "#listHome");
+        // var activeItem = "#" + activeMenu();
+        // switchMenuToActive(activeItem, "#listHome");
 
-        $("#main-content").html("... Home Page !!!");
+        showLoading("#main-content");
+        sendGetRequest(
+            homeHtml,
+            function (homeHtmlContent) {
+                $("#main-content").html(homeHtmlContent);
+            },
+            false);
     };
 
     mainUtils.loadHelp = function () {
@@ -6748,14 +6755,29 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var activeItem = "#" + activeMenu();
         switchMenuToActive(activeItem, "#help");
 
-        $("#main-content").html("Documentation can be found at the " +
+        $("#main-content").html("Documentation can be found at " +
             '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" ' +
-            'target="_blank">Epithelial Modelling Platform</a>');
+            'target="_blank">Read the Docs</a>');
     };
 
     // On page load (before img or CSS)
     $(document).ready(function (event) {
-        // Place some startup code here
+
+        // On first load, show home view
+        showLoading("#main-content");
+
+        // homepage
+        sendGetRequest(
+            homeHtml,
+            function (homeHtmlContent) {
+                $("#main-content").html(homeHtmlContent);
+            },
+            false);
+
+        // TODO: carousal is not starting automatically
+        $(".carousel").carousel({
+            interval: 2000, cycle: true
+        });
     });
 
     $(document).on({
