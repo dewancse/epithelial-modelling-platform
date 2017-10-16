@@ -1,18 +1,18 @@
 <div class="container-fluid btn-group" role="group" aria-label="...">
-    <button id="viewBtn" type="view" class="btn btn-default btn-sm">
-        <a href="#" onclick="$mainUtils.loadViewHtml();">View</a>
+    <button id="viewBtn" type="view" class="btn btn-default btn-md">
+        <a href="#" onclick="$mainUtils.loadViewHtml();">View Model</a>
     </button>
-    <button id="deleteBtn" type="delete" class="btn btn-default btn-sm">
-        <a href="#" onclick="$mainUtils.deleteRowModelHtml();">Delete</a>
+    <button id="deleteBtn" type="delete" class="btn btn-default btn-md">
+        <a href="#" onclick="$mainUtils.deleteRowModelHtml();">Delete Model</a>
     </button>
-    <button id="visualizationBtn" type="visualization" class="btn btn-default btn-sm">
-        <a href="#" onclick="$mainUtils.loadSVGModelHtml();">visualization</a>
+    <button id="visualizationBtn" type="visualization" class="btn btn-default btn-md">
+        <a href="#" onclick="$mainUtils.loadSVGModelHtml();">Overlapping Model</a>
     </button>
-    <button id="confirmBtn" type="confirm" class="btn btn-default btn-sm">
+    <button id="confirmBtn" type="confirm" class="btn btn-default btn-md">
         <a href="#" onclick="$mainUtils.loadEpithelialHtml();">Epithelial Platform</a>
     </button>
     <div class="dropdown btn-group" role="group">
-        <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="tableColModel"
+        <button class="btn btn-default btn-md dropdown-toggle" type="button" id="tableColModel"
                 data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="true">
             Columns
@@ -47,4 +47,5 @@
         </ul>
     </div>
 </div>
+<hr/>
 <div id="modelList" class="container"></div>

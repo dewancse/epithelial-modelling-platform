@@ -88,7 +88,6 @@ var activeMenu = function () {
 
 // Remove the class 'active' from source to target button
 var switchMenuToActive = function (source, target) {
-    // Remove 'active' from source button
     var classes = $(source).attr("class");
     classes = classes.replace(new RegExp("active", "g"), "");
     $(source).addClass(classes);
@@ -6628,12 +6627,12 @@ var createAnchor = __webpack_require__(0).createAnchor;
 var searchFn = __webpack_require__(0).searchFn;
 
 // Show a selected entry from search results
-var showView = function (jsonObj, viewHtmlContent) {
+var showView = function (jsonObj) {
 
-    console.log("jsonObj: ", jsonObj);
+    console.log("showView jsonObj: ", jsonObj);
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
-        var divHead = $("<div/>").addClass("h3");
+        var divHead = $("<div/>").addClass("h4").css("font-weight", "bold");
 
         var divText = $("<div/>").addClass("p");
 
@@ -6646,7 +6645,15 @@ var showView = function (jsonObj, viewHtmlContent) {
 
         // IF more than one result in the JSON object
         for (var j = 0; j < jsonObj.results.bindings.length; j++) {
-            var tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
+
+            var tempValue;
+            if (i == 1) {
+                tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i - 1]].value + "/" +
+                    "rawfile" + "/" + "HEAD" + "/" + jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
+            }
+            else {
+                tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
+            }
 
             // TODO: regular expression to validate a URL
             if (tempValue.indexOf("http") != -1) {
@@ -6665,6 +6672,8 @@ var showView = function (jsonObj, viewHtmlContent) {
 
             var divText = $("<div/>").addClass("p");
         }
+
+        $("#viewList").append("<br>");
     }
 };
 
@@ -6737,9 +6746,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     var str = [];
 
     mainUtils.loadHomeHtml = function () {
-        // Switch from current active button to home button
-        // var activeItem = "#" + activeMenu();
-        // switchMenuToActive(activeItem, "#listHome");
 
         showLoading("#main-content");
         sendGetRequest(
@@ -6750,14 +6756,15 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             false);
     };
 
-    mainUtils.loadHelp = function () {
-        // Switch from current active button to home button
-        var activeItem = "#" + activeMenu();
-        switchMenuToActive(activeItem, "#help");
+    mainUtils.loadDocumentation = function () {
 
         $("#main-content").html("Documentation can be found at " +
             '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" ' +
             'target="_blank">Read the Docs</a>');
+
+        // // Switch current active button to the clicked button
+        // var activeItem = "#" + activeMenu();
+        // switchMenuToActive(activeItem, "#documentation");
     };
 
     // On page load (before img or CSS)
@@ -7113,9 +7120,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
         }
 
-        // Switch from current active button to discovery button
-        var activeItem = "#" + activeMenu();
-        switchMenuToActive(activeItem, "#listDiscovery");
+        // // Switch current active button to the clicked button
+        // var activeItem = "#" + activeMenu();
+        // switchMenuToActive(activeItem, "#listDiscovery");
     };
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
@@ -7349,19 +7356,21 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     mainUtils.loadViewHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
+        cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
 
-        var query = 'SELECT ?Workspace ?Title ?Author ?Abstract ?Keyword ?Protein ?Species ?Gene ?Compartment ' +
+        console.log("cellmlModel: ", cellmlModel);
+
+        var query = 'SELECT ?Workspace ?Model_entity ?Title ?Author ?Abstract ?Keyword ?Protein ?Compartment ' +
             '?Located_in ?DOI WHERE { GRAPH ?Workspace { ' +
-            '<' + cellmlModel + '#Title> <http://purl.org/dc/terms/description> ?Title . ' +
-            'OPTIONAL { <' + cellmlModel + '#Author> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Abstract> <http://purl.org/dc/terms/description> ?Abstract } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Keyword> <http://purl.org/dc/terms/description> ?Keyword } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Compartment> <http://purl.org/dc/terms/description> ?Compartment } . ' +
-            'OPTIONAL { <' + cellmlModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . ' +
-            'OPTIONAL { <' + cellmlModel + '#DOI> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . ' +
+            '<' + cellmlModel + '> <http://purl.org/dc/terms/title> ?Title . ' +
+            '?Model_entity <http://purl.org/dc/terms/title> ?Title . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://purl.org/dc/terms/abstract> ?Abstract } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://purl.org/dc/terms/keyword> ?Keyword } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . ' +
             '}}';
 
         showLoading("#main-content");
@@ -7477,9 +7486,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             },
             true);
 
-        // Switch from current active button to models button
-        var activeItem = "#" + activeMenu();
-        switchMenuToActive(activeItem, "#listModels");
+        // // Switch from current active button to models button
+        // var activeItem = "#" + activeMenu();
+        // switchMenuToActive(activeItem, "#listModels");
     };
 
     // TODO: move to utils directory

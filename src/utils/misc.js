@@ -16,7 +16,6 @@ var activeMenu = function () {
 
 // Remove the class 'active' from source to target button
 var switchMenuToActive = function (source, target) {
-    // Remove 'active' from source button
     var classes = $(source).attr("class");
     classes = classes.replace(new RegExp("active", "g"), "");
     $(source).addClass(classes);

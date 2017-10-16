@@ -5,12 +5,12 @@ var createAnchor = require("../utils/misc.js").createAnchor;
 var searchFn = require("../utils/misc.js").searchFn;
 
 // Show a selected entry from search results
-var showView = function (jsonObj, viewHtmlContent) {
+var showView = function (jsonObj) {
 
-    console.log("jsonObj: ", jsonObj);
+    console.log("showView jsonObj: ", jsonObj);
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
-        var divHead = $("<div/>").addClass("h3");
+        var divHead = $("<div/>").addClass("h4").css("font-weight", "bold");
 
         var divText = $("<div/>").addClass("p");
 
@@ -23,7 +23,15 @@ var showView = function (jsonObj, viewHtmlContent) {
 
         // IF more than one result in the JSON object
         for (var j = 0; j < jsonObj.results.bindings.length; j++) {
-            var tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
+
+            var tempValue;
+            if (i == 1) {
+                tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i - 1]].value + "/" +
+                    "rawfile" + "/" + "HEAD" + "/" + jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
+            }
+            else {
+                tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
+            }
 
             // TODO: regular expression to validate a URL
             if (tempValue.indexOf("http") != -1) {
@@ -42,6 +50,8 @@ var showView = function (jsonObj, viewHtmlContent) {
 
             var divText = $("<div/>").addClass("p");
         }
+
+        $("#viewList").append("<br>");
     }
 };
 

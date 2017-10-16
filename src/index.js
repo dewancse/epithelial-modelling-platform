@@ -61,9 +61,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     var str = [];
 
     mainUtils.loadHomeHtml = function () {
-        // Switch from current active button to home button
-        // var activeItem = "#" + activeMenu();
-        // switchMenuToActive(activeItem, "#listHome");
 
         showLoading("#main-content");
         sendGetRequest(
@@ -74,14 +71,15 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             false);
     };
 
-    mainUtils.loadHelp = function () {
-        // Switch from current active button to home button
-        var activeItem = "#" + activeMenu();
-        switchMenuToActive(activeItem, "#help");
+    mainUtils.loadDocumentation = function () {
 
         $("#main-content").html("Documentation can be found at " +
             '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" ' +
             'target="_blank">Read the Docs</a>');
+
+        // // Switch current active button to the clicked button
+        // var activeItem = "#" + activeMenu();
+        // switchMenuToActive(activeItem, "#documentation");
     };
 
     // On page load (before img or CSS)
@@ -437,9 +435,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
         }
 
-        // Switch from current active button to discovery button
-        var activeItem = "#" + activeMenu();
-        switchMenuToActive(activeItem, "#listDiscovery");
+        // // Switch current active button to the clicked button
+        // var activeItem = "#" + activeMenu();
+        // switchMenuToActive(activeItem, "#listDiscovery");
     };
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
@@ -673,19 +671,21 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     mainUtils.loadViewHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
+        cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
 
-        var query = 'SELECT ?Workspace ?Title ?Author ?Abstract ?Keyword ?Protein ?Species ?Gene ?Compartment ' +
+        console.log("cellmlModel: ", cellmlModel);
+
+        var query = 'SELECT ?Workspace ?Model_entity ?Title ?Author ?Abstract ?Keyword ?Protein ?Compartment ' +
             '?Located_in ?DOI WHERE { GRAPH ?Workspace { ' +
-            '<' + cellmlModel + '#Title> <http://purl.org/dc/terms/description> ?Title . ' +
-            'OPTIONAL { <' + cellmlModel + '#Author> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Abstract> <http://purl.org/dc/terms/description> ?Abstract } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Keyword> <http://purl.org/dc/terms/description> ?Keyword } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Protein> <http://purl.org/dc/terms/description> ?Protein } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Species> <http://purl.org/dc/terms/description> ?Species } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Gene> <http://purl.org/dc/terms/description> ?Gene } . ' +
-            'OPTIONAL { <' + cellmlModel + '#Compartment> <http://purl.org/dc/terms/description> ?Compartment } . ' +
-            'OPTIONAL { <' + cellmlModel + '#located_in> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . ' +
-            'OPTIONAL { <' + cellmlModel + '#DOI> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . ' +
+            '<' + cellmlModel + '> <http://purl.org/dc/terms/title> ?Title . ' +
+            '?Model_entity <http://purl.org/dc/terms/title> ?Title . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://purl.org/dc/terms/abstract> ?Abstract } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://purl.org/dc/terms/keyword> ?Keyword } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . ' +
+            'OPTIONAL { <' + cellmlModel + '> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . ' +
             '}}';
 
         showLoading("#main-content");
@@ -801,9 +801,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             },
             true);
 
-        // Switch from current active button to models button
-        var activeItem = "#" + activeMenu();
-        switchMenuToActive(activeItem, "#listModels");
+        // // Switch from current active button to models button
+        // var activeItem = "#" + activeMenu();
+        // switchMenuToActive(activeItem, "#listModels");
     };
 
     // TODO: move to utils directory
