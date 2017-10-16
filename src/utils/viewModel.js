@@ -1,13 +1,13 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
-var createAnchor = require("../utils/misc.js").createAnchor;
-var searchFn = require("../utils/misc.js").searchFn;
+var createAnchor = require("./miscellaneous.js").createAnchor;
+var searchFn = require("./miscellaneous.js").searchFn;
 
 // Show a selected entry from search results
-var showView = function (jsonObj) {
+var viewModel = function (jsonObj) {
 
-    console.log("showView jsonObj: ", jsonObj);
+    console.log("viewModel jsonObj: ", jsonObj);
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
         var divHead = $("<div/>").addClass("h4").css("font-weight", "bold");
@@ -55,4 +55,4 @@ var showView = function (jsonObj) {
     }
 };
 
-exports.showView = showView;
+exports.viewModel = viewModel;

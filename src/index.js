@@ -1,19 +1,19 @@
 /**
  * Created by dsar941 on 9/8/2016.
  */
-var parseModelName = require("./utils/misc.js").parseModelName;
-var parserFmaNameText = require("./utils/misc.js").parserFmaNameText;
-var headTitle = require("./utils/misc.js").headTitle;
-var compare = require("./utils/misc.js").compare;
-var uniqueifyEpithelial = require("./utils/misc.js").uniqueifyEpithelial;
-var uniqueifySrcSnkMed = require("./utils/misc.js").uniqueifySrcSnkMed;
-var iteration = require("./utils/misc.js").iteration;
-var showView = require("./utils/showView.js").showView;
-var showSVGModelHtml = require("./utils/showSVGModel.js").showSVGModelHtml;
-var showsvgEpithelial = require("./utils/showSVGEpithelial.js").showsvgEpithelial;
-var showLoading = require("./utils/misc.js").showLoading;
-var activeMenu = require("./utils/misc.js").activeMenu;
-var switchMenuToActive = require("./utils/misc.js").switchMenuToActive;
+var parseModelName = require("./utils/miscellaneous.js").parseModelName;
+var parserFmaNameText = require("./utils/miscellaneous.js").parserFmaNameText;
+var headTitle = require("./utils/miscellaneous.js").headTitle;
+var compare = require("./utils/miscellaneous.js").compare;
+var uniqueifyEpithelial = require("./utils/miscellaneous.js").uniqueifyEpithelial;
+var uniqueifySrcSnkMed = require("./utils/miscellaneous.js").uniqueifySrcSnkMed;
+var iteration = require("./utils/miscellaneous.js").iteration;
+var viewModel = require("./utils/viewModel.js").viewModel;
+var overlappingModelsHtml = require("./utils/overlappingModels.js").overlappingModelsHtml;
+var epithelialPlatform = require("./utils/epithelialPlatform.js").epithelialPlatform;
+var showLoading = require("./utils/miscellaneous.js").showLoading;
+var activeMenu = require("./utils/miscellaneous.js").activeMenu;
+var switchMenuToActive = require("./utils/miscellaneous.js").switchMenuToActive;
 
 var sendGetRequest = require("./libs/ajax-utils.js").sendGetRequest;
 var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
@@ -23,12 +23,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
-    var homeHtml = "./snippets/home.html";
-    var viewHtml = "./snippets/view.html";
-    var modelHtml = "./snippets/model.html";
-    var searchHtml = "./snippets/search.html";
-    var svgmodelHtml = "./snippets/svgmodel.html";
-    var svgepithelialHtml = "./snippets/svgepithelial.html";
+    var homeHtml = "./snippets/home-snippet.html";
+    var viewHtml = "./snippets/view-snippet.html";
+    var modelHtml = "./snippets/model-snippet.html";
+    var searchHtml = "./snippets/search-snippet.html";
+    var overlappingHtml = "./snippets/overlapping-snippet.html";
+    var epithelialHtml = "./snippets/epithelial-snippet.html";
 
     var combinedMembrane = [];
 
@@ -697,7 +697,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                     viewHtml,
                     function (viewHtmlContent) {
                         $("#main-content").html(viewHtmlContent);
-                        sendPostRequest(endpoint, query, showView, true);
+                        sendPostRequest(endpoint, query, viewModel, true);
                     },
                     false);
             },
@@ -1025,15 +1025,15 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     };
 
     // Load the SVG model
-    mainUtils.loadSVGModelHtml = function () {
+    mainUtils.loadOverlappingHtml = function () {
 
         sendGetRequest(
-            svgmodelHtml,
-            function (svgmodelHtmlContent) {
-                $("#main-content").html(svgmodelHtmlContent);
+            overlappingHtml,
+            function (overlappingHtmlContent) {
+                $("#main-content").html(overlappingHtmlContent);
 
                 // TODO: Fix it!!
-                sendGetRequest(svgmodelHtml, showSVGModelHtml(links, model2DArray, modelEntityNameArray), false);
+                sendGetRequest(overlappingHtml, overlappingModelsHtml(links, model2DArray, modelEntityNameArray), false);
             },
             false);
     };
@@ -1042,11 +1042,11 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     mainUtils.loadEpithelialHtml = function () {
 
         sendGetRequest(
-            svgepithelialHtml,
+            epithelialHtml,
             function (epithelialHtmlContent) {
                 $("#main-content").html(epithelialHtmlContent);
 
-                sendGetRequest(svgepithelialHtml, mainUtils.loadEpithelial, false);
+                sendGetRequest(epithelialHtml, mainUtils.loadEpithelial, false);
             },
             false);
     };
@@ -1272,7 +1272,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         console.log("modelEntityNameArray: ", modelEntityNameArray);
                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
 
-                        showsvgEpithelial(
+                        epithelialPlatform(
                             combinedMembrane,
                             concentration_fma,
                             source_fma2,
@@ -1559,7 +1559,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                         console.log("modelEntityNameArray: ", modelEntityNameArray);
                                                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
 
-                                                        showsvgEpithelial(
+                                                        epithelialPlatform(
                                                             combinedMembrane,
                                                             concentration_fma,
                                                             source_fma2,
@@ -1643,7 +1643,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
                                         console.log("concentration_fma: ", concentration_fma);
 
-                                        showsvgEpithelial(
+                                        epithelialPlatform(
                                             combinedMembrane,
                                             concentration_fma,
                                             source_fma2,

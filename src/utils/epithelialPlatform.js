@@ -2,17 +2,17 @@
  * Created by dsar941 on 5/11/2017.
  */
 var solutesBouncing = require("./solutesBouncing.js").solutesBouncing;
-var getTextWidth = require("../utils/misc.js").getTextWidth;
-var uniqueify = require("../utils/misc.js").uniqueify;
-var uniqueifyjsonFlux = require("../utils/misc.js").uniqueifyjsonFlux;
+var getTextWidth = require("./miscellaneous.js").getTextWidth;
+var uniqueify = require("./miscellaneous.js").uniqueify;
+var uniqueifyjsonFlux = require("./miscellaneous.js").uniqueifyjsonFlux;
 var sendPostRequest = require("../libs/ajax-utils.js").sendPostRequest;
 var sendGetRequest = require("../libs/ajax-utils.js").sendGetRequest;
-var showLoading = require("../utils/misc.js").showLoading;
-var uniqueifyEpithelial = require("../utils/misc.js").uniqueifyEpithelial;
+var showLoading = require("./miscellaneous.js").showLoading;
+var uniqueifyEpithelial = require("./miscellaneous.js").uniqueifyEpithelial;
 var getRequestObject = require("../libs/ajax-utils.js").getRequestObject;
 var handleResponse = require("../libs/ajax-utils.js").handleResponse;
 
-var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
+var epithelialPlatform = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
                                   apicalMembrane, basolateralMembrane, membrane) {
 
     var apicalID = "http://identifiers.org/fma/FMA:84666";
@@ -6029,4 +6029,4 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
     }
 }
 
-exports.showsvgEpithelial = showsvgEpithelial;
+exports.epithelialPlatform = epithelialPlatform;

@@ -379,7 +379,7 @@ var uniqueifyEpithelial = __webpack_require__(0).uniqueifyEpithelial;
 var getRequestObject = __webpack_require__(1).getRequestObject;
 var handleResponse = __webpack_require__(1).handleResponse;
 
-var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
+var epithelialPlatform = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
                                   apicalMembrane, basolateralMembrane, membrane) {
 
     var apicalID = "http://identifiers.org/fma/FMA:84666";
@@ -6396,7 +6396,7 @@ var showsvgEpithelial = function (combinedMembrane, concentration_fma, source_fm
     }
 }
 
-exports.showsvgEpithelial = showsvgEpithelial;
+exports.epithelialPlatform = epithelialPlatform;
 
 /***/ }),
 /* 3 */
@@ -6407,11 +6407,11 @@ exports.showsvgEpithelial = showsvgEpithelial;
  */
 var uniqueifySVG = __webpack_require__(0).uniqueifySVG;
 
-var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
+var overlappingModelsHtml = function (links, model2DArray, modelEntityNameArray) {
 
-    console.log("showSVGModelHtml links: ", links);
-    console.log("showSVGModelHtml model2DArray: ", model2DArray);
-    console.log("showSVGModelHtml modelEntityNameArray: ", modelEntityNameArray);
+    console.log("overlappingModelsHtml links: ", links);
+    console.log("overlappingModelsHtml model2DArray: ", model2DArray);
+    console.log("overlappingModelsHtml modelEntityNameArray: ", modelEntityNameArray);
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -6459,11 +6459,11 @@ var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
     console.log("links: ", links);
 
     // SVG graph
-    var g = $("#svgVisualize2"),
+    var g = $("#svgOverlappingModels"),
         width = 1200,
         height = 700;
 
-    var svg = d3.select("#svgVisualize2").append("svg")
+    var svg = d3.select("#svgOverlappingModels").append("svg")
         .attrs({
             "width": width,
             "height": height
@@ -6614,7 +6614,7 @@ var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
     modelEntityNameArray = [];
 }
 
-exports.showSVGModelHtml = showSVGModelHtml;
+exports.overlappingModelsHtml = overlappingModelsHtml;
 
 /***/ }),
 /* 4 */
@@ -6627,9 +6627,9 @@ var createAnchor = __webpack_require__(0).createAnchor;
 var searchFn = __webpack_require__(0).searchFn;
 
 // Show a selected entry from search results
-var showView = function (jsonObj) {
+var viewModel = function (jsonObj) {
 
-    console.log("showView jsonObj: ", jsonObj);
+    console.log("viewModel jsonObj: ", jsonObj);
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
         var divHead = $("<div/>").addClass("h4").css("font-weight", "bold");
@@ -6677,7 +6677,7 @@ var showView = function (jsonObj) {
     }
 };
 
-exports.showView = showView;
+exports.viewModel = viewModel;
 
 /***/ }),
 /* 5 */
@@ -6693,9 +6693,9 @@ var compare = __webpack_require__(0).compare;
 var uniqueifyEpithelial = __webpack_require__(0).uniqueifyEpithelial;
 var uniqueifySrcSnkMed = __webpack_require__(0).uniqueifySrcSnkMed;
 var iteration = __webpack_require__(0).iteration;
-var showView = __webpack_require__(4).showView;
-var showSVGModelHtml = __webpack_require__(3).showSVGModelHtml;
-var showsvgEpithelial = __webpack_require__(2).showsvgEpithelial;
+var viewModel = __webpack_require__(4).viewModel;
+var overlappingModelsHtml = __webpack_require__(3).overlappingModelsHtml;
+var epithelialPlatform = __webpack_require__(2).epithelialPlatform;
 var showLoading = __webpack_require__(0).showLoading;
 var activeMenu = __webpack_require__(0).activeMenu;
 var switchMenuToActive = __webpack_require__(0).switchMenuToActive;
@@ -6708,12 +6708,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
-    var homeHtml = "./snippets/home.html";
-    var viewHtml = "./snippets/view.html";
-    var modelHtml = "./snippets/model.html";
-    var searchHtml = "./snippets/search.html";
-    var svgmodelHtml = "./snippets/svgmodel.html";
-    var svgepithelialHtml = "./snippets/svgepithelial.html";
+    var homeHtml = "./snippets/home-snippet.html";
+    var viewHtml = "./snippets/view-snippet.html";
+    var modelHtml = "./snippets/model-snippet.html";
+    var searchHtml = "./snippets/search-snippet.html";
+    var overlappingHtml = "./snippets/overlapping-snippet.html";
+    var epithelialHtml = "./snippets/epithelial-snippet.html";
 
     var combinedMembrane = [];
 
@@ -6782,7 +6782,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             false);
 
         // TODO: carousal is not starting automatically
-        $(".carousel").carousel({
+        // $(".carousel").carousel({
+        //     interval: 2000, cycle: true
+        // });
+
+        $("#theCarousel").carousel({
             interval: 2000, cycle: true
         });
     });
@@ -7382,7 +7386,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     viewHtml,
                     function (viewHtmlContent) {
                         $("#main-content").html(viewHtmlContent);
-                        sendPostRequest(endpoint, query, showView, true);
+                        sendPostRequest(endpoint, query, viewModel, true);
                     },
                     false);
             },
@@ -7710,15 +7714,15 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     };
 
     // Load the SVG model
-    mainUtils.loadSVGModelHtml = function () {
+    mainUtils.loadOverlappingHtml = function () {
 
         sendGetRequest(
-            svgmodelHtml,
-            function (svgmodelHtmlContent) {
-                $("#main-content").html(svgmodelHtmlContent);
+            overlappingHtml,
+            function (overlappingHtmlContent) {
+                $("#main-content").html(overlappingHtmlContent);
 
                 // TODO: Fix it!!
-                sendGetRequest(svgmodelHtml, showSVGModelHtml(links, model2DArray, modelEntityNameArray), false);
+                sendGetRequest(overlappingHtml, overlappingModelsHtml(links, model2DArray, modelEntityNameArray), false);
             },
             false);
     };
@@ -7727,11 +7731,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     mainUtils.loadEpithelialHtml = function () {
 
         sendGetRequest(
-            svgepithelialHtml,
+            epithelialHtml,
             function (epithelialHtmlContent) {
                 $("#main-content").html(epithelialHtmlContent);
 
-                sendGetRequest(svgepithelialHtml, mainUtils.loadEpithelial, false);
+                sendGetRequest(epithelialHtml, mainUtils.loadEpithelial, false);
             },
             false);
     };
@@ -7957,7 +7961,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         console.log("modelEntityNameArray: ", modelEntityNameArray);
                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
 
-                        showsvgEpithelial(
+                        epithelialPlatform(
                             combinedMembrane,
                             concentration_fma,
                             source_fma2,
@@ -8244,7 +8248,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                         console.log("modelEntityNameArray: ", modelEntityNameArray);
                                                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
 
-                                                        showsvgEpithelial(
+                                                        epithelialPlatform(
                                                             combinedMembrane,
                                                             concentration_fma,
                                                             source_fma2,
@@ -8328,7 +8332,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
                                         console.log("concentration_fma: ", concentration_fma);
 
-                                        showsvgEpithelial(
+                                        epithelialPlatform(
                                             combinedMembrane,
                                             concentration_fma,
                                             source_fma2,

@@ -1,13 +1,13 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
-var uniqueifySVG = require("../utils/misc.js").uniqueifySVG;
+var uniqueifySVG = require("./miscellaneous.js").uniqueifySVG;
 
-var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
+var overlappingModelsHtml = function (links, model2DArray, modelEntityNameArray) {
 
-    console.log("showSVGModelHtml links: ", links);
-    console.log("showSVGModelHtml model2DArray: ", model2DArray);
-    console.log("showSVGModelHtml modelEntityNameArray: ", modelEntityNameArray);
+    console.log("overlappingModelsHtml links: ", links);
+    console.log("overlappingModelsHtml model2DArray: ", model2DArray);
+    console.log("overlappingModelsHtml modelEntityNameArray: ", modelEntityNameArray);
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -55,11 +55,11 @@ var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
     console.log("links: ", links);
 
     // SVG graph
-    var g = $("#svgVisualize2"),
+    var g = $("#svgOverlappingModels"),
         width = 1200,
         height = 700;
 
-    var svg = d3.select("#svgVisualize2").append("svg")
+    var svg = d3.select("#svgOverlappingModels").append("svg")
         .attrs({
             "width": width,
             "height": height
@@ -210,4 +210,4 @@ var showSVGModelHtml = function (links, model2DArray, modelEntityNameArray) {
     modelEntityNameArray = [];
 }
 
-exports.showSVGModelHtml = showSVGModelHtml;
+exports.overlappingModelsHtml = overlappingModelsHtml;

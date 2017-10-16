@@ -6,11 +6,12 @@
         <a href="#" onclick="$mainUtils.deleteRowModelHtml();">Delete Model</a>
     </button>
     <button id="visualizationBtn" type="visualization" class="btn btn-default btn-md">
-        <a href="#" onclick="$mainUtils.loadSVGModelHtml();">Overlapping Model</a>
+        <a href="#" onclick="$mainUtils.loadOverlappingHtml();">Overlapping Model</a>
     </button>
     <button id="confirmBtn" type="confirm" class="btn btn-default btn-md">
         <a href="#" onclick="$mainUtils.loadEpithelialHtml();">Epithelial Platform</a>
     </button>
+
     <div class="dropdown btn-group" role="group">
         <button class="btn btn-default btn-md dropdown-toggle" type="button" id="tableColModel"
                 data-toggle="dropdown"
@@ -44,8 +45,14 @@
                        onclick="$mainUtils.toggleColModelHtml();"
                        value=Model_entity> Compartment</a>
             </li>
+            <li><a href="#">
+                <input id=7 type="checkbox" checked="true"
+                       onclick="$mainUtils.toggleColModelHtml();"
+                       value=Model_entity> Located_in</a>
+            </li>
         </ul>
     </div>
 </div>
 <hr/>
+
 <div id="modelList" class="container"></div>
