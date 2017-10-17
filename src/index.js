@@ -21,6 +21,14 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 (function (global) {
     'use strict';
 
+    // TODO: Use identifiers in Auckland OLS
+    var apicalID = "http://purl.org/sig/ont/fma/fma84666";
+    var basolateralID = "http://purl.org/sig/ont/fma/fma84669";
+    var paracellularID = "http://purl.org/sig/ont/fma/fma67394";
+    var luminalID = "http://purl.org/sig/ont/fma/fma74550";
+    var cytosolID = "http://purl.org/sig/ont/fma/fma66836";
+    var interstitialID = "http://purl.org/sig/ont/fma/fma9673";
+
     var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
     var homeHtml = "./snippets/home-snippet.html";
@@ -59,6 +67,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         id = 0;
 
     var str = [];
+
+    var listOfMembrane = [apicalID, basolateralID, luminalID, cytosolID, interstitialID, paracellularID],
+        listOfMembraneName = [],
+        indexOfmemURI = 0;
 
     mainUtils.loadHomeHtml = function () {
 
@@ -100,6 +112,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         $(".carousel").carousel({
             interval: 2000, cycle: true
         });
+
+        $('.dropdown-toggle').dropdown();
     });
 
     $(document).on({
@@ -433,6 +447,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
         else {
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
+            head = headTitle();
+            listOfColumns(head, 1);
+            membraneURIOLS(listOfMembrane[0]);
         }
 
         // // Switch current active button to the clicked button
@@ -574,7 +591,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                     proteinList.push(proteinName);
                                                 }
 
-                                                head = headTitle(jsonModel, jsonSpecies, jsonGene, jsonProtein);
+                                                head = headTitle();
 
                                                 mainUtils.showDiscoverModels(
                                                     head,
@@ -587,6 +604,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                 id++; // increment index of modelEntity
 
                                                 if (id == jsonModel.results.bindings.length) {
+                                                    listOfColumns(head, 1);
+                                                    membraneURIOLS(listOfMembrane[0]);
                                                     return;
                                                 }
 
@@ -812,7 +831,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
         // console.log("showModel: ", jsonObj);
 
-        var head = ["Model_entity", "Protein", "Species", "Gene", "Compartment", "Located_in"];
+        var head = [];
+        for (var name in jsonObj) {
+            head.push(name);
+        }
+        listOfColumns(head, 2);
+
         var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
         // Table header
@@ -928,6 +952,31 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
     };
 
+    // Columns in search and model page
+    var listOfColumns = function (head, flag, membraneUri) {
+        if (flag == 1) { // columns in search html
+            for (var i = 2; i <= head.length + 1; i++) {
+                $('#ulIdSearch')
+                    .append('<li><a href="#"><input id=' + i + ' type="checkbox" checked="true" ' +
+                        'onclick=$mainUtils.toggleColHtml() value=' + head[i - 2] + '>' + head[i - 2] + '</a></li>');
+            }
+        }
+        else if (flag == 2) { // columns in model html
+            for (var i = 2; i <= head.length + 1; i++) {
+                $('#ulIdModel')
+                    .append('<li><a href="#"><input id=' + i + ' type="checkbox" checked="true" ' +
+                        'onclick=$mainUtils.toggleColModelHtml() value=' + head[i - 2] + '>' + head[i - 2] + '</a></li>');
+            }
+        }
+        else if (flag == 3) { // list of membranes in search html
+            for (var i = 0; i < head.length; i++) {
+                $('#ulIdMembrane')
+                    .append('<li><a href="#"><input id=' + membraneUri[i] + ' type="checkbox" checked="true" ' +
+                        'onclick=$mainUtils.filterSearchHtml() value=' + membraneUri[i] + '>' + head[i] + '</a></li>');
+            }
+        }
+    }
+
     // Filter search results
     mainUtils.filterSearchHtml = function () {
 
@@ -983,6 +1032,29 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             }
         }
 
+    };
+
+    // Filter dropdown list in the search html
+    var membraneURIOLS = function (fma_uri) {
+
+        var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+
+        sendGetRequest(
+            endpointOLS,
+            function (jsonObj) {
+                console.log("listOfMembraneName: ", jsonObj._embedded.terms[0].label);
+                listOfMembraneName.push(jsonObj._embedded.terms[0].label);
+
+                indexOfmemURI++;
+
+                if (indexOfmemURI == listOfMembrane.length) {
+                    listOfColumns(listOfMembraneName, 3, listOfMembrane);
+                    return;
+                }
+
+                membraneURIOLS(listOfMembrane[indexOfmemURI]);
+
+            }, true);
     };
 
     // TODO: move to utils directory

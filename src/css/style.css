@@ -37,6 +37,16 @@ body {
     background: #E7E7E7;
 }
 
+#searchBox {
+    width: 800px;
+    background-position: center;
+}
+
+#ulIdMembrane {
+    width: 775px;
+    background-position: center;
+}
+
 /* END HEADER */
 
 /* LEAD */

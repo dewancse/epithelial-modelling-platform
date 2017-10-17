@@ -59,7 +59,7 @@ var parseModelName = function (modelEntity) {
 }
 
 // process table headers
-var headTitle = function (jsonModel, jsonSpecies, jsonGene, jsonProtein) {
+var headTitle = function () {
     var head = [];
 
     // Getting first 2 head title, not i < jsonModel.head.vars.length

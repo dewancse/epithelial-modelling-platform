@@ -1,28 +1,9 @@
 <div class="container">
-    <div class="container input-group">
+    <div id="searchBox" class="container input-group">
         <div class="input-group-btn">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
                     aria-expanded="false">Search Everything <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><a href="#"><input id=http://identifiers.org/fma/FMA:84666 type="checkbox"
-                                       onclick="$mainUtils.filterSearchHtml();"
-                                       value=http://identifiers.org/fma/FMA:74550> Apical Membrane </a></li>
-                <li><a href="#"><input id=http://identifiers.org/fma/FMA:84669 type="checkbox"
-                                       onclick="$mainUtils.filterSearchHtml();"
-                                       value=http://identifiers.org/fma/FMA:66836> Basolateral Membrane </a></li>
-                <li><a href="#"><input id=http://identifiers.org/fma/FMA:74550 type="checkbox"
-                                       onclick="$mainUtils.filterSearchHtml();"
-                                       value=http://identifiers.org/fma/FMA:74550> Luminal Compartment </a></li>
-                <li><a href="#"><input id=http://identifiers.org/fma/FMA:66836 type="checkbox"
-                                       onclick="$mainUtils.filterSearchHtml();"
-                                       value=http://identifiers.org/fma/FMA:66836> Cytosol Compartment </a></li>
-                <li><a href="#"><input id=http://identifiers.org/fma/FMA:9673 type="checkbox"
-                                       onclick="$mainUtils.filterSearchHtml();"
-                                       value=http://identifiers.org/fma/FMA:74550> Interstitial Fluid </a></li>
-                <li><a href="#"><input id=http://identifiers.org/fma/FMA:67394 type="checkbox"
-                                       onclick="$mainUtils.filterSearchHtml();"
-                                       value=http://identifiers.org/fma/FMA:66836> Paracellular Pathway </a></li>
-            </ul>
+            <ul id="ulIdMembrane" class="dropdown-menu"></ul>
         </div><!-- /btn-group -->
         <input id="searchTxt" name="searchTxt" value="" type="text" placeholder="Search Models"
                class="form-control" aria-label="...">
@@ -44,33 +25,7 @@
                 Columns
                 <span class="caret"></span>
             </button>
-            <ul id="ulid" class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <li><a href="#">
-                    <input id=2 type="checkbox" checked="true"
-                           onclick="$mainUtils.toggleColHtml();"
-                           value=Model_entity> Model_entity</a>
-                </li>
-                <li><a href="#">
-                    <input id=3 type="checkbox" checked="true"
-                           onclick="$mainUtils.toggleColHtml();"
-                           value=Model_entity> Biological_meaning</a>
-                </li>
-                <li><a href="#">
-                    <input id=4 type="checkbox" checked="true"
-                           onclick="$mainUtils.toggleColHtml();"
-                           value=Model_entity> Species</a>
-                </li>
-                <li><a href="#">
-                    <input id=5 type="checkbox" checked="true"
-                           onclick="$mainUtils.toggleColHtml();"
-                           value=Model_entity> Gene</a>
-                </li>
-                <li><a href="#">
-                    <input id=6 type="checkbox" checked="true"
-                           onclick="$mainUtils.toggleColHtml();"
-                           value=Model_entity> Protein</a>
-                </li>
-            </ul>
+            <ul id="ulIdSearch" class="dropdown-menu" aria-labelledby="dropdownMenu1"></ul>
         </div>
     </div>
     <hr/>
