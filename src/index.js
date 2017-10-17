@@ -63,11 +63,11 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         geneList = [],
         proteinList = [],
         head = [],
-        filterModelEntity = [],
         id = 0;
 
     var str = [];
 
+    // search everything dropdown menu
     var listOfMembrane = [apicalID, basolateralID, luminalID, cytosolID, interstitialID, paracellularID],
         listOfMembraneName = [],
         indexOfmemURI = 0;
@@ -286,7 +286,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 geneList = [];
                 proteinList = [];
                 head = [];
-                filterModelEntity = [];
 
                 id = 0; // id to index each Model_entity
 
@@ -449,6 +448,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
             head = headTitle();
             listOfColumns(head, 1);
+
+            listOfMembraneName = [];
+            indexOfmemURI = 0;
             membraneURIOLS(listOfMembrane[0]);
         }
 
@@ -733,88 +735,151 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         var model = mainUtils.workspaceName;
         var tempidWithStr = mainUtils.tempidWithStr;
         model = model + "#" + model.slice(0, model.indexOf('.'));
-        var index = $.inArray(tempidWithStr, modelEntity);
 
-        // console.log("model and tempidWithStr in loadModelHtml: ", model, tempidWithStr);
-        var query = 'SELECT ?Compartment ' +
-            'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }';
+        var query = 'SELECT ?Protein ' +
+            'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }';
 
         sendPostRequest(
             endpoint,
             query,
-            function (jsonObjComp) {
-                var query = 'SELECT ?Located_in ' +
-                    'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in. }';
+            function (jsonProteinUri) {
 
-                sendPostRequest(
-                    endpoint,
-                    query,
-                    function (jsonObjLoc) {
-                        // showLoading("#main-content");
+                var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
+                var endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
+
+                sendGetRequest(
+                    endpointproteinOLS,
+                    function (jsonProtein) {
+
+                        if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
+                            var endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
+
                         sendGetRequest(
-                            modelHtml,
-                            function (modelHtmlContent) {
-                                $("#main-content").html(modelHtmlContent);
+                            endpointgeneOLS,
+                            function (jsonGene) {
 
-                                var tempComp = "", counterOLS = 0;
-                                for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
-                                    var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
-                                    var indexofColon = fma_uri.indexOf('FMA:');
-                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
-                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
+                                if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
+                                    var endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
 
-                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
-                                    sendGetRequest(
-                                        endpointOLS,
-                                        function (jsonObjOLS) {
-                                            counterOLS++;
-                                            tempComp += jsonObjOLS._embedded.terms[0].label;
-                                            if (counterOLS < jsonObjComp.results.bindings.length)
-                                                tempComp += ", ";
-                                            else
-                                                tempComp += "";
+                                sendGetRequest(
+                                    endpointspeciesOLS,
+                                    function (jsonSpecies) {
 
-                                            if (counterOLS == jsonObjComp.results.bindings.length) {
-                                                var tempLoc = "", counterOLSLoc = 0;
-                                                for (var i = 0; i < jsonObjLoc.results.bindings.length; i++) {
-                                                    var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
-                                                    var indexofColon = fma_uri.indexOf('FMA:');
-                                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
-                                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
 
-                                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
-                                                    sendGetRequest(
-                                                        endpointOLS,
-                                                        function (jsonObjOLSLoc) {
-                                                            counterOLSLoc++;
-                                                            tempLoc += jsonObjOLSLoc._embedded.terms[0].label;
-                                                            if (counterOLSLoc < jsonObjLoc.results.bindings.length)
-                                                                tempLoc += ", ";
-                                                            else
-                                                                tempLoc += "";
+                                        var query = 'SELECT ?Compartment ' +
+                                            'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }';
 
-                                                            if (counterOLSLoc == jsonObjLoc.results.bindings.length) {
-                                                                var jsonObj = {
-                                                                    "Model_entity": tempidWithStr,
-                                                                    "Protein": proteinList[index],
-                                                                    "Species": speciesList[index],
-                                                                    "Gene": geneList[index],
-                                                                    "Compartment": tempComp,
-                                                                    "Located_in": tempLoc
+                                        sendPostRequest(
+                                            endpoint,
+                                            query,
+                                            function (jsonObjComp) {
+                                                var query = 'SELECT ?Located_in ' +
+                                                    'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in. }';
+
+                                                sendPostRequest(
+                                                    endpoint,
+                                                    query,
+                                                    function (jsonObjLoc) {
+                                                        // showLoading("#main-content");
+                                                        sendGetRequest(
+                                                            modelHtml,
+                                                            function (modelHtmlContent) {
+                                                                $("#main-content").html(modelHtmlContent);
+
+                                                                var species, gene, protein;
+                                                                // species
+                                                                if (jsonSpecies._embedded.terms.length == 0)
+                                                                    species = "Undefined";
+                                                                else
+                                                                    species = jsonSpecies._embedded.terms[0].label;
+
+                                                                // gene
+                                                                if (jsonGene._embedded.terms.length == 0)
+                                                                    geneList = "Undefined";
+                                                                else {
+                                                                    var geneName = jsonGene._embedded.terms[0].label;
+                                                                    var indexOfParen = geneName.indexOf('(');
+                                                                    geneName = geneName.slice(0, indexOfParen - 1);
+                                                                    gene = geneName;
                                                                 }
 
-                                                                // console.log("jsonObj in loadModelHtml: ", jsonObj);
-                                                                mainUtils.showModel(jsonObj);
-                                                            }
-                                                        },
-                                                        true);
-                                                }
-                                            }
-                                        },
-                                        true);
-                                }
+                                                                // protein
+                                                                if (jsonProtein._embedded.terms.length == 0)
+                                                                    protein = "Undefined";
+                                                                else {
+                                                                    var proteinName = jsonProtein._embedded.terms[0].label;
+                                                                    var indexOfParen = proteinName.indexOf('(');
+                                                                    proteinName = proteinName.slice(0, indexOfParen - 1);
+                                                                    protein = proteinName;
+                                                                }
+
+                                                                var tempComp = "", counterOLS = 0;
+                                                                for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
+                                                                    var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
+                                                                    var indexofColon = fma_uri.indexOf('FMA:');
+                                                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
+
+                                                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+                                                                    sendGetRequest(
+                                                                        endpointOLS,
+                                                                        function (jsonObjOLS) {
+                                                                            counterOLS++;
+                                                                            tempComp += jsonObjOLS._embedded.terms[0].label;
+                                                                            if (counterOLS < jsonObjComp.results.bindings.length)
+                                                                                tempComp += ", ";
+                                                                            else
+                                                                                tempComp += "";
+
+                                                                            if (counterOLS == jsonObjComp.results.bindings.length) {
+                                                                                var tempLoc = "", counterOLSLoc = 0;
+                                                                                for (var i = 0; i < jsonObjLoc.results.bindings.length; i++) {
+                                                                                    var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
+                                                                                    var indexofColon = fma_uri.indexOf('FMA:');
+                                                                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                                                                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
+
+                                                                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+                                                                                    sendGetRequest(
+                                                                                        endpointOLS,
+                                                                                        function (jsonObjOLSLoc) {
+                                                                                            counterOLSLoc++;
+                                                                                            tempLoc += jsonObjOLSLoc._embedded.terms[0].label;
+                                                                                            if (counterOLSLoc < jsonObjLoc.results.bindings.length)
+                                                                                                tempLoc += ", ";
+                                                                                            else
+                                                                                                tempLoc += "";
+
+                                                                                            if (counterOLSLoc == jsonObjLoc.results.bindings.length) {
+                                                                                                var jsonObj = {
+                                                                                                    "Model_entity": tempidWithStr,
+                                                                                                    "Protein": protein,
+                                                                                                    "Species": species,
+                                                                                                    "Gene": gene,
+                                                                                                    "Compartment": tempComp,
+                                                                                                    "Located_in": tempLoc
+                                                                                                }
+
+                                                                                                // console.log("jsonObj in loadModelHtml: ", jsonObj);
+                                                                                                mainUtils.showModel(jsonObj);
+                                                                                            }
+                                                                                        },
+                                                                                        true);
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        true);
+                                                                }
+                                                            },
+                                                            false);
+                                                    },
+                                                    true);
+                                            },
+                                            true);
+                                    },
+                                    true);
                             },
-                            false);
+                            true);
                     },
                     true);
             },
@@ -1042,7 +1107,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         sendGetRequest(
             endpointOLS,
             function (jsonObj) {
-                console.log("listOfMembraneName: ", jsonObj._embedded.terms[0].label);
+                // console.log("listOfMembraneName: ", jsonObj._embedded.terms[0].label);
                 listOfMembraneName.push(jsonObj._embedded.terms[0].label);
 
                 indexOfmemURI++;
