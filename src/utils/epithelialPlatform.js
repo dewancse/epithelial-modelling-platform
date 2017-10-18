@@ -485,6 +485,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .attr("strokeWidth", "6px")
         .attr("fill", "white");
 
+    // hide interstitial2's right line bar
+    var widthLine = w / 3 + width + 30,
+        heightLine = height / 3 - 30;
+    newg.append("polygon")
+        .attr("transform", "translate(" + widthLine + ",0)")
+        .attr("points", "0,1.5 0," + (heightLine - 1.5) + "")
+        .attr("stroke", "white")
+        .attr("fill", "white")
+        // .attr("stroke", "url(#basicPattern)")
+        .attr("stroke-width", 5);
+    
     // Paracellular rectangle
     var paracellular = newg.append("rect")
         .attr("id", paracellularID)
