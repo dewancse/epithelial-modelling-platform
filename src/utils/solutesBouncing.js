@@ -12,16 +12,15 @@ var solutesBouncing = function (newg, solutes) {
     for (var i = 0; i < solutes.length; i++) {
         nodes.push({
             text: solutes[i].value,
-            color: color(Math.floor(Math.random() * m)),
-            x: solutes[i].xrect + (Math.random() * (solutes[i].width - solutes[i].xrect)),
-            y: solutes[i].yrect + (Math.random() * (solutes[i].height - solutes[i].yrect)),
+            color: color(Math.floor(Math.random() * m)), // assuming initial text length is 100
+            x: Math.random() * ((solutes[i].xrect + solutes[i].width) - (solutes[i].xrect + 100)) + (solutes[i].xrect),
+            y: Math.random() * ((solutes[i].yrect + solutes[i].height) - solutes[i].yrect) + solutes[i].yrect,
             speedX: Math.random() * maxSpeed,
             speedY: Math.random() * maxSpeed,
             xrect: solutes[i].xrect,
             yrect: solutes[i].yrect,
             width: solutes[i].width,
-            height: solutes[i].height,
-            length: solutes[i].length
+            height: solutes[i].height
         });
     }
 
@@ -65,11 +64,13 @@ var solutesBouncing = function (newg, solutes) {
 
     function gravity() {
         return function (d) {
-            // TODO: approximate solution, fix this later
-            if (d.x <= d.xrect) d.speedX = Math.abs(d.speedX); // each char is 6.5 unit
-            if (d.x + d.length + 6.5 * 2 >= d.xrect + d.width) d.speedX = -1 * Math.abs(d.speedX);
-            if (d.y - 6.5 * 2 <= d.yrect) d.speedY = -1 * Math.abs(d.speedY); // assuming 2 char equiv to height
-            if (d.y >= d.yrect + d.height) d.speedY = Math.abs(d.speedY);
+            var textLength = $(this).prop("textLength").baseVal.value;
+
+            if (d.x <= d.xrect) d.speedX = Math.abs(d.speedX);
+            if (d.x + textLength >= d.xrect + d.width) d.speedX = -1 * Math.abs(d.speedX);
+
+            if (d.y - (6.5 * 2.5) <= d.yrect) d.speedY = -1 * Math.abs(d.speedY); // assuming each char is 6.5 unit
+            if (d.y + 6.5 >= d.yrect + d.height) d.speedY = Math.abs(d.speedY); // number of char is 2.5
 
             d.x = d.x + (d.speedX);
             d.y = d.y + (-1 * d.speedY);

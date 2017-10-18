@@ -512,8 +512,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         // luminal(1), cytosol(2), interstitial(3), interstitial2(4), paracellular(5)
         for (var j = 1; j <= 5; j++) {
-            if (concentration_fma[i].fma == $("rect")[j].id)
+            if (concentration_fma[i].fma == $("rect")[j].id) {
                 break;
+            }
         }
 
         // compartments
@@ -535,8 +536,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yrect: yrect,
                     width: xwidth,
                     height: yheight,
-                    value: value,
-                    length: getTextWidth(value, 12) //value.length
+                    value: value
                 });
         }
     }
