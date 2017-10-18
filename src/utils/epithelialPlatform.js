@@ -543,6 +543,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             solutes.push(
                 {
                     compartment: $("rect")[j].id,
+                    fma: concentration_fma[i].fma,
                     xrect: xrect,
                     yrect: yrect,
                     width: xwidth,
