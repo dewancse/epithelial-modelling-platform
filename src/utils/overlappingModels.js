@@ -3,11 +3,11 @@
  */
 var uniqueifySVG = require("./miscellaneous.js").uniqueifySVG;
 
-var overlappingModelsHtml = function (links, model2DArray, modelEntityNameArray) {
+var overlappingModels = function (links, model2DArray, modelEntityNameArray) {
 
-    console.log("overlappingModelsHtml links: ", links);
-    console.log("overlappingModelsHtml model2DArray: ", model2DArray);
-    console.log("overlappingModelsHtml modelEntityNameArray: ", modelEntityNameArray);
+    console.log("overlappingModels links: ", links);
+    console.log("overlappingModels model2DArray: ", model2DArray);
+    console.log("overlappingModels modelEntityNameArray: ", modelEntityNameArray);
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -56,8 +56,8 @@ var overlappingModelsHtml = function (links, model2DArray, modelEntityNameArray)
 
     // SVG graph
     var g = $("#svgOverlappingModels"),
-        width = 1200,
-        height = 700;
+        width = 2000, //1200,
+        height = 900; // 700
 
     var svg = d3.select("#svgOverlappingModels").append("svg")
         .attrs({
@@ -72,9 +72,9 @@ var overlappingModelsHtml = function (links, model2DArray, modelEntityNameArray)
         .force("link", d3.forceLink().id(function (d) {
             return d.name;
         }))
-        .force("charge", d3.forceManyBody().strength(-100))
-        .force("center", d3.forceCenter(width / 3, height / 2))
-        .force("link", d3.forceLink().distance(100).strength(0.1));
+        .force("charge", d3.forceManyBody().strength(-100)) // -100
+        .force("center", d3.forceCenter(width / 4, height / 2)) // width / 3 and height / 2
+        .force("link", d3.forceLink().distance(100).strength(0.1)); // 100
 
     //build the arrow.
     svg.append("svg:defs").selectAll("marker")
@@ -210,4 +210,4 @@ var overlappingModelsHtml = function (links, model2DArray, modelEntityNameArray)
     modelEntityNameArray = [];
 }
 
-exports.overlappingModelsHtml = overlappingModelsHtml;
+exports.overlappingModels = overlappingModels;

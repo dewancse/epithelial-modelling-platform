@@ -9,7 +9,7 @@ var uniqueifyEpithelial = require("./utils/miscellaneous.js").uniqueifyEpithelia
 var uniqueifySrcSnkMed = require("./utils/miscellaneous.js").uniqueifySrcSnkMed;
 var iteration = require("./utils/miscellaneous.js").iteration;
 var viewModel = require("./utils/viewModel.js").viewModel;
-var overlappingModelsHtml = require("./utils/overlappingModels.js").overlappingModelsHtml;
+var overlappingModels = require("./utils/overlappingModels.js").overlappingModels;
 var epithelialPlatform = require("./utils/epithelialPlatform.js").epithelialPlatform;
 var showLoading = require("./utils/miscellaneous.js").showLoading;
 var activeMenu = require("./utils/miscellaneous.js").activeMenu;
@@ -451,7 +451,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
             listOfMembraneName = [];
             indexOfmemURI = 0;
-            membraneURIOLS(listOfMembrane[0]);
+            // membraneURIOLS(listOfMembrane[0]);
         }
 
         // // Switch current active button to the clicked button
@@ -1170,7 +1170,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 $("#main-content").html(overlappingHtmlContent);
 
                 // TODO: Fix it!!
-                sendGetRequest(overlappingHtml, overlappingModelsHtml(links, model2DArray, modelEntityNameArray), false);
+                sendGetRequest(overlappingHtml, overlappingModels(links, model2DArray, modelEntityNameArray), false);
             },
             false);
     };

@@ -42,6 +42,14 @@ body {
     background-position: center;
 }
 
+#btnText {
+    font-weight: bold;
+    font-size: 14px;
+    height: 45px;
+    /*background-position: center;*/
+    text-align: center;
+}
+
 #ulIdMembrane {
     width: 775px;
     background-position: center;
