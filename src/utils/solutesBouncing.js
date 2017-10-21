@@ -54,15 +54,19 @@ var solutesBouncing = function (newg, solutes) {
         .on("tick", tick);
 
     function tick(e) {
-        simulation.alpha(0.1);
-        text
-            .each(gravity())
-            .attr("x", function (d) {
-                return d.x;
-            })
-            .attr("y", function (d) {
-                return d.y;
-            });
+
+        // platform to model discovery in order to append more solutes
+        if ($("rect")[3] != undefined) {
+            simulation.alpha(0.1);
+            text
+                .each(gravity())
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                });
+        }
     }
 
     console.log("rect: ", $("rect"));

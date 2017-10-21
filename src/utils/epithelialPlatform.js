@@ -203,7 +203,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
-                    med_pr_text_syn: membrane[i].med_pr_text_syn
+                    med_pr_text_syn: membrane[i].med_pr_text_syn,
+                    protein_name: membrane[i].protein_name
                 });
 
             membrane[i].solute_chebi2 = "channel";
@@ -232,7 +233,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
-                    med_pr_text_syn: membrane[i].med_pr_text_syn
+                    med_pr_text_syn: membrane[i].med_pr_text_syn,
+                    protein_name: membrane[i].protein_name
                 });
 
             membrane[i].solute_chebi2 = "channel";
@@ -260,7 +262,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
-                    med_pr_text_syn: membrane[i].med_pr_text_syn
+                    med_pr_text_syn: membrane[i].med_pr_text_syn,
+                    protein_name: membrane[i].protein_name
                 });
 
             membrane[i].solute_chebi2 = "diffusive channel";
@@ -292,7 +295,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
-                    med_pr_text_syn: membrane[i].med_pr_text_syn
+                    med_pr_text_syn: membrane[i].med_pr_text_syn,
+                    protein_name: membrane[i].protein_name
                 });
         }
 
@@ -315,7 +319,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     med_fma: membrane[i].med_fma,
                     med_pr: membrane[i].med_pr,
                     med_pr_text: membrane[i].med_pr_text,
-                    med_pr_text_syn: membrane[i].med_pr_text_syn
+                    med_pr_text_syn: membrane[i].med_pr_text_syn,
+                    protein_name: membrane[i].protein_name
                 });
         }
     }
@@ -495,7 +500,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .attr("fill", "white")
         // .attr("stroke", "url(#basicPattern)")
         .attr("stroke-width", 5);
-    
+
     // Paracellular rectangle
     var paracellular = newg.append("rect")
         .attr("id", paracellularID)
@@ -890,6 +895,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             mediator_pr = combinedMembrane[i].med_pr,
             mediator_pr_text = combinedMembrane[i].med_pr_text,
             mediator_pr_text_syn = combinedMembrane[i].med_pr_text_syn,
+            protein_name = combinedMembrane[i].protein_name,
 
             solute_chebi = combinedMembrane[i].solute_chebi,
             solute_chebi2 = combinedMembrane[i].solute_chebi2,
@@ -967,7 +973,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -1148,7 +1154,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -1328,7 +1334,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -1508,7 +1514,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -1688,7 +1694,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -1822,7 +1828,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -1960,7 +1966,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -2141,7 +2147,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -2321,7 +2327,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -2501,7 +2507,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -2682,7 +2688,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -2816,7 +2822,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             src_fma, snk_fma, src_fma2, snk_fma2,
                             mediator_fma, mediator_pr,
                             solute_chebi, solute_chebi2, solute_text, solute_text2,
-                            mediator_pr_text, mediator_pr_text_syn
+                            mediator_pr_text, mediator_pr_text_syn, protein_name
                         ];
                     })
                     .attr("index", tempID)
@@ -2926,7 +2932,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         src_fma, snk_fma, src_fma2, snk_fma2,
                         mediator_fma, mediator_pr,
                         solute_chebi, solute_chebi2, solute_text, solute_text2,
-                        mediator_pr_text, mediator_pr_text_syn
+                        mediator_pr_text, mediator_pr_text_syn, protein_name
                     ];
                 })
                 .attr("index", tempID)
@@ -4118,17 +4124,52 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             baseUrl = 'https://www.ebi.ac.uk/Tools/services/rest/clustalo';
 
         for (var i = 0; i < membraneModelID.length; i++) {
-            PID.push(membraneModelID[i][15]); // PROTEIN id
+
+            if (membraneModelID[i][9] == "") {
+                var indexOfPR = membraneModelID[i][16].search("PR_"),
+                    medProteinID = membraneModelID[i][16].slice(indexOfPR + 3, membraneModelID[i][16].length);
+
+                PID.push(medProteinID); // Mediator PROTEIN id
+            }
+            else {
+                var indexOfPR = membraneModelID[i][9].search("PR_"),
+                    medProteinID = membraneModelID[i][9].slice(indexOfPR + 3, membraneModelID[i][9].length);
+
+                PID.push(medProteinID); // Mediator PROTEIN id
+            }
         }
 
-        console.log("PID: ", PID);
+        console.log("PID BEFORE: ", PID);
 
-        // TODO: if PID is empty, i.e. no related baso or apical membrane, then add the dragged
-        // TODO: protein Id in PID. After having the sequence, append a "0" digit after the protein Id in the
-        // TODO: result. e.g. >sp|P11170"0"|SC5A1_RABIT ...And we will get 100 percent matching.
-        // TODO: Make a comparison at the end that if 100 percent then "Not exist".
+        var indexOfPR, draggedMedPrID;
+        if (circleID[9] == "") {
+            indexOfPR = circleID[16].search("PR_");
+            draggedMedPrID = circleID[16].slice(indexOfPR + 3, circleID[16].length);
 
-        //TODO: how to deal with running time issue?
+            PID.push(draggedMedPrID); // Mediator PROTEIN id
+        }
+        else {
+            indexOfPR = circleID[9].search("PR_");
+            draggedMedPrID = circleID[9].slice(indexOfPR + 3, circleID[9].length);
+
+            PID.push(draggedMedPrID); // Mediator PROTEIN id
+        }
+
+        // remove duplicate protein ID
+        PID = PID.filter(function (item, pos) {
+            return PID.indexOf(item) == pos;
+        })
+
+        // PID does NOT start with P or Q
+        for (var i = 0; i < PID.length; i++) {
+            if (PID[i].charAt(0) == 'Q') continue;
+
+            if (PID[i].charAt(0) != 'P') {
+                PID[i] = 'P' + PID[i].replace(/^0+/, ''); // Or parseInt("065", 10);
+            }
+        }
+
+        console.log("PID AFTER Filter: ", PID);
 
         // https://www.ebi.ac.uk/seqdb/confluence/pages/viewpage.action?pageId=48923608
         var WSDbfetchREST = function () {
@@ -4139,6 +4180,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 dbfectendpoint,
                 function (psequence) {
                     ProteinSeq += psequence;
+
+                    // PID is empty
+                    if (PID.length == 1) { // in fact, PID.length == 0, to enable the above dbfectendpoint query
+
+                        var indexOfBar = psequence.search(/\|/gi),
+                            indexOfBar2 = psequence.slice(indexOfBar + 1, psequence.length).search(/\|/gi),
+                            t1 = psequence.slice(0, indexOfBar + indexOfBar2 + 1),
+                            t2 = psequence.slice(indexOfBar + indexOfBar2 + 1);
+
+                        psequence = t1 + "0" + t2;
+                        ProteinSeq += psequence;
+
+                        console.log("ProteinSeq when empty: ", ProteinSeq, PID);
+                    }
 
                     index++;
                     if (index == PID.length) {
@@ -4241,34 +4296,35 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     console.log("similarityOBJ: ", similarityOBJ);
                                                     console.log("membraneModelValue: ", membraneModelValue);
 
-                                                    var indexOfPR = proteinName.search("PR_"),
-                                                        draggedProteinID = proteinName.slice(indexOfPR + 3, proteinName.length);
+                                                    console.log("draggedMedPrID Inside: ", draggedMedPrID);
 
-                                                    console.log("draggedProteinID: ", draggedProteinID);
-
-                                                    for (var m = 0; m < membraneModelValue.length; m++) {
-                                                        for (var n = 0; n < similarityOBJ.length; n++) {
-                                                            if ((membraneModelValue[m].pid == similarityOBJ[n].PID1 &&
-                                                                draggedProteinID == similarityOBJ[n].PID2) ||
-                                                                (membraneModelValue[m].pid == similarityOBJ[n].PID2 &&
-                                                                draggedProteinID == similarityOBJ[n].PID1)) {
-                                                                membraneModelValue[m].similar = similarityOBJ[n].similarity;
+                                                    // length is empty when 100% matching
+                                                    // appended a 0 bit after its protein id and make a comparision
+                                                    if (similarityOBJ.length != 0) {
+                                                        for (var m = 0; m < membraneModelValue.length; m++) {
+                                                            for (var n = 0; n < similarityOBJ.length; n++) {
+                                                                if ((membraneModelValue[m].pid == similarityOBJ[n].PID1 &&
+                                                                    draggedMedPrID == similarityOBJ[n].PID2) ||
+                                                                    (membraneModelValue[m].pid == similarityOBJ[n].PID2 &&
+                                                                    draggedMedPrID == similarityOBJ[n].PID1)) {
+                                                                    membraneModelValue[m].similar = similarityOBJ[n].similarity;
+                                                                }
                                                             }
                                                         }
+
+                                                        console.log("membraneModelValue: ", membraneModelValue);
+
+                                                        // Descending sorting
+                                                        membraneModelValue.sort(function (a, b) {
+                                                            return b.similar - a.similar;
+                                                        });
                                                     }
-
-                                                    console.log("membraneModelValue: ", membraneModelValue);
-
-                                                    // Descending sorting
-                                                    membraneModelValue.sort(function (a, b) {
-                                                        return b.similar - a.similar;
-                                                    });
 
                                                     console.log("AFTER membraneModelValue: ", membraneModelValue);
                                                     console.log("AFTER membraneModelId: ", membraneModelID);
 
                                                     var membraneTransporter = "<p><b>" + membraneName + " model</b>";
-                                                    if (membraneModelValue.length == 0) {
+                                                    if (membraneModelValue.length == 0 || similarityOBJ.length == 0) {
                                                         membraneTransporter += "<br>Not Exist";
                                                     }
                                                     else {
@@ -4354,6 +4410,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         return;
                     }
 
+                    // callback
                     WSDbfetchREST();
                 },
                 false);
@@ -4608,16 +4665,29 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                 if (jsonRelatedMembraneModel.results.bindings.length != 0) {
 
-                                                    var tempVal = jsonRelatedMembraneModel.results.bindings[0].Protein.value,
-                                                        indexOfPR = tempVal.search("PR_"),
+                                                    var tempVal, indexOfPR, PID;
+                                                    if (med_pr.length == 0) {
+                                                        tempVal = jsonRelatedMembraneModel.results.bindings[0].Protein.value;
+                                                        indexOfPR = tempVal.search("PR_");
                                                         PID = tempVal.slice(indexOfPR + 3, tempVal.length);
+                                                    }
+                                                    else {
+                                                        tempVal = med_pr[0].med_pr;
+                                                        indexOfPR = tempVal.search("PR_");
+                                                        PID = tempVal.slice(indexOfPR + 3, tempVal.length);
+                                                        
+                                                        // If PID start with 0 digit
+                                                        if (PID.charAt(0) != 'P') {
+                                                            if (PID.charAt(0) != 'Q') {
+                                                                PID = 'P' + PID.replace(/^0+/, ''); // Or parseInt("065", 10)
+                                                            }
+                                                        }
+                                                    }
 
                                                     membraneModelValue.push({
                                                         protein: jsonRelatedMembraneModel.results.bindings[0].Protein.value,
-                                                        pid: PID,
+                                                        pid: PID, // med PID
                                                         prname: jsonPr._embedded.terms[0].label,
-                                                        // uri1 is the dragged circle
-                                                        uri1: combinedMembrane[0].med_pr,
                                                         medfma: combinedMembrane[0].med_fma,
                                                         similar: 0 // initial percent
                                                     });
@@ -4765,13 +4835,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     sourcefma2,
                                                     sinkfma2,
                                                     medfma, // jsonObjFlux.results.bindings[0].med_entity_uri.value, // med_fma
-                                                    medpr, // jsonRelatedMembraneModel.results.bindings[0].Protein.value, // med_pr
+                                                    medpr, // med_pr, e.g. mediator in a cotransporter protein
                                                     solutechebi, // solute_chebi
                                                     solutechebi2, // solute_chebi2
                                                     solutetext, //solute_text
                                                     solutetext2, //solute_text2
                                                     jsonPr._embedded.terms[0].label, //med_pr_text,
-                                                    med_pr_text_syn //med_pr_text_syn
+                                                    med_pr_text_syn, //med_pr_text_syn
+                                                    jsonRelatedMembraneModel.results.bindings[0].Protein.value // protein_name
                                                 ]);
 
                                                 solute_chebi = [];
@@ -5376,6 +5447,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     }
                 }
                 else {
+                    console.log("CicleID here : ", circleID);
                     // update combinedMembrane, this will be sent to GMS to assemble and reproduce a new cellml model
                     combinedMembrane[tempIndex].model_entity = circleID[0]; // cellml model entity (e.g. weinstein_1995.cellml#NHE3.J_NHE3_Na)
                     combinedMembrane[tempIndex].variable_text = circleID[2]; // cellml variable name (e.g. J_NHE_Na)
@@ -5387,6 +5459,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     combinedMembrane[tempIndex].solute_text = circleID[12]; // solute text using the CHEBI uri from OLS
                     combinedMembrane[tempIndex].med_pr_text = circleID[14]; // mediator protein text using the mediator protein uri from OLS
                     combinedMembrane[tempIndex].med_pr_text_syn = circleID[15]; // synonym of a mediator protein text (e.g. NHE3, SGLT1) using the mediator protein uri from OLS
+                    combinedMembrane[tempIndex].protein_name = circleID[16]; // protein name
                     combinedMembrane[tempIndex].model_entity2 = circleID[1]; // cellml model entity => cotransporter or empty otherwise
                     combinedMembrane[tempIndex].variable_text2 = circleID[3]; // cellml variable name
                     combinedMembrane[tempIndex].source_fma2 = circleID[6]; // source FMA uri => cotransporter or empty otherwise

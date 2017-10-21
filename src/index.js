@@ -1335,12 +1335,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                         variable_text: membrane1.variable_text,
                         source_fma: membrane1.source_fma,
                         sink_fma: membrane1.sink_fma,
+                        protein_name: membrane1.protein_name,
                         solute_chebi2: membrane2.solute_chebi,
                         solute_text2: membrane2.solute_text,
                         model_entity2: membrane2.model_entity,
                         variable_text2: membrane2.variable_text,
                         source_fma2: membrane2.source_fma,
-                        sink_fma2: membrane2.sink_fma
+                        sink_fma2: membrane2.sink_fma,
                     }
 
                     // console.log("tempprotein: ", tempProtein);
@@ -1573,7 +1574,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                             endpointOLS,
                                             function (jsonObjOLSMedPr) {
 
-                                                // console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr);
+                                                console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr, medURI);
 
                                                 index++;
 
@@ -1611,7 +1612,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                             med_fma: med_fma[0].fma,
                                                             med_pr: temp_med_pr,
                                                             med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
-                                                            med_pr_text_syn: med_pr_text_syn
+                                                            med_pr_text_syn: med_pr_text_syn,
+                                                            protein_name: jsonObjFlux.results.bindings[0].protein.value
                                                         });
 
                                                         source_fma2.push(source_fma[0]);
@@ -1670,7 +1672,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                                                 med_fma: med_fma[0].fma,
                                                                 med_pr: temp_med_pr,
                                                                 med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
-                                                                med_pr_text_syn: med_pr_text_syn
+                                                                med_pr_text_syn: med_pr_text_syn,
+                                                                protein_name: jsonObjFlux.results.bindings[0].protein.value
                                                             });
 
                                                             source_fma2.push(source_fma[i]);
