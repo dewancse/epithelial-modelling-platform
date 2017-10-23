@@ -78,6 +78,11 @@ body {
 
 .carousel-caption {
     color: darkred;
+    bottom: -20px;
+}
+
+.carousel-indicators {
+    bottom: -10px;
 }
 
 /* END CAROUSAL */

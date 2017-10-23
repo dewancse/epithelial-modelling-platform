@@ -113,13 +113,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             homeHtml,
             function (homeHtmlContent) {
                 $("#main-content").html(homeHtmlContent);
+
+                $('.carousel').carousel({
+                    interval: 2000
+                });
             },
             false);
-
-        // TODO: carousal is not starting automatically
-        $(".carousel").carousel({
-            interval: 2000, cycle: true
-        });
 
         $('.dropdown-toggle').dropdown();
     });
