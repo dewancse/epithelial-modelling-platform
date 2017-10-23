@@ -7,7 +7,7 @@ var searchFn = require("./miscellaneous.js").searchFn;
 // Show a selected entry from search results
 var viewModel = function (jsonObj) {
 
-    console.log("viewModel jsonObj: ", jsonObj);
+    // console.log("viewModel jsonObj: ", jsonObj);
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
         var divHead = $("<div/>").addClass("h4").css("font-weight", "bold");

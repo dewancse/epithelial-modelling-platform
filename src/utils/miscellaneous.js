@@ -41,6 +41,19 @@ var uniqueify = function (es) {
     return retval;
 }
 
+// remove duplicate model entity and biological meaning
+var uniqueifyCombinedMembrane = function (es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if ((retval[j].model_entity === e.model_entity) && (retval[j].model_entity2 === e.model_entity2))
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
     var indexOfHash = fma.name.search("#"),
@@ -94,6 +107,47 @@ function uniqueifySrcSnkMed(es) {
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
             if (retval[j] === e)
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
+// remove duplicate model2DArray
+function uniqueifymodel2DArray(es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            if (retval[j][1] === e[1])
+                return;
+        }
+        retval.push(e);
+    });
+    return retval;
+}
+
+// separate cellml model and variable name from a model entity
+var modelVariableName = function (element) {
+    // console.log("element: ", element);
+    // remove duplicate components with same variable
+    var indexOfHash = element.search("#"),
+        cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
+        componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
+        indexOfDot = componentVariableName.indexOf('.'),
+        variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
+
+    return [cellmlModelName, variableName];
+}
+
+// remove duplicate entity (cellml model and variable name)
+function uniqueifyjsonModel(es) {
+    var retval = [];
+    es.forEach(function (e) {
+        for (var j = 0; j < retval.length; j++) {
+            var temp1 = modelVariableName(retval[j].Model_entity.value),
+                temp2 = modelVariableName(e.Model_entity.value);
+            if (temp1[0] == temp2[0] && temp1[1] == temp2[1])
                 return;
         }
         retval.push(e);
@@ -195,6 +249,53 @@ function iteration(length) {
     return sum;
 }
 
+var isExist = function (element, templistOfModel) {
+    // console.log("element: ", element);
+    // remove duplicate components with same variable
+    var indexOfHash = element.search("#"),
+        cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
+        componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
+        indexOfDot = componentVariableName.indexOf('.'),
+        variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
+
+    for (var i = 0; i < templistOfModel.length; i++) {
+        var indexOfHash2 = templistOfModel[i].search("#"),
+            cellmlModelName2 = templistOfModel[i].slice(0, indexOfHash2), // weinstein_1995.cellml
+            componentVariableName2 = templistOfModel[i].slice(indexOfHash2 + 1), // NHE3.J_NHE3_Na
+            indexOfDot2 = componentVariableName2.indexOf('.'),
+            variableName2 = componentVariableName2.slice(indexOfDot2 + 1); // J_NHE3_Na
+
+        if (cellmlModelName == cellmlModelName2 && variableName == variableName2) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+var isExistModel2DArray = function (element, model2DArray) {
+    // remove duplicate components with same variable
+    var indexOfHash = element.search("#"),
+        cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
+        componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
+        indexOfDot = componentVariableName.indexOf('.'),
+        variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
+
+    for (var i = 0; i < model2DArray.length; i++) {
+        var indexOfHash2 = model2DArray[i][1].search("#"),
+            cellmlModelName2 = model2DArray[i][1].slice(0, indexOfHash2), // weinstein_1995.cellml
+            componentVariableName2 = model2DArray[i][1].slice(indexOfHash2 + 1), // NHE3.J_NHE3_Na
+            indexOfDot2 = componentVariableName2.indexOf('.'),
+            variableName2 = componentVariableName2.slice(indexOfDot2 + 1); // J_NHE3_Na
+
+        if (cellmlModelName == cellmlModelName2 && variableName == variableName2) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
 exports.headTitle = headTitle;
@@ -212,3 +313,8 @@ exports.compare = compare;
 exports.showLoading = showLoading;
 exports.activeMenu = activeMenu;
 exports.switchMenuToActive = switchMenuToActive;
+exports.uniqueifymodel2DArray = uniqueifymodel2DArray;
+exports.uniqueifyjsonModel = uniqueifyjsonModel;
+exports.isExist = isExist;
+exports.isExistModel2DArray = isExistModel2DArray;
+exports.uniqueifyCombinedMembrane = uniqueifyCombinedMembrane;

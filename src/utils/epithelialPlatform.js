@@ -4,6 +4,7 @@
 var solutesBouncing = require("./solutesBouncing.js").solutesBouncing;
 var getTextWidth = require("./miscellaneous.js").getTextWidth;
 var uniqueify = require("./miscellaneous.js").uniqueify;
+var uniqueifyCombinedMembrane = require("./miscellaneous.js").uniqueifyCombinedMembrane;
 var uniqueifyjsonFlux = require("./miscellaneous.js").uniqueifyjsonFlux;
 var sendPostRequest = require("../libs/ajax-utils.js").sendPostRequest;
 var sendGetRequest = require("../libs/ajax-utils.js").sendGetRequest;
@@ -339,6 +340,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         combinedMembrane.push(basolateralMembrane[i]);
     for (var i = 0; i < paracellularMembrane.length; i++)
         combinedMembrane.push(paracellularMembrane[i]);
+
+    combinedMembrane = uniqueifyCombinedMembrane(combinedMembrane);
 
     console.log("combinedMembrane: ", combinedMembrane);
 
@@ -3409,29 +3412,45 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     console.log("jsonModel: ", jsonModel);
 
                                     proteinName = jsonModel.results.bindings[0].Protein.value;
-                                    var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + proteinName;
+
+                                    var endpointprOLS;
+                                    if (proteinName != undefined)
+                                        endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + proteinName;
+                                    else
+                                        endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
 
                                     sendGetRequest(
                                         endpointprOLS,
                                         function (jsonPr) {
 
+                                            var endpointgeneOLS;
                                             if (jsonPr._embedded.terms[0]._links.has_gene_template != undefined)
-                                                var endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
+                                                endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
+                                            else
+                                                endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
 
                                             sendGetRequest(
                                                 endpointgeneOLS,
                                                 function (jsonGene) {
 
+                                                    var endpointspeciesOLS;
                                                     if (jsonPr._embedded.terms[0]._links.only_in_taxon != undefined)
-                                                        var endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
+                                                        endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
+                                                    else
+                                                        endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
 
                                                     sendGetRequest(
                                                         endpointspeciesOLS,
                                                         function (jsonSpecies) {
 
-                                                            proteinText = jsonPr._embedded.terms[0].label;
-                                                            var indexOfParen = proteinText.indexOf('(');
-                                                            proteinText = proteinText.slice(0, indexOfParen - 1);
+                                                            if (jsonPr._embedded == undefined)
+                                                                proteinText = "undefined";
+                                                            else {
+                                                                proteinText = jsonPr._embedded.terms[0].label;
+                                                                var indexOfParen = proteinText.indexOf('(');
+                                                                proteinText = proteinText.slice(0, indexOfParen - 1);
+                                                            }
+
                                                             biological_meaning = jsonModel.results.bindings[0].Biological_meaning.value;
 
                                                             if (circleID[1] != "")
@@ -3439,10 +3458,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             else
                                                                 biological_meaning2 = "";
 
-                                                            speciesName = jsonSpecies._embedded.terms[0].label;
-                                                            geneName = jsonGene._embedded.terms[0].label;
-                                                            var indexOfParen = geneName.indexOf('(');
-                                                            geneName = geneName.slice(0, indexOfParen - 1);
+                                                            if (jsonSpecies._embedded == undefined)
+                                                                speciesName = "undefined";
+                                                            else
+                                                                speciesName = jsonSpecies._embedded.terms[0].label;
+
+                                                            if (jsonGene._embedded == undefined)
+                                                                geneName = "undefined";
+                                                            else {
+                                                                geneName = jsonGene._embedded.terms[0].label;
+                                                                var indexOfParen = geneName.indexOf('(');
+                                                                geneName = geneName.slice(0, indexOfParen - 1);
+                                                            }
 
                                                             var query = 'SELECT ?cellmlmodel ' +
                                                                 'WHERE { GRAPH ?g { ' +
@@ -4429,7 +4456,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var relatedMembraneModel = function (workspaceName, membraneName, cotransporterList) {
 
         var tempmembraneModel;
-        if (membraneModel.length == 0)
+        if (membraneModel.length == 0 || membraneModel[idMembrane].model_entity == undefined)
             tempmembraneModel = undefined;
         else {
             var indexOfHash = membraneModel[idMembrane].model_entity.search("#");
@@ -4675,7 +4702,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         tempVal = med_pr[0].med_pr;
                                                         indexOfPR = tempVal.search("PR_");
                                                         PID = tempVal.slice(indexOfPR + 3, tempVal.length);
-                                                        
+
                                                         // If PID start with 0 digit
                                                         if (PID.charAt(0) != 'P') {
                                                             if (PID.charAt(0) != 'Q') {

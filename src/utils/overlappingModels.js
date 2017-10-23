@@ -3,11 +3,12 @@
  */
 var uniqueifySVG = require("./miscellaneous.js").uniqueifySVG;
 
-var overlappingModels = function (links, model2DArray, modelEntityNameArray) {
+var overlappingModels = function (links, model2DArray, modelEntityNameArray, visualizedOverlapModels) {
 
-    console.log("overlappingModels links: ", links);
-    console.log("overlappingModels model2DArray: ", model2DArray);
-    console.log("overlappingModels modelEntityNameArray: ", modelEntityNameArray);
+    // console.log("overlappingModels links: ", links);
+    // console.log("overlappingModels model2DArray: ", model2DArray);
+    // console.log("overlappingModels modelEntityNameArray: ", modelEntityNameArray);
+    // console.log("overlappingModels visualizedOverlapModels: ", visualizedOverlapModels);
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -19,6 +20,9 @@ var overlappingModels = function (links, model2DArray, modelEntityNameArray) {
     for (var ix = 0; ix < modelEntityNameArray.length; ix++) {
         for (var i = 0; i < model2DArray.length; i++) {
             if (modelEntityNameArray[ix] == model2DArray[i][1]) {
+
+                visualizedOverlapModels.push(model2DArray[i]); // save them to show in Load Model
+
                 for (var j = 2; j < model2DArray[i].length; j++) {
 
                     var name;
