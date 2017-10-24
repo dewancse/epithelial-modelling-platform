@@ -81,7 +81,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     var lengthOfLoadModelTable;
 
     mainUtils.loadHomeHtml = function () {
-
         showLoading("#main-content");
         sendGetRequest(
             homeHtml,
@@ -108,6 +107,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         // On first load, show home view
         showLoading("#main-content");
 
+        console.log("document.ready");
+
         // homepage
         sendGetRequest(
             homeHtml,
@@ -125,14 +126,23 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     $(document).on({
         click: function () {
+
+            console.log("document.on.click");
+
             // If there's an action with the given name, call it
             if (typeof actions[event.target.dataset.action] === "function") {
+                console.log("event.target.dataset.action: ", event.target.dataset.action);
                 actions[event.target.dataset.action].call(this, event);
             }
-
+            // else {
+            //     console.log("ESLE event.target.dataset.action: ", event.target.dataset.action);
+            // }
         },
 
         keydown: function () {
+
+            console.log("document.on.keydown");
+
             // semantic annotation based on search items
             if (event.key == 'Enter') {
 
@@ -418,7 +428,12 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     // Load search html
     mainUtils.loadSearchHtml = function () {
 
+        console.log("loadSearchHtml");
+
         if (!sessionStorage.getItem("searchListContent")) {
+
+            console.log("loadSearchHtml IF");
+
             sendGetRequest(
                 searchHtml,
                 function (searchHtmlContent) {
@@ -429,6 +444,9 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
         else {
             // console.log("templistOfModel: ", templistOfModel);
+
+            console.log("loadSearchHtml ELSE");
+
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
 
             for (var j = 0; j < modelEntity.length; j++) {
@@ -462,6 +480,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     };
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
+
+        console.log("discoverModels");
 
         if (uriCHEBI == "") {
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
@@ -649,11 +669,15 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     // Show discovered models from PMR
     mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
 
+        console.log("showDiscoverModels");
+
         // Empty search result
         if (head.length == 0) {
             $("#searchList").html(
                 "<section class='container-fluid'><label><br>No Search Results!</label></section>"
             );
+
+            sessionStorage.setItem('searchListContent', $("#main-content").html());
 
             return;
         }
@@ -1164,6 +1188,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
 
     // Columns in search and model page
     var listOfColumns = function (head, flag, membraneUri) {
+        console.log("listOfColumns");
+
         if (flag == 1) { // columns in search html
             for (var i = 2; i <= head.length + 1; i++) {
                 $('#ulIdSearch')
@@ -1180,21 +1206,33 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
         }
         else if (flag == 3) { // list of membranes in search html
             for (var i = 0; i < head.length; i++) {
-                $('#ulIdMembrane')
-                    .append('<li><a href="#"><input id=' + membraneUri[i] + ' type="checkbox" checked="true" ' +
-                        'onclick=$mainUtils.filterSearchHtml() value=' + membraneUri[i] + '>' + head[i] + '</a></li>');
+                $('#membraneId')
+                    .append('<option value=' + membraneUri[i] + '>' + head[i] + '</option>');
             }
         }
     }
 
     // Filter search results
-    mainUtils.filterSearchHtml = function () {
+    // mainUtils.filterSearchHtml = function () {
+
+    $("#submitBtn").onclick = function () {
+
 
         var tempstr = [];
 
-        if (event.target.checked == true) {
+        console.log("event in filterSearchHtml: ", event);
+        console.log("membraneId in filterSearchHtml: ", $('#membraneId'));
+        console.log("$('#membraneId').val() in filterSearchHtml: ", $('#membraneId').val());
+        console.log("$('table tr') in filterSearchHtml: ", $('table tr'));
 
-            var id = event.target.id;
+        // if (event.target.checked == true)
+        if ($('#membraneId').val() != undefined) {
+
+            var id = $('#membraneId').val();
+
+            console.log("$('#membraneId').val() in if $('#membraneId').val() != undefined: ", $('#membraneId').val());
+            console.log("$('table tr') in if $('#membraneId').val() != undefined: ", $('table tr'));
+
             for (var i = 1; i < $('table tr').length; i++) {
 
                 tempstr = $('table tr')[i].childNodes[2].id.split(',');
@@ -1213,10 +1251,13 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
             }
         }
 
-        if (event.target.checked == false) {
+        // if (event.target.checked == false)
+        if ($('#membraneId').val() == undefined) {
 
             var tempstr = [];
-            var id = event.target.id;
+            var id = $('#membraneId').val();
+
+            console.log("$('#membraneId').val() == undefined: ", $('#membraneId').val());
 
             str = uniqueifySrcSnkMed(str); // remove duplicate
             str.splice(str.indexOf(id), 1); // delete id
@@ -1241,7 +1282,6 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                 }
             }
         }
-
     };
 
     // Filter dropdown list in the search html
@@ -1638,7 +1678,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                             query,
                             function (jsonObjFlux) {
 
-                                console.log("jsonObjFlux in index.js: ", jsonObjFlux);
+                                // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                                 var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
                                 var indexofColon = chebi_uri.indexOf('CHEBI:');
@@ -1741,7 +1781,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
                                             endpointOLS,
                                             function (jsonObjOLSMedPr) {
 
-                                                console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr, medURI);
+                                                // console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr, medURI);
 
                                                 index++;
 
@@ -1989,5 +2029,4 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     // Expose utility to the global object
     global.$mainUtils = mainUtils;
 
-})
-(window);
+})(window);

@@ -364,17 +364,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             lengthOfBasoMem++;
     }
 
-    // if (apicalMembrane.length > basolateralMembrane.length && apicalMembrane.length > 4)
-    //     height += 50 * (apicalMembrane.length - 4);
-    //
-    // if (basolateralMembrane.length > apicalMembrane.length && basolateralMembrane.length > 4)
-    //     height += 50 * (basolateralMembrane.length - 4);
+    console.log("lengthOfApicalMem, lengthOfBasoMem: ", lengthOfApicalMem, lengthOfBasoMem);
 
     if (lengthOfApicalMem > lengthOfBasoMem && lengthOfApicalMem > 4)
         height += 50 * (lengthOfApicalMem - 4);
 
     if (lengthOfBasoMem > lengthOfApicalMem && lengthOfBasoMem > 4)
         height += 50 * (lengthOfBasoMem - 4);
+
 
     if (prevHeight != height) {
         h += (height - prevHeight);
@@ -1768,8 +1765,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 dytext2[i] = "";
 
                 // increment y-axis of line and circle
-                yvalue += ydistance;
-                cyvalue += ydistance;
+                // circle's radius 20
+                // polygon - probably radius distance from middle point is 10
+                yvalue += ydistance - 20;
+                cyvalue += ydistance - 20;
             }
 
             // case 6

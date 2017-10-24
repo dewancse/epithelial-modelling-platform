@@ -42,6 +42,11 @@ body {
     background-position: center;
 }
 
+.searchEvBox {
+    width: 500px;
+    background-position: center;
+}
+
 #btnText {
     font-weight: bold;
     font-size: 14px;
@@ -51,7 +56,7 @@ body {
 }
 
 #ulIdMembrane {
-    width: 775px;
+    width: 500px;
     background-position: center;
 }
 
