@@ -88,19 +88,6 @@ var headTitle = function () {
     return head;
 }
 
-function compare(str, tempstr) {
-
-    for (var i = 0; i < str.length; i++) {
-        for (var j = 0; j < tempstr.length; j++) {
-            if (str[i] == tempstr[j]) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 // remove duplicate model entity and biological meaning
 function uniqueifySrcSnkMed(es) {
     var retval = [];
@@ -309,7 +296,6 @@ exports.createAnchor = createAnchor;
 exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
 exports.iteration = iteration;
-exports.compare = compare;
 exports.showLoading = showLoading;
 exports.activeMenu = activeMenu;
 exports.switchMenuToActive = switchMenuToActive;

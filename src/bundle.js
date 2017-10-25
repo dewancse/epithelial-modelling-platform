@@ -160,19 +160,6 @@ var headTitle = function () {
     return head;
 }
 
-function compare(str, tempstr) {
-
-    for (var i = 0; i < str.length; i++) {
-        for (var j = 0; j < tempstr.length; j++) {
-            if (str[i] == tempstr[j]) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 // remove duplicate model entity and biological meaning
 function uniqueifySrcSnkMed(es) {
     var retval = [];
@@ -381,7 +368,6 @@ exports.createAnchor = createAnchor;
 exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
 exports.iteration = iteration;
-exports.compare = compare;
 exports.showLoading = showLoading;
 exports.activeMenu = activeMenu;
 exports.switchMenuToActive = switchMenuToActive;
@@ -6906,7 +6892,6 @@ exports.viewModel = viewModel;
 var parseModelName = __webpack_require__(0).parseModelName;
 var parserFmaNameText = __webpack_require__(0).parserFmaNameText;
 var headTitle = __webpack_require__(0).headTitle;
-var compare = __webpack_require__(0).compare;
 var uniqueifyEpithelial = __webpack_require__(0).uniqueifyEpithelial;
 var uniqueifySrcSnkMed = __webpack_require__(0).uniqueifySrcSnkMed;
 var uniqueifymodel2DArray = __webpack_require__(0).uniqueifymodel2DArray;
@@ -6970,13 +6955,16 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         speciesList = [],
         geneList = [],
         proteinList = [],
+        listOfURIs = [],
         head = [],
         id = 0;
 
-    var str = [];
-
     // search everything dropdown menu
-    var listOfMembrane = [apicalID, basolateralID, luminalID, cytosolID, interstitialID, paracellularID],
+    // var listOfMembrane = [apicalID, basolateralID, luminalID, cytosolID, interstitialID, paracellularID],
+    var listOfMembrane = [
+            "http://purl.obolibrary.org/obo/PR_P13866",
+            "http://purl.obolibrary.org/obo/PR_P26433",
+            "http://purl.obolibrary.org/obo/PR_Q9ET37"],
         listOfMembraneName = [],
         indexOfmemURI = 0;
 
@@ -7011,17 +6999,22 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         console.log("document.ready");
 
-        // homepage
-        sendGetRequest(
-            homeHtml,
-            function (homeHtmlContent) {
-                $("#main-content").html(homeHtmlContent);
+        if (sessionStorage.getItem("searchListContent")) {
+            $("#main-content").html(sessionStorage.getItem('searchListContent'));
+        }
+        else {
+            // homepage
+            sendGetRequest(
+                homeHtml,
+                function (homeHtmlContent) {
+                    $("#main-content").html(homeHtmlContent);
 
-                $('.carousel').carousel({
-                    interval: 2000
-                });
-            },
-            false);
+                    $('.carousel').carousel({
+                        interval: 2000
+                    });
+                },
+                false);
+        }
 
         $('.dropdown-toggle').dropdown();
     });
@@ -7036,9 +7029,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 console.log("event.target.dataset.action: ", event.target.dataset.action);
                 actions[event.target.dataset.action].call(this, event);
             }
-            // else {
-            //     console.log("ESLE event.target.dataset.action: ", event.target.dataset.action);
-            // }
         },
 
         keydown: function () {
@@ -7204,6 +7194,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 speciesList = [];
                 geneList = [];
                 proteinList = [];
+                listOfURIs = [];
                 head = [];
 
                 id = 0; // id to index each Model_entity
@@ -7330,8 +7321,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     // Load search html
     mainUtils.loadSearchHtml = function () {
 
-        console.log("loadSearchHtml");
-
         if (!sessionStorage.getItem("searchListContent")) {
 
             console.log("loadSearchHtml IF");
@@ -7365,7 +7354,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 biologicalMeaning,
                 speciesList,
                 geneList,
-                proteinList);
+                proteinList,
+                listOfURIs);
 
             // $("#main-content").html(sessionStorage.getItem('searchListContent'));
             head = headTitle();
@@ -7435,7 +7425,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                 var discoverInnerModels = function () {
                     if (jsonModel.results.bindings.length == 0) {
-                        mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList);
+                        mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfURIs);
                         return;
                     }
 
@@ -7503,6 +7493,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                                     // console.log("jsonModel: ", jsonModel);
 
+                                                    // protein uri
+                                                    if (pr_uri != undefined)
+                                                        listOfURIs.push(pr_uri);
+
                                                     // model and biological meaning
                                                     modelEntity.push(jsonModel.results.bindings[id].Model_entity.value);
                                                     biologicalMeaning.push(jsonModel.results.bindings[id].Biological_meaning.value);
@@ -7541,7 +7535,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                         biologicalMeaning,
                                                         speciesList,
                                                         geneList,
-                                                        proteinList);
+                                                        proteinList,
+                                                        listOfURIs);
 
                                                     id++; // increment index of modelEntity
 
@@ -7569,7 +7564,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     }
 
     // Show discovered models from PMR
-    mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList) {
+    mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfURIs) {
 
         console.log("showDiscoverModels");
 
@@ -7579,7 +7574,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 "<section class='container-fluid'><label><br>No Search Results!</label></section>"
             );
 
-            sessionStorage.setItem('searchListContent', $("#main-content").html());
+            // $("#main-content").html(sessionStorage.getItem('searchListContent'));
+
+            // sessionStorage.setItem('searchListContent', $("#main-content").html());
 
             return;
         }
@@ -7612,7 +7609,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 if (j == 0) {
                     tr.append($("<td/>")
                         .append($('<label/>')
-                            .html('<input id="' + modelEntity[i] + '" type="checkbox" ' +
+                            .html('<input id="' + modelEntity[i] + '" uri="' + listOfURIs[i] + '" type="checkbox" ' +
                                 'data-action="search" value="' + modelEntity[i] + '" class="checkbox">')));
                 }
 
@@ -8115,36 +8112,23 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     }
 
     // Filter search results
-    // mainUtils.filterSearchHtml = function () {
-
-    $("#submitBtn").onclick = function () {
-
-
-        var tempstr = [];
-
-        console.log("event in filterSearchHtml: ", event);
+    mainUtils.filterSearchHtml = function () {
         console.log("membraneId in filterSearchHtml: ", $('#membraneId'));
         console.log("$('#membraneId').val() in filterSearchHtml: ", $('#membraneId').val());
         console.log("$('table tr') in filterSearchHtml: ", $('table tr'));
 
-        // if (event.target.checked == true)
         if ($('#membraneId').val() != undefined) {
 
-            var id = $('#membraneId').val();
-
-            console.log("$('#membraneId').val() in if $('#membraneId').val() != undefined: ", $('#membraneId').val());
-            console.log("$('table tr') in if $('#membraneId').val() != undefined: ", $('table tr'));
+            var selectedprotein = $('#membraneId option:selected').val();
 
             for (var i = 1; i < $('table tr').length; i++) {
 
-                tempstr = $('table tr')[i].childNodes[2].id.split(',');
+                var tempstr = $('table tr')[i];
+                tempstr = $($(tempstr).find('input')).attr('uri');
 
-                // id repository
-                str.push(id);
-                str = uniqueifySrcSnkMed(str);
+                console.log("selectedprotein, tempstr: ", selectedprotein, tempstr);
 
-                // check whether str is in tempstr!!!
-                if (compare(str, tempstr) == true) {
+                if (selectedprotein == tempstr) {
                     $('table tr')[i].hidden = false;
                 }
                 else {
@@ -8153,43 +8137,17 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             }
         }
 
-        // if (event.target.checked == false)
-        if ($('#membraneId').val() == undefined) {
+        sessionStorage.setItem('searchListContent', $("#main-content").html());
+        // $("#main-content").html(sessionStorage.getItem('searchListContent'));
 
-            var tempstr = [];
-            var id = $('#membraneId').val();
-
-            console.log("$('#membraneId').val() == undefined: ", $('#membraneId').val());
-
-            str = uniqueifySrcSnkMed(str); // remove duplicate
-            str.splice(str.indexOf(id), 1); // delete id
-
-            if (str.length != 0) {
-                for (var i = 1; i < $('table tr').length; i++) {
-
-                    tempstr = $('table tr')[i].childNodes[2].id.split(',');
-
-                    // check whether str is in tempstr
-                    if (tempstr.indexOf(id) != -1 && tempstr.length == 1) {
-                        $('table tr')[i].hidden = true;
-                    }
-                    else {
-                        $('table tr')[i].hidden = false;
-                    }
-                }
-            }
-            else { // if empty then show all
-                for (var i = 1; i < $('table tr').length; i++) {
-                    $('table tr')[i].hidden = false;
-                }
-            }
-        }
+        return;
     };
 
     // Filter dropdown list in the search html
     var membraneURIOLS = function (fma_uri) {
 
-        var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+        // var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+        var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + fma_uri;
 
         sendGetRequest(
             endpointOLS,
