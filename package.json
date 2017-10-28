@@ -4,5 +4,9 @@
   "devDependencies": {
     "mocha": "*",
     "chai": "*"
+  },
+  "dependencies": {
+    "http-proxy": "^1.16.2",
+    "proxy-from-env": "^1.0.0"
   }
 }

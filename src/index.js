@@ -32,7 +32,10 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     var cytosolID = "http://purl.org/sig/ont/fma/fma66836";
     var interstitialID = "http://purl.org/sig/ont/fma/fma9673";
 
-    var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+    // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+    var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
+        cors_api_url = 'http://localhost:8080/',
+        endpoint = cors_api_url + pmrEndpoint;
 
     var homeHtml = "./snippets/home-snippet.html";
     var viewHtml = "./snippets/view-snippet.html";
