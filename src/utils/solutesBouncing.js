@@ -1,6 +1,7 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
+
 var solutesBouncing = function (newg, solutes) {
 
     var m = 10,

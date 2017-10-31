@@ -1,12 +1,38 @@
 {
-  "name": "project",
+  "name": "epithelial-modelling-platform",
   "version": "0.0.1",
+  "description": "A web-based epithelial transport discovery, exploration and assembly tool",
+  "main": "./src/index.html",
+  "scripts": {
+    "build": "node ./src/server.js"
+  },
+  "authors": [
+    "Dewan Sarwar <dsar941@aucklanduni.ac.nz>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dewancse/epithelial-modelling-platform.git"
+  },
   "devDependencies": {
-    "mocha": "*",
-    "chai": "*"
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "mocha-phantomjs": "^4.1.0"
   },
   "dependencies": {
+    "bootstrap": "^3.3.7",
+    "cors-anywhere": "^0.4.0",
+    "d3": "^4.11.0",
+    "d3-selection-multi": "^1.0.1",
     "http-proxy": "^1.16.2",
+    "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1",
     "proxy-from-env": "^1.0.0"
-  }
+  },
+  "keywords": [
+    "epithelial",
+    "platform",
+    "learning tool",
+    "svg"
+  ]
 }

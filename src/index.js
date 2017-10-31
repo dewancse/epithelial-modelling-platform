@@ -36,6 +36,7 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
         cors_api_url = 'http://localhost:8080/',
         endpoint = cors_api_url + pmrEndpoint;
+        // endpoint = pmrEndpoint;
 
     var homeHtml = "./snippets/home-snippet.html";
     var viewHtml = "./snippets/view-snippet.html";
