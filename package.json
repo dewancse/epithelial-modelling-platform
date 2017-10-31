@@ -4,7 +4,7 @@
   "description": "A web-based epithelial transport discovery, exploration and assembly tool",
   "main": "./src/index.html",
   "scripts": {
-    "build": "node ./src/server.js"
+    "build": "node ./src/js/server.js"
   },
   "authors": [
     "Dewan Sarwar <dsar941@aucklanduni.ac.nz>"

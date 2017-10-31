@@ -1,25 +1,25 @@
 /**
  * Created by dsar941 on 9/8/2016.
  */
-var parseModelName = require("./utils/miscellaneous.js").parseModelName;
-var parserFmaNameText = require("./utils/miscellaneous.js").parserFmaNameText;
-var headTitle = require("./utils/miscellaneous.js").headTitle;
-var uniqueifyEpithelial = require("./utils/miscellaneous.js").uniqueifyEpithelial;
-var uniqueifySrcSnkMed = require("./utils/miscellaneous.js").uniqueifySrcSnkMed;
-var uniqueifymodel2DArray = require("./utils/miscellaneous.js").uniqueifymodel2DArray;
-var uniqueifyjsonModel = require("./utils/miscellaneous.js").uniqueifyjsonModel;
-var isExist = require("./utils/miscellaneous.js").isExist;
-var isExistModel2DArray = require("./utils/miscellaneous.js").isExistModel2DArray;
-var iteration = require("./utils/miscellaneous.js").iteration;
-var viewModel = require("./utils/viewModel.js").viewModel;
-var overlappingModels = require("./utils/overlappingModels.js").overlappingModels;
-var epithelialPlatform = require("./utils/epithelialPlatform.js").epithelialPlatform;
-var showLoading = require("./utils/miscellaneous.js").showLoading;
-var activeMenu = require("./utils/miscellaneous.js").activeMenu;
-var switchMenuToActive = require("./utils/miscellaneous.js").switchMenuToActive;
+var parseModelName = require("./miscellaneous.js").parseModelName;
+var parserFmaNameText = require("./miscellaneous.js").parserFmaNameText;
+var headTitle = require("./miscellaneous.js").headTitle;
+var uniqueifyEpithelial = require("./miscellaneous.js").uniqueifyEpithelial;
+var uniqueifySrcSnkMed = require("./miscellaneous.js").uniqueifySrcSnkMed;
+var uniqueifymodel2DArray = require("./miscellaneous.js").uniqueifymodel2DArray;
+var uniqueifyjsonModel = require("./miscellaneous.js").uniqueifyjsonModel;
+var isExist = require("./miscellaneous.js").isExist;
+var isExistModel2DArray = require("./miscellaneous.js").isExistModel2DArray;
+var iteration = require("./miscellaneous.js").iteration;
+var viewModel = require("./viewModel.js").viewModel;
+var overlappingModels = require("./overlappingModels.js").overlappingModels;
+var epithelialPlatform = require("./epithelialPlatform.js").epithelialPlatform;
+var showLoading = require("./miscellaneous.js").showLoading;
+var activeMenu = require("./miscellaneous.js").activeMenu;
+var switchMenuToActive = require("./miscellaneous.js").switchMenuToActive;
 
-var sendGetRequest = require("./libs/ajax-utils.js").sendGetRequest;
-var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
+var sendGetRequest = require("./../libs/ajax-utils.js").sendGetRequest;
+var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
 (function (global) {
     'use strict';
@@ -35,8 +35,8 @@ var sendPostRequest = require("./libs/ajax-utils.js").sendPostRequest;
     // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
         cors_api_url = 'http://localhost:8080/',
-        endpoint = cors_api_url + pmrEndpoint;
-        // endpoint = pmrEndpoint;
+        // endpoint = cors_api_url + pmrEndpoint;
+        endpoint = pmrEndpoint;
 
     var homeHtml = "./snippets/home-snippet.html";
     var viewHtml = "./snippets/view-snippet.html";

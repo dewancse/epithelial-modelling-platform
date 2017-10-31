@@ -943,7 +943,7 @@ require.register("interfaces/bdd.js", function(module, exports, require){
 
 var Suite = require('../suite')
   , Test = require('../test')
-  , utils = require('../utils')
+  , utils = require('../js')
   , escapeRe = require('browser/escape-string-regexp');
 
 /**
@@ -1198,7 +1198,7 @@ require.register("interfaces/qunit.js", function(module, exports, require){
 var Suite = require('../suite')
   , Test = require('../test')
   , escapeRe = require('browser/escape-string-regexp')
-  , utils = require('../utils');
+  , utils = require('../js');
 
 /**
  * QUnit-style interface:
@@ -1296,7 +1296,7 @@ require.register("interfaces/tdd.js", function(module, exports, require){
 var Suite = require('../suite')
   , Test = require('../test')
   , escapeRe = require('browser/escape-string-regexp')
-  , utils = require('../utils');
+  , utils = require('../js');
 
 /**
  * TDD-style interface:
@@ -1414,7 +1414,7 @@ require.register("mocha.js", function(module, exports, require){
 
 var path = require('browser/path')
   , escapeRe = require('browser/escape-string-regexp')
-  , utils = require('./utils');
+  , utils = require('./js');
 
 /**
  * Expose `Mocha`.
@@ -1992,7 +1992,7 @@ require.register("reporters/base.js", function(module, exports, require){
 var tty = require('browser/tty')
   , diff = require('browser/diff')
   , ms = require('../ms')
-  , utils = require('../utils')
+  , utils = require('../js')
   , supportsColor = process.env ? require('supports-color') : null;
 
 /**
@@ -2460,7 +2460,7 @@ require.register("reporters/doc.js", function(module, exports, require){
  */
 
 var Base = require('./base')
-  , utils = require('../utils');
+  , utils = require('../js');
 
 /**
  * Expose `Doc`.
@@ -2650,7 +2650,7 @@ require.register("reporters/html.js", function(module, exports, require){
  */
 
 var Base = require('./base')
-  , utils = require('../utils')
+  , utils = require('../js')
   , Progress = require('../browser/progress')
   , escape = utils.escape;
 
@@ -3455,7 +3455,7 @@ require.register("reporters/markdown.js", function(module, exports, require){
  */
 
 var Base = require('./base')
-  , utils = require('../utils');
+  , utils = require('../js');
 
 /**
  * Constants
@@ -4138,7 +4138,7 @@ require.register("reporters/xunit.js", function(module, exports, require){
  */
 
 var Base = require('./base')
-  , utils = require('../utils')
+  , utils = require('../js')
   , fs = require('browser/fs')
   , escape = utils.escape;
 
@@ -4298,7 +4298,7 @@ var EventEmitter = require('browser/events').EventEmitter
   , debug = require('browser/debug')('mocha:runnable')
   , Pending = require('./pending')
   , milliseconds = require('./ms')
-  , utils = require('./utils');
+  , utils = require('./js');
 
 /**
  * Save timer references to avoid Sinon interfering (see GH-237).
@@ -4586,7 +4586,7 @@ var EventEmitter = require('browser/events').EventEmitter
   , debug = require('browser/debug')('mocha:runner')
   , Pending = require('./pending')
   , Test = require('./test')
-  , utils = require('./utils')
+  , utils = require('./js')
   , filter = utils.filter
   , keys = utils.keys
   , type = utils.type
@@ -5309,7 +5309,7 @@ require.register("suite.js", function(module, exports, require){
 var EventEmitter = require('browser/events').EventEmitter
   , debug = require('browser/debug')('mocha:suite')
   , milliseconds = require('./ms')
-  , utils = require('./utils')
+  , utils = require('./js')
   , Hook = require('./hook');
 
 /**
@@ -6400,7 +6400,7 @@ exports.stackTraceFilter = function() {
     return stack.join('\n');
   }
 };
-}); // module: utils.js
+}); // module: js.js
 // The global object is "self" in Web Workers.
 var global = (function() { return this; })();
 

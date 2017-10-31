@@ -7358,8 +7358,8 @@ var call  = Function.prototype.call,
  *
  * Adds a method to an object, such that the method can also be chained.
  *
- *     utils.addChainableMethod(chai.Assertion.prototype, 'foo', function (str) {
- *       var obj = utils.flag(this, 'object');
+ *     js.addChainableMethod(chai.Assertion.prototype, 'foo', function (str) {
+ *       var obj = js.flag(this, 'object');
  *       new chai.Assertion(obj).to.be.equal(str);
  *     });
  *
@@ -7545,8 +7545,8 @@ var transferFlags = require('./transferFlags');
  *
  * Adds a method to the prototype of an object.
  *
- *     utils.addMethod(chai.Assertion.prototype, 'foo', function (str) {
- *       var obj = utils.flag(this, 'object');
+ *     js.addMethod(chai.Assertion.prototype, 'foo', function (str) {
+ *       var obj = js.flag(this, 'object');
  *       new chai.Assertion(obj).to.be.equal(str);
  *     });
  *
@@ -7614,8 +7614,8 @@ var transferFlags = require('./transferFlags');
  *
  * Adds a property to the prototype of an object.
  *
- *     utils.addProperty(chai.Assertion.prototype, 'foo', function () {
- *       var obj = utils.flag(this, 'object');
+ *     js.addProperty(chai.Assertion.prototype, 'foo', function () {
+ *       var obj = js.flag(this, 'object');
  *       new chai.Assertion(obj).to.be.instanceof(Foo);
  *     });
  *
@@ -7773,8 +7773,8 @@ module.exports = function expectTypes(obj, types, ssfi) {
  * return the currently set value or `undefined` if
  * the value is not set.
  *
- *     utils.flag(this, 'foo', 'bar'); // setter
- *     utils.flag(this, 'foo'); // getter, returns `bar`
+ *     js.flag(this, 'foo', 'bar'); // setter
+ *     js.flag(this, 'foo'); // getter, returns `bar`
  *
  * @param {Object} object constructed Assertion
  * @param {String} key
@@ -8750,9 +8750,9 @@ var transferFlags = require('./transferFlags');
  * access to previous function. Must return function
  * to be used for name.
  *
- *     utils.overwriteMethod(chai.Assertion.prototype, 'equal', function (_super) {
+ *     js.overwriteMethod(chai.Assertion.prototype, 'equal', function (_super) {
  *       return function (str) {
- *         var obj = utils.flag(this, 'object');
+ *         var obj = js.flag(this, 'object');
  *         if (obj instanceof Foo) {
  *           new chai.Assertion(obj.value).to.equal(str);
  *         } else {
@@ -8842,9 +8842,9 @@ var transferFlags = require('./transferFlags');
  * Overwites an already existing property getter and provides
  * access to previous value. Must return function to use as getter.
  *
- *     utils.overwriteProperty(chai.Assertion.prototype, 'ok', function (_super) {
+ *     js.overwriteProperty(chai.Assertion.prototype, 'ok', function (_super) {
  *       return function () {
- *         var obj = utils.flag(this, 'object');
+ *         var obj = js.flag(this, 'object');
  *         if (obj instanceof Foo) {
  *           new chai.Assertion(obj.name).to.equal('bar');
  *         } else {
@@ -9092,10 +9092,10 @@ module.exports = function test(obj, args) {
  *
  *
  *     var newAssertion = new Assertion();
- *     utils.transferFlags(assertion, newAssertion);
+ *     js.transferFlags(assertion, newAssertion);
  *
  *     var anotherAsseriton = new Assertion(myObj);
- *     utils.transferFlags(assertion, anotherAssertion, false);
+ *     js.transferFlags(assertion, anotherAssertion, false);
  *
  * @param {Assertion} assertion the assertion to transfer the flags from
  * @param {Object} object the object to transfer the flags to; usually a new assertion

@@ -492,8 +492,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
         cors_api_url = 'http://localhost:8080/',
-        endpoint = cors_api_url + pmrEndpoint;
-        // endpoint = pmrEndpoint;
+        // endpoint = cors_api_url + pmrEndpoint;
+        endpoint = pmrEndpoint;
 
     /*
      * relatedModel - all related models
@@ -4665,8 +4665,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             // var dbfectendpoint = "http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
             var cors_api_url = 'http://localhost:8080/',
-                dbfectendpoint = cors_api_url + "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
-                // dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+                // dbfectendpoint = cors_api_url + "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+                dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
 
             sendGetRequest(
                 dbfectendpoint,
@@ -6930,8 +6930,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
         cors_api_url = 'http://localhost:8080/',
-        endpoint = cors_api_url + pmrEndpoint;
-        // endpoint = pmrEndpoint;
+        // endpoint = cors_api_url + pmrEndpoint;
+        endpoint = pmrEndpoint;
 
     var homeHtml = "./snippets/home-snippet.html";
     var viewHtml = "./snippets/view-snippet.html";
