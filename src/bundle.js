@@ -1281,9 +1281,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         return checkBox;
     }
 
-    // var div = d3.select("#svgVisualize").append("div")
-    //     .attr("class", "tooltip")
-    //     .style("opacity", 0);
+    // tooltip
+    var div = d3.select("#svgVisualize").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
     var state = 0;
     $(document).on({
@@ -1442,7 +1443,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
                     .on("mouseover", function () {
-                        div.style("display", "inline");
+                        // div.style("display", "inline");
                         div.transition()
                             .duration(200)
                             .style("opacity", 1);
@@ -3502,6 +3503,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     function dragcircleline(d) {
+
+        div.style("display", "none");
+
         // console.log("this: ", this);
         // console.log("d3.select(this): ", d3.select(this));
         // icircleGlobal = this.getAttribute("index");
@@ -3681,6 +3685,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     function dragcircleendline(d) {
+
+        div.style("display", "none");
+
         initdragcircleandend();
 
         // If paracellular's diffusive channel Then undefined
