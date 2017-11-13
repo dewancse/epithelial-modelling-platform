@@ -897,7 +897,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             return "purple";
         })
-        .attr("strokeWidth", "6px")
+        .attr("stroke-width", 2)
         .attr("fill", "white");
 
     // Intracellular rectangle
@@ -918,7 +918,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             return "blue";
         })
-        .attr("strokeWidth", "6px")
+        .attr("stroke-width", 2)
         .attr("fill", "white");
 
     // Interstitial fluid rectangle
@@ -939,30 +939,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             return "teal";
         })
-        .attr("strokeWidth", "6px")
+        .attr("stroke-width", 2)
         .attr("fill", "white");
-
-    // Interstitial fluid rectangle
-    var interstitial2 = newg.append("rect")
-        .attr("id", interstitialID)
-        .attr("x", w / 3 - 10)
-        .attr("y", 0)
-        .attr("width", width + 40)
-        .attr("height", height / 3 - 30)
-        .attr("stroke", "teal")
-        .attr("strokeWidth", "6px")
-        .attr("fill", "white");
-
-    // hide interstitial2's right line bar
-    var widthLine = w / 3 + width + 30,
-        heightLine = height / 3 - 30;
-    newg.append("polygon")
-        .attr("transform", "translate(" + widthLine + ",0)")
-        .attr("points", "0,1.5 0," + (heightLine - 1.5) + "")
-        .attr("stroke", "white")
-        .attr("fill", "white")
-        // .attr("stroke", "url(#basicPattern)")
-        .attr("stroke-width", 5);
 
     // Paracellular rectangle
     var paracellular = newg.append("rect")
@@ -982,14 +960,25 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             return "violet";
         })
-        .attr("strokeWidth", "6px")
+        .attr("stroke-width", 2)
+        .attr("fill", "white");
+
+    // Paracellular rectangle
+    var paracellular2 = newg.append("rect")
+        .attr("id", paracellularID)
+        .attr("x", w / 3 - 10)
+        .attr("y", 0)
+        .attr("width", width + 20)
+        .attr("height", height / 3 - 30)
+        .attr("stroke", "violet")
+        .attr("stroke-width", 2)
         .attr("fill", "white");
 
     var solutes = [];
 
     for (var i = 0; i < concentration_fma.length; i++) {
 
-        // luminal(1), cytosol(2), interstitial(3), interstitial2(4), paracellular(5)
+        // luminal(1), cytosol(2), interstitial(3), paracellular(4), paracellular2(5)
         for (var j = 1; j <= 5; j++) {
             if (concentration_fma[i].fma == $("rect")[j].id) {
                 break;
@@ -1011,7 +1000,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             solutes.push(
                 {
                     compartment: $("rect")[j].id,
-                    fma: concentration_fma[i].fma,
                     xrect: xrect,
                     yrect: yrect,
                     width: xwidth,
@@ -1099,8 +1087,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     console.log("$(rect)", $("rect"));
 
     // Paracellular membrane
-    var xprect = $("rect")[5].x.baseVal.value;
-    var yprect = $("rect")[5].y.baseVal.value;
+    var xprect = $("rect")[4].x.baseVal.value;
+    var yprect = $("rect")[4].y.baseVal.value;
     var xpvalue = xprect + 10;
     var ypvalue = yprect + 25;
     var ypdistance = 35;
@@ -8914,14 +8902,12 @@ var solutesBouncing = function (newg, solutes) {
         maxSpeed = 1,
         color = d3.scaleOrdinal(d3.schemeCategory20).domain(d3.range(m));
 
-    var interstitialID = "http://identifiers.org/fma/FMA:9673";
-
     var nodes = [];
 
     for (var i = 0; i < solutes.length; i++) {
         nodes.push({
             text: solutes[i].value,
-            fma: solutes[i].fma,
+            // fma: solutes[i].fma,
             color: color(Math.floor(Math.random() * m)), // assuming initial text length is 100
             x: Math.random() * ((solutes[i].xrect + solutes[i].width) - (solutes[i].xrect + 100)) + (solutes[i].xrect),
             y: Math.random() * ((solutes[i].yrect + solutes[i].height) - solutes[i].yrect) + solutes[i].yrect,
@@ -8961,56 +8947,20 @@ var solutesBouncing = function (newg, solutes) {
         .on("tick", tick);
 
     function tick(e) {
-
-        // platform to model discovery in order to append more solutes
-        if ($("rect")[3] != undefined) {
-            simulation.alpha(0.1);
-            text
-                .each(gravity())
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                });
-        }
+        simulation.alpha(0.1);
+        text
+            .each(gravity())
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            });
     }
-
-    console.log("rect: ", $("rect"));
 
     function gravity() {
         return function (d) {
             var textLength = $(this).prop("textLength").baseVal.value;
-
-            // interstitial -> interstitial2 OR interstitial2 -> interstitial
-            var xif = $("rect")[3].x.baseVal.value; // x of interstitial
-            var yheightif2 = $("rect")[4].height.baseVal.value; // height of interstitial2
-            if (d.fma == interstitialID && (d.x <= xif && d.y <= yheightif2)) {
-                for (var i = 0; i < nodes.length; i++) {
-                    if (nodes[i].text == $(this).prop("textContent")) {
-                        // console.log("interstitial -> interstitial2 : ", $(this).prop("textContent"));
-                        nodes[i].xrect = $("rect")[4].x.baseVal.value;
-                        nodes[i].yrect = $("rect")[4].y.baseVal.value;
-                        nodes[i].width = $("rect")[4].width.baseVal.value + $("rect")[3].width.baseVal.value;
-                        nodes[i].height = $("rect")[4].height.baseVal.value;
-                        break;
-                    }
-                }
-            }
-            else {
-                if (d.fma == interstitialID) {
-                    for (var j = 0; j < nodes.length; j++) {
-                        if (nodes[j].text == $(this).prop("textContent")) {
-                            // console.log("interstitial2 -> interstitial inside: ", $(this).prop("textContent"));
-                            nodes[j].xrect = $("rect")[3].x.baseVal.value;
-                            nodes[j].yrect = $("rect")[3].y.baseVal.value;
-                            nodes[j].width = $("rect")[3].width.baseVal.value;
-                            nodes[j].height = $("rect")[3].height.baseVal.value;
-                            break;
-                        }
-                    }
-                }
-            }
 
             if (d.x <= d.xrect) d.speedX = Math.abs(d.speedX);
             if (d.x + textLength >= d.xrect + d.width) d.speedX = -1 * Math.abs(d.speedX);
