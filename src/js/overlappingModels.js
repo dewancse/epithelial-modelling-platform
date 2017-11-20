@@ -17,6 +17,22 @@ var overlappingModels = function (links, model2DArray, modelEntityNameArray, vis
 
     console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
 
+    // Rearrange items in compartment and located_in
+    for (var i = 0; i < model2DArray.length; i++) {
+        // compartment
+        model2DArray[i][5] = model2DArray[i][5].split(",").map(function(item) {
+            return item.trim();
+        });
+
+        // located_in
+        model2DArray[i][6] = model2DArray[i][6].split(",").map(function(item) {
+            return item.trim();
+        });
+
+        model2DArray[i][5].sort();
+        model2DArray[i][6].sort();
+    }
+
     for (var ix = 0; ix < modelEntityNameArray.length; ix++) {
         for (var i = 0; i < model2DArray.length; i++) {
             if (modelEntityNameArray[ix] == model2DArray[i][1]) {
@@ -30,6 +46,7 @@ var overlappingModels = function (links, model2DArray, modelEntityNameArray, vis
                     if (j == 3) name = "Species";
                     if (j == 4) name = "Gene";
                     if (j == 5) name = "Compartment";
+                    if (j == 6) name = "Located_in";
 
                     links.push({
                         source: model2DArray[i][1],
@@ -97,7 +114,7 @@ var overlappingModels = function (links, model2DArray, modelEntityNameArray, vis
         .attr("d", "M0,-5L10,0L0,5");
 
     // label edges with different color
-    var edgelabels = ["Protein", "Species", "Gene", "Compartment"];
+    var edgelabels = ["Protein", "Species", "Gene", "Compartment", "Located_in"];
     var py = 20;
 
     // add the links and the arrows
