@@ -6608,12 +6608,7 @@ exports.epithelialPlatform = epithelialPlatform;
  */
 var uniqueifySVG = __webpack_require__(0).uniqueifySVG;
 
-var overlappingModels = function (links, model2DArray, modelEntityNameArray, visualizedOverlapModels) {
-
-    // console.log("overlappingModels links: ", links);
-    // console.log("overlappingModels model2DArray: ", model2DArray);
-    // console.log("overlappingModels modelEntityNameArray: ", modelEntityNameArray);
-    // console.log("overlappingModels visualizedOverlapModels: ", visualizedOverlapModels);
+var similarityModels = function (links, model2DArray, modelEntityNameArray, visualizedOverlapModels) {
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -6681,11 +6676,11 @@ var overlappingModels = function (links, model2DArray, modelEntityNameArray, vis
     console.log("links: ", links);
 
     // SVG graph
-    var g = $("#svgOverlappingModels"),
+    var g = $("#svgSimilarityModels"),
         width = 2000, //1200,
         height = 900; // 700
 
-    var svg = d3.select("#svgOverlappingModels").append("svg")
+    var svg = d3.select("#svgSimilarityModels").append("svg")
         .attrs({
             "width": width,
             "height": height
@@ -6836,7 +6831,7 @@ var overlappingModels = function (links, model2DArray, modelEntityNameArray, vis
     modelEntityNameArray = [];
 }
 
-exports.overlappingModels = overlappingModels;
+exports.similarityModels = similarityModels;
 
 /***/ }),
 /* 4 */
@@ -6919,7 +6914,7 @@ var isExist = __webpack_require__(0).isExist;
 var isExistModel2DArray = __webpack_require__(0).isExistModel2DArray;
 var iteration = __webpack_require__(0).iteration;
 var viewModel = __webpack_require__(4).viewModel;
-var overlappingModels = __webpack_require__(3).overlappingModels;
+var similarityModels = __webpack_require__(3).similarityModels;
 var epithelialPlatform = __webpack_require__(2).epithelialPlatform;
 var showLoading = __webpack_require__(0).showLoading;
 var activeMenu = __webpack_require__(0).activeMenu;
@@ -6949,7 +6944,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     var viewHtml = "./snippets/view-snippet.html";
     var modelHtml = "./snippets/model-snippet.html";
     var searchHtml = "./snippets/search-snippet.html";
-    var overlappingHtml = "./snippets/overlapping-snippet.html";
+    var similarityHtml = "./snippets/similarity-snippet.html";
     var epithelialHtml = "./snippets/epithelial-snippet.html";
 
     var combinedMembrane = [];
@@ -7382,7 +7377,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
             // $("#main-content").html(sessionStorage.getItem('searchListContent'));
             head = headTitle();
-            listOfColumns(head, 1);
 
             listOfMembraneName = [];
             indexOfmemURI = 0;
@@ -7564,7 +7558,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                     id++; // increment index of modelEntity
 
                                                     if (id == jsonModel.results.bindings.length) {
-                                                        listOfColumns(head, 1);
                                                         membraneURIOLS(listOfMembrane[0]);
                                                         return;
                                                     }
@@ -7933,7 +7926,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         for (var name in jsonObj) {
             head.push(name);
         }
-        listOfColumns(head, 2);
 
         var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
@@ -8022,7 +8014,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         console.log("templistOfModel in showModel: ", templistOfModel);
         console.log("visualizedOverlapModels in showModel: ", visualizedOverlapModels);
 
-        visualizedOverlapModels = []; // reinitialize for next iteration in Overlapping models
+        visualizedOverlapModels = []; // reinitialize for next iteration in Similarity models
 
         // Table body
         var tbody = $("<tbody/>"), td = [];
@@ -8049,7 +8041,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         table.append(tbody);
         $("#modelList").append(table);
 
-        // Uncheck checkboxes when back from overlapping models
+        // Uncheck checkboxes when back from Similarity models
         for (var i = 0; i < $('table tr td label').length; i++) {
             if ($('table tr td label')[i].firstChild.checked == true) {
                 $('table tr td label')[i].firstChild.checked = false;
@@ -8108,32 +8100,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
     };
 
-    // Columns in search and model page
-    var listOfColumns = function (head, flag, membraneUri) {
-        console.log("listOfColumns");
-
-        if (flag == 1) { // columns in search html
-            for (var i = 2; i <= head.length + 1; i++) {
-                $('#ulIdSearch')
-                    .append('<li><a href="#"><input id=' + i + ' type="checkbox" checked="true" ' +
-                        'onclick=$mainUtils.toggleColHtml() value=' + head[i - 2] + '>' + head[i - 2] + '</a></li>');
-            }
-        }
-        else if (flag == 2) { // columns in model html
-            for (var i = 2; i <= head.length + 1; i++) {
-                $('#ulIdModel')
-                    .append('<li><a href="#"><input id=' + i + ' type="checkbox" checked="true" ' +
-                        'onclick=$mainUtils.toggleColModelHtml() value=' + head[i - 2] + '>' + head[i - 2] + '</a></li>');
-            }
-        }
-        else if (flag == 3) { // list of membranes in search html
-            for (var i = 0; i < head.length; i++) {
-                $('#membraneId')
-                    .append('<option value=' + membraneUri[i] + '>' + head[i] + '</option>');
-            }
-        }
-    }
-
     // Filter search results
     mainUtils.filterSearchHtml = function () {
         console.log("membraneId in filterSearchHtml: ", $('#membraneId'));
@@ -8179,7 +8145,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 indexOfmemURI++;
 
                 if (indexOfmemURI == listOfMembrane.length) {
-                    listOfColumns(listOfMembraneName, 3, listOfMembrane);
+                    for (var i = 0; i < listOfMembraneName.length; i++) {
+                        $('#membraneId')
+                            .append('<option value=' + listOfMembrane[i] + '>' + listOfMembraneName[i] + '</option>');
+                    }
                     return;
                 }
 
@@ -8239,15 +8208,15 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
     };
 
     // Load the SVG model
-    mainUtils.loadOverlappingHtml = function () {
+    mainUtils.loadSimilarityHtml = function () {
 
         sendGetRequest(
-            overlappingHtml,
-            function (overlappingHtmlContent) {
-                $("#main-content").html(overlappingHtmlContent);
+            similarityHtml,
+            function (similarityHtmlContent) {
+                $("#main-content").html(similarityHtmlContent);
 
                 // TODO: Fix it!!
-                sendGetRequest(overlappingHtml, overlappingModels(links, model2DArray, modelEntityNameArray, visualizedOverlapModels), false);
+                sendGetRequest(similarityHtml, similarityModels(links, model2DArray, modelEntityNameArray, visualizedOverlapModels), false);
             },
             false);
     };

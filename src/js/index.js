@@ -12,7 +12,7 @@ var isExist = require("./miscellaneous.js").isExist;
 var isExistModel2DArray = require("./miscellaneous.js").isExistModel2DArray;
 var iteration = require("./miscellaneous.js").iteration;
 var viewModel = require("./viewModel.js").viewModel;
-var overlappingModels = require("./overlappingModels.js").overlappingModels;
+var similarityModels = require("./similarityModels.js").similarityModels;
 var epithelialPlatform = require("./epithelialPlatform.js").epithelialPlatform;
 var showLoading = require("./miscellaneous.js").showLoading;
 var activeMenu = require("./miscellaneous.js").activeMenu;
@@ -42,7 +42,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     var viewHtml = "./snippets/view-snippet.html";
     var modelHtml = "./snippets/model-snippet.html";
     var searchHtml = "./snippets/search-snippet.html";
-    var overlappingHtml = "./snippets/overlapping-snippet.html";
+    var similarityHtml = "./snippets/similarity-snippet.html";
     var epithelialHtml = "./snippets/epithelial-snippet.html";
 
     var combinedMembrane = [];
@@ -475,7 +475,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
             // $("#main-content").html(sessionStorage.getItem('searchListContent'));
             head = headTitle();
-            listOfColumns(head, 1);
 
             listOfMembraneName = [];
             indexOfmemURI = 0;
@@ -657,7 +656,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                     id++; // increment index of modelEntity
 
                                                     if (id == jsonModel.results.bindings.length) {
-                                                        listOfColumns(head, 1);
                                                         membraneURIOLS(listOfMembrane[0]);
                                                         return;
                                                     }
@@ -1026,7 +1024,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         for (var name in jsonObj) {
             head.push(name);
         }
-        listOfColumns(head, 2);
 
         var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
@@ -1115,7 +1112,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         console.log("templistOfModel in showModel: ", templistOfModel);
         console.log("visualizedOverlapModels in showModel: ", visualizedOverlapModels);
 
-        visualizedOverlapModels = []; // reinitialize for next iteration in Overlapping models
+        visualizedOverlapModels = []; // reinitialize for next iteration in Similarity models
 
         // Table body
         var tbody = $("<tbody/>"), td = [];
@@ -1142,7 +1139,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         table.append(tbody);
         $("#modelList").append(table);
 
-        // Uncheck checkboxes when back from overlapping models
+        // Uncheck checkboxes when back from Similarity models
         for (var i = 0; i < $('table tr td label').length; i++) {
             if ($('table tr td label')[i].firstChild.checked == true) {
                 $('table tr td label')[i].firstChild.checked = false;
@@ -1201,32 +1198,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    // Columns in search and model page
-    var listOfColumns = function (head, flag, membraneUri) {
-        console.log("listOfColumns");
-
-        if (flag == 1) { // columns in search html
-            for (var i = 2; i <= head.length + 1; i++) {
-                $('#ulIdSearch')
-                    .append('<li><a href="#"><input id=' + i + ' type="checkbox" checked="true" ' +
-                        'onclick=$mainUtils.toggleColHtml() value=' + head[i - 2] + '>' + head[i - 2] + '</a></li>');
-            }
-        }
-        else if (flag == 2) { // columns in model html
-            for (var i = 2; i <= head.length + 1; i++) {
-                $('#ulIdModel')
-                    .append('<li><a href="#"><input id=' + i + ' type="checkbox" checked="true" ' +
-                        'onclick=$mainUtils.toggleColModelHtml() value=' + head[i - 2] + '>' + head[i - 2] + '</a></li>');
-            }
-        }
-        else if (flag == 3) { // list of membranes in search html
-            for (var i = 0; i < head.length; i++) {
-                $('#membraneId')
-                    .append('<option value=' + membraneUri[i] + '>' + head[i] + '</option>');
-            }
-        }
-    }
-
     // Filter search results
     mainUtils.filterSearchHtml = function () {
         console.log("membraneId in filterSearchHtml: ", $('#membraneId'));
@@ -1272,7 +1243,10 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 indexOfmemURI++;
 
                 if (indexOfmemURI == listOfMembrane.length) {
-                    listOfColumns(listOfMembraneName, 3, listOfMembrane);
+                    for (var i = 0; i < listOfMembraneName.length; i++) {
+                        $('#membraneId')
+                            .append('<option value=' + listOfMembrane[i] + '>' + listOfMembraneName[i] + '</option>');
+                    }
                     return;
                 }
 
@@ -1332,15 +1306,15 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     };
 
     // Load the SVG model
-    mainUtils.loadOverlappingHtml = function () {
+    mainUtils.loadSimilarityHtml = function () {
 
         sendGetRequest(
-            overlappingHtml,
-            function (overlappingHtmlContent) {
-                $("#main-content").html(overlappingHtmlContent);
+            similarityHtml,
+            function (similarityHtmlContent) {
+                $("#main-content").html(similarityHtmlContent);
 
                 // TODO: Fix it!!
-                sendGetRequest(overlappingHtml, overlappingModels(links, model2DArray, modelEntityNameArray, visualizedOverlapModels), false);
+                sendGetRequest(similarityHtml, similarityModels(links, model2DArray, modelEntityNameArray, visualizedOverlapModels), false);
             },
             false);
     };

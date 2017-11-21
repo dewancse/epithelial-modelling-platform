@@ -3,12 +3,7 @@
  */
 var uniqueifySVG = require("./miscellaneous.js").uniqueifySVG;
 
-var overlappingModels = function (links, model2DArray, modelEntityNameArray, visualizedOverlapModels) {
-
-    // console.log("overlappingModels links: ", links);
-    // console.log("overlappingModels model2DArray: ", model2DArray);
-    // console.log("overlappingModels modelEntityNameArray: ", modelEntityNameArray);
-    // console.log("overlappingModels visualizedOverlapModels: ", visualizedOverlapModels);
+var similarityModels = function (links, model2DArray, modelEntityNameArray, visualizedOverlapModels) {
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -76,11 +71,11 @@ var overlappingModels = function (links, model2DArray, modelEntityNameArray, vis
     console.log("links: ", links);
 
     // SVG graph
-    var g = $("#svgOverlappingModels"),
+    var g = $("#svgSimilarityModels"),
         width = 2000, //1200,
         height = 900; // 700
 
-    var svg = d3.select("#svgOverlappingModels").append("svg")
+    var svg = d3.select("#svgSimilarityModels").append("svg")
         .attrs({
             "width": width,
             "height": height
@@ -231,4 +226,4 @@ var overlappingModels = function (links, model2DArray, modelEntityNameArray, vis
     modelEntityNameArray = [];
 }
 
-exports.overlappingModels = overlappingModels;
+exports.similarityModels = similarityModels;

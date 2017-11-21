@@ -15,7 +15,7 @@ GMS will provide a new model with an URI. Novice modellers could use this platfo
 
    discover
    load
-   overlapping
+   similarity
    platform
    recommender
 
