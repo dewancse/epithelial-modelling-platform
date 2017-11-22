@@ -8,4 +8,4 @@ comparison between models. In addition, we have provided two more useful informa
 and location, for a quick view. If user is happy with the discovered models in this page, these models 
 will be generated as SVG in the platform through the “Epithelial Platform” option. 
 
-.. image:: loadmodel.png
+.. image:: load.png

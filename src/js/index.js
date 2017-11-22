@@ -75,15 +75,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         head = [],
         id = 0;
 
-    // search everything dropdown menu
-    // var listOfMembrane = [apicalID, basolateralID, luminalID, cytosolID, interstitialID, paracellularID],
-    var listOfMembrane = [
-            "http://purl.obolibrary.org/obo/PR_P13866",
-            "http://purl.obolibrary.org/obo/PR_P26433",
-            "http://purl.obolibrary.org/obo/PR_Q9ET37"],
-        listOfMembraneName = [],
-        indexOfmemURI = 0;
-
     var lengthOfLoadModelTable;
 
     mainUtils.loadHomeHtml = function () {
@@ -476,9 +467,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             // $("#main-content").html(sessionStorage.getItem('searchListContent'));
             head = headTitle();
 
-            listOfMembraneName = [];
-            indexOfmemURI = 0;
-            // membraneURIOLS(listOfMembrane[0]);
+            // filterByProtein(listOfMembrane[0]);
         }
 
         // // Switch current active button to the clicked button
@@ -605,7 +594,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                 function (jsonSpecies) {
 
                                                     // console.log("jsonSpecies: ", jsonSpecies);
-
                                                     // console.log("jsonModel: ", jsonModel);
 
                                                     // protein uri
@@ -656,7 +644,16 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                     id++; // increment index of modelEntity
 
                                                     if (id == jsonModel.results.bindings.length) {
-                                                        membraneURIOLS(listOfMembrane[0]);
+
+                                                        proteinList = proteinList.filter(function (item, pos) {
+                                                            return proteinList.indexOf(item) == pos;
+                                                        })
+
+                                                        listOfURIs = listOfURIs.filter(function (item, pos) {
+                                                            return listOfURIs.indexOf(item) == pos;
+                                                        })
+
+                                                        filterByProtein();
                                                         return;
                                                     }
 
@@ -1158,54 +1155,19 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    // Toggle table column in Model discovery
-    mainUtils.toggleColHtml = function () {
-
-        if (event.target.checked == false) {
-            var id = event.target.id;
-
-            console.log("id: ", id);
-
-            $('td:nth-child(' + id + '),th:nth-child(' + id + ')').hide();
-        }
-
-        if (event.target.checked == true) {
-            var id = event.target.id;
-
-            console.log("id: ", id);
-
-            $('td:nth-child(' + id + '),th:nth-child(' + id + ')').show();
-        }
-    };
-
-    // Toggle table column in Load model
-    mainUtils.toggleColModelHtml = function () {
-
-        if (event.target.checked == false) {
-            var id = event.target.id;
-
-            console.log("id: ", id);
-
-            $('td:nth-child(' + id + '),th:nth-child(' + id + ')').hide();
-        }
-
-        if (event.target.checked == true) {
-            var id = event.target.id;
-
-            console.log("id: ", id);
-
-            $('td:nth-child(' + id + '),th:nth-child(' + id + ')').show();
-        }
-    };
-
     // Filter search results
     mainUtils.filterSearchHtml = function () {
         console.log("membraneId in filterSearchHtml: ", $('#membraneId'));
         console.log("$('#membraneId').val() in filterSearchHtml: ", $('#membraneId').val());
         console.log("$('table tr') in filterSearchHtml: ", $('table tr'));
 
-        if ($('#membraneId').val() != undefined) {
+        console.log("selected options: ", $('#membraneId').val());
 
+        if ($('#membraneId').val() == "all") {
+            console.log("all options are selected");
+            $('table tr').show();
+        }
+        else {
             var selectedprotein = $('#membraneId option:selected').val();
 
             for (var i = 1; i < $('table tr').length; i++) {
@@ -1229,30 +1191,14 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     };
 
     // Filter dropdown list in the search html
-    var membraneURIOLS = function (fma_uri) {
+    var filterByProtein = function () {
+        // Initializing the dropdown list
+        $('#membraneId').empty();
+        $('#membraneId').append('<option value=all>select all</option>');
 
-        // var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
-        var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + fma_uri;
-
-        sendGetRequest(
-            endpointOLS,
-            function (jsonObj) {
-                // console.log("listOfMembraneName: ", jsonObj._embedded.terms[0].label);
-                listOfMembraneName.push(jsonObj._embedded.terms[0].label);
-
-                indexOfmemURI++;
-
-                if (indexOfmemURI == listOfMembrane.length) {
-                    for (var i = 0; i < listOfMembraneName.length; i++) {
-                        $('#membraneId')
-                            .append('<option value=' + listOfMembrane[i] + '>' + listOfMembraneName[i] + '</option>');
-                    }
-                    return;
-                }
-
-                membraneURIOLS(listOfMembrane[indexOfmemURI]);
-
-            }, true);
+        for (var i = 0; i < proteinList.length; i++) {
+            $('#membraneId').append('<option value=' + listOfURIs[i] + '>' + proteinList[i] + '</option>');
+        }
     };
 
     // Delete model

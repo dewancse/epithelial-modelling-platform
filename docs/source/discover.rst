@@ -10,4 +10,4 @@ model discovery; protein name; and species and genes used for experiment. User c
 include a list of models to be considered for next round. However, user can rediscover models from 
 there to this “Discover models” page to explore more models.
 
-.. image:: modeldiscovery.png
+.. image:: discovery.png
