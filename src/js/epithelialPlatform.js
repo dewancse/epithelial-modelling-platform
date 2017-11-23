@@ -350,7 +350,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     console.log("combinedMembrane: ", combinedMembrane);
 
     var g = $("#svgVisualize"),
-        wth = 2000, // 1200,
+        wth = 2000, // 1200
         hth = 900,
         width = 300,
         height = 400;
@@ -375,7 +375,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     if (lengthOfBasoMem > lengthOfApicalMem && lengthOfBasoMem > 4)
         height += 50 * (lengthOfBasoMem - 4);
-
 
     if (prevHeight != height) {
         h += (height - prevHeight);
@@ -984,7 +983,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     .attr("stroke-width", 20)
                     .attr("cursor", "move")
                     .on("mouseover", function () {
-                        // div.style("display", "inline");
+                        div.style("display", "inline");
                         div.transition()
                             .duration(200)
                             .style("opacity", 1);
@@ -1004,7 +1003,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -1185,7 +1184,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -1365,7 +1364,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -1545,7 +1544,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -1727,7 +1726,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -1863,7 +1862,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -1999,7 +1998,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -2180,7 +2179,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -2360,7 +2359,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -2540,7 +2539,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -2723,7 +2722,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -2857,7 +2856,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                             '<br/>' +
                             '<b>Click middle mouse to close</b>')
-                            .style("left", d3.mouse(this)[0] + 140 + "px")
+                            .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
 
@@ -2970,7 +2969,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
                         '<br/>' +
                         '<b>Click middle mouse to close</b>')
-                        .style("left", d3.mouse(this)[0] + 140 + "px")
+                        .style("left", d3.mouse(this)[0] + 540 + "px")
                         .style("top", d3.mouse(this)[1] + 90 + "px");
                 });
 
@@ -4349,6 +4348,22 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     }
 
                                                     console.log("AFTER membraneModelValue: ", membraneModelValue);
+
+                                                    var tempList = [];
+                                                    for (var i = 0; i < membraneModelValue.length; i++) {
+                                                        for (var j = 0; j < membraneModelID.length; j++) {
+                                                            if (membraneModelValue[i].protein == membraneModelID[j][16]) {
+                                                                tempList.push(membraneModelID[j]);
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    for (var i = 0; i < tempList.length; i++) {
+                                                        membraneModelID[i] = tempList[i];
+                                                    }
+
+                                                    console.log("tempList: ", tempList);
                                                     console.log("AFTER membraneModelId: ", membraneModelID);
 
                                                     var membraneTransporter = "<p><b>" + membraneName + " model</b>";
@@ -4424,7 +4439,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                     console.log("outside modelbody!");
 
-                                                    // reinitVariable();
+                                                    reinitVariable();
                                                 },
                                                 false);
                                         },
@@ -5192,6 +5207,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         workspaceName = "";
         membraneModel = [];
         membraneModelID = [];
+        PID = [];
     }
 
     var Modal = function (options) {
@@ -5654,6 +5670,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     circleRearrange();
                 }
 
+                var reflectCheckbox = function (tempIndex) {
+                    checkboxsvg.call(checkBox[tempIndex])._groups[0][0].textContent = combinedMembrane[tempIndex].med_pr_text;
+                    console.log("checkboxsvg: ", checkboxsvg._groups[0][0].textContent);
+
+                    // update
+                    var textvaluechk = combinedMembrane[tempIndex].med_pr_text;
+                    var indexOfParen = textvaluechk.indexOf('(');
+                    textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + ' (' + combinedMembrane[tempIndex].med_pr_text_syn + ')';
+                    checkBox[tempIndex].text("" + textvaluechk + "");
+                    checkboxsvg.call(checkBox[tempIndex]);
+                }
+
                 var sourcefma = combinedMembrane[tempIndex].source_fma,
                     sinkfma = combinedMembrane[tempIndex].sink_fma,
                     mediatorfma = combinedMembrane[tempIndex].med_fma,
@@ -5666,6 +5694,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 1
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && variable_text2 == "single flux") {
 
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
+
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-start", null);
@@ -5677,13 +5708,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 2
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && variable_text2 == "single flux") {
 
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
+
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(end)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-end", null);
@@ -5697,12 +5729,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .text(combinedMembrane[tempIndex].solute_text);
                         }
 
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 3
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && (sourcefma2 == luminalID && sinkfma2 == cytosolID)) {
 
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
+
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-start", null);
@@ -5727,12 +5761,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
 
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 4
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && (sourcefma2 == cytosolID && sinkfma2 == luminalID)) {
 
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
+
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(end)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-end", null);
@@ -5759,11 +5795,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
 
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 5
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && (sourcefma2 == cytosolID && sinkfma2 == luminalID)) {
+
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
                             // line marker
@@ -5789,14 +5827,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 6
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && (sourcefma2 == luminalID && sinkfma2 == cytosolID)) {
 
-                        console.log("case 6 apical");
+                        console.log("case 6");
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(end)") {
                             // line marker
@@ -5822,8 +5860,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
                 }
 
@@ -5832,6 +5868,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 1
                     if ((sourcefma == cytosolID && sinkfma == interstitialID) && variable_text2 == "single flux") {
                         console.log("case 1");
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
+
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-start", null);
@@ -5843,13 +5882,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 2
                     if ((sourcefma == interstitialID && sinkfma == cytosolID) && variable_text2 == "single flux") {
 
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
+
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(#end)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-end", null);
@@ -5862,13 +5902,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 3
                     if ((sourcefma == cytosolID && sinkfma == interstitialID) && (sourcefma2 == cytosolID && sinkfma2 == interstitialID)) {
 
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
+
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-start", null);
@@ -5892,13 +5933,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 4
                     if ((sourcefma == interstitialID && sinkfma == cytosolID) && (sourcefma2 == interstitialID && sinkfma2 == cytosolID)) {
 
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
+
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(#end)") {
                             // line marker
                             linewithlineg[tempIndex].attr("marker-end", null);
@@ -5924,12 +5966,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 5
                     if ((sourcefma == cytosolID && sinkfma == interstitialID) && (sourcefma2 == interstitialID && sinkfma2 == cytosolID)) {
+
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
                             // line marker
@@ -5955,12 +5998,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
 
                     // case 6
                     if ((sourcefma == interstitialID && sinkfma == cytosolID) && (sourcefma2 == cytosolID && sinkfma2 == interstitialID)) {
+
+                        reflectCheckbox(tempIndex);
+                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(#end)") {
                             // line marker
@@ -5986,8 +6030,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .attr("y", dytext2[tempIndex])
                                 .text(combinedMembrane[tempIndex].solute_text2);
                         }
-
-                        circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
                     }
                 }
 

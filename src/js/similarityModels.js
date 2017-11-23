@@ -72,7 +72,7 @@ var similarityModels = function (links, model2DArray, modelEntityNameArray, visu
 
     // SVG graph
     var g = $("#svgSimilarityModels"),
-        width = 2000, //1200,
+        width = 2000, // 1200
         height = 900; // 700
 
     var svg = d3.select("#svgSimilarityModels").append("svg")
