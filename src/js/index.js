@@ -1307,6 +1307,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         var apicalID = "http://identifiers.org/fma/FMA:84666";
         var basolateralID = "http://identifiers.org/fma/FMA:84669";
         var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
+        var partOfGOUri = "http://identifiers.org/go/GO";
         var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
         var fluxOPB = "http://identifiers.org/opb/OPB_00593";
         var concentrationOPB = "http://identifiers.org/opb/OPB_00340";
@@ -1419,15 +1420,29 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                     })
 
                     // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
+                    // console.log("med_pr in makecotransporter : ", membrane1, membrane1.med_pr, membrane2, membrane2.med_pr);
+
+                    // check med_pr, med_pr_text and med_pr_text_syn
+                    var tmp_med_pr, tmp_med_pr_text, tmp_med_pr_text_syn;
+                    if (tempProtein[0] == membrane1.med_pr) {
+                        tmp_med_pr = membrane1.med_pr;
+                        tmp_med_pr_text = membrane1.med_pr_text;
+                        tmp_med_pr_text_syn = membrane1.med_pr_text_syn;
+                    }
+                    else {
+                        tmp_med_pr = membrane2.med_pr;
+                        tmp_med_pr_text = membrane2.med_pr_text;
+                        tmp_med_pr_text_syn = membrane2.med_pr_text_syn;
+                    }
 
                     var membraneOBJ = {
                         solute_chebi: membrane1.solute_chebi,
                         solute_text: membrane1.solute_text,
                         model_entity: membrane1.model_entity,
                         med_fma: membrane1.med_fma,
-                        med_pr: membrane1.med_pr,
-                        med_pr_text: membrane1.med_pr_text,
-                        med_pr_text_syn: membrane1.med_pr_text_syn,
+                        med_pr: tmp_med_pr, // membrane1.med_pr,
+                        med_pr_text: tmp_med_pr_text, // membrane1.med_pr_text,
+                        med_pr_text_syn: tmp_med_pr_text_syn, // membrane1.med_pr_text_syn,
                         variable_text: membrane1.variable_text,
                         source_fma: membrane1.source_fma,
                         sink_fma: membrane1.sink_fma,
@@ -1437,7 +1452,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                         model_entity2: membrane2.model_entity,
                         variable_text2: membrane2.variable_text,
                         source_fma2: membrane2.source_fma,
-                        sink_fma2: membrane2.sink_fma,
+                        sink_fma2: membrane2.sink_fma
                     }
 
                     // console.log("tempprotein: ", tempProtein);
@@ -1572,7 +1587,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                             query,
                             function (jsonObjFlux) {
 
-                                // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
+                                console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                                 var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
                                 var indexofColon = chebi_uri.indexOf('CHEBI:');
@@ -1630,7 +1645,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                             }
                                             else {
                                                 var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
-                                                if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
+                                                if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfGOUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
                                                     med_pr.push({
                                                         // name of med_pr from OLS
                                                         name: modelEntityFullNameArray[index],
@@ -1655,9 +1670,11 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                         med_pr = uniqueifyEpithelial(med_pr);
                                         med_fma = uniqueifyEpithelial(med_fma);
 
-                                        // console.log("med_pr[0] in index.js: ", med_pr[0]);
+                                        // console.log("med_pr[0], med_pr in index.js: ", med_pr[0], med_pr);
+                                        // console.log("med_fma in index.js: ", med_fma);
 
                                         var medURI, endpointOLS;
+
                                         if (med_pr[0] == undefined)
                                             medURI = jsonObjFlux.results.bindings[0].protein.value;
                                         else
@@ -1668,6 +1685,11 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                             chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
                                             endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                         }
+                                        else if (medURI.indexOf(partOfGOUri) != -1) {
+                                            var indexofColon = medURI.indexOf('GO:');
+                                            var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
+                                            endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
+                                        }
                                         else
                                             endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
 
@@ -1675,7 +1697,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                             endpointOLS,
                                             function (jsonObjOLSMedPr) {
 
-                                                // console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr, medURI);
+                                                // console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr);
 
                                                 index++;
 
@@ -1689,15 +1711,17 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                         // No mediator protein in NHE3, SGLT models
                                                         if (med_pr[0] == undefined)
                                                             temp_med_pr = undefined;
-                                                        else
+                                                        else {
                                                             temp_med_pr = med_pr[0].fma;
+                                                        }
+
+                                                        console.log("med_pr, temp_med_pr in index.js: ", med_pr, temp_med_pr);
 
                                                         var tempvar;
                                                         if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
                                                             // med_pr_text_syn = undefined;
                                                             med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
                                                         }
-
                                                         else {
                                                             tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
                                                             med_pr_text_syn = tempvar[0].toUpperCase();
@@ -1723,13 +1747,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                     }
                                                     else { // same solute co-transporter
 
-                                                        // console.log("ELSE source_fma.length == 1");
-                                                        // console.log("modelEntity: ", modelEntity);
-                                                        // console.log("biologicalMeaning: ", biologicalMeaning);
-                                                        // console.log("speciesList: ", speciesList);
-                                                        // console.log("geneList: ", geneList);
-                                                        // console.log("proteinList: ", proteinList);
-
                                                         // Swap if source and sink have same direction
                                                         if (source_fma[0].fma == sink_fma[0].fma) {
 
@@ -1748,10 +1765,11 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                             var srctext = parserFmaNameText(source_fma[i]),
                                                                 temp_med_pr, med_pr_text_syn;
 
-                                                            if (med_pr[i] == undefined)
+                                                            if (med_pr[0] == undefined)
                                                                 temp_med_pr = undefined;
-                                                            else
+                                                            else {
                                                                 temp_med_pr = med_pr[0].fma;
+                                                            }
 
                                                             var tempvar;
                                                             if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
@@ -1796,6 +1814,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
+                                                        console.log("membrane: ", membrane);
                                                         console.log("model2DArr: ", model2DArray);
                                                         console.log("modelEntityNameArray: ", modelEntityNameArray);
                                                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
