@@ -1301,7 +1301,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     });
 
-
     // apical, basolateral, and paracellular membrane
     for (var i = 0; i < combinedMembrane.length; i++) {
         model_entity = combinedMembrane[i].model_entity;
@@ -3699,7 +3698,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                             moveBack();
                             membraneColorBack();
-                            // reinitVariable();
 
                             // reinitialization
                             reinitVariable();
@@ -4451,6 +4449,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
     var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
     var partOfFMAUri = "http://identifiers.org/fma/FMA";
+    var partOfGOUri = "http://identifiers.org/go/GO";
 
     var relatedMembraneModel = function (workspaceName, membraneName, cotransporterList) {
 
@@ -4664,7 +4663,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     }
                                                     else {
                                                         var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
-                                                        if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
+                                                        if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfGOUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
                                                             med_pr.push({
                                                                 // name of med_pr from OLS
                                                                 // TODO: J_sc_K two PR and one FMA URI!!
@@ -4809,14 +4808,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         }
                                                     }
                                                     else {
-                                                        // console.log("solute_chebi: ", solute_chebi);
-                                                        // console.log("solute_chebi2: ", solute_chebi2);
-                                                        // console.log("source_fma: ", source_fma);
-                                                        // console.log("sink_fma: ", sink_fma);
-                                                        // console.log("source_fma2: ", source_fma2);
-                                                        // console.log("sink_fma2: ", sink_fma2);
-                                                        // console.log("med_pr: ", med_pr);
-                                                        // console.log("med_fma: ", med_fma);
 
                                                         indexOfHash = membraneModel[idMembrane].model_entity.search("#");
                                                         variabletext = membraneModel[idMembrane].model_entity.slice(indexOfHash + 1);
@@ -4842,58 +4833,86 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     }
                                                 }
 
-                                                var tempvar, med_pr_text_syn;
-                                                if (jsonPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
-                                                    med_pr_text_syn = jsonPr._embedded.terms[0].annotation["id"][0].slice(3);
+                                                console.log("medpr, protein.value: ", medpr, jsonRelatedMembraneModel, jsonRelatedMembraneModel.results.bindings[0].Protein.value);
+
+                                                var medURI, endpointOLS;
+                                                if (medpr == undefined || medpr == "")
+                                                    medURI = jsonRelatedMembraneModel.results.bindings[0].Protein.value;
+                                                else
+                                                    medURI = medpr;
+
+                                                console.log("medURI: ", medURI);
+
+                                                if (medURI.indexOf(partOfCHEBIUri) != -1) {
+                                                    var indexofColon = medURI.indexOf('CHEBI:');
+                                                    chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
+                                                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                                 }
-                                                else {
-                                                    tempvar = jsonPr._embedded.terms[0].annotation["has_related_synonym"];
-                                                    med_pr_text_syn = tempvar[0].toUpperCase();
+                                                else if (medURI.indexOf(partOfGOUri) != -1) {
+                                                    var indexofColon = medURI.indexOf('GO:');
+                                                    var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
+                                                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
                                                 }
+                                                else
+                                                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
 
-                                                membraneModelID.push([
-                                                    membraneModel[idMembrane].model_entity, // model_entity
-                                                    modelentity2, // model_entity2
-                                                    variabletext, // variable_text
-                                                    variabletext2, // variable_text2
-                                                    sourcefma,
-                                                    sinkfma,
-                                                    sourcefma2,
-                                                    sinkfma2,
-                                                    medfma, // jsonObjFlux.results.bindings[0].med_entity_uri.value, // med_fma
-                                                    medpr, // med_pr, e.g. mediator in a cotransporter protein
-                                                    solutechebi, // solute_chebi
-                                                    solutechebi2, // solute_chebi2
-                                                    solutetext, //solute_text
-                                                    solutetext2, //solute_text2
-                                                    jsonPr._embedded.terms[0].label, //med_pr_text,
-                                                    med_pr_text_syn, //med_pr_text_syn
-                                                    jsonRelatedMembraneModel.results.bindings[0].Protein.value // protein_name
-                                                ]);
+                                                sendGetRequest(
+                                                    endpointOLS,
+                                                    function (jsonObjOLSMedPr) {
 
-                                                solute_chebi = [];
-                                                solute_chebi2 = [];
-                                                source_fma = [];
-                                                sink_fma = [];
-                                                source_fma2 = [];
-                                                sink_fma2 = [];
-                                                med_pr = [];
-                                                med_fma = [];
+                                                        var tempvar, med_pr_text_syn;
+                                                        if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
+                                                            med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
+                                                        }
+                                                        else {
+                                                            tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
+                                                            med_pr_text_syn = tempvar[0].toUpperCase();
+                                                        }
 
-                                                // console.log("idMembrane: ", idMembrane);
-                                                // console.log("membraneModel.length: ", membraneModel.length);
-                                                console.log("membraneModelID: ", membraneModelID);
+                                                        membraneModelID.push([
+                                                            membraneModel[idMembrane].model_entity, // model_entity
+                                                            modelentity2, // model_entity2
+                                                            variabletext, // variable_text
+                                                            variabletext2, // variable_text2
+                                                            sourcefma,
+                                                            sinkfma,
+                                                            sourcefma2,
+                                                            sinkfma2,
+                                                            medfma, // jsonObjFlux.results.bindings[0].med_entity_uri.value, // med_fma
+                                                            medpr, // med_pr, e.g. mediator in a cotransporter protein
+                                                            solutechebi, // solute_chebi
+                                                            solutechebi2, // solute_chebi2
+                                                            solutetext, //solute_text
+                                                            solutetext2, //solute_text2
+                                                            jsonObjOLSMedPr._embedded.terms[0].label, //med_pr_text,
+                                                            med_pr_text_syn, //med_pr_text_syn
+                                                            jsonRelatedMembraneModel.results.bindings[0].Protein.value // protein_name
+                                                        ]);
 
-                                                if (membraneModel[idMembrane].model_entity != undefined)
-                                                    idMembrane++;
+                                                        solute_chebi = [];
+                                                        solute_chebi2 = [];
+                                                        source_fma = [];
+                                                        sink_fma = [];
+                                                        source_fma2 = [];
+                                                        sink_fma2 = [];
+                                                        med_pr = [];
+                                                        med_fma = [];
 
-                                                if (idMembrane == membraneModel.length) {
-                                                    showModalWindow(workspaceName, membraneName);
-                                                    return;
-                                                }
+                                                        // console.log("idMembrane: ", idMembrane);
+                                                        // console.log("membraneModel.length: ", membraneModel.length);
+                                                        console.log("membraneModelID: ", membraneModelID);
 
-                                                relatedMembraneModel(workspaceName, membraneName, cotransporterList);
+                                                        if (membraneModel[idMembrane].model_entity != undefined)
+                                                            idMembrane++;
 
+                                                        if (idMembrane == membraneModel.length) {
+                                                            showModalWindow(workspaceName, membraneName);
+                                                            return;
+                                                        }
+
+                                                        relatedMembraneModel(workspaceName, membraneName, cotransporterList);
+
+                                                    }, true);
                                             }, true);
                                     }, true);
                             }, true);
@@ -4901,6 +4920,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }, true);
     }
 
+    // Post function to get similarity matrix
     var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
         var request = getRequestObject();
 
@@ -4924,6 +4944,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         request.send(data); // for POST only
     };
 
+    // split PR_ from protein identifier
     var proteinOrMedPrID = function (membraneModelID, PID) {
         for (var i = 0; i < membraneModelID.length; i++) {
             if (membraneModelID[i][9] == "") {
@@ -5302,7 +5323,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         WSDbfetchREST();
     }
 
-    // utility function
+    // circles, polygons, and arrows move back if close clicked
     var moveBack = function () {
         if (linewithlineg[icircleGlobal] != undefined) {
             linewithlineg[icircleGlobal]
@@ -5377,7 +5398,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     }
 
-    // utility function
+    // retain color of membranes
     var membraneColorBack = function () {
         for (var i = 0; i < $("line").length; i++) {
             if ($("line")[i].id == $(cthis).attr("membrane") && i == 0) {
@@ -5403,6 +5424,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     }
 
+    // rearrange circles, polygons, and arrows for a change
     var circleRearrange = function () {
         // initial values for apical
         var cyinitial = 213.3333282470703,
@@ -5576,6 +5598,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     }
 
+    // reinitialize variable for next iteration
     var reinitVariable = function () {
         // Reinitialise to store fluxes/models in next iteration
         idProtein = 0;
@@ -6055,28 +6078,28 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     circleRearrange();
                 }
 
-                // var reflectCheckbox = function (tempIndex) {
-                //     checkboxsvg.call(checkBox[tempIndex])._groups[0][0].textContent = combinedMembrane[tempIndex].med_pr_text;
-                //     console.log("checkboxsvg: ", checkboxsvg._groups[0][0].textContent);
-                //
-                //     ydistancechk = 50;
-                //     yinitialchk = 185;
-                //     ytextinitialchk = 200;
-                //
-                //     for (var i = 0; i < combinedMembrane.length; i++) {
-                //         var textvaluechk = combinedMembrane[i].med_pr_text;
-                //         var indexOfParen = textvaluechk.indexOf('(');
-                //         textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + ' (' + combinedMembrane[i].med_pr_text_syn + ')';
-                //
-                //         checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
-                //         checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
-                //
-                //         checkboxsvg.call(checkBox[i]);
-                //
-                //         yinitialchk += ydistancechk;
-                //         ytextinitialchk += ydistancechk;
-                //     }
-                // }
+                var reflectCheckbox = function (tempIndex) {
+                    checkboxsvg.call(checkBox[tempIndex])._groups[0][0].textContent = combinedMembrane[tempIndex].med_pr_text;
+                    console.log("checkboxsvg: ", checkboxsvg._groups[0][0].textContent);
+
+                    ydistancechk = 50;
+                    yinitialchk = 185;
+                    ytextinitialchk = 200;
+
+                    for (var i = 0; i < combinedMembrane.length; i++) {
+                        var textvaluechk = combinedMembrane[i].med_pr_text;
+                        var indexOfParen = textvaluechk.indexOf('(');
+                        textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + ' (' + combinedMembrane[i].med_pr_text_syn + ')';
+
+                        checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
+                        checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
+
+                        checkboxsvg.call(checkBox[i]);
+
+                        yinitialchk += ydistancechk;
+                        ytextinitialchk += ydistancechk;
+                    }
+                }
 
                 var sourcefma = combinedMembrane[tempIndex].source_fma,
                     sinkfma = combinedMembrane[tempIndex].sink_fma,
@@ -6090,7 +6113,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 1
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && variable_text2 == "single flux") {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
@@ -6109,7 +6132,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 2
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && variable_text2 == "single flux") {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(end)") {
@@ -6130,7 +6153,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 3
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && (sourcefma2 == luminalID && sinkfma2 == cytosolID)) {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
@@ -6162,7 +6185,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 4
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && (sourcefma2 == cytosolID && sinkfma2 == luminalID)) {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(end)") {
@@ -6196,7 +6219,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 5
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && (sourcefma2 == cytosolID && sinkfma2 == luminalID)) {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
@@ -6229,7 +6252,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && (sourcefma2 == luminalID && sinkfma2 == cytosolID)) {
 
                         console.log("case 6");
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(end)") {
@@ -6264,7 +6287,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 1
                     if ((sourcefma == cytosolID && sinkfma == interstitialID) && variable_text2 == "single flux") {
                         console.log("case 1");
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
@@ -6283,7 +6306,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 2
                     if ((sourcefma == interstitialID && sinkfma == cytosolID) && variable_text2 == "single flux") {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(#end)") {
@@ -6303,7 +6326,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 3
                     if ((sourcefma == cytosolID && sinkfma == interstitialID) && (sourcefma2 == cytosolID && sinkfma2 == interstitialID)) {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
@@ -6334,7 +6357,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 4
                     if ((sourcefma == interstitialID && sinkfma == cytosolID) && (sourcefma2 == interstitialID && sinkfma2 == cytosolID)) {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(#end)") {
@@ -6367,7 +6390,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 5
                     if ((sourcefma == cytosolID && sinkfma == interstitialID) && (sourcefma2 == interstitialID && sinkfma2 == cytosolID)) {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-start") == "url(#start)") {
@@ -6399,7 +6422,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 6
                     if ((sourcefma == interstitialID && sinkfma == cytosolID) && (sourcefma2 == cytosolID && sinkfma2 == interstitialID)) {
 
-                        // reflectCheckbox(tempIndex);
+                        reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(#end)") {
