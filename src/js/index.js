@@ -90,8 +90,8 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     mainUtils.loadDocumentation = function () {
 
         $("#main-content").html("Documentation can be found at " +
-            '<a href="http://epithelial-modelling-platform.readthedocs.io/en/latest/" ' +
-            'target="_blank">Read the Docs</a>');
+            '<a href="https://github.com/dewancse/epithelial-modelling-platform/edit/master/README.md" ' +
+            'target="_blank">README.md in github</a>');
 
         // // Switch current active button to the clicked button
         // var activeItem = "#" + activeMenu();
