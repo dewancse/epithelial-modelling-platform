@@ -17,7 +17,7 @@ Therefore, mapping follows `exact match` principle. It is case insenstitive and 
 
 | Physical entity | Physical process | Solutes |
 | --- | --- | --- |
-| `concentration` | `flux` | sodium, hydrogen, chloride, potassium |
+| `concentration` | `flux` | sodium, hydrogen, chloride, potassium, ammonium |
 
 <center><img src=src/img/modeldiscovery-main.png /></center>
 

@@ -5,7 +5,6 @@ var parseModelName = require("./miscellaneous.js").parseModelName;
 var parserFmaNameText = require("./miscellaneous.js").parserFmaNameText;
 var headTitle = require("./miscellaneous.js").headTitle;
 var uniqueifyEpithelial = require("./miscellaneous.js").uniqueifyEpithelial;
-var uniqueifySrcSnkMed = require("./miscellaneous.js").uniqueifySrcSnkMed;
 var uniqueifymodel2DArray = require("./miscellaneous.js").uniqueifymodel2DArray;
 var uniqueifyjsonModel = require("./miscellaneous.js").uniqueifyjsonModel;
 var isExist = require("./miscellaneous.js").isExist;
@@ -15,22 +14,12 @@ var viewModel = require("./viewModel.js").viewModel;
 var similarityModels = require("./similarityModels.js").similarityModels;
 var epithelialPlatform = require("./epithelialPlatform.js").epithelialPlatform;
 var showLoading = require("./miscellaneous.js").showLoading;
-var activeMenu = require("./miscellaneous.js").activeMenu;
-var switchMenuToActive = require("./miscellaneous.js").switchMenuToActive;
 
 var sendGetRequest = require("./../libs/ajax-utils.js").sendGetRequest;
 var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
 (function (global) {
     'use strict';
-
-    // TODO: Use identifiers in Auckland OLS
-    var apicalID = "http://purl.org/sig/ont/fma/fma84666";
-    var basolateralID = "http://purl.org/sig/ont/fma/fma84669";
-    var paracellularID = "http://purl.org/sig/ont/fma/fma67394";
-    var luminalID = "http://purl.org/sig/ont/fma/fma74550";
-    var cytosolID = "http://purl.org/sig/ont/fma/fma66836";
-    var interstitialID = "http://purl.org/sig/ont/fma/fma9673";
 
     // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
@@ -90,12 +79,8 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     mainUtils.loadDocumentation = function () {
 
         $("#main-content").html("Documentation can be found at " +
-            '<a href="https://github.com/dewancse/epithelial-modelling-platform/edit/master/README.md" ' +
+            '<a href="https://github.com/dewancse/epithelial-modelling-platform" ' +
             'target="_blank">README.md in github</a>');
-
-        // // Switch current active button to the clicked button
-        // var activeItem = "#" + activeMenu();
-        // switchMenuToActive(activeItem, "#documentation");
     };
 
     // On page load (before img or CSS)
@@ -183,41 +168,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                         "chebi": "<http://identifiers.org/chebi/CHEBI:29103>"
                     },
                     {
-                        "key1": "flux", "key2": "calcium",
-                        "opb": "<http://identifiers.org/opb/OPB_00593>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-                    },
-                    {
-                        "key1": "flux", "key2": "IP3",
-                        "opb": "<http://identifiers.org/opb/OPB_00593>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-                    },
-                    {
-                        "key1": "flux", "key2": "glucose",
-                        "opb": "<http://identifiers.org/opb/OPB_00593>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-                    },
-                    {
-                        "key1": "flux", "key2": "lactate",
-                        "opb": "<http://identifiers.org/opb/OPB_00593>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-                    },
-                    {
-                        "key1": "flux", "key2": "aldosterone",
-                        "opb": "<http://identifiers.org/opb/OPB_00593>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-                    },
-                    {
-                        "key1": "flux", "key2": "thiazide",
-                        "opb": "<http://identifiers.org/opb/OPB_00593>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
-                    },
-                    {
-                        "key1": "flux", "key2": "ATP",
-                        "opb": "<http://identifiers.org/opb/OPB_00593>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-                    },
-                    {
                         "key1": "concentration", "key2": "",
                         "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
                     },
@@ -245,41 +195,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                         "key1": "concentration", "key2": "potassium",
                         "opb": "<http://identifiers.org/opb/OPB_00340>",
                         "chebi": "<http://identifiers.org/chebi/CHEBI:29103>"
-                    },
-                    {
-                        "key1": "concentration", "key2": "calcium",
-                        "opb": "<http://identifiers.org/opb/OPB_00340>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:22984>"
-                    },
-                    {
-                        "key1": "concentration", "key2": "IP3",
-                        "opb": "<http://identifiers.org/opb/OPB_00340>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:131186>"
-                    },
-                    {
-                        "key1": "concentration", "key2": "ATP",
-                        "opb": "<http://identifiers.org/opb/OPB_00340>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:15422>"
-                    },
-                    {
-                        "key1": "concentration", "key2": "glucose",
-                        "opb": "<http://identifiers.org/opb/OPB_00340>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
-                    },
-                    {
-                        "key1": "concentration", "key2": "lactate",
-                        "opb": "<http://identifiers.org/opb/OPB_00340>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:24996>"
-                    },
-                    {
-                        "key1": "concentration", "key2": "aldosterone",
-                        "opb": "<http://identifiers.org/opb/OPB_00340>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:27584>"
-                    },
-                    {
-                        "key1": "concentration", "key2": "thiazide",
-                        "opb": "<http://identifiers.org/opb/OPB_00340>",
-                        "chebi": "<http://identifiers.org/chebi/CHEBI:50264>"
                     }
                 ];
 
@@ -441,8 +356,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         }
         else {
-            // console.log("templistOfModel: ", templistOfModel);
-
             console.log("loadSearchHtml ELSE");
 
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
@@ -450,8 +363,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             for (var j = 0; j < modelEntity.length; j++) {
                 if (isExist(modelEntity[j], templistOfModel)) {
                     modelEntity.splice(j, 1);
-
-                    // console.log("modelEntity: ", modelEntity);
                 }
             }
 
@@ -466,13 +377,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
             // $("#main-content").html(sessionStorage.getItem('searchListContent'));
             head = headTitle();
-
-            // filterByProtein(listOfMembrane[0]);
         }
-
-        // // Switch current active button to the clicked button
-        // var activeItem = "#" + activeMenu();
-        // switchMenuToActive(activeItem, "#listDiscovery");
     };
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
@@ -553,9 +458,15 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                             // console.log("jsonProteinUri: ", jsonProteinUri);
 
-                            // pig SGLT2 (PR_P31636) is missing in protein ontology
-                            // Write a test case for unsuccessful OLS query and handle this issue as undefined
-                            // Just assign mouse species for the time being
+                            if (jsonProteinUri.results.bindings[0] == undefined) {
+                                id++;
+
+                                if (id != jsonModel.results.bindings.length) {
+                                    discoverInnerModels();
+                                }
+                            }
+
+                            // pig SGLT2 (PR_P31636) does not exist in PR ontology, assign mouse species instead
                             var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
 
                             var endpointproteinOLS;
@@ -571,7 +482,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                     // console.log("jsonProtein: ", jsonProtein);
 
                                     var endpointgeneOLS;
-                                    // if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
                                     if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
                                         endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
                                     else
@@ -787,6 +697,72 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             true);
     };
 
+    var findCompartmentLoc = function (jsonObjComp, jsonObjLoc, tempidWithStr, protein, species, gene) {
+        var tempComp = "", counterOLS = 0;
+        for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
+            var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
+            var indexofColon = fma_uri.indexOf('FMA:');
+            // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
+
+            var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+            sendGetRequest(
+                endpointOLS,
+                function (jsonObjOLS) {
+
+                    // console.log("jsonObjOLS: ", jsonObjOLS);
+
+                    counterOLS++;
+                    tempComp += jsonObjOLS._embedded.terms[0].label;
+                    if (counterOLS < jsonObjComp.results.bindings.length)
+                        tempComp += ", ";
+                    else
+                        tempComp += "";
+
+                    if (counterOLS == jsonObjComp.results.bindings.length) {
+                        var tempLoc = "", counterOLSLoc = 0;
+                        for (var i = 0; i < jsonObjLoc.results.bindings.length; i++) {
+                            var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
+                            var indexofColon = fma_uri.indexOf('FMA:');
+                            // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
+                            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
+
+                            var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+                            sendGetRequest(
+                                endpointOLS,
+                                function (jsonObjOLSLoc) {
+
+                                    // console.log("jsonObjOLSLoc: ", jsonObjOLSLoc);
+
+                                    counterOLSLoc++;
+                                    tempLoc += jsonObjOLSLoc._embedded.terms[0].label;
+                                    if (counterOLSLoc < jsonObjLoc.results.bindings.length)
+                                        tempLoc += ", ";
+                                    else
+                                        tempLoc += "";
+
+                                    if (counterOLSLoc == jsonObjLoc.results.bindings.length) {
+                                        var jsonObj = {
+                                            "Model_entity": tempidWithStr,
+                                            "Protein": protein,
+                                            "Species": species,
+                                            "Gene": gene,
+                                            "Compartment": tempComp,
+                                            "Located_in": tempLoc
+                                        }
+
+                                        // console.log("jsonObj in loadModelHtml: ", jsonObj);
+                                        mainUtils.showModel(jsonObj);
+                                    }
+                                },
+                                true);
+                        }
+                    }
+                },
+                true);
+        }
+    }
+
     // Load the model
     mainUtils.loadModelHtml = function () {
 
@@ -922,69 +898,8 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                                     protein = proteinName;
                                                                 }
 
-                                                                var tempComp = "", counterOLS = 0;
-                                                                for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
-                                                                    var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
-                                                                    var indexofColon = fma_uri.indexOf('FMA:');
-                                                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
-                                                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
-
-                                                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
-                                                                    sendGetRequest(
-                                                                        endpointOLS,
-                                                                        function (jsonObjOLS) {
-
-                                                                            // console.log("jsonObjOLS: ", jsonObjOLS);
-
-                                                                            counterOLS++;
-                                                                            tempComp += jsonObjOLS._embedded.terms[0].label;
-                                                                            if (counterOLS < jsonObjComp.results.bindings.length)
-                                                                                tempComp += ", ";
-                                                                            else
-                                                                                tempComp += "";
-
-                                                                            if (counterOLS == jsonObjComp.results.bindings.length) {
-                                                                                var tempLoc = "", counterOLSLoc = 0;
-                                                                                for (var i = 0; i < jsonObjLoc.results.bindings.length; i++) {
-                                                                                    var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
-                                                                                    var indexofColon = fma_uri.indexOf('FMA:');
-                                                                                    // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
-                                                                                    fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
-
-                                                                                    var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
-                                                                                    sendGetRequest(
-                                                                                        endpointOLS,
-                                                                                        function (jsonObjOLSLoc) {
-
-                                                                                            // console.log("jsonObjOLSLoc: ", jsonObjOLSLoc);
-
-                                                                                            counterOLSLoc++;
-                                                                                            tempLoc += jsonObjOLSLoc._embedded.terms[0].label;
-                                                                                            if (counterOLSLoc < jsonObjLoc.results.bindings.length)
-                                                                                                tempLoc += ", ";
-                                                                                            else
-                                                                                                tempLoc += "";
-
-                                                                                            if (counterOLSLoc == jsonObjLoc.results.bindings.length) {
-                                                                                                var jsonObj = {
-                                                                                                    "Model_entity": tempidWithStr,
-                                                                                                    "Protein": protein,
-                                                                                                    "Species": species,
-                                                                                                    "Gene": gene,
-                                                                                                    "Compartment": tempComp,
-                                                                                                    "Located_in": tempLoc
-                                                                                                }
-
-                                                                                                // console.log("jsonObj in loadModelHtml: ", jsonObj);
-                                                                                                mainUtils.showModel(jsonObj);
-                                                                                            }
-                                                                                        },
-                                                                                        true);
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        true);
-                                                                }
+                                                                // compartment and location in load model
+                                                                findCompartmentLoc(jsonObjComp, jsonObjLoc, tempidWithStr, protein, species, gene);
                                                             },
                                                             false);
                                                     },
@@ -999,10 +914,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                     true);
             },
             true);
-
-        // // Switch from current active button to models button
-        // var activeItem = "#" + activeMenu();
-        // switchMenuToActive(activeItem, "#listModels");
     };
 
     // Show selected models

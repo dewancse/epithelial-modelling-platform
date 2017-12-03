@@ -4766,7 +4766,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         console.log("tempList: ", tempList);
                                                         console.log("AFTER membraneModelID: ", membraneModelID);
 
-                                                        var membraneTransporter = "<p><b>" + membraneName + " model</b>";
+                                                        // apical or basolateral membrane
+                                                        var membraneTransporter = "<p id='membraneTransporterID'><b>" + membraneName + " model</b>";
                                                         if (membraneModelValue.length == 0 || similarityOBJ.length == 0) {
                                                             membraneTransporter += "<br>Not Exist";
                                                         }
@@ -4785,18 +4786,22 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             }
                                                         }
 
+                                                        // membraneTransporter.id = "membraneTransporterID";
+
                                                         // Alternative model
-                                                        var alternativeModel = "<p><b>Alternative model of " + proteinText + "</b>";
+                                                        var alternativeModel = "<p id='alternativeModelID'><b>Alternative model of " + proteinText + "</b>";
                                                         // console.log("Alternative model: ", altCellmlModel);
                                                         if (altCellmlModel == "") {
                                                             alternativeModel += "<br>Not Exist";
                                                         }
                                                         else {
-                                                            alternativeModel += "</b>" + altCellmlModel + "</p>";
+                                                            alternativeModel += "</b>" + altCellmlModel;
                                                         }
 
+                                                        alternativeModel += "</p>";
+
                                                         // related organ models (kidney, lungs, etc) in PMR
-                                                        var relatedOrganModels = "<p><b>" + typeOfModel + " model in PMR</b>";
+                                                        var relatedOrganModels = "<p id='relatedOrganModelsID'><b>" + typeOfModel + " model in PMR</b>";
                                                         // console.log("related kidney model: ", relatedModelValue, relatedOrganModels);
                                                         if (relatedModelValue.length == 1) { // includes own protein name
                                                             relatedOrganModels += "<br>Not Exist";
@@ -4818,6 +4823,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 relatedOrganModels += label.innerHTML;
                                                             }
                                                         }
+
+                                                        relatedOrganModels += "</p>";
 
                                                         $('#modalBody').empty();
 
@@ -5257,88 +5264,47 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             $("#msaveID").click(function (event) {
 
                 console.log("second save button clicked!");
-                console.log("cthis and $(cthis): ", cthis, $(cthis));
-                console.log("win AFTER save clicked: ", win);
                 console.log("membrane: ", membrane);
                 console.log("combinedMembrane: ", combinedMembrane);
 
-                // checkbox!!
-                if (win[0].children[1].children[0].children[9] != undefined) {
-                    for (var i = 0; i < win[0].children[1].children[0].children[9].getElementsByTagName("input").length; i++) {
-                        if (win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].checked) {
+                // apical or basolateral membrane models
+                for (var i = 0; i < $('#membraneTransporterID input').length; i++) {
+                    if ($('#membraneTransporterID input')[i].checked) {
 
-                            console.log("Basolateral or apical model clicked!!");
+                        console.log("Apical or Basolateral membrane!!");
 
-                            console.log("checked: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].checked);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id);
-
-                            $(cthis).attr("id", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id)
-                            // cthis.id = win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id;
-                            console.log("cthis AFTER: ", cthis);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[9].getElementsByTagName("input")[i].id);
+                        // paracellular
+                        if ($(cthis).attr("membrane") == paracellularID) {
+                            $(cthis).attr("idParacellular", $('#membraneTransporterID input')[i].id);
                         }
+                        else {
+                            $(cthis).attr("id", $('#membraneTransporterID input')[i].id);
+                        }
+
+                        $(cthis).attr("id", $('#membraneTransporterID input')[i].id);
+                        console.log("cthis AFTER: ", cthis);
                     }
                 }
 
-                // checkbox!!
-                if (win[0].children[1].children[0].children[10] != undefined) {
-                    for (var i = 0; i < win[0].children[1].children[0].children[10].getElementsByTagName("input").length; i++) {
-                        if (win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].checked) {
+                // alternative models
+                for (var i = 0; i < $('#alternativeModelID input').length; i++) {
+                    if ($('#alternativeModelID input')[i].checked) {
 
-                            console.log("Alternative model clicked!!");
+                        console.log("Alternative model!!");
 
-                            console.log("checked: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].checked);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
-
-                            $(cthis).attr("id", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
-                            // cthis.id = win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id;
-                            console.log("cthis AFTER: ", cthis);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[10].getElementsByTagName("input")[i].id);
-                        }
+                        $(cthis).attr("id", $('#alternativeModelID input')[i].id);
+                        console.log("cthis AFTER: ", cthis);
                     }
                 }
 
-                // checkbox!!
-                if (win[0].children[1].children[0].children[11] != undefined) {
-                    for (var i = 0; i < win[0].children[1].children[0].children[11].getElementsByTagName("input").length; i++) {
-                        if (win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].checked) {
+                // related organ models in PMR
+                for (var i = 0; i < $('#relatedOrganModelsID input').length; i++) {
+                    if ($('#relatedOrganModelsID input')[i].checked) {
 
-                            console.log("Related cellml model clicked!!");
+                        console.log("Related organ model!!");
 
-                            console.log("checked CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].checked);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
-
-                            // paracellular
-                            if ($(cthis).attr("membrane") == paracellularID) {
-                                $(cthis).attr("idParacellular", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
-                            }
-                            else {
-                                $(cthis).attr("id", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
-                            }
-
-                            $(cthis).attr("id", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
-                            // cthis.id = win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id;
-                            console.log("cthis AFTER: ", cthis);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id);
-                        }
-                    }
-                }
-
-                // checkbox!!
-                if (win[0].children[1].children[0].children[12] != undefined) {
-                    for (var i = 0; i < win[0].children[1].children[0].children[12].getElementsByTagName("input").length; i++) {
-                        if (win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked) {
-
-                            console.log("Related cellml model clicked 12!!");
-
-                            console.log("checked CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].checked);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
-
-                            $(cthis).attr("id", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
-                            // cthis.id = win[0].children[1].children[0].children[11].getElementsByTagName("input")[i].id;
-                            console.log("cthis AFTER: ", cthis);
-                            console.log("id CHECKBOX: ", win[0].children[1].children[0].children[12].getElementsByTagName("input")[i].id);
-                        }
+                        $(cthis).attr("id", $('#relatedOrganModelsID input')[i].id);
+                        console.log("cthis AFTER: ", cthis);
                     }
                 }
 
@@ -6105,7 +6071,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-    // display modal window after clicking either apical or basolateral membrane
+    //  // display modal window after clicking either apical or basolateral membrane
     // function modalWindowToAddModels(located_in) {
     //     console.log("located_in: ", located_in);
     //
