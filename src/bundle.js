@@ -501,9 +501,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
      * relatedModelID - relatedModel which have #protein
      * */
     var relatedModel = [], relatedModelValue = [], relatedModelID = [], workspaceName = "";
+    var alternativeModelValue = [];
     var membraneModel = [], membraneModelValue = [], membraneModelID = [];
     var proteinName, proteinText, cellmlModel, biological_meaning, biological_meaning2, speciesName, geneName;
-    var idProtein = 0, idAltProtein = 0, idMembrane = 0, loc, typeOfModel, altCellmlModel = "", cthis;
+    var idProtein = 0, idAltProtein = 0, idMembrane = 0, loc, typeOfModel, cthis;
     var icircleGlobal, organIndex, model_entity, model_entity2;
 
     var dx = [], dy = [], dxcircletext = [], dycircletext = [],
@@ -3595,6 +3596,132 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     }
 
+    // remaining part of dragcircleendline function
+    var helperFunction = function () {
+
+        // find cellml models with same protein names
+        var query = 'SELECT ?cellmlmodel ' +
+            'WHERE { GRAPH ?g { ' +
+            '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#modelOf> <' + proteinName + '> . ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonCellmlModel) {
+
+                console.log("jsonCellmlModel: ", jsonCellmlModel);
+
+                var query = 'SELECT ?located_in ' +
+                    'WHERE { GRAPH ?g { ' +
+                    '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
+                    '}}'
+
+                // location of that cellml model
+                sendPostRequest(
+                    endpoint,
+                    query,
+                    function (jsonLocatedin) {
+
+                        console.log("jsonLocatedin: ", jsonLocatedin);
+
+                        var counter = 0;
+                        // Type of model - kidney, lungs, etc
+                        for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                            for (var j = 0; j < organ.length; j++) {
+                                for (var k = 0; k < organ[j].key.length; k++) {
+                                    if (jsonLocatedin.results.bindings[i].located_in.value == organ[j].key[k].key)
+                                        counter++;
+
+                                    if (counter == jsonLocatedin.results.bindings.length) {
+                                        typeOfModel = organ[j].value;
+                                        organIndex = j;
+                                        break;
+                                    }
+                                }
+                                if (counter == jsonLocatedin.results.bindings.length)
+                                    break;
+                            }
+                            if (counter == jsonLocatedin.results.bindings.length)
+                                break;
+                        }
+
+                        loc = "";
+                        counter = 0;
+                        // get locations of the above type of model
+                        for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                            for (var j = 0; j < organ[organIndex].key.length; j++) {
+                                if (jsonLocatedin.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
+                                    loc += organ[organIndex].key[j].value;
+
+                                    if (i == jsonLocatedin.results.bindings.length - 1)
+                                        loc += ".";
+                                    else
+                                        loc += ", ";
+
+                                    counter++;
+                                }
+                                if (counter == jsonLocatedin.results.bindings.length)
+                                    break;
+                            }
+                            if (counter == jsonLocatedin.results.bindings.length)
+                                break;
+                        }
+
+                        // related cellml model, i.e. kidney, lungs, etc
+                        var query = 'SELECT ?cellmlmodel ?located_in ' +
+                            'WHERE { GRAPH ?g { ' +
+                            '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
+                            '}}'
+
+                        sendPostRequest(
+                            endpoint,
+                            query,
+                            function (jsonRelatedModel) {
+
+                                console.log("jsonRelatedModel: ", jsonRelatedModel);
+
+                                for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
+                                    for (var j = 0; j < organ[organIndex].key.length; j++) {
+                                        if (jsonRelatedModel.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
+                                            // parsing
+                                            var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
+                                            var indexOfHash = tempModel.search("#");
+                                            tempModel = tempModel.slice(0, indexOfHash);
+
+                                            relatedModel.push(tempModel);
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                relatedModel = uniqueify(relatedModel);
+
+                                // kidney, lungs, heart, etc
+                                console.log("relatedModel: ", relatedModel);
+                                console.log("jsonCellmlModel: ", jsonCellmlModel);
+
+                                var alternativeCellmlArray = [],
+                                    cellmlModel2 = cellmlModel,
+                                    indexOfHash = cellmlModel2.search("#");
+                                cellmlModel2 = cellmlModel2.slice(0, indexOfHash);
+                                for (var i = 0; i < relatedModel.length; i++) {
+                                    if (relatedModel[i] != cellmlModel2) {
+                                        alternativeCellmlArray.push(relatedModel[i]);
+                                    }
+                                }
+
+                                relatedCellmlModel(
+                                    relatedModel,
+                                    alternativeCellmlArray,
+                                    $(cthis).attr("membrane")
+                                );
+                            }, true);
+                    }, true);
+            }, true);
+    }
+
     function dragcircleendline(d) {
 
         // div.style("display", "none");
@@ -3825,129 +3952,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 geneName = jsonGene._embedded.terms[0].label;
                                                                 var indexOfParen = geneName.indexOf('(');
                                                                 geneName = geneName.slice(0, indexOfParen - 1);
+
+                                                                helperFunction();
                                                             }
-
-                                                            var query = 'SELECT ?cellmlmodel ' +
-                                                                'WHERE { GRAPH ?g { ' +
-                                                                '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#modelOf> <' + proteinName + '> . ' +
-                                                                '}}'
-
-                                                            sendPostRequest(
-                                                                endpoint,
-                                                                query,
-                                                                function (jsonCellmlModel) {
-
-                                                                    console.log("jsonCellmlModel: ", jsonCellmlModel);
-
-                                                                    var query = 'SELECT ?located_in ' +
-                                                                        'WHERE { GRAPH ?g { ' +
-                                                                        '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
-                                                                        '}}'
-
-                                                                    // location of that cellml model
-                                                                    sendPostRequest(
-                                                                        endpoint,
-                                                                        query,
-                                                                        function (jsonLocatedin) {
-
-                                                                            console.log("jsonLocatedin: ", jsonLocatedin);
-
-                                                                            var counter = 0;
-                                                                            // Type of model - kidney, lungs, etc
-                                                                            for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                                                                                for (var j = 0; j < organ.length; j++) {
-                                                                                    for (var k = 0; k < organ[j].key.length; k++) {
-                                                                                        if (jsonLocatedin.results.bindings[i].located_in.value == organ[j].key[k].key)
-                                                                                            counter++;
-
-                                                                                        if (counter == jsonLocatedin.results.bindings.length) {
-                                                                                            typeOfModel = organ[j].value;
-                                                                                            organIndex = j;
-                                                                                            break;
-                                                                                        }
-                                                                                    }
-                                                                                    if (counter == jsonLocatedin.results.bindings.length)
-                                                                                        break;
-                                                                                }
-                                                                                if (counter == jsonLocatedin.results.bindings.length)
-                                                                                    break;
-                                                                            }
-
-                                                                            loc = "";
-                                                                            counter = 0;
-                                                                            // get locations of the above type of model
-                                                                            for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                                                                                for (var j = 0; j < organ[organIndex].key.length; j++) {
-                                                                                    if (jsonLocatedin.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
-                                                                                        loc += organ[organIndex].key[j].value;
-
-                                                                                        if (i == jsonLocatedin.results.bindings.length - 1)
-                                                                                            loc += ".";
-                                                                                        else
-                                                                                            loc += ", ";
-
-                                                                                        counter++;
-                                                                                    }
-                                                                                    if (counter == jsonLocatedin.results.bindings.length)
-                                                                                        break;
-                                                                                }
-                                                                                if (counter == jsonLocatedin.results.bindings.length)
-                                                                                    break;
-                                                                            }
-
-                                                                            // related cellml model, i.e. kidney, lungs, etc
-                                                                            var query = 'SELECT ?cellmlmodel ?located_in ' +
-                                                                                'WHERE { GRAPH ?g { ' +
-                                                                                '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
-                                                                                '}}'
-
-                                                                            sendPostRequest(
-                                                                                endpoint,
-                                                                                query,
-                                                                                function (jsonRelatedModel) {
-
-                                                                                    console.log("jsonRelatedModel: ", jsonRelatedModel);
-
-                                                                                    for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
-                                                                                        for (var j = 0; j < organ[organIndex].key.length; j++) {
-                                                                                            if (jsonRelatedModel.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
-                                                                                                // parsing
-                                                                                                var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
-                                                                                                var indexOfHash = tempModel.search("#");
-                                                                                                tempModel = tempModel.slice(0, indexOfHash);
-
-                                                                                                relatedModel.push(tempModel);
-
-                                                                                                break;
-                                                                                            }
-                                                                                        }
-                                                                                    }
-
-                                                                                    relatedModel = uniqueify(relatedModel);
-
-                                                                                    // kidney, lungs, heart, etc
-                                                                                    console.log("relatedModel: ", relatedModel);
-
-                                                                                    console.log("jsonCellmlModel: ", jsonCellmlModel);
-
-                                                                                    var alternativeCellmlArray = [],
-                                                                                        cellmlModel2 = cellmlModel,
-                                                                                        indexOfHash = cellmlModel2.search("#");
-                                                                                    cellmlModel2 = cellmlModel2.slice(0, indexOfHash);
-                                                                                    for (var i = 0; i < relatedModel.length; i++) {
-                                                                                        if (relatedModel[i] != cellmlModel2) {
-                                                                                            alternativeCellmlArray.push(relatedModel[i]);
-                                                                                        }
-                                                                                    }
-
-                                                                                    relatedCellmlModel(
-                                                                                        relatedModel,
-                                                                                        alternativeCellmlArray,
-                                                                                        $(cthis).attr("membrane")
-                                                                                    );
-                                                                                }, true);
-                                                                        }, true);
-                                                                }, true)
                                                         }, true);
                                                 }, true);
                                         }, true);
@@ -4069,18 +4076,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
     var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
-        console.log("alternativeCellmlArray: ", alternativeCellmlArray[idAltProtein], membrane, alternativeCellmlArray);
+        // console.log("alternativeCellmlArray: ", alternativeCellmlArray[idAltProtein], membrane, alternativeCellmlArray);
         var modelname;
         if (alternativeCellmlArray[idAltProtein] == undefined) {
             modelname = undefined;
         }
         else {
             var indexOfcellml = alternativeCellmlArray[idAltProtein].search(".cellml");
-            modelname = alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
-            modelname = alternativeCellmlArray[idAltProtein] + "#" + modelname;
+            modelname = alternativeCellmlArray[idAltProtein] + "#" +
+                alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
         }
-
-        console.log("modelname: ", modelname);
+        // console.log("modelname: ", modelname);
 
         var query = 'SELECT ?Protein ?workspaceName ' +
             'WHERE { GRAPH ?workspaceName { ' +
@@ -4092,115 +4098,56 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             query,
             function (jsonAltProtein) {
                 // console.log("jsonAltProtein: ", jsonAltProtein);
-                // console.log("jsonAltProtein OUTSIDE: ", jsonAltProtein);
-
-                var flagvar = true;
-
                 if (jsonAltProtein.results.bindings.length != 0) {
+
                     if (jsonAltProtein.results.bindings[0].Protein.value == proteinName) {
 
                         // console.log("jsonAltProtein INSIDE: ", jsonAltProtein);
-                        // console.log("jsonAltProtein INSIDE: ", jsonAltProtein.results.bindings[0].Protein.value);
+                        workspaceName = jsonAltProtein.results.bindings[0].workspaceName.value;
+                        var endpointOLS = "https://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" +
+                            jsonAltProtein.results.bindings[0].Protein.value;
 
-                        flagvar = false;
-
-                        var callOLS = function () {
-
-                            console.log("jsonAltProtein INSIDE callOLS: ", jsonAltProtein);
-
-                            workspaceName = jsonAltProtein.results.bindings[0].workspaceName.value;
-                            var pruri = jsonAltProtein.results.bindings[0].Protein.value;
-                            var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeCellmlArray[idAltProtein];
-
-                            var endpointOLS = "https://www.ebi.ac.uk/ols/api/ontologies/pr/terms?iri=" + pruri;
-
-                            sendGetRequest(
-                                endpointOLS,
-                                function (jsonOLSObj) {
-                                    var label = document.createElement('label');
-                                    label.innerHTML = '<br><input id="' + alternativeCellmlArray[idAltProtein] + '" ' +
-                                        'type="checkbox" value="' + alternativeCellmlArray[idAltProtein] + '">' +
-                                        '<a href="' + workspaceuri + '" target="_blank" ' +
-                                        'data-toggle="tooltip" data-placement="right" ' +
-                                        'title="' + pruri + '">' + jsonOLSObj._embedded.terms[0].label + '</a></label>';
-
-                                    console.log("ALTERNATIVE workspaceName: ", workspaceName);
-                                    console.log("ALTERNATIVE pruri: ", pruri);
-                                    console.log("ALTERNATIVE workspaceuri: ", workspaceuri);
-                                    console.log("ALTERNATIVE jsonOLSObj: ", jsonOLSObj);
-
-                                    altCellmlModel += label.innerHTML;
-
-                                    flagvar = true;
-
-                                    // console.log("jsonAltProtein INSIDE sendGetRequest: ", jsonAltProtein);
-
-                                    idAltProtein++;
-
-                                    if (idAltProtein == alternativeCellmlArray.length) {
-
-                                        // If apical Then basolateral and vice versa
-                                        var membraneName;
-                                        if (membrane == apicalID) {
-                                            membrane = basolateralID;
-                                            membraneName = "Basolateral membrane";
-                                        }
-                                        else {
-                                            membrane = apicalID;
-                                            membraneName = "Apical membrane";
-                                        }
-
-                                        // TODO: make it dynamic
-                                        if (workspaceName == "") {
-                                            relatedMembrane(267, membrane, membraneName);
-                                            return;
-                                        }
-                                        else {
-                                            relatedMembrane(workspaceName, membrane, membraneName);
-                                            return;
-                                        }
-                                    }
-
-                                    alternativeCellmlModel(alternativeCellmlArray, membrane);
-                                },
-                                true);
-                        }
-
-                        callOLS();
+                        sendGetRequest(
+                            endpointOLS,
+                            function (jsonOLSObj) {
+                                alternativeModelValue.push({
+                                    protein: jsonAltProtein.results.bindings[0].Protein.value,
+                                    prname: jsonOLSObj._embedded.terms[0].label,
+                                    modelEntity: modelname
+                                });
+                            },
+                            true);
                     }
                 }
 
-                if (flagvar == true) {
-                    idAltProtein++;
+                idAltProtein++;
 
-                    if (idAltProtein == alternativeCellmlArray.length) {
+                if (idAltProtein == alternativeCellmlArray.length) {
 
-                        idAltProtein = 0;
-
-                        // If apical Then basolateral and vice versa
-                        var membraneName;
-                        if (membrane == apicalID) {
-                            membrane = basolateralID;
-                            membraneName = "Basolateral membrane";
-                        }
-                        else {
-                            membrane = apicalID;
-                            membraneName = "Apical membrane";
-                        }
-
-                        // TODO: make it dynamic
-                        if (workspaceName == "") {
-                            relatedMembrane(267, membrane, membraneName);
-                            return;
-                        }
-                        else {
-                            relatedMembrane(workspaceName, membrane, membraneName);
-                            return;
-                        }
+                    // If apical Then basolateral and vice versa
+                    var membraneName;
+                    if (membrane == apicalID) {
+                        membrane = basolateralID;
+                        membraneName = "Basolateral membrane";
+                    }
+                    else {
+                        membrane = apicalID;
+                        membraneName = "Apical membrane";
                     }
 
-                    alternativeCellmlModel(alternativeCellmlArray, membrane);
+                    // TODO: make it dynamic
+                    if (workspaceName == "") {
+                        relatedMembrane(267, membrane, membraneName);
+                        return;
+                    }
+                    else {
+                        relatedMembrane(workspaceName, membrane, membraneName);
+                        return;
+                    }
                 }
+
+                alternativeCellmlModel(alternativeCellmlArray, membrane);
+
             }, true);
     }
 
@@ -5262,13 +5209,29 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         }
                                                     }
 
+                                                    console.log("alternativeModelValue: ", alternativeModelValue);
+
                                                     // alternative model
                                                     var alternativeModel = "<p id='alternativeModelID'><b>Alternative model of " + proteinText + "</b>";
-                                                    if (altCellmlModel == "") {
+                                                    if (alternativeModelValue.length == 0) {
                                                         alternativeModel += "<br>Not Exist";
                                                     }
                                                     else {
-                                                        alternativeModel += "</b>" + altCellmlModel;
+                                                        for (var i = 0; i < alternativeModelValue.length; i++) {
+                                                            var workspaceuri = workspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeModelValue[i].modelEntity;
+
+                                                            var label = document.createElement('label');
+                                                            label.innerHTML = '<br><input id="' + alternativeModelValue[i].modelEntity + '" ' +
+                                                                'type="checkbox" value="' + alternativeModelValue[i].modelEntity + '">' +
+                                                                '<a href="' + workspaceuri + '" target="_blank" ' +
+                                                                'data-toggle="tooltip" data-placement="right" ' +
+                                                                'title="Protein name: ' + alternativeModelValue[i].prname + '\n' +
+                                                                'Protein uri: ' + alternativeModelValue[i].protein + '\n' +
+                                                                'Model entity: ' + alternativeModelValue[i].modelEntity + '"' +
+                                                                '>' + alternativeModelValue[i].prname + '</a></label>';
+
+                                                            alternativeModel += label.innerHTML;
+                                                        }
                                                     }
 
                                                     alternativeModel += "</p>";
@@ -5289,9 +5252,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             var label = document.createElement('label');
                                                             label.innerHTML = '<br><a href="' + workspaceuri + '" target="_blank" ' +
                                                                 'data-toggle="tooltip" data-placement="right" ' +
-                                                                'title="' + relatedModelValue[i].protein + '">' + relatedModelValue[i].prname + '' +
-                                                                '</a></label>';
-
+                                                                'title="Protein name: ' + relatedModelValue[i].prname + '\n' +
+                                                                'Protein uri: ' + relatedModelValue[i].protein + '\n' +
+                                                                'Model entity: ' + relatedModelID[i] + '"' +
+                                                                '>' + relatedModelValue[i].prname + '</a></label>';
+                                                            
                                                             relatedOrganModels += label.innerHTML;
                                                         }
                                                     }
@@ -5622,7 +5587,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         idMembrane = 0;
 
         membraneModelValue = [];
-        altCellmlModel = "";
+        alternativeModelValue = [];
         relatedModelValue = [];
 
         relatedModel = [];
