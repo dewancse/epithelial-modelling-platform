@@ -1296,8 +1296,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         click: function () {
             // Change marker direction and text position
             if (event.target.localName == "line" && event.target.nodeName == "line") {
-                var id = event.srcElement.id;
-                modalWindowToAddModels(id);
+                console.log("event.srcElement.id: ", event.srcElement.id);
+                if (event.srcElement.id == apicalID || event.srcElement.id == basolateralID);
+                modalWindowToAddModels(event.srcElement.id);
             }
         }
     });
@@ -3712,11 +3713,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     }
                                 }
 
-                                relatedCellmlModel(
-                                    relatedModel,
-                                    alternativeCellmlArray,
-                                    $(cthis).attr("membrane")
-                                );
+                                relatedCellmlModel(relatedModel, alternativeCellmlArray, $(cthis).attr("membrane"));
+
                             }, true);
                     }, true);
             }, true);
@@ -4017,10 +4015,16 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // related kidney, lungs, etc model
     var relatedCellmlModel = function (relatedModel, alternativeCellmlArray, membrane) {
 
-        var indexOfcellml = relatedModel[idProtein].search(".cellml");
-        var modelname = relatedModel[idProtein].slice(0, indexOfcellml);
-
-        modelname = relatedModel[idProtein] + "#" + modelname;
+        var modelname;
+        if (relatedModel[idProtein] == undefined) {
+            modelname = undefined;
+        }
+        else {
+            var indexOfcellml = relatedModel[idProtein].search(".cellml");
+            modelname = relatedModel[idProtein].slice(0, indexOfcellml);
+            modelname = relatedModel[idProtein] + "#" + modelname;
+        }
+        // console.log("modelname: ", modelname);
 
         var query = 'SELECT ?Protein ?workspaceName ' +
             'WHERE { GRAPH ?workspaceName { ' +
@@ -4032,43 +4036,36 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             query,
             function (jsonProtein) {
 
-                if (jsonProtein.results.bindings.length == 0) {
-                    idProtein++;
-                    relatedCellmlModel(relatedModel, alternativeCellmlArray, membrane);
+                if (jsonProtein.results.bindings.length != 0) {
+                    var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
+                        jsonProtein.results.bindings[0].Protein.value;
+
+                    sendGetRequest(
+                        endpointprOLS,
+                        function (jsonPr) {
+
+                            if (jsonProtein.results.bindings.length != 0) {
+                                // relatedModelValue.push(jsonProtein.results.bindings[0].Protein.value);
+                                relatedModelValue.push({
+                                    protein: jsonProtein.results.bindings[0].Protein.value,
+                                    prname: jsonPr._embedded.terms[0].label
+                                });
+                                relatedModelID.push(relatedModel[idProtein]);
+                                workspaceName = jsonProtein.results.bindings[0].workspaceName.value;
+                            }
+                        },
+                        true);
                 }
 
-                // console.log("jsonProtein.results.bindings: ", jsonProtein.results.bindings);
-                var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
-                    jsonProtein.results.bindings[0].Protein.value;
+                if (idProtein == relatedModel.length) {
+                    idProtein = 0;
+                    alternativeCellmlModel(alternativeCellmlArray, membrane);
+                    return;
+                }
 
-                sendGetRequest(
-                    endpointprOLS,
-                    function (jsonPr) {
+                idProtein++;
 
-                        if (jsonProtein.results.bindings.length != 0) {
-                            // relatedModelValue.push(jsonProtein.results.bindings[0].Protein.value);
-                            relatedModelValue.push({
-                                protein: jsonProtein.results.bindings[0].Protein.value,
-                                prname: jsonPr._embedded.terms[0].label
-                            });
-                            relatedModelID.push(relatedModel[idProtein]);
-                            workspaceName = jsonProtein.results.bindings[0].workspaceName.value;
-                        }
-
-                        idProtein++;
-
-                        if (idProtein == relatedModel.length) {
-                            idProtein = 0;
-
-                            // console.log("alternativeCellmlArray Before: ", alternativeCellmlArray, membrane);
-
-                            alternativeCellmlModel(alternativeCellmlArray, membrane);
-                            return;
-                        }
-
-                        relatedCellmlModel(relatedModel, alternativeCellmlArray, membrane);
-                    },
-                    true);
+                relatedCellmlModel(relatedModel, alternativeCellmlArray, membrane);
             },
             true);
     }
@@ -4897,7 +4894,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         request.send(data); // for POST only
     };
 
-    // utility function: split PR_ from protein identifier
+    // split PR_ from protein identifier
     var proteinOrMedPrID = function (membraneModelID, PID) {
         for (var i = 0; i < membraneModelID.length; i++) {
             if (membraneModelID[i][9] == "") {
@@ -4915,7 +4912,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     }
 
-    // utility function: split PR_ from protein identifier
+    // split PR_ from protein identifier
     var splitPRFromProtein = function (tempMemModelID) {
         var indexOfPR;
         if (tempMemModelID[9] == "") {
@@ -4928,7 +4925,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     }
 
-    // utility function: process EBI similarity matrix
+    // process EBI similarity matrix
     var similarityMatrixEBI = function (identityMatrix, PID, draggedMedPrID) {
         console.log("Identity Matrix: ", identityMatrix);
 
@@ -5256,7 +5253,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 'Protein uri: ' + relatedModelValue[i].protein + '\n' +
                                                                 'Model entity: ' + relatedModelID[i] + '"' +
                                                                 '>' + relatedModelValue[i].prname + '</a></label>';
-                                                            
+
                                                             relatedOrganModels += label.innerHTML;
                                                         }
                                                     }
@@ -6504,52 +6501,309 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-    //  // display modal window after clicking either apical or basolateral membrane
-    // function modalWindowToAddModels(located_in) {
-    //     console.log("located_in: ", located_in);
-    //
-    //     var m = new Modal({
-    //         id: 'myModal',
-    //         header: 'Recommender System',
-    //         footer: 'My footer',
-    //         footerCloseButton: 'Close',
-    //         footerSaveButton: 'Save'
-    //     });
-    //
-    //     $('#myModal').modal({backdrop: 'static', keyboard: false});
-    //     m.getBody().html('<div id="modalBody"></div>');
-    //     m.show();
-    //
-    //     showLoading("#modalBody");
-    //
-    //     // related cellml model, i.e. kidney, lungs, etc
-    //     var query = 'SELECT ?cellmlmodel ?located_in ' +
-    //         'WHERE { GRAPH ?g { ' +
-    //         '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> <' + located_in + '>. ' +
-    //         '}}'
-    //
-    //     sendPostRequest(
-    //         endpoint,
-    //         query,
-    //         function (jsonRelatedModel) {
-    //
-    //             console.log("jsonRelatedModel: ", jsonRelatedModel);
-    //             for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
-    //                 // parsing
-    //                 var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
-    //                 var indexOfHash = tempModel.search("#");
-    //                 tempModel = tempModel.slice(0, indexOfHash);
-    //
-    //                 relatedModel.push(tempModel);
-    //             }
-    //
-    //             relatedModel = uniqueify(relatedModel);
-    //             console.log("relatedModel: ", relatedModel);
-    //
-    //         }, true);
-    //
-    //     jQuery(window).trigger('resize');
-    // }
+
+    var relatedModel2 = [], idProtein2 = 0, relatedModelValue2 = [];
+
+    // reinitialize variables
+    var reinitVariable2 = function () {
+        idProtein2 = 0;
+        relatedModel2 = [];
+        relatedModelValue2 = [];
+    }
+
+    // second modal window to add models
+    var Modal2 = function (options) {
+        var $this = this;
+
+        options = options ? options : {};
+        $this.options = {};
+        $this.options.header = options.header !== undefined ? options.header : false;
+        $this.options.footer = options.footer !== undefined ? options.footer : false;
+        $this.options.closeButton = options.closeButton !== undefined ? options.closeButton : true;
+        $this.options.footerCloseButton = options.footerCloseButton !== undefined ? options.footerCloseButton : false;
+        $this.options.footerSaveButton = options.footerSaveButton !== undefined ? options.footerSaveButton : false;
+        $this.options.id = options.id !== undefined ? options.id : "myModal2";
+
+        /**
+         * Append modal window html to body
+         */
+        $this.createModal = function () {
+            $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
+            $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
+            var win = $('.modal-content', $this.selector);
+
+            var someText = "A recommender system or a recommendation system (sometimes replacing " +
+                "\nsystem with a synonym such as platform or engine) is a subclass of information " +
+                "\nfiltering system that seeks to predict the rating or preference that a user " +
+                "\nwould give to an item.";
+
+            var headerHtml = '<div class="modal-header">' +
+                '<h4 class="modal-title" data-toggle="tooltip" data-placement="right" title="' + someText + '" lang="de">' +
+                '</h4></div>';
+
+            if ($this.options.header) {
+                win.append(headerHtml);
+
+                if ($this.options.closeButton) {
+                    win.find('.modal-header').prepend('<button type="button" ' +
+                        'class="close" data-dismiss="modal">&times;</button>');
+                }
+            }
+
+            win.append('<div class="modal-body"></div>');
+            if ($this.options.footer) {
+                win.append('<div class="modal-footer"></div>');
+
+                if ($this.options.footerCloseButton) {
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="mcloseID2" href="#" ' +
+                        'class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                }
+
+                if ($this.options.footerSaveButton) {
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="msaveID2" href="#" ' +
+                        'class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                }
+            }
+
+            // close button clicked!!
+            $("#mcloseID2").click(function (event) {
+                console.log("Model2 close button clicked!!");
+                reinitVariable2();
+                return;
+            })
+
+            // save button clicked!!
+            $("#msaveID2").click(function (event) {
+
+                console.log("Model2 save button clicked!");
+                console.log("membrane: ", membrane);
+                console.log("combinedMembrane: ", combinedMembrane);
+
+                // alternative models
+                for (var i = 0; i < $('#relatedOrganModelsID2 input').length; i++) {
+                    if ($('#relatedOrganModelsID2 input')[i].checked) {
+
+                        console.log("add model!!");
+
+                        $(cthis).attr("id", $('#relatedOrganModelsID2 input')[i].id);
+                        console.log("cthis AFTER: ", cthis);
+                    }
+                }
+
+                reinitVariable2();
+                return;
+            })
+        };
+
+        /**
+         * Set header text. It makes sense only if the options.header is logical true.
+         * @param {String} html New header text.
+         */
+        $this.setHeader = function (html) {
+            $this.window.find('.modal-title').html(html);
+        };
+
+        /**
+         * Set body HTML.
+         * @param {String} html New body HTML
+         */
+        $this.setBody = function (html) {
+            $this.window.find('.modal-body').html(html);
+        };
+
+        /**
+         * Set footer HTML.
+         * @param {String} html New footer HTML
+         */
+        $this.setFooter = function (html) {
+            $this.window.find('.modal-footer').html(html);
+        };
+
+        /**
+         * Return window body element.
+         * @returns {jQuery} The body element
+         */
+        $this.getBody = function () {
+            return $this.window.find('.modal-body');
+        };
+
+        /**
+         * Show modal window
+         */
+        $this.show = function () {
+            $this.window.modal('show');
+        };
+
+        /**
+         * Hide modal window
+         */
+        $this.hide = function () {
+            $this.window.modal('hide');
+        };
+
+        /**
+         * Toggle modal window
+         */
+        $this.toggle = function () {
+            $this.window.modal('toggle');
+        };
+
+        $this.selector = "#" + $this.options.id;
+        if (!$($this.selector).length) {
+            $this.createModal();
+        }
+
+        $this.window = $($this.selector);
+        $this.setHeader($this.options.header);
+    }
+
+    // apical or basolateral models when clicking on them
+    var relatedCellmlModel2 = function (relatedModel2, membraneName) {
+
+        var modelname;
+        if (relatedModel2[idProtein2] == undefined) {
+            modelname = undefined;
+        }
+        else {
+            var indexOfcellml = relatedModel2[idProtein2].search(".cellml");
+            modelname = relatedModel2[idProtein2].slice(0, indexOfcellml);
+            modelname = relatedModel2[idProtein2] + "#" + modelname;
+        }
+        // console.log("modelname: ", modelname);
+
+        var query = 'SELECT ?Protein ?workspaceName ' +
+            'WHERE { GRAPH ?workspaceName { ' +
+            '<' + modelname + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonProtein) {
+                // console.log("jsonProtein: ", jsonProtein);
+                if (jsonProtein.results.bindings.length != 0) {
+                    var endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
+                        jsonProtein.results.bindings[0].Protein.value;
+
+                    sendGetRequest(
+                        endpointprOLS,
+                        function (jsonPr) {
+
+                            if (jsonProtein.results.bindings.length != 0) {
+                                relatedModelValue2.push({
+                                    protein: jsonProtein.results.bindings[0].Protein.value,
+                                    prname: jsonPr._embedded.terms[0].label,
+                                    workspace: jsonProtein.results.bindings[0].workspaceName.value,
+                                    modelEntity: modelname
+                                });
+                            }
+
+                        }, true);
+                }
+
+                if (idProtein2 == relatedModel2.length) {
+                    idProtein2 = 0;
+
+                    var relatedOrganModels2 = "<p id='relatedOrganModelsID2'>";
+                    if (relatedModelValue2.length == 0) {
+                        relatedOrganModels2 += "<br>Not Exist";
+                    }
+                    else {
+                        for (var i = 0; i < relatedModelValue2.length; i++) {
+
+                            var workspaceuri = relatedModelValue2[i].workspace + "/" +
+                                "rawfile" + "/" + "HEAD" + "/" + relatedModelValue2[i].modelEntity;
+
+                            var label = document.createElement('label');
+                            label.innerHTML = '<br><input id="' + relatedModelValue2[i].modelEntity + '" ' +
+                                'type="checkbox" value="' + relatedModelValue2[i].modelEntity + '">' +
+                                '<a href="' + workspaceuri + '" target="_blank" ' +
+                                'data-toggle="tooltip" data-placement="right" ' +
+                                'title="Protein name: ' + relatedModelValue2[i].prname + '\n' +
+                                'Protein uri: ' + relatedModelValue2[i].protein + '\n' +
+                                'Model entity: ' + relatedModelValue2[i].modelEntity + '"' +
+                                '>' + relatedModelValue2[i].prname + '</a></label>';
+
+                            relatedOrganModels2 += label.innerHTML;
+                        }
+                    }
+
+                    relatedOrganModels2 += "</p>";
+
+                    $('#modalBody2').empty();
+
+                    var msg = "<br><p><b>" + membraneName + " models in PMR<b><\p>";
+
+                    $('#modalBody2')
+                        .append(msg)
+                        .append(relatedOrganModels2);
+
+                    console.log("outside modelbody2!");
+
+                    return;
+                }
+
+                idProtein2++;
+
+                relatedCellmlModel2(relatedModel2, membraneName);
+
+            }, true);
+    }
+
+    // display modal window after clicking either apical or basolateral membrane
+    function modalWindowToAddModels(located_in) {
+
+        console.log("located_in: ", located_in);
+
+        var membraneName;
+        if (located_in == apicalID)
+            membraneName = "Apical";
+        else
+            membraneName = "Basolateral";
+
+        var m = new Modal2({
+            id: 'myModal2',
+            header: 'Recommender system',
+            footer: 'My footer',
+            footerCloseButton: 'Close',
+            footerSaveButton: 'Save'
+        });
+
+        $('#myModal2').modal({backdrop: 'static', keyboard: false});
+        m.getBody().html('<div id="modalBody2"></div>');
+        m.show();
+
+        showLoading("#modalBody2");
+
+        var query = 'SELECT ?cellmlmodel ?located_in ' +
+            'WHERE { GRAPH ?g { ' +
+            '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> <' + located_in + '>. ' +
+            '}}'
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonRelatedModel2) {
+
+                console.log("jsonRelatedModel2: ", jsonRelatedModel2);
+                for (var i = 0; i < jsonRelatedModel2.results.bindings.length; i++) {
+                    // parsing
+                    var tempModel = jsonRelatedModel2.results.bindings[i].cellmlmodel.value;
+                    var indexOfHash = tempModel.search("#");
+                    tempModel = tempModel.slice(0, indexOfHash);
+
+                    relatedModel2.push(tempModel);
+                }
+
+                relatedModel2 = uniqueify(relatedModel2);
+                console.log("relatedModel2: ", relatedModel2);
+
+                relatedCellmlModel2(relatedModel2, membraneName);
+
+            }, true);
+
+        jQuery(window).trigger('resize');
+    }
 }
 
 exports.epithelialPlatform = epithelialPlatform;
@@ -7315,7 +7569,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                             // console.log("jsonProteinUri: ", jsonProteinUri);
 
-                            if (jsonProteinUri.results.bindings[0] == undefined) {
+                            if (jsonProteinUri.results.bindings.length == 0) {
                                 id++;
 
                                 if (id != jsonModel.results.bindings.length) {
@@ -7554,6 +7808,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             true);
     };
 
+    // extension of loadModelHtml function
     var findCompartmentLoc = function (jsonObjComp, jsonObjLoc, tempidWithStr, protein, species, gene) {
         var tempComp = "", counterOLS = 0;
         for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {

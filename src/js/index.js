@@ -458,7 +458,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                             // console.log("jsonProteinUri: ", jsonProteinUri);
 
-                            if (jsonProteinUri.results.bindings[0] == undefined) {
+                            if (jsonProteinUri.results.bindings.length == 0) {
                                 id++;
 
                                 if (id != jsonModel.results.bindings.length) {
@@ -697,6 +697,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             true);
     };
 
+    // extension of loadModelHtml function
     var findCompartmentLoc = function (jsonObjComp, jsonObjLoc, tempidWithStr, protein, species, gene) {
         var tempComp = "", counterOLS = 0;
         for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
