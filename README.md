@@ -1,5 +1,5 @@
 ### Epithelial Modelling Platform (EPM)
-This application allows users to discover, explore and assemble computational models for investigating experimental or clinical hypotheses. Specifically, this can aid biologists and clinicians to test their clinical or experimental hypotheses for a given collection of disparate mechanisms and/or observations such as diseases, drug actions and clinical observations.
+Epithelial modelling platform is a web-based epithelial transport discovery, exploration and assembly tool. This application allows users to discover, explore and assemble computational models for investigating experimental or clinical hypotheses. Specifically, this can aid biologists and clinicians to test their clinical or experimental hypotheses for a given collection of disparate mechanisms and/or observations such as diseases, drug actions and clinical observations.
 
 ### EPM workflow
 
