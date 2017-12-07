@@ -628,6 +628,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var yrect = $("rect")[0].y.baseVal.value;
 
     console.log("$(rect)", $("rect"));
+    console.log("$(line)", $("line"));
 
     // Paracellular membrane
     var xprect = $("rect")[4].x.baseVal.value;
@@ -3001,7 +3002,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     combinedMemFunc(combinedMembrane.length - 1);
 
-    var initdragcircleandend = function () {
+    var dropCirclesOnMembrane = function () {
         var membrane = $(cthis).attr("membrane");
         for (var i = 0; i < $("line").length; i++) {
             if ($("line")[i].id == membrane && i == 0) {
@@ -3014,6 +3015,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }
         }
     }
+
+    var lineb_id, circle_id, cx, cy, lt, gt;
 
     function dragcircleline(d) {
 
@@ -3103,12 +3106,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }
         }
 
-        initdragcircleandend();
+        dropCirclesOnMembrane();
 
         // detect basolateralMembrane - 0 apical, 1 basolateralMembrane
         var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
 
-        var cx, cy;
         if ($(this).prop("tagName") == "circle") {
             cx = $(this).prop("cx").baseVal.value;
             cy = $(this).prop("cy").baseVal.value;
@@ -3125,9 +3127,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             cy = $(this).attr("y");
         }
 
-        var lineb_id = $($("line")[mindex]).prop("id");
+        lineb_id = $($("line")[mindex]).prop("id");
 
-        var circle_id;
         if ($(this).attr("membrane") == paracellularID) {
             circle_id = $(this).attr("idParacellular");
         }
@@ -3135,10 +3136,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             circle_id = $(this).prop("id");
         }
 
-        if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
+        // determine position on apical or basolateral membrane
+        if ($(this).prop("tagName") == "circle") {
+            lt = lineb_x - radius / 2;
+            gt = lineb_x + radius / 2;
+        }
+        else if ($(this).prop("tagName") == "polygon") {
+            lt = lineb_x + polygonlineLen + 40;
+            gt = lineb_x + polygonlineLen * 2;
+        }
+
+        if ((cx >= lt && cx <= gt) && (lineb_id != circle_id)) {
             $($("line")[mindex]).css("stroke", "red");
 
-            if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
+            if ((cx >= lt && cx <= gt) && (lineb_id != circle_id)) {
                 $($("line")[mindex]).css("stroke", "yellow");
             }
         }
@@ -3278,41 +3289,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         // div.style("display", "none");
 
-        initdragcircleandend();
+        if ((cx >= lt && cx <= gt) && (lineb_id != circle_id)) {
 
-        // detect basolateralMembrane - 0 apical, 1 basolateralMembrane
-        var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
-
-        var cx, cy;
-        if ($(cthis).prop("tagName") == "circle") {
-            cx = $(cthis).prop("cx").baseVal.value;
-            cy = $(cthis).prop("cy").baseVal.value;
-        }
-
-        if ($(cthis).prop("tagName") == "polygon") {
-            cx = event.x;
-            cy = event.y;
-        }
-
-        // paracellular
-        if ($(cthis).prop("tagName") == "text") { // OR if ($(cthis).attr("membrane") == paracellularID) {}
-            cx = $(cthis).attr("x");
-            cy = $(cthis).attr("y");
-        }
-
-        var lineb_id = $($("line")[mindex]).prop("id");
-
-        var circle_id;
-        if ($(cthis).attr("membrane") == paracellularID) {
-            circle_id = $(cthis).attr("idParacellular");
-        }
-        else {
-            circle_id = $(cthis).prop("id");
-        }
-
-        if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
-
-            if ((cx >= lineb_x - radius / 2 && cx <= lineb_x + radius / 2) && (lineb_id != circle_id)) {
+            if ((cx >= lt && cx <= gt) && (lineb_id != circle_id)) {
 
                 $($("line")[mindex]).css("stroke", "yellow");
 
@@ -3422,7 +3401,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                             console.log("cellmlModel: ", cellmlModel);
 
-                            if (circleID[1] != "") {
+                            if (circleID[1] == "channel" || circleID[1] == "diffusive channel" || circleID[1] == "") {
+                                var query = 'SELECT ?Protein ?Biological_meaning ' +
+                                    'WHERE { GRAPH ?g { ' +
+                                    '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
+                                    '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
+                                    '}}'
+                            }
+                            else { // (circleID[1] != "")
                                 var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
                                     'WHERE { GRAPH ?g { ' +
                                     '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
@@ -3430,13 +3416,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     '<' + circleID[1] + '> <http://purl.org/dc/terms/description> ?Biological_meaning2 . ' +
                                     '}}'
                             }
-                            else {
-                                var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
-                                    'WHERE { GRAPH ?g { ' +
-                                    '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-                                    '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
-                                    '}}'
-                            }
+
+                            console.log("query: ", query);
 
                             // protein name
                             sendPostRequest(
@@ -3446,7 +3427,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                     console.log("jsonModel: ", jsonModel);
 
-                                    proteinName = jsonModel.results.bindings[0].Protein.value;
+                                    if (jsonModel.results.bindings.length == 0) {
+                                        proteinName = undefined;
+                                    }
+                                    else
+                                        proteinName = jsonModel.results.bindings[0].Protein.value;
 
                                     var endpointprOLS;
                                     if (proteinName != undefined)
@@ -3459,20 +3444,30 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                         function (jsonPr) {
 
                                             var endpointgeneOLS;
-                                            if (jsonPr._embedded.terms[0]._links.has_gene_template != undefined)
-                                                endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
-                                            else
+                                            if (jsonPr._embedded == undefined) {
                                                 endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                            }
+                                            else {
+                                                if (jsonPr._embedded.terms[0]._links.has_gene_template != undefined)
+                                                    endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
+                                                else
+                                                    endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                            }
 
                                             sendGetRequest(
                                                 endpointgeneOLS,
                                                 function (jsonGene) {
 
                                                     var endpointspeciesOLS;
-                                                    if (jsonPr._embedded.terms[0]._links.only_in_taxon != undefined)
-                                                        endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
-                                                    else
+                                                    if (jsonPr._embedded == undefined) {
                                                         endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                                    }
+                                                    else {
+                                                        if (jsonPr._embedded.terms[0]._links.only_in_taxon != undefined)
+                                                            endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
+                                                        else
+                                                            endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                                    }
 
                                                     sendGetRequest(
                                                         endpointspeciesOLS,
@@ -3486,12 +3481,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 proteinText = proteinText.slice(0, indexOfParen - 1);
                                                             }
 
-                                                            biological_meaning = jsonModel.results.bindings[0].Biological_meaning.value;
+                                                            if (jsonModel.results.bindings.length == 0) {
+                                                                biological_meaning = "";
+                                                            }
+                                                            else {
+                                                                biological_meaning = jsonModel.results.bindings[0].Biological_meaning.value;
 
-                                                            if (circleID[1] != "")
-                                                                biological_meaning2 = jsonModel.results.bindings[0].Biological_meaning2.value;
-                                                            else
-                                                                biological_meaning2 = "";
+                                                                if (circleID[1] == "channel" || circleID[1] == "diffusive channel" || circleID[1] == "") {
+                                                                    biological_meaning2 = "";
+                                                                }
+                                                                else
+                                                                    biological_meaning2 = jsonModel.results.bindings[0].Biological_meaning2.value;
+                                                            }
 
                                                             if (jsonSpecies._embedded == undefined)
                                                                 speciesName = "undefined";
@@ -4670,7 +4671,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 indexOfPR = circleID[16].search("PR_");
                 draggedMedPrID = circleID[16].slice(indexOfPR + 3, circleID[16].length);
 
-                PID.push(draggedMedPrID); // Mediator PROTEIN id
+                PID.push(draggedMedPrID); // PROTEIN id if Mediator is empty
             }
             else {
                 indexOfPR = circleID[9].search("PR_");
@@ -6214,7 +6215,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         jQuery(window).trigger('resize');
     }
 
-// build the start arrow.
+    // build the start arrow.
     svg.append("svg:defs")
         .selectAll("marker")
         .data(["start"])      // Different link/path types can be defined here
@@ -6229,7 +6230,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-// build the starttop arrow.
+    // build the starttop arrow.
     svg.append("svg:defs")
         .selectAll("marker")
         .data(["starttop"])      // Different link/path types can be defined here
@@ -6244,7 +6245,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-// build the end arrow.
+    // build the end arrow.
     svg.append("svg:defs").selectAll("marker")
         .data(["end"])      // Different link/path types can be defined here
         .enter().append("svg:marker")    // This section adds in the arrows
