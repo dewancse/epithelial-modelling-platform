@@ -4410,6 +4410,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     endpointprOLS,
                     function (jsonPr) {
 
+                        // TODO: optimize this similar to above!
                         if (modelEntityObj[idMembrane].model_entity2 == "") {
                             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
                                 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
@@ -4683,7 +4684,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 vartext2 = "flux"; // "no mediator"
                                                             }
 
-                                                            console.log("vartext2: ", vartext2, med_pr);
+                                                            console.log("vartext2, med_pr: ", vartext2, med_pr);
 
                                                             sourcefma = tempjsonObjFlux[0].source_fma.value;
                                                             sinkfma = tempjsonObjFlux[0].sink_fma.value;
@@ -5763,7 +5764,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 else
                     lineapical.transition().delay(1000).duration(1000).style("stroke", "green");
 
-                reinitVariable();
+                // reinitVariable();
                 return;
             })
 
@@ -5963,8 +5964,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     }
                 }
                 else {
-                    console.log("CicleID here : ", circleID);
-                    console.log("tempIndex : ", tempIndex);
+                    console.log("CicleID here: ", circleID);
+                    console.log("tempIndex: ", tempIndex);
 
                     // update combinedMembrane, this will be sent to GMS to assemble and reproduce a new cellml model
                     combinedMembrane[tempIndex].model_entity = circleID[0]; // cellml model entity (e.g. weinstein_1995.cellml#NHE3.J_NHE3_Na)
@@ -5984,7 +5985,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     combinedMembrane[tempIndex].sink_fma2 = circleID[7]; // sink FMA uri => cotransporter or empty otherwise
                     combinedMembrane[tempIndex].solute_chebi2 = circleID[11]; // solute CHEBI uri
                     combinedMembrane[tempIndex].solute_text2 = circleID[13]; // solute text using the CHEBI uri from OLS
-
                 }
 
                 // TODO: circle placement and rearrangement
@@ -6167,6 +6167,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     }
                 }
 
+                console.log("Testing circlewithlineg: ", circlewithlineg);
+                console.log("Testing circlewithtext: ", circlewithtext);
+
                 var sourcefma = combinedMembrane[tempIndex].source_fma,
                     sinkfma = combinedMembrane[tempIndex].sink_fma,
                     mediatorfma = combinedMembrane[tempIndex].med_fma,
@@ -6174,10 +6177,19 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     sinkfma2 = combinedMembrane[tempIndex].sink_fma2,
                     variable_text2 = combinedMembrane[tempIndex].variable_text2;
 
+                console.log("linewithlineg[tempIndex]: ", linewithlineg[tempIndex]);
+                console.log("linewithtextg[tempIndex]: ", linewithtextg[tempIndex]);
+                console.log("circlewithlineg[tempIndex]: ", circlewithlineg[tempIndex]);
+                console.log("circlewithtext[tempIndex]: ", circlewithtext[tempIndex]);
+                console.log("linewithlineg2[tempIndex]: ", linewithlineg2[tempIndex]);
+                console.log("linewithtextg2[tempIndex]: ", linewithtextg2[tempIndex]);
+
                 if (mediatorfma == apicalID) {
 
                     // case 1
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && variable_text2 == "flux") {
+
+                        console.log("case 1");
 
                         reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
@@ -6197,6 +6209,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                     // case 2
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && variable_text2 == "flux") {
+
+                        console.log("case 2");
 
                         reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
@@ -6218,6 +6232,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                     // case 3
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && (sourcefma2 == luminalID && sinkfma2 == cytosolID)) {
+
+                        console.log("case 3");
 
                         reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
@@ -6250,6 +6266,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                     // case 4
                     if ((sourcefma == cytosolID && sinkfma == luminalID) && (sourcefma2 == cytosolID && sinkfma2 == luminalID)) {
+
+                        console.log("case 4");
 
                         reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
@@ -6285,6 +6303,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     // case 5
                     if ((sourcefma == luminalID && sinkfma == cytosolID) && (sourcefma2 == cytosolID && sinkfma2 == luminalID)) {
 
+                        console.log("case 5");
+
                         reflectCheckbox(tempIndex);
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
@@ -6319,15 +6339,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                         console.log("case 6");
 
-                        console.log("linewithlineg[tempIndex]: ", linewithlineg[tempIndex]);
-                        console.log("linewithtextg[tempIndex]: ", linewithtextg[tempIndex]);
-                        console.log("circlewithlineg[tempIndex]: ", circlewithlineg[tempIndex]);
-                        console.log("circlewithtext[tempIndex]: ", circlewithtext[tempIndex]);
-                        console.log("linewithlineg2[tempIndex]: ", linewithlineg2[tempIndex]);
-                        console.log("linewithtextg2[tempIndex]: ", linewithtextg2[tempIndex]);
-
                         reflectCheckbox(tempIndex);
-
                         circlewithtext[tempIndex].text(combinedMembrane[tempIndex].med_pr_text_syn);
 
                         if (linewithlineg[tempIndex].attr("marker-end") == "url(end)") {
