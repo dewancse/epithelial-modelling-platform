@@ -5764,7 +5764,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 else
                     lineapical.transition().delay(1000).duration(1000).style("stroke", "green");
 
-                // reinitVariable();
+                reinitVariable();
                 return;
             })
 
@@ -6167,22 +6167,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     }
                 }
 
-                console.log("Testing circlewithlineg: ", circlewithlineg);
-                console.log("Testing circlewithtext: ", circlewithtext);
-
                 var sourcefma = combinedMembrane[tempIndex].source_fma,
                     sinkfma = combinedMembrane[tempIndex].sink_fma,
                     mediatorfma = combinedMembrane[tempIndex].med_fma,
                     sourcefma2 = combinedMembrane[tempIndex].source_fma2,
                     sinkfma2 = combinedMembrane[tempIndex].sink_fma2,
                     variable_text2 = combinedMembrane[tempIndex].variable_text2;
-
-                console.log("linewithlineg[tempIndex]: ", linewithlineg[tempIndex]);
-                console.log("linewithtextg[tempIndex]: ", linewithtextg[tempIndex]);
-                console.log("circlewithlineg[tempIndex]: ", circlewithlineg[tempIndex]);
-                console.log("circlewithtext[tempIndex]: ", circlewithtext[tempIndex]);
-                console.log("linewithlineg2[tempIndex]: ", linewithlineg2[tempIndex]);
-                console.log("linewithtextg2[tempIndex]: ", linewithtextg2[tempIndex]);
 
                 if (mediatorfma == apicalID) {
 
