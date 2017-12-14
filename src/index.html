@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Epithelial Modelling Platform</title>
 
+    <!--<link rel="stylesheet" href="../node_modules/mocha/mocha.css"/>-->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 
@@ -17,6 +18,8 @@
     <script src="./libs/d3-selection-multi.v1.min.js" charset="utf-8"></script>
     <!--<script src="./libs/mocha.js"></script>-->
     <!--<script src="./libs/chai.js"></script>-->
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
 </head>
 
 <body>
@@ -78,20 +81,11 @@
     </div>
 </footer>
 
-<div id="mocha" class="container"></div>
 <!-- home scripts -->
 <script src="bundle.js"></script>
-<!--<script src="../tests/test_harness.js"></script>-->
 
-<script>
-    // mocha run
-//    if (window.mochaPhantomJS) {
-//        mochaPhantomJS.run();
-//    }
-//    else {
-//        mocha.run();
-//    }
-</script>
-
+<!-- PhantomJS and Mocha -->
+<div id="mocha"></div>
+<script src="../test/test_harness.js"></script>
 </body>
 </html>

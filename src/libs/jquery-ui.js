@@ -1455,7 +1455,7 @@ $.effects = {
 	},
 	support = color.support = {},
 
-	// Element for support tests
+	// Element for support test
 	supportElem = jQuery( "<p>" )[ 0 ],
 
 	// Colors = jQuery.Color.names
@@ -5549,7 +5549,7 @@ var widgetsMenu = $.widget( "ui.menu", {
 	select: function( event ) {
 
 		// TODO: It should never be possible to not have an active item at this
-		// point, but the tests don't trigger mouseenter before click.
+		// point, but the test don't trigger mouseenter before click.
 		this.active = this.active || $( event.target ).closest( ".ui-menu-item" );
 		var ui = { item: this.active };
 		if ( !this.active.has( ".ui-menu" ).length ) {
