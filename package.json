@@ -24,10 +24,12 @@
     "cors-anywhere": "^0.4.0",
     "d3": "^4.11.0",
     "d3-selection-multi": "^1.0.1",
+    "fs": "0.0.1-security",
     "http-proxy": "^1.16.2",
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
-    "proxy-from-env": "^1.0.0"
+    "proxy-from-env": "^1.0.0",
+    "selenium-webdriver": "^3.6.0"
   },
   "keywords": [
     "epithelial",

@@ -16,10 +16,6 @@
     <script src="./libs/bootstrap.min.js"></script>
     <script src="./libs/d3.min.js"></script>
     <script src="./libs/d3-selection-multi.v1.min.js" charset="utf-8"></script>
-    <!--<script src="./libs/mocha.js"></script>-->
-    <!--<script src="./libs/chai.js"></script>-->
-    <script src="../node_modules/mocha/mocha.js"></script>
-    <script src="../node_modules/chai/chai.js"></script>
 </head>
 
 <body>
@@ -44,13 +40,13 @@
             <div id="collapsable-nav" class="collapse navbar-collapse">
                 <ul id="ulistItems" class="nav navbar-nav navbar-right">
                     <li id="listDiscovery">
-                        <a href="#" onclick="$mainUtils.loadSearchHtml();">MODEL DISCOVERY</a>
+                        <a href="#listDiscovery" onclick="$mainUtils.loadSearchHtml();">MODEL DISCOVERY</a>
                     </li>
                     <li id="listModels">
-                        <a href="#" onclick="$mainUtils.loadModelHtml();">LOAD MODELS</a>
+                        <a href="#listModels" onclick="$mainUtils.loadModelHtml();">LOAD MODELS</a>
                     </li>
                     <li id="documentation">
-                        <a href="#" onclick="$mainUtils.loadDocumentation();">DOCUMENTATION</a>
+                        <a href="#documentation" onclick="$mainUtils.loadDocumentation();">DOCUMENTATION</a>
                     </li>
                 </ul><!-- #nav-list -->
             </div><!-- .collapse .navbar-collapse -->
@@ -83,9 +79,5 @@
 
 <!-- home scripts -->
 <script src="bundle.js"></script>
-
-<!-- PhantomJS and Mocha -->
-<div id="mocha"></div>
-<script src="../test/test_harness.js"></script>
 </body>
 </html>

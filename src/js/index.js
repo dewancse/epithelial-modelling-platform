@@ -353,7 +353,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                     $("#main-content").html(searchHtmlContent);
                 },
                 false);
-
         }
         else {
             console.log("loadSearchHtml ELSE");
