@@ -807,13 +807,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 searchHtml,
                 function (searchHtmlContent) {
                     $("#main-content").html(searchHtmlContent);
-
-                    console.log("if $(#listDiscovery): ", $("#listDiscovery"));
-                    console.log("if $(#listDiscovery): ", $("#listDiscovery").prop("baseURI"));
-                    console.log("if $(#listModels): ", $("#listModels").attr("id"));
-                    console.log("if $(#listModels): ", $("#listModels").prop("baseURI"));
-                    console.log("if $(#documentation): ", $("#documentation").attr("id"));
-                    console.log("if $(#documentation): ", $("#documentation").prop("baseURI"));
                 },
                 false);
         }
@@ -839,13 +832,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
             // $("#main-content").html(sessionStorage.getItem('searchListContent'));
             head = headTitle();
-
-            console.log("else $(#listDiscovery): ", $("#listDiscovery"));
-            console.log("else $(#listDiscovery): ", $("#listDiscovery").prop("baseURI"));
-            console.log("else $(#listModels): ", $("#listModels").attr("id"));
-            console.log("else $(#listModels): ", $("#listModels").prop("baseURI"));
-            console.log("else $(#documentation): ", $("#documentation").attr("id"));
-            console.log("else $(#documentation): ", $("#documentation").prop("baseURI"));
         }
     };
 
