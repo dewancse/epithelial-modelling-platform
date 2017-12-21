@@ -2,14 +2,72 @@
  * Created by Dewan Sarwar on 18/12/2017.
  * Automated test cases by Selenium
  */
+// var sendGetRequest = require("../src/libs/ajax-utils.js").sendGetRequest;
+// var sendPostRequest = require("../src/libs/ajax-utils").sendPostRequest;
+// TODO: Fix this later!! Window call is not working!!
+function getRequestObject() {
+    if (window.XMLHttpRequest) {
+        return (new XMLHttpRequest());
+    }
+    else if (window.ActiveXObject) {
+        // For very old IE browsers (optional)
+        return (new ActiveXObject("Microsoft.XMLHTTP"));
+    }
+    else {
+        alert("Ajax is not supported!");
+        return (null);
+    }
+}
+var sendPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
+    var request = getRequestObject();
+
+    request.onreadystatechange = function () {
+        handleResponse(request, responseHandler, isJsonResponse);
+    };
+
+    request.open("POST", requestUrl, true);
+
+    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    request.setRequestHeader("Accept", "application/sparql-results+json");
+
+    request.send(query); // for POST only
+};
+function handleResponse(request, responseHandler, isJsonResponse) {
+    if ((request.readyState == 4) && (request.status == 200)) {
+
+        // Default to isJsonResponse = true
+        if (isJsonResponse == undefined) {
+            isJsonResponse = true;
+        }
+
+        if (isJsonResponse) {
+            responseHandler(JSON.parse(request.responseText));
+        }
+        else {
+            responseHandler(request.responseText);
+        }
+    }
+
+    else if (request.readyState == 4) {
+        console.log("ERROR!");
+        console.error(request.responseText);
+    }
+}
+
+// var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
+    cors_api_url = 'http://localhost:8080/',
+    endpoint = cors_api_url + pmrEndpoint;
+
+var baseUrl = 'http://localhost:63342/epithelial-modelling-platform/src/index.html';
+
 var webdriver = require('selenium-webdriver'),
     By = webdriver.By,
+    key = webdriver.Key,
     // until = webdriver.until,
     browser = new webdriver.Builder()
         .forBrowser('chrome')
         .build();
-
-var baseUrl = 'http://localhost:63342/epithelial-modelling-platform/src/index.html';
 
 searchTest(browser);
 
@@ -46,6 +104,26 @@ function searchTest(browser) {
                     }
                 })
             })
+
+            // search 'Flux of Sodium'
+            browser.findElement(By.name('searchTxt')).sendKeys('Flux of Sodium');
+            // press Enter key
+            browser.actions().sendKeys(key.ENTER).perform();
+            // TODO: wait until full page loads
+            // browser.wait(until.titleIs('Epithelial Modelling Platform'), 2000);
+
+            var query = 'SELECT ?Protein ' +
+                'WHERE { <weinstein_1995.cellml#weinstein_1995> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }';
+
+            console.log("query: ", query);
+            console.log("endpoint: ", endpoint);
+            sendPostRequest(
+                endpoint,
+                query,
+                function (jsonProtein) {
+                    console.log("jsonProtein: ", jsonProtein);
+                },
+                true);
 
             // console.log("$(#listDiscovery): ", document.getElementById("#listDiscovery"));
             // console.log("$(#listDiscovery): ", $("#listDiscovery").prop("baseURI"));
