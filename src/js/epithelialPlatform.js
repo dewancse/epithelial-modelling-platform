@@ -827,9 +827,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // tooltip
-    var div = d3.select("#svgVisualize").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    // var div = d3.select("#svgVisualize").append("div")
+    //     .attr("class", "tooltip")
+    //     .style("opacity", 0);
 
     $(document).on({
         mousedown: function () {

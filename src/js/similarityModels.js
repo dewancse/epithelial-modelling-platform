@@ -3,7 +3,10 @@
  */
 var uniqueifySVG = require("./miscellaneous.js").uniqueifySVG;
 
-var similarityModels = function (links, model2DArray, modelEntityNameArray, visualizedOverlapModels) {
+var similarityModels = function (model2DArray, modelEntityNameArray) {
+
+
+    var links = [];
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -11,18 +14,24 @@ var similarityModels = function (links, model2DArray, modelEntityNameArray, visu
     })
 
     console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
+    console.log("visualization in model2DArray: ", model2DArray);
 
     // Rearrange items in compartment and located_in
     for (var i = 0; i < model2DArray.length; i++) {
+
         // compartment
-        model2DArray[i][5] = model2DArray[i][5].split(",").map(function(item) {
-            return item.trim();
-        });
+        if (Array.isArray(model2DArray[i][5]) == false) {
+            model2DArray[i][5] = model2DArray[i][5].split(",").map(function (item) {
+                return item.trim();
+            });
+        }
 
         // located_in
-        model2DArray[i][6] = model2DArray[i][6].split(",").map(function(item) {
-            return item.trim();
-        });
+        if (Array.isArray(model2DArray[i][6]) == false) {
+            model2DArray[i][6] = model2DArray[i][6].split(",").map(function (item) {
+                return item.trim();
+            });
+        }
 
         model2DArray[i][5].sort();
         model2DArray[i][6].sort();
@@ -31,8 +40,6 @@ var similarityModels = function (links, model2DArray, modelEntityNameArray, visu
     for (var ix = 0; ix < modelEntityNameArray.length; ix++) {
         for (var i = 0; i < model2DArray.length; i++) {
             if (modelEntityNameArray[ix] == model2DArray[i][1]) {
-
-                visualizedOverlapModels.push(model2DArray[i]); // save them to show in Load Model
 
                 for (var j = 2; j < model2DArray[i].length; j++) {
 

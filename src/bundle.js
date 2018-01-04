@@ -307,7 +307,7 @@ function iteration(length) {
 
 var isExist = function (element, templistOfModel) {
     // console.log("element: ", element);
-    // remove duplicate components with same variable
+    // remove duplicate components with same variable and cellml model
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
         componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
@@ -505,12 +505,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         modelEntityNameArray = [], // model action
         modelEntityFullNameArray = [];
 
-    // svg visualization
-    var links = [];
+    // variables for switching between pages
+    var lengthOfLoadModelTable,
+        visualizedModelsOnPlatform = [];
 
-    var visualizedOverlapModels = [];
-
-    // process AJAX call
+    // variables for AJAX call
     var modelEntity = [],
         biologicalMeaning = [],
         speciesList = [],
@@ -520,7 +519,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         head = [],
         id = 0;
 
-    var lengthOfLoadModelTable;
+    // variables for Load Models Entity
+    var modelEntityInLoadModels = [];
 
     mainUtils.loadHomeHtml = function () {
         showLoading("#main-content");
@@ -530,14 +530,14 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 $("#main-content").html(homeHtmlContent);
             },
             false);
-    };
+    }
 
     mainUtils.loadDocumentation = function () {
 
         $("#main-content").html("Documentation can be found at " +
             '<a href="https://github.com/dewancse/epithelial-modelling-platform" ' +
             'target="_blank">README.md in github</a>');
-    };
+    }
 
     // On page load (before img or CSS)
     $(document).ready(function (event) {
@@ -682,7 +682,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
     });
 
-    // Event handling for SEARCH, MODEL
+    // Event handling for MODEL DISCOVERY and LOAD MODELS
     var actions = {
 
         search: function (event) {
@@ -692,11 +692,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             if (event.target.className == "checkbox") {
 
                 if (event.target.checked) {
-                    var idWithStr = event.target.id;
-                    var index = idWithStr.search("#");
-                    var workspaceName = idWithStr.slice(0, index);
-
-                    var tempidWithStr = event.target.id;
+                    var idWithStr = event.target.id,
+                        index = idWithStr.search("#"),
+                        workspaceName = idWithStr.slice(0, index),
+                        tempidWithStr = event.target.id;
 
                     mainUtils.workspaceName = workspaceName;
                     mainUtils.tempidWithStr = tempidWithStr;
@@ -719,10 +718,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                 if (event.target.checked) {
 
+                    // filter duplicate cellml component for a variable and a model name
                     if (!isExist(event.target.value, templistOfModel)) {
                         templistOfModel.push(event.target.value);
 
-                        // for making visualization graph
+                        // @modelEntityNameArray for similarity graph
                         modelEntityNameArray.push(event.target.value);
                         modelEntityFullNameArray.push(event.target.value);
                     }
@@ -731,19 +731,18 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     var pos = templistOfModel.indexOf(event.target.value);
                     templistOfModel.splice(pos, 1);
 
-                    // for making visualization graph
+                    // @modelEntityNameArray for similarity graph
                     var pos2 = modelEntityNameArray.indexOf(event.target.value);
                     modelEntityNameArray.splice(pos2, 1);
                     modelEntityFullNameArray.splice(pos2, 1);
                 }
 
-                var idWithStr = event.target.id;
-                var index = idWithStr.search("#");
-                var workspaceName = idWithStr.slice(0, index);
+                var idWithStr = event.target.id,
+                    index = idWithStr.search("#"),
+                    workspaceName = idWithStr.slice(0, index),
+                    tempidWithStr = event.target.id;
 
-                var tempidWithStr = event.target.id;
-
-                // mainUtils.workspaceName.push(workspaceName);
+                // @modelEntityNameArray for similarity graph
                 mainUtils.workspaceName = workspaceName;
                 mainUtils.tempidWithStr = tempidWithStr;
             }
@@ -755,10 +754,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     for (var i = 0; i < $('.attribute').length; i++) {
                         $('.attribute')[i].checked = true;
 
+                        // filter duplicate cellml component for a variable and a model name
                         if (!isExist($('.attribute')[i].value, templistOfModel)) {
                             templistOfModel.push($('.attribute')[i].value);
 
-                            // for making visualization graph
+                            // @modelEntityNameArray for similarity graph
                             modelEntityNameArray.push($('.attribute')[i].value);
                             modelEntityFullNameArray.push($('.attribute')[i].value);
                         }
@@ -771,7 +771,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         var pos = templistOfModel.indexOf($('.attribute')[i].value);
                         templistOfModel.splice(pos, 1);
 
-                        // for making visualization graph
+                        // @modelEntityNameArray for similarity graph
                         var pos2 = modelEntityNameArray.indexOf($('.attribute')[i].value);
                         modelEntityNameArray.splice(pos2, 1);
                         modelEntityFullNameArray.splice(pos2, 1);
@@ -794,7 +794,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 return modelEntityFullNameArray.indexOf(item) == pos;
             })
         }
-    };
+    }
 
     // Load search html
     mainUtils.loadSearchHtml = function () {
@@ -815,12 +815,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
 
-            for (var j = 0; j < modelEntity.length; j++) {
-                if (isExist(modelEntity[j], templistOfModel)) {
-                    modelEntity.splice(j, 1);
-                }
-            }
-
             mainUtils.showDiscoverModels(
                 head,
                 modelEntity,
@@ -829,11 +823,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 geneList,
                 proteinList,
                 listOfURIs);
-
-            // $("#main-content").html(sessionStorage.getItem('searchListContent'));
-            head = headTitle();
         }
-    };
+    }
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
 
@@ -1050,10 +1041,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 "<section class='container-fluid'><label><br>No Search Results!</label></section>"
             );
 
-            // $("#main-content").html(sessionStorage.getItem('searchListContent'));
-
-            // sessionStorage.setItem('searchListContent', $("#main-content").html());
-
             return;
         }
 
@@ -1150,7 +1137,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     false);
             },
             true);
-    };
+    }
 
     // extension of loadModelHtml function
     var findCompartmentLoc = function (jsonObjComp, jsonObjLoc, tempidWithStr, protein, species, gene) {
@@ -1370,12 +1357,17 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     true);
             },
             true);
-    };
+    }
 
     // Show selected models
     mainUtils.showModel = function (jsonObj) {
 
         console.log("showModel: ", jsonObj);
+        if (modelEntityInLoadModels.indexOf(jsonObj.Model_entity) == -1)
+            modelEntityInLoadModels.push(jsonObj.Model_entity);
+
+        if (modelEntity.indexOf(jsonObj.Model_entity) != -1)
+            modelEntity.splice(modelEntity.indexOf(jsonObj.Model_entity), 1);
 
         // Empty result
         if ($.isEmptyObject(jsonObj)) {
@@ -1434,50 +1426,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         model2DArray = uniqueifymodel2DArray(model2DArray);
 
-        if (visualizedOverlapModels.length != 0) {
-            // remove visualizedOverlapModels's elem from templistOfModel
-            for (var i = 0; i < visualizedOverlapModels.length; i++) {
-                for (var j = 0; j < templistOfModel.length; j++) {
-                    if (visualizedOverlapModels[i][1] == templistOfModel[j]) {
-                        templistOfModel.splice(j, 1);
-                        j--;
-
-                        // Remove from modelEntity
-                        modelEntityNameArray.forEach(function (elem, index) {
-                            if (visualizedOverlapModels[i][1] == elem) {
-                                modelEntityNameArray.splice(index, 1);
-                            }
-                        })
-
-                        // Remove from modelEntityFullNameArray
-                        modelEntityFullNameArray.forEach(function (elem, index) {
-                            if (visualizedOverlapModels[i][1] == elem) {
-                                modelEntityFullNameArray.splice(index, 1);
-                            }
-                        })
-                    }
-                }
-            }
-        }
-        else {
-            // remove templistOfModel's elem from model2DArray
-            // templistOfModel's elem is in Epithelial Platform
-            // model2DArray's elem is in Load Model
-            for (var i = 0; i < model2DArray.length; i++) {
-                for (var j = 0; j < templistOfModel.length; j++) {
-                    if (model2DArray[i][1] == templistOfModel[j]) {
-                        model2DArray.splice(i, 1);
-                    }
-                }
-            }
-        }
-
-        console.log("model and model2DArray in showModel: ", model, model2DArray);
-        console.log("templistOfModel in showModel: ", templistOfModel);
-        console.log("visualizedOverlapModels in showModel: ", visualizedOverlapModels);
-
-        visualizedOverlapModels = []; // reinitialize for next iteration in Similarity models
-
         // Table body
         var tbody = $("<tbody/>"), td = [];
         for (var i = 0; i < model2DArray.length; i++) {
@@ -1503,6 +1451,24 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         table.append(tbody);
         $("#modelList").append(table);
 
+        // delete already visualized models on the platform
+        visualizedModelsOnPlatform.forEach(function (element, tempIndex) {
+            for (var i = 0; i < $('table tr').length; i++) {
+
+                if ($('table tr')[i].id == element) {
+                    // Remove selected row
+                    $('table tr')[i].remove();
+
+                    // Remove from model2DArray
+                    model2DArray.forEach(function (elem, index) {
+                        if (element == elem[1]) {
+                            model2DArray.splice(index, 1);
+                        }
+                    })
+                }
+            }
+        })
+
         // Uncheck checkboxes when back from Similarity models
         for (var i = 0; i < $('table tr td label').length; i++) {
             if ($('table tr td label')[i].firstChild.checked == true) {
@@ -1510,17 +1476,14 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             }
         }
 
-        console.log("lengthOfLoadModelTable in showModel: ", $('table tr').length);
         lengthOfLoadModelTable = $('table tr').length;
+        console.log("lengthOfLoadModelTable in showModel: ", lengthOfLoadModelTable);
         if (lengthOfLoadModelTable == 1) {
-
             mainUtils.workspaceName = "";
-
             $("#modelList").html("Please load models from Model Discovery");
-
             return;
         }
-    };
+    }
 
     // Filter search results
     mainUtils.filterSearchHtml = function () {
@@ -1553,9 +1516,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             }
         }
 
-        sessionStorage.setItem('searchListContent', $("#main-content").html());
+        // sessionStorage.setItem('searchListContent', $("#main-content").html());
         // $("#main-content").html(sessionStorage.getItem('searchListContent'));
-    };
+    }
 
     // Filter dropdown list in the search html
     var filterByProtein = function () {
@@ -1566,7 +1529,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         for (var i = 0; i < proteinList.length; i++) {
             $('#membraneId').append('<option value=' + listOfURIs[i] + '>' + proteinList[i] + '</option>');
         }
-    };
+    }
 
     // Delete model
     mainUtils.deleteRowModelHtml = function () {
@@ -1588,12 +1551,20 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     // Remove from templistOfModel
                     templistOfModel.splice(tempIndex, 1);
 
-                    // Remove from modelEntity
-                    modelEntity.forEach(function (elem, index) {
+                    // Remove from modelEntityInLoadModels
+                    modelEntityInLoadModels.forEach(function (elem, index) {
+                        console.log("Testing deleteRowModelHtml element: ", element);
+                        console.log("Testing deleteRowModelHtml elem: ", elem);
+                        console.log("Testing deleteRowModelHtml index: ", index);
+                        console.log("Testing deleteRowModelHtml modelEntityInLoadModels: ", modelEntityInLoadModels);
+
                         if (element == elem) {
-                            modelEntity.splice(index, 1);
+                            modelEntityInLoadModels.splice(index, 1);
                         }
                     })
+
+                    // delete from LOAD MODELS and push it back to MODEL DISCOVERY
+                    modelEntity.push(element);
 
                     // Remove from modelEntityNameArray
                     modelEntityNameArray.splice(tempIndex, 1);
@@ -1602,21 +1573,23 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     modelEntityFullNameArray.splice(tempIndex, 1);
                 }
             }
-        });
+        })
+
+        console.log("model2DArray in deleteRowModelHtml: ", model2DArray);
+        console.log("templistOfModel in deleteRowModelHtml: ", templistOfModel);
+        console.log("modelEntityNameArray in deleteRowModelHtml: ", modelEntityNameArray);
+        console.log("modelEntityFullNameArray in deleteRowModelHtml: ", modelEntityFullNameArray);
+        console.log("modelEntity in deleteRowModelHtml: ", modelEntity);
+        console.log("modelEntityInLoadModels in deleteRowModelHtml: ", modelEntityInLoadModels);
 
         console.log("lengthOfLoadModelTable in deleteRowModelHtml: ", $('table tr').length);
-
         lengthOfLoadModelTable = $('table tr').length;
-
         if (lengthOfLoadModelTable == 1) {
-
             mainUtils.workspaceName = "";
-
             $("#modelList").html("Please load models from Model Discovery");
-
             return;
         }
-    };
+    }
 
     // Load the SVG model
     mainUtils.loadSimilarityHtml = function () {
@@ -1626,19 +1599,28 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             function (similarityHtmlContent) {
                 $("#main-content").html(similarityHtmlContent);
 
-                // TODO: Fix it!!
-                sendGetRequest(similarityHtml, similarityModels(links, model2DArray, modelEntityNameArray, visualizedOverlapModels), false);
+                sendGetRequest(
+                    similarityHtml,
+                    function (similarityHtmlContent) {
+                        similarityModels(model2DArray, modelEntityNameArray);
+
+                        // Reinitialize to display only selected models on the Platform
+                        templistOfModel = [];
+                        modelEntityNameArray = [];
+                        modelEntityFullNameArray = [];
+                    },
+                    false);
             },
             false);
-    };
+    }
 
     // Load the epithelial
     mainUtils.loadEpithelialHtml = function () {
 
-        if (modelEntityFullNameArray.length == 0) {
-            $("#main-content").html("Please select models from Load Model");
-
-            return;
+        // make empty list in LOAD MODELS
+        if (lengthOfLoadModelTable == 2) {
+            mainUtils.workspaceName = "";
+            $("#modelList").html("Please load models from Model Discovery");
         }
 
         sendGetRequest(
@@ -1648,15 +1630,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 sendGetRequest(epithelialHtml, mainUtils.loadEpithelial, false);
             },
             false);
-    };
+    }
 
     var concentration_fma = [];
     mainUtils.loadEpithelial = function (epithelialHtmlContent) {
 
-        console.log("lengthOfLoadModelTable in loadEpithelial: ", lengthOfLoadModelTable);
-        if (lengthOfLoadModelTable == 2) {
-            mainUtils.workspaceName = "";
-        }
+        console.log("loadEpithelial page");
 
         // remove model name, keep only solutes
         for (var i = 0; i < modelEntityNameArray.length; i++) {
@@ -1667,6 +1646,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         console.log("loadEpithelial in model2DArr: ", model2DArray);
         console.log("loadEpithelial in modelEntityNameArray: ", modelEntityNameArray);
         console.log("loadEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
+        console.log("loadEpithelial in templistOfModel: ", templistOfModel);
 
         var source_fma = [], sink_fma = [], med_fma = [], med_pr = [];
         var source_fma2 = [], sink_fma2 = [], solute_chebi = [];
@@ -1682,14 +1662,32 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var index = 0, counter = 0;
         var membrane = [], apicalMembrane = [], basolateralMembrane = [];
 
+        if (modelEntityFullNameArray.length == 0) {
+
+            epithelialPlatform(
+                combinedMembrane,
+                concentration_fma,
+                source_fma2,
+                sink_fma2,
+                apicalMembrane,
+                basolateralMembrane,
+                membrane);
+
+            return;
+        }
+
         // remove visualized solutes in the next iteration in Load Model page
         var rmFromModelEntityFullNameArray = function (membrane, concentration_fma) {
+
             for (var i = 0; i < membrane.length; i++) {
                 for (var j = 0; j < modelEntityFullNameArray.length; j++) {
                     if (membrane[i].model_entity == modelEntityFullNameArray[j]) {
 
+                        // add models to delete from Load Models table row
+                        visualizedModelsOnPlatform.push(modelEntityFullNameArray[j]);
+
                         // Remove from modelEntityFullNameArray
-                        //// modelEntityFullNameArray.splice(j, 1);
+                        modelEntityFullNameArray.splice(j, 1);
 
                         // Remove from modelEntityNameArray
                         modelEntityNameArray.splice(j, 1);
@@ -1700,15 +1698,33 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                 model2DArray.splice(index, 1);
                             }
                         })
+
+                        // Remove from templistOfModel
+                        templistOfModel.forEach(function (elem, index) {
+                            if (membrane[i].model_entity == elem) {
+                                templistOfModel.splice(index, 1);
+                            }
+                        })
+
+                        // Remove from modelEntity
+                        modelEntity.forEach(function (elem, index) {
+                            if (membrane[i].model_entity == elem) {
+                                modelEntity.splice(index, 1);
+                            }
+                        })
                     }
                 }
             }
+
             for (var i = 0; i < concentration_fma.length; i++) {
                 for (var j = 0; j < modelEntityFullNameArray.length; j++) {
                     if (concentration_fma[i].name == modelEntityFullNameArray[j]) {
 
+                        // add models to delete from Load Models table row
+                        visualizedModelsOnPlatform.push(modelEntityFullNameArray[j]);
+
                         // Remove from modelEntityFullNameArray
-                        //// modelEntityFullNameArray.splice(j, 1);
+                        modelEntityFullNameArray.splice(j, 1);
 
                         // Remove from modelEntityNameArray
                         modelEntityNameArray.splice(j, 1);
@@ -1717,6 +1733,13 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         model2DArray.forEach(function (elem, index) {
                             if (concentration_fma[i].name == elem[1]) {
                                 model2DArray.splice(index, 1);
+                            }
+                        })
+
+                        // Remove from modelEntity
+                        modelEntity.forEach(function (elem, index) {
+                            if (concentration_fma[i].name == elem) {
+                                modelEntity.splice(index, 1);
                             }
                         })
                     }
@@ -1864,29 +1887,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         console.log("apicalMembrane in index.js: ", apicalMembrane);
                         console.log("basolateralMembrane in index.js: ", basolateralMembrane);
 
-                        for (var i = 0; i < membrane.length; i++) {
-                            for (var j = 0; j < modelEntityFullNameArray.length; j++) {
-                                if (membrane[i].model_entity == modelEntityFullNameArray[j]) {
-
-                                    // Remove from modelEntityFullNameArray
-                                    //// modelEntityFullNameArray.splice(j, 1);
-
-                                    // Remove from modelEntityNameArray
-                                    modelEntityNameArray.splice(j, 1);
-
-                                    // Remove from model2DArray
-                                    model2DArray.forEach(function (elem, index) {
-                                        if (membrane[i].model_entity == elem[1]) {
-                                            model2DArray.splice(index, 1);
-                                        }
-                                    })
-                                }
-                            }
-                        }
+                        rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
                         console.log("model2DArr: ", model2DArray);
                         console.log("modelEntityNameArray: ", modelEntityNameArray);
                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                        console.log("templistOfModel: ", templistOfModel);
 
                         epithelialPlatform(
                             combinedMembrane,
@@ -1900,7 +1906,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     }
                 },
                 true);
-        };
+        }
 
         mainUtils.srcDescMediatorOfFluxes = function () {
 
@@ -2179,12 +2185,15 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                     // special case: one flux is chosen
                                                     if (membrane.length <= 1) {
 
+                                                        console.log("membrane.length <= 1 membrane: ", membrane);
+
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
                                                         console.log("membrane: ", membrane);
                                                         console.log("model2DArr: ", model2DArray);
                                                         console.log("modelEntityNameArray: ", modelEntityNameArray);
                                                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                                        console.log("templistOfModel: ", templistOfModel);
 
                                                         epithelialPlatform(
                                                             combinedMembrane,
@@ -2200,6 +2209,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                         console.log("membrane.length >= 1 membrane: ", membrane);
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
+
+                                                        console.log("membrane: ", membrane);
+                                                        console.log("model2DArr: ", model2DArray);
+                                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                                        console.log("templistOfModel: ", templistOfModel);
 
                                                         for (var i = 0; i < membrane.length; i++) {
                                                             for (var j = i + 1; j < membrane.length; j++) {
@@ -2261,13 +2276,14 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                     // special case: one concentration is chosen
                                     if (membrane.length <= 1) {
 
-                                        console.log("membrane.length <= 1: ", membrane);
+                                        console.log("concentration OPB, membrane.length <= 1: ", membrane);
 
                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
                                         console.log("model2DArr: ", model2DArray);
                                         console.log("modelEntityNameArray: ", modelEntityNameArray);
                                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                        console.log("templistOfModel: ", templistOfModel);
                                         console.log("concentration_fma: ", concentration_fma);
 
                                         epithelialPlatform(
@@ -2281,9 +2297,15 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                     }
                                     else {
 
-                                        console.log("membrane.length >= 1 membrane: ", membrane);
+                                        console.log("concentration OPB, membrane.length >= 1 membrane: ", membrane);
 
                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
+
+                                        console.log("model2DArr: ", model2DArray);
+                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                        console.log("templistOfModel: ", templistOfModel);
+                                        console.log("concentration_fma: ", concentration_fma);
 
                                         for (var i = 0; i < membrane.length; i++) {
                                             for (var j = i + 1; j < membrane.length; j++) {
@@ -2304,7 +2326,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         }
 
         mainUtils.srcDescMediatorOfFluxes();
-    };
+    }
 
     // Expose utility to the global object
     global.$mainUtils = mainUtils;
@@ -2383,7 +2405,10 @@ exports.viewModel = viewModel;
  */
 var uniqueifySVG = __webpack_require__(0).uniqueifySVG;
 
-var similarityModels = function (links, model2DArray, modelEntityNameArray, visualizedOverlapModels) {
+var similarityModels = function (model2DArray, modelEntityNameArray) {
+
+
+    var links = [];
 
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
@@ -2391,18 +2416,24 @@ var similarityModels = function (links, model2DArray, modelEntityNameArray, visu
     })
 
     console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
+    console.log("visualization in model2DArray: ", model2DArray);
 
     // Rearrange items in compartment and located_in
     for (var i = 0; i < model2DArray.length; i++) {
+
         // compartment
-        model2DArray[i][5] = model2DArray[i][5].split(",").map(function(item) {
-            return item.trim();
-        });
+        if (Array.isArray(model2DArray[i][5]) == false) {
+            model2DArray[i][5] = model2DArray[i][5].split(",").map(function (item) {
+                return item.trim();
+            });
+        }
 
         // located_in
-        model2DArray[i][6] = model2DArray[i][6].split(",").map(function(item) {
-            return item.trim();
-        });
+        if (Array.isArray(model2DArray[i][6]) == false) {
+            model2DArray[i][6] = model2DArray[i][6].split(",").map(function (item) {
+                return item.trim();
+            });
+        }
 
         model2DArray[i][5].sort();
         model2DArray[i][6].sort();
@@ -2411,8 +2442,6 @@ var similarityModels = function (links, model2DArray, modelEntityNameArray, visu
     for (var ix = 0; ix < modelEntityNameArray.length; ix++) {
         for (var i = 0; i < model2DArray.length; i++) {
             if (modelEntityNameArray[ix] == model2DArray[i][1]) {
-
-                visualizedOverlapModels.push(model2DArray[i]); // save them to show in Load Model
 
                 for (var j = 2; j < model2DArray[i].length; j++) {
 
@@ -3441,9 +3470,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // tooltip
-    var div = d3.select("#svgVisualize").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    // var div = d3.select("#svgVisualize").append("div")
+    //     .attr("class", "tooltip")
+    //     .style("opacity", 0);
 
     $(document).on({
         mousedown: function () {

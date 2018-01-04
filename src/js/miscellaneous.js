@@ -238,7 +238,7 @@ function iteration(length) {
 
 var isExist = function (element, templistOfModel) {
     // console.log("element: ", element);
-    // remove duplicate components with same variable
+    // remove duplicate components with same variable and cellml model
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
         componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
