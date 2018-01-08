@@ -89,7 +89,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         // On first load, show home view
         showLoading("#main-content");
 
-        console.log("document.ready");
+        // console.log("document.ready");
 
         if (sessionStorage.getItem("searchListContent")) {
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
@@ -114,7 +114,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     $(document).on({
         click: function () {
 
-            console.log("document.on.click");
+            // console.log("document.on.click");
 
             // If there's an action with the given name, call it
             if (typeof actions[event.target.dataset.action] === "function") {
@@ -125,7 +125,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         keydown: function () {
 
-            console.log("document.on.keydown");
+            // console.log("document.on.keydown");
 
             // semantic annotation based on search items
             if (event.key == 'Enter') {
@@ -231,7 +231,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         search: function (event) {
 
-            console.log("search event: ", event);
+            // console.log("search event: ", event);
 
             if (event.target.className == "checkbox") {
 
@@ -255,7 +255,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         model: function (event) {
 
-            console.log("model event: ", event);
+            // console.log("model event: ", event);
 
             // select one by one
             if (event.target.className == "attribute") {
@@ -345,7 +345,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         if (!sessionStorage.getItem("searchListContent")) {
 
-            console.log("loadSearchHtml IF");
+            // console.log("loadSearchHtml IF");
 
             sendGetRequest(
                 searchHtml,
@@ -355,7 +355,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 false);
         }
         else {
-            console.log("loadSearchHtml ELSE");
+            // console.log("loadSearchHtml ELSE");
 
             $("#main-content").html(sessionStorage.getItem('searchListContent'));
 
@@ -372,7 +372,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
 
-        console.log("discoverModels");
+        // console.log("discoverModels");
 
         if (uriCHEBI == "") {
             var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
@@ -577,7 +577,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     // Show discovered models from PMR
     mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfURIs) {
 
-        console.log("showDiscoverModels");
+        // console.log("showDiscoverModels");
 
         // Empty search result
         if (head.length == 0) {
@@ -652,7 +652,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
 
-        console.log("cellmlModel: ", cellmlModel);
+        // console.log("cellmlModel: ", cellmlModel);
 
         var query = 'SELECT ?Workspace ?Model_entity ?Title ?Author ?Abstract ?Keyword ?Protein ?Compartment ' +
             '?Located_in ?DOI WHERE { GRAPH ?Workspace { ' +
@@ -755,7 +755,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         var model = mainUtils.workspaceName;
 
-        console.log("model in loadModelHtml: ", model);
+        // console.log("model in loadModelHtml: ", model);
 
         var tempidWithStr;
         if (model == undefined)
@@ -906,7 +906,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     // Show selected models
     mainUtils.showModel = function (jsonObj) {
 
-        console.log("showModel: ", jsonObj);
+        // console.log("showModel: ", jsonObj);
         if (modelEntityInLoadModels.indexOf(jsonObj.Model_entity) == -1)
             modelEntityInLoadModels.push(jsonObj.Model_entity);
 
@@ -1021,7 +1021,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         }
 
         lengthOfLoadModelTable = $('table tr').length;
-        console.log("lengthOfLoadModelTable in showModel: ", lengthOfLoadModelTable);
+        // console.log("lengthOfLoadModelTable in showModel: ", lengthOfLoadModelTable);
         if (lengthOfLoadModelTable == 1) {
             mainUtils.workspaceName = "";
             $("#modelList").html("Please load models from Model Discovery");
@@ -1031,14 +1031,14 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
     // Filter search results
     mainUtils.filterSearchHtml = function () {
-        console.log("membraneId in filterSearchHtml: ", $('#membraneId'));
-        console.log("$('#membraneId').val() in filterSearchHtml: ", $('#membraneId').val());
-        console.log("$('table tr') in filterSearchHtml: ", $('table tr'));
-
-        console.log("selected options: ", $('#membraneId').val());
+        // console.log("membraneId in filterSearchHtml: ", $('#membraneId'));
+        // console.log("$('#membraneId').val() in filterSearchHtml: ", $('#membraneId').val());
+        // console.log("$('table tr') in filterSearchHtml: ", $('table tr'));
+        //
+        // console.log("selected options: ", $('#membraneId').val());
 
         if ($('#membraneId').val() == "all") {
-            console.log("all options are selected");
+            // console.log("all options are selected");
             $('table tr').show();
         }
         else {
@@ -1049,7 +1049,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 var tempstr = $('table tr')[i];
                 tempstr = $($(tempstr).find('input')).attr('uri');
 
-                console.log("selectedprotein, tempstr: ", selectedprotein, tempstr);
+                // console.log("selectedprotein, tempstr: ", selectedprotein, tempstr);
 
                 if (selectedprotein == tempstr) {
                     $('table tr')[i].hidden = false;
@@ -1097,10 +1097,10 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                     // Remove from modelEntityInLoadModels
                     modelEntityInLoadModels.forEach(function (elem, index) {
-                        console.log("Testing deleteRowModelHtml element: ", element);
-                        console.log("Testing deleteRowModelHtml elem: ", elem);
-                        console.log("Testing deleteRowModelHtml index: ", index);
-                        console.log("Testing deleteRowModelHtml modelEntityInLoadModels: ", modelEntityInLoadModels);
+                        // console.log("Testing deleteRowModelHtml element: ", element);
+                        // console.log("Testing deleteRowModelHtml elem: ", elem);
+                        // console.log("Testing deleteRowModelHtml index: ", index);
+                        // console.log("Testing deleteRowModelHtml modelEntityInLoadModels: ", modelEntityInLoadModels);
 
                         if (element == elem) {
                             modelEntityInLoadModels.splice(index, 1);
@@ -1119,14 +1119,14 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             }
         })
 
-        console.log("model2DArray in deleteRowModelHtml: ", model2DArray);
-        console.log("templistOfModel in deleteRowModelHtml: ", templistOfModel);
-        console.log("modelEntityNameArray in deleteRowModelHtml: ", modelEntityNameArray);
-        console.log("modelEntityFullNameArray in deleteRowModelHtml: ", modelEntityFullNameArray);
-        console.log("modelEntity in deleteRowModelHtml: ", modelEntity);
-        console.log("modelEntityInLoadModels in deleteRowModelHtml: ", modelEntityInLoadModels);
+        // console.log("model2DArray in deleteRowModelHtml: ", model2DArray);
+        // console.log("templistOfModel in deleteRowModelHtml: ", templistOfModel);
+        // console.log("modelEntityNameArray in deleteRowModelHtml: ", modelEntityNameArray);
+        // console.log("modelEntityFullNameArray in deleteRowModelHtml: ", modelEntityFullNameArray);
+        // console.log("modelEntity in deleteRowModelHtml: ", modelEntity);
+        // console.log("modelEntityInLoadModels in deleteRowModelHtml: ", modelEntityInLoadModels);
 
-        console.log("lengthOfLoadModelTable in deleteRowModelHtml: ", $('table tr').length);
+        // console.log("lengthOfLoadModelTable in deleteRowModelHtml: ", $('table tr').length);
         lengthOfLoadModelTable = $('table tr').length;
         if (lengthOfLoadModelTable == 1) {
             mainUtils.workspaceName = "";
@@ -1185,10 +1185,10 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
         }
 
-        console.log("loadEpithelial in model2DArr: ", model2DArray);
-        console.log("loadEpithelial in modelEntityNameArray: ", modelEntityNameArray);
-        console.log("loadEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
-        console.log("loadEpithelial in templistOfModel: ", templistOfModel);
+        // console.log("loadEpithelial in model2DArr: ", model2DArray);
+        // console.log("loadEpithelial in modelEntityNameArray: ", modelEntityNameArray);
+        // console.log("loadEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
+        // console.log("loadEpithelial in templistOfModel: ", templistOfModel);
 
         var source_fma = [], sink_fma = [], med_fma = [], med_pr = [];
         var source_fma2 = [], sink_fma2 = [], solute_chebi = [];
@@ -1426,16 +1426,16 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                     if (counter == iteration(membrane.length)) {
 
-                        console.log("membrane in index.js: ", membrane);
-                        console.log("apicalMembrane in index.js: ", apicalMembrane);
-                        console.log("basolateralMembrane in index.js: ", basolateralMembrane);
+                        // console.log("membrane in index.js: ", membrane);
+                        // console.log("apicalMembrane in index.js: ", apicalMembrane);
+                        // console.log("basolateralMembrane in index.js: ", basolateralMembrane);
 
                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
-                        console.log("model2DArr: ", model2DArray);
-                        console.log("modelEntityNameArray: ", modelEntityNameArray);
-                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
-                        console.log("templistOfModel: ", templistOfModel);
+                        // console.log("model2DArr: ", model2DArray);
+                        // console.log("modelEntityNameArray: ", modelEntityNameArray);
+                        // console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                        // console.log("templistOfModel: ", templistOfModel);
 
                         epithelialPlatform(
                             combinedMembrane,
@@ -1503,7 +1503,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                             query,
                             function (jsonObjFlux) {
 
-                                console.log("jsonObjFlux in index.js: ", jsonObjFlux);
+                                // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                                 var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
                                 var indexofColon = chebi_uri.indexOf('CHEBI:');
@@ -1631,7 +1631,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                             temp_med_pr = med_pr[0].fma;
                                                         }
 
-                                                        console.log("med_pr, temp_med_pr in index.js: ", med_pr, temp_med_pr);
+                                                        // console.log("med_pr, temp_med_pr in index.js: ", med_pr, temp_med_pr);
 
                                                         var tempvar;
                                                         if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
@@ -1728,15 +1728,15 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                     // special case: one flux is chosen
                                                     if (membrane.length <= 1) {
 
-                                                        console.log("membrane.length <= 1 membrane: ", membrane);
+                                                        // console.log("membrane.length <= 1 membrane: ", membrane);
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
-                                                        console.log("membrane: ", membrane);
-                                                        console.log("model2DArr: ", model2DArray);
-                                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
-                                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
-                                                        console.log("templistOfModel: ", templistOfModel);
+                                                        // console.log("membrane: ", membrane);
+                                                        // console.log("model2DArr: ", model2DArray);
+                                                        // console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                                        // console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                                        // console.log("templistOfModel: ", templistOfModel);
 
                                                         epithelialPlatform(
                                                             combinedMembrane,
@@ -1749,15 +1749,15 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                     }
                                                     else {
 
-                                                        console.log("membrane.length >= 1 membrane: ", membrane);
+                                                        // console.log("membrane.length >= 1 membrane: ", membrane);
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
-                                                        console.log("membrane: ", membrane);
-                                                        console.log("model2DArr: ", model2DArray);
-                                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
-                                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
-                                                        console.log("templistOfModel: ", templistOfModel);
+                                                        // console.log("membrane: ", membrane);
+                                                        // console.log("model2DArr: ", model2DArray);
+                                                        // console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                                        // console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                                        // console.log("templistOfModel: ", templistOfModel);
 
                                                         for (var i = 0; i < membrane.length; i++) {
                                                             for (var j = i + 1; j < membrane.length; j++) {
