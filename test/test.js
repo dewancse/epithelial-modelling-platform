@@ -2,26 +2,22 @@
  * Created by Dewan Sarwar on 18/12/2017.
  * Automated test cases by Selenium
  */
-// var sendGetRequest = require("../src/libs/ajax-utils.js").sendGetRequest;
-// var sendPostRequest = require("../src/libs/ajax-utils").sendPostRequest;
+var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+var baseUrl = "http://localhost:63342/epithelial-modelling-platform/src/index.html";
 
-// TODO: Fix this later!! Window call is not working!!
-var getRequestObject = function () {
-    if (window.XMLHttpRequest) {
-        return (new XMLHttpRequest());
-    }
-    else if (window.ActiveXObject) {
-        // For very old IE browsers (optional)
-        return (new ActiveXObject("Microsoft.XMLHTTP"));
-    }
-    else {
-        alert("Ajax is not supported!");
-        return (null);
-    }
-};
+var webdriver = require("selenium-webdriver"),
+    By = webdriver.By,
+    key = webdriver.Key,
+    // until = webdriver.until,
+    browser = new webdriver.Builder()
+        .forBrowser("chrome")
+        .build(),
+    http = require('http');
 
 var sendPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
-    var request = getRequestObject();
+    var request = new http.request("POST", requestUrl, true);
+
+    console.log("request: ", request);
 
     request.onreadystatechange = function () {
         handleResponse(request, responseHandler, isJsonResponse);
@@ -56,23 +52,6 @@ var handleResponse = function (request, responseHandler, isJsonResponse) {
         console.error(request.responseText);
     }
 };
-
-// var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
-var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
-    cors_api_url = "http://localhost:8080/",
-    endpoint = cors_api_url + pmrEndpoint;
-
-var baseUrl = "http://localhost:63342/epithelial-modelling-platform/src/index.html";
-
-var webdriver = require("selenium-webdriver"),
-    By = webdriver.By,
-    key = webdriver.Key,
-    // until = webdriver.until,
-    browser = new webdriver.Builder()
-        .forBrowser("chrome")
-        .build();
-
-searchTest(browser);
 
 var searchTest = function (browser) {
     browser.get(baseUrl);
@@ -127,9 +106,6 @@ var searchTest = function (browser) {
                     console.log("jsonProtein: ", jsonProtein);
                 },
                 true);
-
-            // console.log("$(#listDiscovery): ", document.getElementById("#listDiscovery"));
-            // console.log("$(#listDiscovery): ", $("#listDiscovery").prop("baseURI"));
         }
     );
 
@@ -195,3 +171,5 @@ var searchTest = function (browser) {
 
     browser.quit();
 };
+
+searchTest(browser);
