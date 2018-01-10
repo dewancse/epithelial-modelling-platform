@@ -47,8 +47,6 @@ var viewModel = function (jsonObj) {
             }
 
             $("#viewList").append(divText);
-
-            var divText = $("<div/>").addClass("p");
         }
 
         $("#viewList").append("<br>");

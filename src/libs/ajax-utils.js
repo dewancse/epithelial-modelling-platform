@@ -33,7 +33,7 @@ var sendPostRequest = function (requestUrl, query, responseHandler, isJsonRespon
 
     request.open("POST", requestUrl, true);
 
-    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/sparql-results+json");
 
     request.send(query); // for POST only

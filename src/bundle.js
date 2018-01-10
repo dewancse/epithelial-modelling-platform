@@ -108,7 +108,7 @@ var uniqueify = function (es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // remove duplicate model entity and biological meaning
 var uniqueifyCombinedMembrane = function (es) {
@@ -121,16 +121,16 @@ var uniqueifyCombinedMembrane = function (es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
     var indexOfHash = fma.name.search("#"),
         srctext = fma.name.slice(indexOfHash + 1),
-        indexOfdot = srctext.indexOf('.');
+        indexOfdot = srctext.indexOf(".");
 
     return srctext.slice(indexOfdot + 1);
-}
+};
 
 // extract species, gene, and protein names
 var parseModelName = function (modelEntity) {
@@ -138,7 +138,7 @@ var parseModelName = function (modelEntity) {
         modelName = modelEntity.slice(0, indexOfHash);
 
     return modelName;
-}
+};
 
 // process table headers
 var headTitle = function () {
@@ -155,10 +155,10 @@ var headTitle = function () {
     head.push("Protein");
 
     return head;
-}
+};
 
 // remove duplicate model entity and biological meaning
-function uniqueifySrcSnkMed(es) {
+var uniqueifySrcSnkMed = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -168,10 +168,10 @@ function uniqueifySrcSnkMed(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // remove duplicate model2DArray
-function uniqueifymodel2DArray(es) {
+var uniqueifymodel2DArray = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -181,7 +181,7 @@ function uniqueifymodel2DArray(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // separate cellml model and variable name from a model entity
 var modelVariableName = function (element) {
@@ -190,14 +190,14 @@ var modelVariableName = function (element) {
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
         componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
-        indexOfDot = componentVariableName.indexOf('.'),
+        indexOfDot = componentVariableName.indexOf("."),
         variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
 
     return [cellmlModelName, variableName];
-}
+};
 
 // remove duplicate entity (cellml model and variable name)
-function uniqueifyjsonModel(es) {
+var uniqueifyjsonModel = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -209,10 +209,10 @@ function uniqueifyjsonModel(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // remove duplicate model entity and biological meaning
-function uniqueifyModelEntity(es) {
+var uniqueifyModelEntity = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -223,10 +223,10 @@ function uniqueifyModelEntity(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // Remove duplicate fma
-function uniqueifyEpithelial(es) {
+var uniqueifyEpithelial = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -236,10 +236,10 @@ function uniqueifyEpithelial(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // Remove duplicate links
-function uniqueifySVG(es) {
+var uniqueifySVG = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -249,10 +249,10 @@ function uniqueifySVG(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // Remove duplicate links
-function uniqueifyjsonFlux(es) {
+var uniqueifyjsonFlux = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -265,7 +265,7 @@ function uniqueifyjsonFlux(es) {
             retval.push(e);
     });
     return retval;
-}
+};
 
 // Create anchor tag
 var createAnchor = function (value) {
@@ -288,22 +288,22 @@ var searchFn = function (searchItem, arrayOfItems) {
 };
 
 // TODO: temp solution, fix this in svg
-function getTextWidth(text, fontSize, fontFace) {
-    var a = document.createElement('canvas'); // $("<canvas/>");
-    var b = a.getContext('2d');
-    b.font = fontSize + 'px ' + fontFace;
+var getTextWidth = function (text, fontSize, fontFace) {
+    var a = document.createElement("canvas"); // $("<canvas/>");
+    var b = a.getContext("2d");
+    b.font = fontSize + "px " + fontFace;
     return b.measureText(text).width;
-}
+};
 
 // Utility to calculate number of iterations
-function iteration(length) {
+var iteration = function (length) {
     var sum = 0;
     for (var i = 0; i < length; i++) {
         sum = sum + (length - i - 1);
     }
 
     return sum;
-}
+};
 
 var isExist = function (element, templistOfModel) {
     // console.log("element: ", element);
@@ -311,14 +311,14 @@ var isExist = function (element, templistOfModel) {
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
         componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
-        indexOfDot = componentVariableName.indexOf('.'),
+        indexOfDot = componentVariableName.indexOf("."),
         variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
 
     for (var i = 0; i < templistOfModel.length; i++) {
         var indexOfHash2 = templistOfModel[i].search("#"),
             cellmlModelName2 = templistOfModel[i].slice(0, indexOfHash2), // weinstein_1995.cellml
             componentVariableName2 = templistOfModel[i].slice(indexOfHash2 + 1), // NHE3.J_NHE3_Na
-            indexOfDot2 = componentVariableName2.indexOf('.'),
+            indexOfDot2 = componentVariableName2.indexOf("."),
             variableName2 = componentVariableName2.slice(indexOfDot2 + 1); // J_NHE3_Na
 
         if (cellmlModelName == cellmlModelName2 && variableName == variableName2) {
@@ -327,21 +327,21 @@ var isExist = function (element, templistOfModel) {
     }
 
     return false;
-}
+};
 
 var isExistModel2DArray = function (element, model2DArray) {
     // remove duplicate components with same variable
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
         componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
-        indexOfDot = componentVariableName.indexOf('.'),
+        indexOfDot = componentVariableName.indexOf("."),
         variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
 
     for (var i = 0; i < model2DArray.length; i++) {
         var indexOfHash2 = model2DArray[i][1].search("#"),
             cellmlModelName2 = model2DArray[i][1].slice(0, indexOfHash2), // weinstein_1995.cellml
             componentVariableName2 = model2DArray[i][1].slice(indexOfHash2 + 1), // NHE3.J_NHE3_Na
-            indexOfDot2 = componentVariableName2.indexOf('.'),
+            indexOfDot2 = componentVariableName2.indexOf("."),
             variableName2 = componentVariableName2.slice(indexOfDot2 + 1); // J_NHE3_Na
 
         if (cellmlModelName == cellmlModelName2 && variableName == variableName2) {
@@ -350,7 +350,7 @@ var isExistModel2DArray = function (element, model2DArray) {
     }
 
     return false;
-}
+};
 
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
@@ -413,7 +413,7 @@ var sendPostRequest = function (requestUrl, query, responseHandler, isJsonRespon
 
     request.open("POST", requestUrl, true);
 
-    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/sparql-results+json");
 
     request.send(query); // for POST only
@@ -475,11 +475,11 @@ var sendGetRequest = __webpack_require__(1).sendGetRequest;
 var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
 (function (global) {
-    'use strict';
+    "use strict";
 
     // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
-        cors_api_url = 'http://localhost:8080/',
+        // cors_api_url = "http://localhost:8080/",
         // endpoint = cors_api_url + pmrEndpoint;
         endpoint = pmrEndpoint;
 
@@ -530,17 +530,16 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 $("#main-content").html(homeHtmlContent);
             },
             false);
-    }
+    };
 
     mainUtils.loadDocumentation = function () {
-
+        var uri = "https://github.com/dewancse/epithelial-modelling-platform";
         $("#main-content").html("Documentation can be found at " +
-            '<a href="https://github.com/dewancse/epithelial-modelling-platform" ' +
-            'target="_blank">README.md in github</a>');
-    }
+            "<a href=" + uri + " + target=_blank>README.md in github</a>");
+    };
 
     // On page load (before img or CSS)
-    $(document).ready(function (event) {
+    $(document).ready(function () {
 
         // On first load, show home view
         showLoading("#main-content");
@@ -548,7 +547,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         // console.log("document.ready");
 
         if (sessionStorage.getItem("searchListContent")) {
-            $("#main-content").html(sessionStorage.getItem('searchListContent'));
+            $("#main-content").html(sessionStorage.getItem("searchListContent"));
         }
         else {
             // homepage
@@ -557,14 +556,14 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 function (homeHtmlContent) {
                     $("#main-content").html(homeHtmlContent);
 
-                    $('.carousel').carousel({
+                    $(".carousel").carousel({
                         interval: 2000
                     });
                 },
                 false);
         }
 
-        $('.dropdown-toggle').dropdown();
+        $(".dropdown-toggle").dropdown();
     });
 
     $(document).on({
@@ -572,7 +571,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
             // console.log("document.on.click");
 
-            // If there's an action with the given name, call it
+            // If there"s an action with the given name, call it
             if (typeof actions[event.target.dataset.action] === "function") {
                 console.log("event.target.dataset.action: ", event.target.dataset.action);
                 actions[event.target.dataset.action].call(this, event);
@@ -584,13 +583,13 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             // console.log("document.on.keydown");
 
             // semantic annotation based on search items
-            if (event.key == 'Enter') {
+            if (event.key == "Enter") {
 
                 var uriOPB, uriCHEBI, keyValue;
                 var searchTxt = document.getElementById("searchTxt").value;
 
                 // set local storage
-                sessionStorage.setItem('searchTxtContent', searchTxt);
+                sessionStorage.setItem("searchTxtContent", searchTxt);
 
                 // dictionary object
                 var dictionary = [
@@ -713,6 +712,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
             // console.log("model event: ", event);
 
+            var pos, pos2, i;
             // select one by one
             if (event.target.className == "attribute") {
 
@@ -728,11 +728,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     }
                 }
                 else {
-                    var pos = templistOfModel.indexOf(event.target.value);
+                    pos = templistOfModel.indexOf(event.target.value);
                     templistOfModel.splice(pos, 1);
 
                     // @modelEntityNameArray for similarity graph
-                    var pos2 = modelEntityNameArray.indexOf(event.target.value);
+                    pos2 = modelEntityNameArray.indexOf(event.target.value);
                     modelEntityNameArray.splice(pos2, 1);
                     modelEntityFullNameArray.splice(pos2, 1);
                 }
@@ -751,28 +751,28 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             if (event.target.className == "attributeAll") {
 
                 if (event.target.checked == true) {
-                    for (var i = 0; i < $('.attribute').length; i++) {
-                        $('.attribute')[i].checked = true;
+                    for (i = 0; i < $(".attribute").length; i++) {
+                        $(".attribute")[i].checked = true;
 
                         // filter duplicate cellml component for a variable and a model name
-                        if (!isExist($('.attribute')[i].value, templistOfModel)) {
-                            templistOfModel.push($('.attribute')[i].value);
+                        if (!isExist($(".attribute")[i].value, templistOfModel)) {
+                            templistOfModel.push($(".attribute")[i].value);
 
                             // @modelEntityNameArray for similarity graph
-                            modelEntityNameArray.push($('.attribute')[i].value);
-                            modelEntityFullNameArray.push($('.attribute')[i].value);
+                            modelEntityNameArray.push($(".attribute")[i].value);
+                            modelEntityFullNameArray.push($(".attribute")[i].value);
                         }
                     }
                 }
                 else {
-                    for (var i = 0; i < $('.attribute').length; i++) {
-                        $('.attribute')[i].checked = false;
+                    for (i = 0; i < $(".attribute").length; i++) {
+                        $(".attribute")[i].checked = false;
 
-                        var pos = templistOfModel.indexOf($('.attribute')[i].value);
+                        pos = templistOfModel.indexOf($(".attribute")[i].value);
                         templistOfModel.splice(pos, 1);
 
                         // @modelEntityNameArray for similarity graph
-                        var pos2 = modelEntityNameArray.indexOf($('.attribute')[i].value);
+                        pos2 = modelEntityNameArray.indexOf($(".attribute")[i].value);
                         modelEntityNameArray.splice(pos2, 1);
                         modelEntityFullNameArray.splice(pos2, 1);
                     }
@@ -782,19 +782,19 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             // remove duplicate in templistOfModel
             templistOfModel = templistOfModel.filter(function (item, pos) {
                 return templistOfModel.indexOf(item) == pos;
-            })
+            });
 
             // remove duplicate in modelEntityNameArray
             modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
                 return modelEntityNameArray.indexOf(item) == pos;
-            })
+            });
 
             // remove duplicate in modelEntityFullNameArray
             modelEntityFullNameArray = modelEntityFullNameArray.filter(function (item, pos) {
                 return modelEntityFullNameArray.indexOf(item) == pos;
-            })
+            });
         }
-    }
+    };
 
     // Load search html
     mainUtils.loadSearchHtml = function () {
@@ -813,7 +813,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         else {
             // console.log("loadSearchHtml ELSE");
 
-            $("#main-content").html(sessionStorage.getItem('searchListContent'));
+            $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
             mainUtils.showDiscoverModels(
                 head,
@@ -824,46 +824,47 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 proteinList,
                 listOfURIs);
         }
-    }
+    };
 
     mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
 
         // console.log("discoverModels");
 
+        var query;
         if (uriCHEBI == "") {
-            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-                'SELECT ?Model_entity ?Biological_meaning ' +
-                'WHERE { ' +
-                '?property semsim:hasPhysicalDefinition ' + uriOPB + '. ' +
-                '?Model_entity semsim:isComputationalComponentFor ?property. ' +
-                '?Model_entity dcterms:description ?Biological_meaning.' +
-                '}';
+            query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                "PREFIX dcterms: <http://purl.org/dc/terms/>" +
+                "SELECT ?Model_entity ?Biological_meaning " +
+                "WHERE { " +
+                "?property semsim:hasPhysicalDefinition " + uriOPB + ". " +
+                "?Model_entity semsim:isComputationalComponentFor ?property. " +
+                "?Model_entity dcterms:description ?Biological_meaning." +
+                "}";
         }
         else {
             if (keyValue == "flux") {
-                var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                    'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-                    'SELECT DISTINCT ?g ?Model_entity ?Biological_meaning ' +
-                    'WHERE { GRAPH ?g { ' +
-                    '?entity semsim:hasPhysicalDefinition ' + uriCHEBI + '. ' +
-                    '?source semsim:hasPhysicalEntityReference ?entity. ' +
-                    '?process semsim:hasSourceParticipant ?source. ' +
-                    '?property semsim:physicalPropertyOf ?process. ' +
-                    '?Model_entity semsim:isComputationalComponentFor ?property. ' +
-                    '?Model_entity dcterms:description ?Biological_meaning.' +
-                    '}}'
+                query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                    "PREFIX dcterms: <http://purl.org/dc/terms/>" +
+                    "SELECT DISTINCT ?g ?Model_entity ?Biological_meaning " +
+                    "WHERE { GRAPH ?g { " +
+                    "?entity semsim:hasPhysicalDefinition " + uriCHEBI + ". " +
+                    "?source semsim:hasPhysicalEntityReference ?entity. " +
+                    "?process semsim:hasSourceParticipant ?source. " +
+                    "?property semsim:physicalPropertyOf ?process. " +
+                    "?Model_entity semsim:isComputationalComponentFor ?property. " +
+                    "?Model_entity dcterms:description ?Biological_meaning." +
+                    "}}";
             }
             else {
-                var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                    'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-                    'SELECT ?Model_entity ?Biological_meaning ' +
-                    'WHERE { ' +
-                    '?entity semsim:hasPhysicalDefinition ' + uriCHEBI + '. ' +
-                    '?property semsim:physicalPropertyOf ?entity. ' +
-                    '?Model_entity semsim:isComputationalComponentFor ?property. ' +
-                    '?Model_entity dcterms:description ?Biological_meaning.' +
-                    '}'
+                query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                    "PREFIX dcterms: <http://purl.org/dc/terms/>" +
+                    "SELECT ?Model_entity ?Biological_meaning " +
+                    "WHERE { " +
+                    "?entity semsim:hasPhysicalDefinition " + uriCHEBI + ". " +
+                    "?property semsim:physicalPropertyOf ?entity. " +
+                    "?Model_entity semsim:isComputationalComponentFor ?property. " +
+                    "?Model_entity dcterms:description ?Biological_meaning." +
+                    "}";
             }
         }
 
@@ -888,12 +889,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                     // console.log("model: ", model);
 
-                    model = model + "#" + model.slice(0, model.indexOf('.'));
+                    model = model + "#" + model.slice(0, model.indexOf("."));
 
                     // console.log("model#: ", model);
 
-                    var query = 'SELECT ?Protein ' +
-                        'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }';
+                    var query = "SELECT ?Protein " +
+                        "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }";
 
                     // console.log("query: ", query);
 
@@ -971,8 +972,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                         geneList.push("Undefined");
                                                     else {
                                                         var geneName = jsonGene._embedded.terms[0].label;
-                                                        var indexOfParen = geneName.indexOf('(');
-                                                        geneName = geneName.slice(0, indexOfParen - 1);
+                                                        geneName = geneName.slice(0, geneName.indexOf("(") - 1);
                                                         geneList.push(geneName);
                                                     }
 
@@ -981,8 +981,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                         proteinList.push("Undefined");
                                                     else {
                                                         var proteinName = jsonProtein._embedded.terms[0].label;
-                                                        var indexOfParen = proteinName.indexOf('(');
-                                                        proteinName = proteinName.slice(0, indexOfParen - 1);
+                                                        proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
                                                         proteinList.push(proteinName);
                                                     }
 
@@ -1003,11 +1002,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                                         proteinList = proteinList.filter(function (item, pos) {
                                                             return proteinList.indexOf(item) == pos;
-                                                        })
+                                                        });
 
                                                         listOfURIs = listOfURIs.filter(function (item, pos) {
                                                             return listOfURIs.indexOf(item) == pos;
-                                                        })
+                                                        });
 
                                                         filterByProtein();
                                                         return;
@@ -1023,12 +1022,12 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                 true);
                         },
                         true);
-                } // end of discoverInnerModels function
+                }; // end of discoverInnerModels function
 
                 discoverInnerModels();
             },
             true);
-    }
+    };
 
     // Show discovered models from PMR
     mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfURIs) {
@@ -1038,7 +1037,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         // Empty search result
         if (head.length == 0) {
             $("#searchList").html(
-                "<section class='container-fluid'><label><br>No Search Results!</label></section>"
+                "<section class=container-fluid><label><br>No Search Results!</label></section>"
             );
 
             return;
@@ -1050,8 +1049,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
         // Table header
-        var thead = $("<thead/>"), tr = $("<tr/>");
-        for (var i = 0; i < head.length; i++) {
+        var thead = $("<thead/>"), tr = $("<tr/>"), i;
+        for (i = 0; i < head.length; i++) {
             // Empty header for checkbox column
             if (i == 0)
                 tr.append($("<th/>").append(""));
@@ -1064,16 +1063,17 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         // Table body
         var tbody = $("<tbody/>");
-        for (var i = 0; i < modelEntity.length; i++) {
-            var tr = $("<tr/>"), temp = [];
+        for (i = 0; i < modelEntity.length; i++) {
+            var temp = [];
+            tr = $("<tr/>");
             temp.push(modelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
 
             for (var j = 0; j < temp.length; j++) {
                 if (j == 0) {
                     tr.append($("<td/>")
-                        .append($('<label/>')
-                            .html('<input id="' + modelEntity[i] + '" uri="' + listOfURIs[i] + '" type="checkbox" ' +
-                                'data-action="search" value="' + modelEntity[i] + '" class="checkbox">')));
+                        .append($("<label/>")
+                            .html("<input id=" + modelEntity[i] + " uri=" + listOfURIs[i] + " type=checkbox " +
+                                "data-action=search value=" + modelEntity[i] + " + class=checkbox>")));
                 }
 
                 if (j == 1)
@@ -1089,11 +1089,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         $("#searchList").append(table);
 
         // Fill in search attribute value
-        $("#searchTxt").attr("value", sessionStorage.getItem('searchTxtContent'));
+        $("#searchTxt").attr("value", sessionStorage.getItem("searchTxtContent"));
 
         // SET main content in local storage
-        sessionStorage.setItem('searchListContent', $("#main-content").html());
-    }
+        sessionStorage.setItem("searchListContent", $("#main-content").html());
+    };
 
     // Load the view
     mainUtils.loadViewHtml = function () {
@@ -1106,28 +1106,28 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             return;
         }
 
-        cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
+        cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf("."));
 
         // console.log("cellmlModel: ", cellmlModel);
 
-        var query = 'SELECT ?Workspace ?Model_entity ?Title ?Author ?Abstract ?Keyword ?Protein ?Compartment ' +
-            '?Located_in ?DOI WHERE { GRAPH ?Workspace { ' +
-            '<' + cellmlModel + '> <http://purl.org/dc/terms/title> ?Title . ' +
-            '?Model_entity <http://purl.org/dc/terms/title> ?Title . ' +
-            'OPTIONAL { <' + cellmlModel + '> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . ' +
-            'OPTIONAL { <' + cellmlModel + '> <http://purl.org/dc/terms/abstract> ?Abstract } . ' +
-            'OPTIONAL { <' + cellmlModel + '> <http://purl.org/dc/terms/keyword> ?Keyword } . ' +
-            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein } . ' +
-            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment } . ' +
-            'OPTIONAL { <' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . ' +
-            'OPTIONAL { <' + cellmlModel + '> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . ' +
-            '}}';
+        var query = "SELECT ?Workspace ?Model_entity ?Title ?Author ?Abstract ?Keyword ?Protein ?Compartment " +
+            "?Located_in ?DOI WHERE { GRAPH ?Workspace { " +
+            "<" + cellmlModel + "> <http://purl.org/dc/terms/title> ?Title . " +
+            "?Model_entity <http://purl.org/dc/terms/title> ?Title . " +
+            "OPTIONAL { <" + cellmlModel + "> <http://www.w3.org/2001/vcard-rdf/3.0#FN> ?Author } . " +
+            "OPTIONAL { <" + cellmlModel + "> <http://purl.org/dc/terms/abstract> ?Abstract } . " +
+            "OPTIONAL { <" + cellmlModel + "> <http://purl.org/dc/terms/keyword> ?Keyword } . " +
+            "OPTIONAL { <" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein } . " +
+            "OPTIONAL { <" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment } . " +
+            "OPTIONAL { <" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in } . " +
+            "OPTIONAL { <" + cellmlModel + "> <http://biomodels.net/model-qualifiers/isDescribedBy> ?DOI } . " +
+            "}}";
 
         showLoading("#main-content");
         sendPostRequest(
             endpoint,
             query,
-            function (jsonObj) {
+            function () {
                 sendGetRequest(
                     viewHtml,
                     function (viewHtmlContent) {
@@ -1137,14 +1137,14 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     false);
             },
             true);
-    }
+    };
 
     // extension of loadModelHtml function
     var findCompartmentLoc = function (jsonObjComp, jsonObjLoc, tempidWithStr, protein, species, gene) {
         var tempComp = "", counterOLS = 0;
         for (var i = 0; i < jsonObjComp.results.bindings.length; i++) {
             var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
-            var indexofColon = fma_uri.indexOf('FMA:');
+            var indexofColon = fma_uri.indexOf("FMA:");
             // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
 
@@ -1166,7 +1166,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         var tempLoc = "", counterOLSLoc = 0;
                         for (var i = 0; i < jsonObjLoc.results.bindings.length; i++) {
                             var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
-                            var indexofColon = fma_uri.indexOf('FMA:');
+                            var indexofColon = fma_uri.indexOf("FMA:");
                             // fma_uri = "http://purl.obolibrary.org/obo/FMA_" + fma_uri.slice(indexofColon + 4);
                             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(indexofColon + 4);
 
@@ -1192,7 +1192,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                             "Gene": gene,
                                             "Compartment": tempComp,
                                             "Located_in": tempLoc
-                                        }
+                                        };
 
                                         // console.log("jsonObj in loadModelHtml: ", jsonObj);
                                         mainUtils.showModel(jsonObj);
@@ -1204,7 +1204,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 },
                 true);
         }
-    }
+    };
 
     // Load the model
     mainUtils.loadModelHtml = function () {
@@ -1218,11 +1218,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
             model = undefined;
         else {
             tempidWithStr = mainUtils.tempidWithStr;
-            model = model + "#" + model.slice(0, model.indexOf('.'));
+            model = model + "#" + model.slice(0, model.indexOf("."));
         }
 
-        var query = 'SELECT ?Protein ' +
-            'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }';
+        var query = "SELECT ?Protein " +
+            "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }";
 
         sendPostRequest(
             endpoint,
@@ -1280,8 +1280,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                         // console.log("jsonSpecies: ", jsonSpecies);
 
-                                        var query = 'SELECT ?Compartment ' +
-                                            'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }';
+                                        var query = "SELECT ?Compartment " +
+                                            "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }";
 
                                         sendPostRequest(
                                             endpoint,
@@ -1290,8 +1290,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                                 // console.log("jsonObjComp: ", jsonObjComp);
 
-                                                var query = 'SELECT ?Located_in ' +
-                                                    'WHERE { ' + '<' + model + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in. }';
+                                                var query = "SELECT ?Located_in " +
+                                                    "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in. }";
 
                                                 sendPostRequest(
                                                     endpoint,
@@ -1326,7 +1326,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                                     gene = "Undefined";
                                                                 else {
                                                                     var geneName = jsonGene._embedded.terms[0].label;
-                                                                    var indexOfParen = geneName.indexOf('(');
+                                                                    var indexOfParen = geneName.indexOf("(");
                                                                     geneName = geneName.slice(0, indexOfParen - 1);
                                                                     gene = geneName;
                                                                 }
@@ -1336,8 +1336,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                                     protein = "Undefined";
                                                                 else {
                                                                     var proteinName = jsonProtein._embedded.terms[0].label;
-                                                                    var indexOfParen = proteinName.indexOf('(');
-                                                                    proteinName = proteinName.slice(0, indexOfParen - 1);
+                                                                    proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
                                                                     protein = proteinName;
                                                                 }
 
@@ -1357,7 +1356,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     true);
             },
             true);
-    }
+    };
 
     // Show selected models
     mainUtils.showModel = function (jsonObj) {
@@ -1384,13 +1383,13 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
 
         // Table header
-        var thead = $("<thead/>"), tr = $("<tr/>");
-        for (var i = 0; i < head.length; i++) {
+        var thead = $("<thead/>"), tr = $("<tr/>"), i;
+        for (i = 0; i < head.length; i++) {
             if (i == 0) {
                 tr.append($("<th/>")
                     .append($("<label/>")
-                        .html('<input id="' + head[0] + '" type="checkbox" name="attributeAll" ' +
-                            'class="attributeAll" data-action="model" value="' + head[0] + '" >')));
+                        .html("<input id=" + head[0] + " + type=checkbox name=attributeAll " +
+                            "class=attributeAll data-action=model value=" + head[0] + " >")));
             }
 
             tr.append($("<th/>").append(head[i]));
@@ -1399,7 +1398,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         thead.append(tr);
         table.append(thead);
 
-        for (var i = 0; i < head.length; i++) {
+        for (i = 0; i < head.length; i++) {
             if (i == 0) {
                 // search list to model list with empty model
                 if (jsonObj.length == 0) break;
@@ -1407,8 +1406,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 if (isExistModel2DArray(modelEntityName, model2DArray))
                     break;
 
-                model.push($("<label/>").html('<input id="' + modelEntityName + '" type="checkbox" ' +
-                    'name="attribute" class="attribute" data-action="model" value="' + modelEntityName + '" >'));
+                model.push($("<label/>").html("<input id=" + modelEntityName + " + type=checkbox " +
+                    "name=attribute class=attribute data-action=model value=" + modelEntityName + " >"));
             }
 
             if (head[i] == "Model_entity") {
@@ -1428,8 +1427,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
         // Table body
         var tbody = $("<tbody/>"), td = [];
-        for (var i = 0; i < model2DArray.length; i++) {
-            var tr = $("<tr/>");
+        for (i = 0; i < model2DArray.length; i++) {
+            tr = $("<tr/>");
             // +1 for adding checkbox column
             for (var j = 0; j < head.length + 1; j++) {
                 td[j] = $("<td/>");
@@ -1452,101 +1451,101 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         $("#modelList").append(table);
 
         // delete already visualized models on the platform
-        visualizedModelsOnPlatform.forEach(function (element, tempIndex) {
-            for (var i = 0; i < $('table tr').length; i++) {
+        visualizedModelsOnPlatform.forEach(function (element) {
+            for (var i = 0; i < $("table tr").length; i++) {
 
-                if ($('table tr')[i].id == element) {
+                if ($("table tr")[i].id == element) {
                     // Remove selected row
-                    $('table tr')[i].remove();
+                    $("table tr")[i].remove();
 
                     // Remove from model2DArray
                     model2DArray.forEach(function (elem, index) {
                         if (element == elem[1]) {
                             model2DArray.splice(index, 1);
                         }
-                    })
+                    });
                 }
             }
-        })
+        });
 
         // Uncheck checkboxes when back from Similarity models
-        for (var i = 0; i < $('table tr td label').length; i++) {
-            if ($('table tr td label')[i].firstChild.checked == true) {
-                $('table tr td label')[i].firstChild.checked = false;
+        for (i = 0; i < $("table tr td label").length; i++) {
+            if ($("table tr td label")[i].firstChild.checked == true) {
+                $("table tr td label")[i].firstChild.checked = false;
             }
         }
 
-        lengthOfLoadModelTable = $('table tr').length;
+        lengthOfLoadModelTable = $("table tr").length;
         // console.log("lengthOfLoadModelTable in showModel: ", lengthOfLoadModelTable);
         if (lengthOfLoadModelTable == 1) {
             mainUtils.workspaceName = "";
             $("#modelList").html("Please load models from Model Discovery");
             return;
         }
-    }
+    };
 
     // Filter search results
     mainUtils.filterSearchHtml = function () {
-        // console.log("membraneId in filterSearchHtml: ", $('#membraneId'));
-        // console.log("$('#membraneId').val() in filterSearchHtml: ", $('#membraneId').val());
-        // console.log("$('table tr') in filterSearchHtml: ", $('table tr'));
+        // console.log("membraneId in filterSearchHtml: ", $("#membraneId"));
+        // console.log("$("#membraneId").val() in filterSearchHtml: ", $("#membraneId").val());
+        // console.log("$("table tr") in filterSearchHtml: ", $("table tr"));
         //
-        // console.log("selected options: ", $('#membraneId').val());
+        // console.log("selected options: ", $("#membraneId").val());
 
-        if ($('#membraneId').val() == "all") {
+        if ($("#membraneId").val() == "all") {
             // console.log("all options are selected");
-            $('table tr').show();
+            $("table tr").show();
         }
         else {
-            var selectedprotein = $('#membraneId option:selected').val();
+            var selectedprotein = $("#membraneId option:selected").val();
 
-            for (var i = 1; i < $('table tr').length; i++) {
+            for (var i = 1; i < $("table tr").length; i++) {
 
-                var tempstr = $('table tr')[i];
-                tempstr = $($(tempstr).find('input')).attr('uri');
+                var tempstr = $("table tr")[i];
+                tempstr = $($(tempstr).find("input")).attr("uri");
 
                 // console.log("selectedprotein, tempstr: ", selectedprotein, tempstr);
 
                 if (selectedprotein == tempstr) {
-                    $('table tr')[i].hidden = false;
+                    $("table tr")[i].hidden = false;
                 }
                 else {
-                    $('table tr')[i].hidden = true;
+                    $("table tr")[i].hidden = true;
                 }
             }
         }
 
-        // sessionStorage.setItem('searchListContent', $("#main-content").html());
-        // $("#main-content").html(sessionStorage.getItem('searchListContent'));
-    }
+        // sessionStorage.setItem("searchListContent", $("#main-content").html());
+        // $("#main-content").html(sessionStorage.getItem("searchListContent"));
+    };
 
     // Filter dropdown list in the search html
     var filterByProtein = function () {
         // Initializing the dropdown list
-        $('#membraneId').empty();
-        $('#membraneId').append('<option value=all>select all</option>');
+        $("#membraneId").empty();
+        $("#membraneId").append("<option value=all>select all</option>");
 
         for (var i = 0; i < proteinList.length; i++) {
-            $('#membraneId').append('<option value=' + listOfURIs[i] + '>' + proteinList[i] + '</option>');
+            $("#membraneId").append("<option value=" + listOfURIs[i] + ">" + proteinList[i] + "</option>");
         }
-    }
+    };
 
     // Delete model
     mainUtils.deleteRowModelHtml = function () {
 
         templistOfModel.forEach(function (element, tempIndex) {
-            for (var i = 0; i < $('table tr').length; i++) {
+            for (var i = 0; i < $("table tr").length; i++) {
 
-                if ($('table tr')[i].id == element) {
+                if ($("table tr")[i].id == element) {
                     // Remove selected row
-                    $('table tr')[i].remove();
+                    $("table tr")[i].remove();
 
                     // Remove from model2DArray
                     model2DArray.forEach(function (elem, index) {
                         if (element == elem[1]) {
                             model2DArray.splice(index, 1);
                         }
-                    })
+                    });
 
                     // Remove from templistOfModel
                     templistOfModel.splice(tempIndex, 1);
@@ -1561,7 +1560,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         if (element == elem) {
                             modelEntityInLoadModels.splice(index, 1);
                         }
-                    })
+                    });
 
                     // delete from LOAD MODELS and push it back to MODEL DISCOVERY
                     modelEntity.push(element);
@@ -1573,7 +1572,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     modelEntityFullNameArray.splice(tempIndex, 1);
                 }
             }
-        })
+        });
 
         // console.log("model2DArray in deleteRowModelHtml: ", model2DArray);
         // console.log("templistOfModel in deleteRowModelHtml: ", templistOfModel);
@@ -1582,14 +1581,14 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         // console.log("modelEntity in deleteRowModelHtml: ", modelEntity);
         // console.log("modelEntityInLoadModels in deleteRowModelHtml: ", modelEntityInLoadModels);
 
-        // console.log("lengthOfLoadModelTable in deleteRowModelHtml: ", $('table tr').length);
-        lengthOfLoadModelTable = $('table tr').length;
+        // console.log("lengthOfLoadModelTable in deleteRowModelHtml: ", $("table tr").length);
+        lengthOfLoadModelTable = $("table tr").length;
         if (lengthOfLoadModelTable == 1) {
             mainUtils.workspaceName = "";
             $("#modelList").html("Please load models from Model Discovery");
             return;
         }
-    }
+    };
 
     // Load the SVG model
     mainUtils.loadSimilarityHtml = function () {
@@ -1601,7 +1600,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                 sendGetRequest(
                     similarityHtml,
-                    function (similarityHtmlContent) {
+                    function () {
                         similarityModels(model2DArray, modelEntityNameArray);
 
                         // Reinitialize to display only selected models on the Platform
@@ -1612,7 +1611,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     false);
             },
             false);
-    }
+    };
 
     // Load the epithelial
     mainUtils.loadEpithelialHtml = function () {
@@ -1630,10 +1629,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                 sendGetRequest(epithelialHtml, mainUtils.loadEpithelial, false);
             },
             false);
-    }
+    };
 
     var concentration_fma = [];
-    mainUtils.loadEpithelial = function (epithelialHtmlContent) {
+    mainUtils.loadEpithelial = function () {
 
         // remove model name, keep only solutes
         for (var i = 0; i < modelEntityNameArray.length; i++) {
@@ -1678,8 +1677,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
         // remove visualized solutes in the next iteration in Load Model page
         var rmFromModelEntityFullNameArray = function (membrane, concentration_fma) {
 
-            for (var i = 0; i < membrane.length; i++) {
-                for (var j = 0; j < modelEntityFullNameArray.length; j++) {
+            var i, j;
+            for (i = 0; i < membrane.length; i++) {
+                for (j = 0; j < modelEntityFullNameArray.length; j++) {
                     if (membrane[i].model_entity == modelEntityFullNameArray[j]) {
 
                         // add models to delete from Load Models table row
@@ -1696,27 +1696,27 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                             if (membrane[i].model_entity == elem[1]) {
                                 model2DArray.splice(index, 1);
                             }
-                        })
+                        });
 
                         // Remove from templistOfModel
                         templistOfModel.forEach(function (elem, index) {
                             if (membrane[i].model_entity == elem) {
                                 templistOfModel.splice(index, 1);
                             }
-                        })
+                        });
 
                         // Remove from modelEntity
                         modelEntity.forEach(function (elem, index) {
                             if (membrane[i].model_entity == elem) {
                                 modelEntity.splice(index, 1);
                             }
-                        })
+                        });
                     }
                 }
             }
 
-            for (var i = 0; i < concentration_fma.length; i++) {
-                for (var j = 0; j < modelEntityFullNameArray.length; j++) {
+            for (i = 0; i < concentration_fma.length; i++) {
+                for (j = 0; j < modelEntityFullNameArray.length; j++) {
                     if (concentration_fma[i].name == modelEntityFullNameArray[j]) {
 
                         // add models to delete from Load Models table row
@@ -1733,38 +1733,38 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                             if (concentration_fma[i].name == elem[1]) {
                                 model2DArray.splice(index, 1);
                             }
-                        })
+                        });
 
                         // Remove from modelEntity
                         modelEntity.forEach(function (elem, index) {
                             if (concentration_fma[i].name == elem) {
                                 modelEntity.splice(index, 1);
                             }
-                        })
+                        });
                     }
                 }
             }
-        }
+        };
 
         // making cotransporter from RDF graph using SPARQL
         mainUtils.makecotransporter = function (membrane1, membrane2) {
             // query to find fluxes in order to make a cotransporter
-            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                'SELECT ?med_entity_uri ?med_entity_uriCl ' +
-                'WHERE { GRAPH ?Workspace { ' +
-                '<' + membrane1.model_entity + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant. ' +
-                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. ' +
-                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-                '<' + membrane2.model_entity + '> semsim:isComputationalComponentFor ?model_propCl. ' +
-                '?model_propCl semsim:physicalPropertyOf ?model_procCl. ' +
-                '?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. ' +
-                '?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. ' +
-                '?med_entityCl semsim:hasPhysicalDefinition ?med_entity_uriCl.' +
-                'FILTER (?med_entity_uri = ?med_entity_uriCl) . ' +
-                '}}'
+            var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+                "SELECT ?med_entity_uri ?med_entity_uriCl " +
+                "WHERE { GRAPH ?Workspace { " +
+                "<" + membrane1.model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
+                "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+                "?model_proc semsim:hasMediatorParticipant ?model_medparticipant. " +
+                "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. " +
+                "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
+                "<" + membrane2.model_entity + "> semsim:isComputationalComponentFor ?model_propCl. " +
+                "?model_propCl semsim:physicalPropertyOf ?model_procCl. " +
+                "?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. " +
+                "?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. " +
+                "?med_entityCl semsim:hasPhysicalDefinition ?med_entity_uriCl." +
+                "FILTER (?med_entity_uri = ?med_entity_uriCl) . " +
+                "}}";
 
             sendPostRequest(
                 endpoint,
@@ -1798,15 +1798,15 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     // TODO: probably no need to do this!
                     tempProtein = tempProtein.filter(function (item, pos) {
                         return tempProtein.indexOf(item) == pos;
-                    })
+                    });
 
                     tempApical = tempApical.filter(function (item, pos) {
                         return tempApical.indexOf(item) == pos;
-                    })
+                    });
 
                     tempBasolateral = tempBasolateral.filter(function (item, pos) {
                         return tempBasolateral.indexOf(item) == pos;
-                    })
+                    });
 
                     // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
                     // console.log("med_pr in makecotransporter : ", membrane1, membrane1.med_pr, membrane2, membrane2.med_pr);
@@ -1842,7 +1842,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                         variable_text2: membrane2.variable_text,
                         source_fma2: membrane2.source_fma,
                         sink_fma2: membrane2.sink_fma
-                    }
+                    };
 
                     // console.log("tempprotein: ", tempProtein);
 
@@ -1905,26 +1905,26 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     }
                 },
                 true);
-        }
+        };
 
         mainUtils.srcDescMediatorOfFluxes = function () {
 
-            var model;
+            var model, query, i;
             if (modelEntityFullNameArray[index] == undefined)
                 model = undefined;
             else {
                 model = parseModelName(modelEntityFullNameArray[index]);
-                model = model + "#" + model.slice(0, model.indexOf('.'));
+                model = model + "#" + model.slice(0, model.indexOf("."));
             }
 
             // console.log("model: ", model, modelEntityFullNameArray[index]);
 
-            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                'SELECT ?opb ' +
-                'WHERE { ' +
-                '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                '?model_prop semsim:hasPhysicalDefinition ?opb. ' +
-                '}'
+            query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                "SELECT ?opb " +
+                "WHERE { " +
+                "<" + modelEntityFullNameArray[index] + "> semsim:isComputationalComponentFor ?model_prop. " +
+                "?model_prop semsim:hasPhysicalDefinition ?opb. " +
+                "}";
 
             sendPostRequest(
                 endpoint,
@@ -1933,26 +1933,26 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     // flux OPB
                     if (jsonObjOPB.results.bindings[0].opb.value == fluxOPB) {
 
-                        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                            'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                            'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?protein ' +
-                            'WHERE { ' +
-                            '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                            '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-                            '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-                            '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-                            '?source_entity ro:part_of ?source_part_of_entity. ' +
-                            '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-                            '?source_entity semsim:hasPhysicalDefinition ?solute_chebi. ' +
-                            '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-                            '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-                            '?sink_entity ro:part_of ?sink_part_of_entity. ' +
-                            '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
-                            '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
-                            '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
-                            '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-                            '<' + model + '>  <http://www.obofoundry.org/ro/ro.owl#modelOf> ?protein. ' +
-                            '}'
+                        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+                            "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?protein " +
+                            "WHERE { " +
+                            "<" + modelEntityFullNameArray[index] + "> semsim:isComputationalComponentFor ?model_prop. " +
+                            "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+                            "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
+                            "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
+                            "?source_entity ro:part_of ?source_part_of_entity. " +
+                            "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
+                            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
+                            "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
+                            "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
+                            "?sink_entity ro:part_of ?sink_part_of_entity. " +
+                            "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
+                            "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
+                            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
+                            "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
+                            "<" + model + ">  <http://www.obofoundry.org/ro/ro.owl#modelOf> ?protein. " +
+                            "}";
 
                         sendPostRequest(
                             endpoint,
@@ -1960,9 +1960,9 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                             function (jsonObjFlux) {
 
                                 // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
-
+                                
                                 var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
-                                var indexofColon = chebi_uri.indexOf('CHEBI:');
+                                var indexofColon = chebi_uri.indexOf("CHEBI:");
                                 chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
                                 var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
@@ -1971,11 +1971,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                     function (jsonObjOLSChebi) {
 
                                         // Name of a solute CHEBI from OLS
-                                        for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
+                                        for (i = 0; i < jsonObjFlux.results.bindings.length; i++) {
                                             var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
                                                 solute_chebi_name;
                                             for (var m = 0; m < temparr.length; m++) {
-                                                if (temparr[m].slice(-1) == '+' || temparr[m].slice(-1) == '-') {
+                                                if (temparr[m].slice(-1) == "+" || temparr[m].slice(-1) == "-") {
                                                     solute_chebi_name = temparr[m];
                                                     break;
                                                 }
@@ -2045,7 +2045,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                         // console.log("med_pr[0], med_pr in index.js: ", med_pr[0], med_pr);
                                         // console.log("med_fma in index.js: ", med_fma);
 
-                                        var medURI, endpointOLS;
+                                        var medURI, endpointOLS, srctext, temp_med_pr, med_pr_text_syn, tempvar;
 
                                         if (med_pr[0] == undefined)
                                             medURI = jsonObjFlux.results.bindings[0].protein.value;
@@ -2053,13 +2053,11 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                             medURI = med_pr[0].fma;
 
                                         if (medURI.indexOf(partOfCHEBIUri) != -1) {
-                                            var indexofColon = medURI.indexOf('CHEBI:');
-                                            chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
+                                            chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(medURI.indexOf("CHEBI:") + 6);
                                             endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                         }
                                         else if (medURI.indexOf(partOfGOUri) != -1) {
-                                            var indexofColon = medURI.indexOf('GO:');
-                                            var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
+                                            var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(medURI.indexOf("GO:") + 3);
                                             endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
                                         }
                                         else
@@ -2077,8 +2075,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                                     if (source_fma.length == 1) { // transporter (single flux)
 
-                                                        var srctext = parserFmaNameText(source_fma[0]), // get this from OLS
-                                                            temp_med_pr, med_pr_text_syn;
+                                                        srctext = parserFmaNameText(source_fma[0]); // get this from OLS;
 
                                                         // No mediator protein in NHE3, SGLT models
                                                         if (med_pr[0] == undefined)
@@ -2089,7 +2086,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
 
                                                         // console.log("med_pr, temp_med_pr in index.js: ", med_pr, temp_med_pr);
 
-                                                        var tempvar;
                                                         if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
                                                             // med_pr_text_syn = undefined;
                                                             med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
@@ -2133,9 +2129,8 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                             sink_fma[1].name = tempName;
                                                         }
 
-                                                        for (var i = 0; i < source_fma.length; i++) {
-                                                            var srctext = parserFmaNameText(source_fma[i]),
-                                                                temp_med_pr, med_pr_text_syn;
+                                                        for (i = 0; i < source_fma.length; i++) {
+                                                            srctext = parserFmaNameText(source_fma[i]);
 
                                                             if (med_pr[0] == undefined)
                                                                 temp_med_pr = undefined;
@@ -2143,7 +2138,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                                 temp_med_pr = med_pr[0].fma;
                                                             }
 
-                                                            var tempvar;
                                                             if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
                                                                 // med_pr_text_syn = undefined;
                                                                 med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
@@ -2215,7 +2209,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                         // console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
                                                         // console.log("templistOfModel: ", templistOfModel);
 
-                                                        for (var i = 0; i < membrane.length; i++) {
+                                                        for (i = 0; i < membrane.length; i++) {
                                                             for (var j = i + 1; j < membrane.length; j++) {
                                                                 mainUtils.makecotransporter(membrane[i], membrane[j]);
                                                             }
@@ -2226,7 +2220,6 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                                 }
                                                 else
                                                     mainUtils.srcDescMediatorOfFluxes(); // callback
-
                                             },
                                             true);
                                     },
@@ -2238,17 +2231,17 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     // concentration OPB
                     else if (jsonObjOPB.results.bindings[0].opb.value == concentrationOPB) {
 
-                        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                            'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                            'SELECT ?concentration_fma ?solute_chebi ?protein ' +
-                            'WHERE { ' +
-                            '<' + modelEntityFullNameArray[index] + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                            '?model_prop semsim:physicalPropertyOf ?source_entity. ' +
-                            '?source_entity ro:part_of ?source_part_of_entity. ' +
-                            '?source_part_of_entity semsim:hasPhysicalDefinition ?concentration_fma.' +
-                            '?source_entity semsim:hasPhysicalDefinition ?solute_chebi. ' +
-                            '<' + model + '>  <http://www.obofoundry.org/ro/ro.owl#modelOf> ?protein. ' +
-                            '}'
+                        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+                            "SELECT ?concentration_fma ?solute_chebi ?protein " +
+                            "WHERE { " +
+                            "<" + modelEntityFullNameArray[index] + "> semsim:isComputationalComponentFor ?model_prop. " +
+                            "?model_prop semsim:physicalPropertyOf ?source_entity. " +
+                            "?source_entity ro:part_of ?source_part_of_entity. " +
+                            "?source_part_of_entity semsim:hasPhysicalDefinition ?concentration_fma." +
+                            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
+                            "<" + model + ">  <http://www.obofoundry.org/ro/ro.owl#modelOf> ?protein. " +
+                            "}";
 
                         sendPostRequest(
                             endpoint,
@@ -2256,7 +2249,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                             function (jsonObjCon) {
                                 console.log("jsonObjCon in index.js: ", jsonObjCon);
 
-                                for (var i = 0; i < jsonObjCon.results.bindings.length; i++) {
+                                for (i = 0; i < jsonObjCon.results.bindings.length; i++) {
                                     if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
                                         concentration_fma.push("");
                                     else
@@ -2306,7 +2299,7 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                                         console.log("templistOfModel: ", templistOfModel);
                                         console.log("concentration_fma: ", concentration_fma);
 
-                                        for (var i = 0; i < membrane.length; i++) {
+                                        for (i = 0; i < membrane.length; i++) {
                                             for (var j = i + 1; j < membrane.length; j++) {
                                                 mainUtils.makecotransporter(membrane[i], membrane[j]);
                                             }
@@ -2322,10 +2315,10 @@ var sendPostRequest = __webpack_require__(1).sendPostRequest;
                     }
                 },
                 true);
-        }
+        };
 
         mainUtils.srcDescMediatorOfFluxes();
-    }
+    };
 
     // Expose utility to the global object
     global.$mainUtils = mainUtils;
@@ -2385,8 +2378,6 @@ var viewModel = function (jsonObj) {
             }
 
             $("#viewList").append(divText);
-
-            var divText = $("<div/>").addClass("p");
         }
 
         $("#viewList").append("<br>");
@@ -2412,10 +2403,10 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
         return modelEntityNameArray.indexOf(item) == pos;
-    })
+    });
 
-    console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
-    console.log("visualization in model2DArray: ", model2DArray);
+    // console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
+    // console.log("visualization in model2DArray: ", model2DArray);
 
     // Rearrange items in compartment and located_in
     for (var i = 0; i < model2DArray.length; i++) {
@@ -2439,7 +2430,7 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
     }
 
     for (var ix = 0; ix < modelEntityNameArray.length; ix++) {
-        for (var i = 0; i < model2DArray.length; i++) {
+        for (i = 0; i < model2DArray.length; i++) {
             if (modelEntityNameArray[ix] == model2DArray[i][1]) {
 
                 for (var j = 2; j < model2DArray[i].length; j++) {
@@ -2475,12 +2466,11 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
     });
 
     // Making edges ...
-    console.log("nodes: ", nodes);
-    console.log("links: ", links);
+    // console.log("nodes: ", nodes);
+    // console.log("links: ", links);
 
     // SVG graph
-    var g = $("#svgSimilarityModels"),
-        width = 2000, // 1200
+    var width = 2000, // 1200
         height = 900; // 700
 
     var svg = d3.select("#svgSimilarityModels").append("svg")
@@ -2570,7 +2560,7 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
                     return 10;
                 }
             }
-        })
+        });
 
     // add the text
     node.append("text")
@@ -2632,7 +2622,7 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
 
     // Empty list
     modelEntityNameArray = [];
-}
+};
 
 exports.similarityModels = similarityModels;
 
@@ -2675,11 +2665,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
     var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
-        cors_api_url = 'http://localhost:8080/',
+        cors_api_url = "http://localhost:8080/",
         // endpoint = cors_api_url + pmrEndpoint;
         endpoint = pmrEndpoint;
 
     var myWorkspaneName = "https://models.physiomeproject.org/workspace/267";
+    var uriSEDML = "https://sed-ml.github.io/index.html";
 
     var relatedModel = [];
     var membraneModelObj = [], alternativeModelObj = [], relatedModelObj = [];
@@ -2774,8 +2765,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     ];
 
+    var i, j;
+
     // Extract apical fluxes
-    for (var i = 0; i < apicalMembrane.length; i++) {
+    for (i = 0; i < apicalMembrane.length; i++) {
         tempapical.push({
             srctext: apicalMembrane[i].variable_text,
             srcfma: apicalMembrane[i].source_fma,
@@ -2790,7 +2783,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // Extract basolateral fluxes
-    for (var i = 0; i < basolateralMembrane.length; i++) {
+    for (i = 0; i < basolateralMembrane.length; i++) {
         tempBasolateral.push({
             srctext: basolateralMembrane[i].variable_text,
             srcfma: basolateralMembrane[i].source_fma,
@@ -2805,7 +2798,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // remove apical fluxes from membrane array
-    for (var i = 0; i < tempapical.length; i++) {
+    for (i = 0; i < tempapical.length; i++) {
         for (var j = 0; j < membrane.length; j++) {
             if (tempapical[i].srctext == membrane[j].variable_text &&
                 tempapical[i].srcfma == membrane[j].source_fma &&
@@ -2817,7 +2810,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // remove basolateral fluxes from membrane array
-    for (var i = 0; i < tempBasolateral.length; i++) {
+    for (i = 0; i < tempBasolateral.length; i++) {
         for (var j = 0; j < membrane.length; j++) {
             if (tempBasolateral[i].srctext == membrane[j].variable_text &&
                 tempBasolateral[i].srcfma == membrane[j].source_fma &&
@@ -2829,7 +2822,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // TODO: Hard coded for Nachannel, Clchannel, Kchannel
-    for (var i = 0; i < membrane.length; i++) {
+    for (i = 0; i < membrane.length; i++) {
         if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == Nachannel ||
             membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
             apicalMembrane.push(
@@ -2921,7 +2914,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // flux
-    for (var i = 0; i < membrane.length; i++) {
+    for (i = 0; i < membrane.length; i++) {
         if (membrane[i].med_fma == apicalID && membrane[i].variable_text2 != "channel" &&
             membrane[i].variable_text2 != "diffusiveflux") {
             apicalMembrane.push(
@@ -2979,11 +2972,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     // var combinedMembrane = [];
 
-    for (var i = 0; i < apicalMembrane.length; i++)
+    for (i = 0; i < apicalMembrane.length; i++)
         combinedMembrane.push(apicalMembrane[i]);
-    for (var i = 0; i < basolateralMembrane.length; i++)
+    for (i = 0; i < basolateralMembrane.length; i++)
         combinedMembrane.push(basolateralMembrane[i]);
-    for (var i = 0; i < paracellularMembrane.length; i++)
+    for (i = 0; i < paracellularMembrane.length; i++)
         combinedMembrane.push(paracellularMembrane[i]);
 
     combinedMembrane = uniqueifyCombinedMembrane(combinedMembrane);
@@ -3002,7 +2995,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var prevHeight = height;
 
     var lengthOfApicalMem = 0, lengthOfBasoMem = 0;
-    for (var i = 0; i < combinedMembrane.length; i++) {
+    for (i = 0; i < combinedMembrane.length; i++) {
         if (combinedMembrane[i].med_fma == apicalID)
             lengthOfApicalMem++;
         else if (combinedMembrane[i].med_fma == basolateralID)
@@ -3157,7 +3150,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var solutes = [];
 
-    for (var i = 0; i < concentration_fma.length; i++) {
+    for (i = 0; i < concentration_fma.length; i++) {
 
         // luminal(1), cytosol(2), interstitial(3), paracellular(4), paracellular2(5)
         for (var j = 1; j <= 5; j++) {
@@ -3175,7 +3168,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             var indexOfHash = concentration_fma[i].name.search("#");
             var value = concentration_fma[i].name.slice(indexOfHash + 1);
-            var indexOfdot = value.indexOf('.');
+            var indexOfdot = value.indexOf(".");
             value = value.slice(indexOfdot + 1);
 
             solutes.push(
@@ -3343,7 +3336,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         markerWidth = 4, markerHeight = 4;
 
     var update = function () {
-        for (var i = 0; i < combinedMembrane.length; i++) {
+        for (i = 0; i < combinedMembrane.length; i++) {
             checkedchk[i] = checkBox[i].checked();
             if (checkedchk[i] == true) {
                 circlewithlineg[i].call(d3.drag().on("drag", dragcircle).on("end", dropcircle));
@@ -3352,18 +3345,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 circlewithlineg[i].call(d3.drag().on("end", dragcircleunchecked));
             }
         }
-    }
+    };
 
     var combinedMemChk = function (index) {
-        for (var i = index; i < combinedMembrane.length; i++) {
+        for (i = index; i < combinedMembrane.length; i++) {
             checkBox[i] = new d3CheckBox();
         }
 
-        for (var i = index; i < combinedMembrane.length; i++) {
+        for (i = index; i < combinedMembrane.length; i++) {
             // var textvaluechk = combinedMembrane[i].variable_text + " " + combinedMembrane[i].variable_text2;
             var textvaluechk = combinedMembrane[i].med_pr_text;
-            var indexOfParen = textvaluechk.indexOf('(');
-            textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + ' (' + combinedMembrane[i].med_pr_text_syn + ')';
+            var indexOfParen = textvaluechk.indexOf("(");
+            textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + " (" + combinedMembrane[i].med_pr_text_syn + ")";
 
             checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
             checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
@@ -3448,37 +3441,37 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         checkBox.size = function (val) {
             size = val;
             return checkBox;
-        }
+        };
 
         checkBox.x = function (val) {
             x = val;
             return checkBox;
-        }
+        };
 
         checkBox.y = function (val) {
             y = val;
             return checkBox;
-        }
+        };
 
         checkBox.rx = function (val) {
             rx = val;
             return checkBox;
-        }
+        };
 
         checkBox.ry = function (val) {
             ry = val;
             return checkBox;
-        }
+        };
 
         checkBox.markStrokeWidth = function (val) {
             markStrokeWidth = val;
             return checkBox;
-        }
+        };
 
         checkBox.boxStrokeWidth = function (val) {
             boxStrokeWidth = val;
             return checkBox;
-        }
+        };
 
         checkBox.checked = function (val) {
             if (val === undefined) {
@@ -3487,35 +3480,35 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 checked = val;
                 return checkBox;
             }
-        }
+        };
 
         checkBox.clickEvent = function (val) {
             clickEvent = val;
             return checkBox;
-        }
+        };
 
         checkBox.xtext = function (val) {
             xtext = val;
             return checkBox;
-        }
+        };
 
         checkBox.ytext = function (val) {
             ytext = val;
             return checkBox;
-        }
+        };
 
         checkBox.text = function (val) {
             text = val;
             return checkBox;
-        }
+        };
 
         return checkBox;
     }
 
     // tooltip
-    var div = d3.select("#svgVisualize").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    // var div = d3.select("#svgVisualize").append("div")
+    //     .attr("class", "tooltip")
+    //     .style("opacity", 0);
 
     $(document).on({
         mousedown: function () {
@@ -3539,7 +3532,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // apical, basolateral and paracellular membrane
     var combinedMemFunc = function (index) {
 
-        for (var i = index; i < combinedMembrane.length; i++) {
+        for (i = index; i < combinedMembrane.length; i++) {
             model_entity = combinedMembrane[i].model_entity;
 
             if (combinedMembrane[i].model_entity2 != undefined)
@@ -3649,20 +3642,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -3826,20 +3819,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -4000,20 +3993,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -4174,20 +4167,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -4352,20 +4345,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -4397,7 +4390,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     dytext2[i] = "";
 
                     // increment y-axis of line and circle
-                    // circle's radius 20
+                    // circle"s radius 20
                     // polygon - probably radius distance from middle point is 10
                     // yvalue += ydistance - 20;
                     // cyvalue += ydistance - 20;
@@ -4490,20 +4483,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -4625,20 +4618,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -4802,20 +4795,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -4976,20 +4969,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -5150,20 +5143,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -5330,20 +5323,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -5463,20 +5456,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 .style("opacity", 1);
 
                             var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(','),
+                                indexOfComma = id.indexOf(","),
                                 tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                     "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                             div.html(
-                                '<b>CellML </b> ' +
-                                '<a href="' + tempworkspace + '" target="_blank">' +
-                                '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>SEDML </b> ' +
-                                '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                                '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                                '<br/>' +
-                                '<b>Click middle mouse to close</b>')
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
                                 .style("left", d3.mouse(this)[0] + 540 + "px")
                                 .style("top", d3.mouse(this)[1] + 90 + "px");
                         });
@@ -5555,20 +5548,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                         // var id = d3.select(this)._groups[0][0].id,
                         var id = $(this).attr("idParacellular"),
-                            indexOfComma = id.indexOf(','),
+                            indexOfComma = id.indexOf(","),
                             tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
                         div.html(
-                            '<b>CellML </b> ' +
-                            '<a href="' + tempworkspace + '" target="_blank">' +
-                            '<img border="0" alt="CellML" src="img/cellml.png" width="30" height="20"></a>' +
-                            '<br/>' +
-                            '<b>SEDML </b> ' +
-                            '<a href="https://sed-ml.github.io/index.html" target="_blank">' +
-                            '<img border="0" alt="SEDML" src="img/SEDML.png" width="30" height="20"></a>' +
-                            '<br/>' +
-                            '<b>Click middle mouse to close</b>')
+                            "<b>CellML </b> " +
+                            "<a href=" + tempworkspace + " + target=_blank>" +
+                            "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                            "<br/>" +
+                            "<b>SEDML </b> " +
+                            "<a href=" + uriSEDML + " + target=_blank>" +
+                            "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                            "<br/>" +
+                            "<b>Click middle mouse to close</b>")
                             .style("left", d3.mouse(this)[0] + 540 + "px")
                             .style("top", d3.mouse(this)[1] + 90 + "px");
                     });
@@ -5622,7 +5615,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var lineb_id, circle_id, cx, cy, lt, gt;
 
-    function dragcircle(d) {
+    var dragcircle = function () {
 
         // div.style("display", "none");
 
@@ -5774,15 +5767,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             else
                 $($("line")[mindex]).css("stroke", "green");
         }
-    }
+    };
 
     // remaining part of dropcircle function
     var dropcircleExtended = function () {
 
-        var query = 'SELECT ?located_in ' +
-            'WHERE { GRAPH ?g { ' +
-            '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . ' +
-            '}}'
+        var query;
+
+        query = "SELECT ?located_in " +
+            "WHERE { GRAPH ?g { " +
+            "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in . " +
+            "}}"
 
         // location of that cellml model
         sendPostRequest(
@@ -5794,8 +5789,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 var jsonLocatedinCounter = 0;
                 // Type of model - kidney, lungs, etc
-                for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                    for (var j = 0; j < organ.length; j++) {
+                for (i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                    for (j = 0; j < organ.length; j++) {
                         for (var k = 0; k < organ[j].key.length; k++) {
                             if (jsonLocatedin.results.bindings[i].located_in.value == organ[j].key[k].key)
                                 jsonLocatedinCounter++;
@@ -5816,8 +5811,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 locationOfModel = "";
                 jsonLocatedinCounter = 0;
                 // location of the above type of model
-                for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                    for (var j = 0; j < organ[organIndex].key.length; j++) {
+                for (i = 0; i < jsonLocatedin.results.bindings.length; i++) {
+                    for (j = 0; j < organ[organIndex].key.length; j++) {
                         if (jsonLocatedin.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
                             locationOfModel += organ[organIndex].key[j].value;
 
@@ -5836,10 +5831,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // related cellml model, i.e. kidney, lungs, etc
-                var query = 'SELECT ?cellmlmodel ?located_in ' +
-                    'WHERE { GRAPH ?g { ' +
-                    '?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. ' +
-                    '}}'
+                query = "SELECT ?cellmlmodel ?located_in " +
+                    "WHERE { GRAPH ?g { " +
+                    "?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. " +
+                    "}}"
 
                 sendPostRequest(
                     endpoint,
@@ -5848,8 +5843,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                         // console.log("jsonRelatedModel: ", jsonRelatedModel);
 
-                        for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
-                            for (var j = 0; j < organ[organIndex].key.length; j++) {
+                        for (i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
+                            for (j = 0; j < organ[organIndex].key.length; j++) {
                                 if (jsonRelatedModel.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
                                     // parsing
                                     var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
@@ -5871,7 +5866,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         var alternativeCellmlArray = [], tempcellmlModel,
                             indexOfHash = cellmlModel.search("#");
                         tempcellmlModel = cellmlModel.slice(0, indexOfHash);
-                        for (var i = 0; i < relatedModel.length; i++) {
+                        for (i = 0; i < relatedModel.length; i++) {
                             if (relatedModel[i] != tempcellmlModel) {
                                 alternativeCellmlArray.push(relatedModel[i]);
                             }
@@ -5883,7 +5878,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }, true);
     }
 
-    function dropcircle(d) {
+    var dropcircle = function () {
 
         // div.style("display", "none");
 
@@ -5894,14 +5889,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 $($("line")[mindex]).css("stroke", "yellow");
 
                 var m = new welcomeModal({
-                    id: 'myWelcomeModal',
-                    header: 'Are you sure you want to move?',
-                    footer: 'My footer',
-                    footerCloseButton: 'No',
-                    footerSaveButton: 'Yes'
+                    id: "myWelcomeModal",
+                    header: "Are you sure you want to move?",
+                    footer: "My footer",
+                    footerCloseButton: "No",
+                    footerSaveButton: "Yes"
                 });
 
-                $('#myWelcomeModal').modal({backdrop: 'static', keyboard: false});
+                $("#myWelcomeModal").modal({backdrop: "static", keyboard: false});
                 m.show();
 
                 function welcomeModal(options) {
@@ -5967,15 +5962,15 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             console.log("first save button clicked!");
 
                             var m = new Modal({
-                                id: 'myModal',
-                                header: 'Recommender System',
-                                footer: 'My footer',
-                                footerCloseButton: 'Close',
-                                footerSaveButton: 'Save'
+                                id: "myModal",
+                                header: "Recommender System",
+                                footer: "My footer",
+                                footerCloseButton: "Close",
+                                footerSaveButton: "Save"
                             });
 
-                            $('#myModal').modal({backdrop: 'static', keyboard: false});
-                            m.getBody().html('<div id="modalBody"></div>');
+                            $("#myModal").modal({backdrop: "static", keyboard: false});
+                            m.getBody().html("<div id=modalBody></div>");
                             m.show();
 
                             showLoading("#modalBody");
@@ -5992,27 +5987,27 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                             // parsing
                             cellmlModel = circleID[0];
-                            var indexOfHash = cellmlModel.search("#");
+                            var indexOfHash = cellmlModel.search("#"), query;
                             cellmlModel = cellmlModel.slice(0, indexOfHash);
 
-                            cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf('.'));
+                            cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf("."));
 
                             // console.log("cellmlModel: ", cellmlModel);
 
                             if (circleID[1] == "") {
-                                var query = 'SELECT ?Protein ?Biological_meaning ' +
-                                    'WHERE { GRAPH ?g { ' +
-                                    '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-                                    '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
-                                    '}}'
+                                query = "SELECT ?Protein ?Biological_meaning " +
+                                    "WHERE { GRAPH ?g { " +
+                                    "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
+                                    "<" + circleID[0] + "> <http://purl.org/dc/terms/description> ?Biological_meaning . " +
+                                    "}}"
                             }
                             else { // (circleID[1] != "")
-                                var query = 'SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ' +
-                                    'WHERE { GRAPH ?g { ' +
-                                    '<' + cellmlModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-                                    '<' + circleID[0] + '> <http://purl.org/dc/terms/description> ?Biological_meaning . ' +
-                                    '<' + circleID[1] + '> <http://purl.org/dc/terms/description> ?Biological_meaning2 . ' +
-                                    '}}'
+                                query = "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 " +
+                                    "WHERE { GRAPH ?g { " +
+                                    "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
+                                    "<" + circleID[0] + "> <http://purl.org/dc/terms/description> ?Biological_meaning . " +
+                                    "<" + circleID[1] + "> <http://purl.org/dc/terms/description> ?Biological_meaning2 . " +
+                                    "}}"
                             }
 
                             // console.log("query: ", query);
@@ -6074,8 +6069,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 proteinText = "undefined";
                                                             else {
                                                                 proteinText = jsonPr._embedded.terms[0].label;
-                                                                var indexOfParen = proteinText.indexOf('(');
-                                                                proteinText = proteinText.slice(0, indexOfParen - 1);
+                                                                proteinText = proteinText.slice(0, proteinText.indexOf("(") - 1);
                                                             }
 
                                                             if (jsonModel.results.bindings.length == 0) {
@@ -6100,8 +6094,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 geneName = "undefined";
                                                             else {
                                                                 geneName = jsonGene._embedded.terms[0].label;
-                                                                var indexOfParen = geneName.indexOf('(');
-                                                                geneName = geneName.slice(0, indexOfParen - 1);
+                                                                geneName = geneName.slice(0, geneName.indexOf("(") - 1);
 
                                                                 dropcircleExtended();
                                                             }
@@ -6110,12 +6103,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                         }, true);
                                 }, true);
 
-                            jQuery(window).trigger('resize');
+                            jQuery(window).trigger("resize");
 
                             // reinitialization
                             reinitVariable();
                             return;
-                        })
+                        });
                     };
 
                     /**
@@ -6123,14 +6116,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                      * @param {String} html New header text.
                      */
                     $this.setHeader = function (html) {
-                        $this.window.find('.modal-title').html(html);
+                        $this.window.find(".modal-title").html(html);
                     };
 
                     /**
                      * Show modal window
                      */
                     $this.show = function () {
-                        $this.window.modal('show');
+                        $this.window.modal("show");
                     };
 
                     $this.selector = "#" + $this.options.id;
@@ -6159,14 +6152,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     }
 
-    function dragcircleunchecked(d) {
+    var dragcircleunchecked = function () {
         d3.select(this).classed("dragging", false);
-    }
+    };
 
     // related kidney, lungs, etc model
     var relatedCellmlModel = function (relatedModel, alternativeCellmlArray, membrane) {
 
-        var modelname, indexOfcellml;
+        var modelname, indexOfcellml, query;
         if (relatedModel[idProtein] == undefined) {
             modelname = undefined;
         }
@@ -6176,10 +6169,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
         // console.log("modelname in relatedCellmlModel: ", modelname);
 
-        var query = 'SELECT ?Protein ?workspaceName ' +
-            'WHERE { GRAPH ?workspaceName { ' +
-            '<' + modelname + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-            '}}'
+        query = "SELECT ?Protein ?workspaceName " +
+            "WHERE { GRAPH ?workspaceName { " +
+            "<" + modelname + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
+            "}}";
 
         sendPostRequest(
             endpoint,
@@ -6223,13 +6216,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     true);
             },
             true);
-    }
+    };
 
     // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
     var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
         // console.log("alternativeCellmlArray: ", alternativeCellmlArray[idAltProtein], membrane, alternativeCellmlArray);
-        var modelname, indexOfcellml;
+        var modelname, indexOfcellml, query, endpointOLS;
         if (alternativeCellmlArray[idAltProtein] == undefined) {
             modelname = undefined;
         }
@@ -6240,10 +6233,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
         // console.log("modelname in alternativeCellmlModel: ", modelname);
 
-        var query = 'SELECT ?Protein ?workspaceName ' +
-            'WHERE { GRAPH ?workspaceName { ' +
-            '<' + modelname + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-            '}}'
+        query = "SELECT ?Protein ?workspaceName " +
+            "WHERE { GRAPH ?workspaceName { " +
+            "<" + modelname + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
+            "}}";
 
         sendPostRequest(
             endpoint,
@@ -6252,7 +6245,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 // console.log("jsonAltProtein in alternativeCellmlModel: ", jsonAltProtein);
 
-                var endpointOLS;
                 if (jsonAltProtein.results.bindings.length == 0)
                     endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
                 else {
@@ -6303,35 +6295,35 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     },
                     true);
             }, true);
-    }
+    };
 
     // Utility to calculate number of iterations
-    function iteration(length) {
+    var iteration = function (length) {
         var sum = 0;
-        for (var i = 0; i < length; i++) {
+        for (i = 0; i < length; i++) {
             sum = sum + (length - i - 1);
         }
 
         return sum;
-    }
+    };
 
     var makecotransporter = function (membrane1, membrane2, fluxList, membraneName, flag) {
-        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-            'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-            'SELECT ?med_entity_uri ?med_entity_uriCl ' +
-            'WHERE { GRAPH ?Workspace { ' +
-            '<' + membrane1 + '> semsim:isComputationalComponentFor ?model_prop. ' +
-            '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-            '?model_proc semsim:hasMediatorParticipant ?model_medparticipant. ' +
-            '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. ' +
-            '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-            '<' + membrane2 + '> semsim:isComputationalComponentFor ?model_propCl. ' +
-            '?model_propCl semsim:physicalPropertyOf ?model_procCl. ' +
-            '?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. ' +
-            '?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. ' +
-            '?med_entityCl semsim:hasPhysicalDefinition ?med_entity_uriCl.' +
-            'FILTER (?med_entity_uri = ?med_entity_uriCl) . ' +
-            '}}'
+        var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+            "SELECT ?med_entity_uri ?med_entity_uriCl " +
+            "WHERE { GRAPH ?Workspace { " +
+            "<" + membrane1 + "> semsim:isComputationalComponentFor ?model_prop. " +
+            "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+            "?model_proc semsim:hasMediatorParticipant ?model_medparticipant. " +
+            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. " +
+            "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
+            "<" + membrane2 + "> semsim:isComputationalComponentFor ?model_propCl. " +
+            "?model_propCl semsim:physicalPropertyOf ?model_procCl. " +
+            "?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. " +
+            "?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. " +
+            "?med_entityCl semsim:hasPhysicalDefinition ?med_entity_uriCl." +
+            "FILTER (?med_entity_uri = ?med_entity_uriCl) . " +
+            "}}";
 
         sendPostRequest(
             endpoint,
@@ -6357,14 +6349,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 // TODO: probably no need to do this!
                 tempProtein = tempProtein.filter(function (item, pos) {
                     return tempProtein.indexOf(item) == pos;
-                })
+                });
                 tempFMA = tempFMA.filter(function (item, pos) {
                     return tempFMA.indexOf(item) == pos;
-                })
+                });
 
                 // console.log("temp protein, and fma: ", tempProtein, tempFMA);
 
-                for (var i = 0; i < tempProtein.length; i++) {
+                for (i = 0; i < tempProtein.length; i++) {
                     // cotransporter
                     if (tempProtein.length != 0 && tempFMA.length != 0) {
                         cotransporterList.push({
@@ -6381,8 +6373,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 if (counter == iteration(fluxList.length)) {
 
                     // delete cotransporter indices from fluxList
-                    for (var i = 0; i < cotransporterList.length; i++) {
-                        for (var j = 0; j < fluxList.length; j++) {
+                    for (i = 0; i < cotransporterList.length; i++) {
+                        for (j = 0; j < fluxList.length; j++) {
                             if (cotransporterList[i].membrane1 == fluxList[j] ||
                                 cotransporterList[i].membrane2 == fluxList[j]) {
 
@@ -6392,7 +6384,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     }
 
                     // make cotransproter in modelEntityObj
-                    for (var i = 0; i < cotransporterList.length; i++) {
+                    for (i = 0; i < cotransporterList.length; i++) {
                         modelEntityObj.push({
                             "model_entity": cotransporterList[i].membrane1,
                             "model_entity2": cotransporterList[i].membrane2
@@ -6400,7 +6392,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     }
 
                     // make flux in modelEntityObj
-                    for (var i = 0; i < fluxList.length; i++) {
+                    for (i = 0; i < fluxList.length; i++) {
                         modelEntityObj.push({
                             "model_entity": fluxList[i],
                             "model_entity2": ""
@@ -6417,7 +6409,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
             },
             true);
-    }
+    };
 
     // apical or basolateral membrane in PMR
     var relatedMembrane = function (membrane, membraneName, flag) {
@@ -6441,26 +6433,26 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             sndCHEBI = fstCHEBI;
         else sndCHEBI = circleID[11];
 
-        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-            'SELECT ?Model_entity ?Model_entity2 ' +
-            'WHERE { GRAPH ?g { ' +
-            '?entity semsim:hasPhysicalDefinition <' + fstCHEBI + '>. ' +
-            '?source semsim:hasPhysicalEntityReference ?entity. ' +
-            '?process semsim:hasSourceParticipant ?source. ' +
-            '?property semsim:physicalPropertyOf ?process. ' +
-            '?Model_entity semsim:isComputationalComponentFor ?property.' +
-            '?process semsim:hasMediatorParticipant ?model_medparticipant.' +
-            '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
-            '?med_entity semsim:hasPhysicalDefinition <' + membrane + '>.' +
-            '?entity2 semsim:hasPhysicalDefinition <' + sndCHEBI + '>. ' +
-            '?source2 semsim:hasPhysicalEntityReference ?entity2. ' +
-            '?process2 semsim:hasSourceParticipant ?source2. ' +
-            '?property2 semsim:physicalPropertyOf ?process2. ' +
-            '?Model_entity2 semsim:isComputationalComponentFor ?property2.' +
-            '?process2 semsim:hasMediatorParticipant ?model_medparticipant2.' +
-            '?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2.' +
-            '?med_entity2 semsim:hasPhysicalDefinition <' + membrane + '>.' +
-            '}}';
+        var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "SELECT ?Model_entity ?Model_entity2 " +
+            "WHERE { GRAPH ?g { " +
+            "?entity semsim:hasPhysicalDefinition <" + fstCHEBI + ">. " +
+            "?source semsim:hasPhysicalEntityReference ?entity. " +
+            "?process semsim:hasSourceParticipant ?source. " +
+            "?property semsim:physicalPropertyOf ?process. " +
+            "?Model_entity semsim:isComputationalComponentFor ?property." +
+            "?process semsim:hasMediatorParticipant ?model_medparticipant." +
+            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
+            "?med_entity semsim:hasPhysicalDefinition <" + membrane + ">." +
+            "?entity2 semsim:hasPhysicalDefinition <" + sndCHEBI + ">. " +
+            "?source2 semsim:hasPhysicalEntityReference ?entity2. " +
+            "?process2 semsim:hasSourceParticipant ?source2. " +
+            "?property2 semsim:physicalPropertyOf ?process2. " +
+            "?Model_entity2 semsim:isComputationalComponentFor ?property2." +
+            "?process2 semsim:hasMediatorParticipant ?model_medparticipant2." +
+            "?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2." +
+            "?med_entity2 semsim:hasPhysicalDefinition <" + membrane + ">." +
+            "}}";
 
         sendPostRequest(
             endpoint,
@@ -6470,7 +6462,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 // console.log("jsonRelatedMembrane: ", jsonRelatedMembrane);
 
                 var fluxList = [], cotransporterList = [];
-                for (var i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
+                for (i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
 
                     // allow only related apical or basolateral membrane from my workspace
                     if (jsonRelatedMembrane.results.bindings[i].g.value != myWorkspaneName)
@@ -6485,7 +6477,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 // console.log("fluxList 1ST: ", fluxList);
                 var tempfluxList = [];
-                for (var i = 0; i < fluxList.length; i++) {
+                for (i = 0; i < fluxList.length; i++) {
                     if (!isExist(fluxList[i], tempfluxList)) {
                         tempfluxList.push(fluxList[i]);
                     }
@@ -6509,15 +6501,15 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     relatedMembraneModel(membraneName, cotransporterList, flag);
                 }
                 else {
-                    for (var i = 0; i < fluxList.length; i++) {
-                        for (var j = i + 1; j < fluxList.length; j++) {
+                    for (i = 0; i < fluxList.length; i++) {
+                        for (j = i + 1; j < fluxList.length; j++) {
                             makecotransporter(fluxList[i], fluxList[j], fluxList, membraneName, flag);
                         }
                     }
                 }
             },
             true);
-    }
+    };
 
     var source_fma = [], sink_fma = [], med_fma = [], med_pr = [], solute_chebi = [];
     var source_fma2 = [], sink_fma2 = [], solute_chebi2 = [];
@@ -6531,7 +6523,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         // console.log("flag in relatedMembraneModel: ", flag);
 
-        var tempmembraneModel, indexOfHash, indexOfcellml, modelname;
+        var tempmembraneModel, indexOfHash, indexOfcellml, modelname, query;
         if (modelEntityObj.length == 0 || modelEntityObj[idMembrane].model_entity == undefined)
             tempmembraneModel = undefined;
         else {
@@ -6547,12 +6539,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         // console.log("tempmembraneModel: ", tempmembraneModel);
         // console.log("modelEntityObj: ", modelEntityObj);
 
-        var query = 'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-            'PREFIX dcterms: <http://purl.org/dc/terms/>' +
-            'SELECT ?Protein ' +
-            'WHERE { ' +
-            '<' + tempmembraneModel + '> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . ' +
-            '}'
+        query = "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+            "PREFIX dcterms: <http://purl.org/dc/terms/>" +
+            "SELECT ?Protein " +
+            "WHERE { " +
+            "<" + tempmembraneModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
+            "}";
 
         sendPostRequest(
             endpoint,
@@ -6576,61 +6568,61 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                         // TODO: optimize this similar to above!
                         if (modelEntityObj[idMembrane].model_entity2 == "") {
-                            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?solute_chebi2 ' +
-                                'WHERE { ' +
-                                '<' + modelEntityObj[idMembrane].model_entity + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-                                '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-                                '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-                                '?source_entity ro:part_of ?source_part_of_entity. ' +
-                                '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-                                '?source_entity semsim:hasPhysicalDefinition ?solute_chebi. ' +
-                                '?source_entity semsim:hasPhysicalDefinition ?solute_chebi2. ' + // change this later
-                                '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-                                '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-                                '?sink_entity ro:part_of ?sink_part_of_entity. ' +
-                                '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
-                                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
-                                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
-                                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-                                '}'
+                            query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                                "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+                                "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?solute_chebi2 " +
+                                "WHERE { " +
+                                "<" + modelEntityObj[idMembrane].model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
+                                "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+                                "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
+                                "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
+                                "?source_entity ro:part_of ?source_part_of_entity. " +
+                                "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
+                                "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
+                                "?source_entity semsim:hasPhysicalDefinition ?solute_chebi2. " + // change this later
+                                "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
+                                "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
+                                "?sink_entity ro:part_of ?sink_part_of_entity. " +
+                                "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
+                                "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
+                                "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
+                                "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
+                                "}";
                         }
                         else {
-                            var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-                                'PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>' +
-                                'SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?source_fma2 ?sink_fma2 ?med_entity_uri2 ?solute_chebi2 ' +
-                                'WHERE { ' +
-                                '<' + modelEntityObj[idMembrane].model_entity + '> semsim:isComputationalComponentFor ?model_prop. ' +
-                                '?model_prop semsim:physicalPropertyOf ?model_proc. ' +
-                                '?model_proc semsim:hasSourceParticipant ?model_srcparticipant. ' +
-                                '?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. ' +
-                                '?source_entity ro:part_of ?source_part_of_entity. ' +
-                                '?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. ' +
-                                '?source_entity semsim:hasPhysicalDefinition ?solute_chebi. ' +
-                                '?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. ' +
-                                '?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. ' +
-                                '?sink_entity ro:part_of ?sink_part_of_entity. ' +
-                                '?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma.' +
-                                '?model_proc semsim:hasMediatorParticipant ?model_medparticipant.' +
-                                '?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity.' +
-                                '?med_entity semsim:hasPhysicalDefinition ?med_entity_uri.' +
-                                '<' + modelEntityObj[idMembrane].model_entity2 + '> semsim:isComputationalComponentFor ?model_prop2. ' +
-                                '?model_prop2 semsim:physicalPropertyOf ?model_proc2. ' +
-                                '?model_proc2 semsim:hasSourceParticipant ?model_srcparticipant2. ' +
-                                '?model_srcparticipant2 semsim:hasPhysicalEntityReference ?source_entity2. ' +
-                                '?source_entity2 ro:part_of ?source_part_of_entity2. ' +
-                                '?source_part_of_entity2 semsim:hasPhysicalDefinition ?source_fma2. ' +
-                                '?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi2. ' +
-                                '?model_proc2 semsim:hasSinkParticipant ?model_sinkparticipant2. ' +
-                                '?model_sinkparticipant2 semsim:hasPhysicalEntityReference ?sink_entity2. ' +
-                                '?sink_entity2 ro:part_of ?sink_part_of_entity2. ' +
-                                '?sink_part_of_entity2 semsim:hasPhysicalDefinition ?sink_fma2.' +
-                                '?model_proc2 semsim:hasMediatorParticipant ?model_medparticipant2.' +
-                                '?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2.' +
-                                '?med_entity2 semsim:hasPhysicalDefinition ?med_entity_uri2.' +
-                                '}'
+                            query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+                                "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+                                "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?source_fma2 ?sink_fma2 ?med_entity_uri2 ?solute_chebi2 " +
+                                "WHERE { " +
+                                "<" + modelEntityObj[idMembrane].model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
+                                "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+                                "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
+                                "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
+                                "?source_entity ro:part_of ?source_part_of_entity. " +
+                                "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
+                                "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
+                                "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
+                                "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
+                                "?sink_entity ro:part_of ?sink_part_of_entity. " +
+                                "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
+                                "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
+                                "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
+                                "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
+                                "<" + modelEntityObj[idMembrane].model_entity2 + "> semsim:isComputationalComponentFor ?model_prop2. " +
+                                "?model_prop2 semsim:physicalPropertyOf ?model_proc2. " +
+                                "?model_proc2 semsim:hasSourceParticipant ?model_srcparticipant2. " +
+                                "?model_srcparticipant2 semsim:hasPhysicalEntityReference ?source_entity2. " +
+                                "?source_entity2 ro:part_of ?source_part_of_entity2. " +
+                                "?source_part_of_entity2 semsim:hasPhysicalDefinition ?source_fma2. " +
+                                "?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi2. " +
+                                "?model_proc2 semsim:hasSinkParticipant ?model_sinkparticipant2. " +
+                                "?model_sinkparticipant2 semsim:hasPhysicalEntityReference ?sink_entity2. " +
+                                "?sink_entity2 ro:part_of ?sink_part_of_entity2. " +
+                                "?sink_part_of_entity2 semsim:hasPhysicalDefinition ?sink_fma2." +
+                                "?model_proc2 semsim:hasMediatorParticipant ?model_medparticipant2." +
+                                "?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2." +
+                                "?med_entity2 semsim:hasPhysicalDefinition ?med_entity_uri2." +
+                                "}";
                         }
 
                         sendPostRequest(
@@ -6645,7 +6637,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 }
                                 else {
                                     var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
-                                    var indexofColon = chebi_uri.indexOf('CHEBI:');
+                                    var indexofColon = chebi_uri.indexOf("CHEBI:");
                                     chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
                                     endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                 }
@@ -6660,7 +6652,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                         }
                                         else {
                                             var chebi_uri2 = jsonObjFlux.results.bindings[0].solute_chebi2.value;
-                                            var indexofColon2 = chebi_uri2.indexOf('CHEBI:');
+                                            var indexofColon2 = chebi_uri2.indexOf("CHEBI:");
                                             chebi_uri2 = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri2.slice(indexofColon2 + 6);
 
                                             endpointOLS2 = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri2;
@@ -6675,7 +6667,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
                                                         solute_chebi_name;
                                                     for (var m = 0; m < temparr.length; m++) {
-                                                        if (temparr[m].slice(-1) == '+' || temparr[m].slice(-1) == '-') {
+                                                        if (temparr[m].slice(-1) == "+" || temparr[m].slice(-1) == "-") {
                                                             solute_chebi_name = temparr[m];
                                                             break;
                                                         }
@@ -6695,7 +6687,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     var temparr2 = jsonObjOLSChebi2._embedded.terms[0].annotation["has_related_synonym"],
                                                         solute_chebi_name2;
                                                     for (var m = 0; m < temparr2.length; m++) {
-                                                        if (temparr2[m].slice(-1) == '+' || temparr2[m].slice(-1) == '-') {
+                                                        if (temparr2[m].slice(-1) == "+" || temparr2[m].slice(-1) == "-") {
                                                             solute_chebi_name2 = temparr2[m];
                                                             break;
                                                         }
@@ -6781,9 +6773,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         PID = tempVal.slice(indexOfPR + 3, tempVal.length);
 
                                                         // If PID start with 0 digit
-                                                        if (PID.charAt(0) != 'P') {
-                                                            if (PID.charAt(0) != 'Q') {
-                                                                PID = 'P' + PID.replace(/^0+/, ''); // Or parseInt("065", 10)
+                                                        if (PID.charAt(0) != "P") {
+                                                            if (PID.charAt(0) != "Q") {
+                                                                PID = "P" + PID.replace(/^0+/, ""); // Or parseInt("065", 10)
                                                             }
                                                         }
                                                     }
@@ -6819,7 +6811,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                         indexOfHash = modelEntityObj[idMembrane].model_entity.search("#");
                                                         variabletext = modelEntityObj[idMembrane].model_entity.slice(indexOfHash + 1);
-                                                        indexOfdot = variabletext.indexOf('.');
+                                                        indexOfdot = variabletext.indexOf(".");
 
                                                         variabletext = variabletext.slice(indexOfdot + 1);
 
@@ -6904,12 +6896,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                         indexOfHash = modelEntityObj[idMembrane].model_entity.search("#");
                                                         variabletext = modelEntityObj[idMembrane].model_entity.slice(indexOfHash + 1);
-                                                        indexOfdot = variabletext.indexOf('.');
+                                                        indexOfdot = variabletext.indexOf(".");
                                                         variabletext = variabletext.slice(indexOfdot + 1);
 
                                                         indexOfHash = modelEntityObj[idMembrane].model_entity2.search("#");
                                                         variabletext2 = modelEntityObj[idMembrane].model_entity2.slice(indexOfHash + 1);
-                                                        indexOfdot = variabletext2.indexOf('.');
+                                                        indexOfdot = variabletext2.indexOf(".");
                                                         variabletext2 = variabletext2.slice(indexOfdot + 1);
 
                                                         modelentity2 = modelEntityObj[idMembrane].model_entity2;
@@ -6937,12 +6929,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 // console.log("medURI: ", medURI);
 
                                                 if (medURI.indexOf(partOfCHEBIUri) != -1) {
-                                                    var indexofColon = medURI.indexOf('CHEBI:');
+                                                    var indexofColon = medURI.indexOf("CHEBI:");
                                                     chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
                                                     endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                                 }
                                                 else if (medURI.indexOf(partOfGOUri) != -1) {
-                                                    var indexofColon = medURI.indexOf('GO:');
+                                                    var indexofColon = medURI.indexOf("GO:");
                                                     var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
                                                     endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
                                                 }
@@ -7011,7 +7003,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             }, true);
                     }, true);
             }, true);
-    }
+    };
 
     // post function to get similarity matrix
     var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
@@ -7023,17 +7015,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         request.open("POST", requestUrl, true);
 
-        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         request.setRequestHeader("Accept", "text/plain");
 
-        var data = '';
+        var data = "";
         for (var key in query) {
             data += encodeURIComponent(key);
-            data += '=';
+            data += "=";
             data += encodeURIComponent(query[key]);
-            data += '&';
+            data += "&";
         }
-        // console.log('data: ', data);
+        // console.log("data: ", data);
         request.send(data); // for POST only
     }
 
@@ -7053,7 +7045,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 PID.push(medProteinID); // Mediator PROTEIN id
             }
         }
-    }
+    };
 
     // split PR_ from protein identifier
     var splitPRFromProtein = function (tempMemModelID) {
@@ -7066,13 +7058,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             indexOfPR = tempMemModelID[9].search("PR_");
             return tempMemModelID[9].slice(indexOfPR + 3, tempMemModelID[9].length);
         }
-    }
+    };
 
     // process EBI similarity matrix
     var similarityMatrixEBI = function (identityMatrix, PID, draggedMedPrID) {
         // console.log("Identity Matrix: ", identityMatrix);
 
-        var indexOfColon = identityMatrix.search("1:");
+        var indexOfColon = identityMatrix.search("1:"), m, n;
 
         // console.log("index1stBar: ", identityMatrix.slice(indexOfColon - 1, identityMatrix.length));
         identityMatrix = identityMatrix.slice(indexOfColon - 1, identityMatrix.length);
@@ -7085,18 +7077,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         // console.log("matrixArray: ", matrixArray);
 
-        for (var i = 0; i < matrixArray.length; i = i + PID.length + 3) // +3 for digit:, PID, and Genes and Species
+        for (i = 0; i < matrixArray.length; i = i + PID.length + 3) // +3 for digit:, PID, and Genes and Species
             matrixArray.splice(i, 1);
 
-        for (var i = 0; i < matrixArray.length; i = i + PID.length + 2) // +2 for PID and Genes and Species
+        for (i = 0; i < matrixArray.length; i = i + PID.length + 2) // +2 for PID and Genes and Species
             matrixArray.splice(i, 1);
 
-        for (var i = 1; i < matrixArray.length; i = i + PID.length + 1) // +1 for PID
+        for (i = 1; i < matrixArray.length; i = i + PID.length + 1) // +1 for PID
             matrixArray.splice(i, 1);
 
         // console.log("matrixArray: ", matrixArray);
 
-        for (var i = 0; i < matrixArray.length; i++) {
+        for (i = 0; i < matrixArray.length; i++) {
             if (matrixArray[i].charAt(0).match(/[A-Za-z]/gi)) {
                 proteinIndex.push([matrixArray[i], i]);
             }
@@ -7110,8 +7102,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             twoDMatrix.push(matrixArray.splice(0, proteinIndex.length));
         }
 
-        for (var i = 0; i < twoDMatrix.length; i++) {
-            for (var j = 0; j < twoDMatrix[i].length; j++) {
+        for (i = 0; i < twoDMatrix.length; i++) {
+            for (j = 0; j < twoDMatrix[i].length; j++) {
                 twoDMatrix[i][j] = parseFloat(twoDMatrix[i][j]);
             }
         }
@@ -7119,8 +7111,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         // console.log("twoDMatrix: ", twoDMatrix);
 
         var similarityOBJ = [];
-        for (var i = 0; i < twoDMatrix.length; i++) {
-            for (var j = 0; j < twoDMatrix.length; j++) {
+        for (i = 0; i < twoDMatrix.length; i++) {
+            for (j = 0; j < twoDMatrix.length; j++) {
                 if (i == j || j < i) continue;
 
                 similarityOBJ.push({
@@ -7139,8 +7131,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         // length is empty when 100% matching
         // appended a 0 bit after its protein id and make a comparision
         if (similarityOBJ.length != 0) {
-            for (var m = 0; m < membraneModelObj.length; m++) {
-                for (var n = 0; n < similarityOBJ.length; n++) {
+            for (m = 0; m < membraneModelObj.length; m++) {
+                for (n = 0; n < similarityOBJ.length; n++) {
                     if ((membraneModelObj[m].pid == similarityOBJ[n].PID1 &&
                         draggedMedPrID == similarityOBJ[n].PID2) ||
                         (membraneModelObj[m].pid == similarityOBJ[n].PID2 &&
@@ -7161,10 +7153,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         // console.log("AFTER membraneModelObj: ", membraneModelObj);
 
         return similarityOBJ;
-    }
+    };
 
     var findInCombinedMembrane = function (model1, model2) {
-        for (var i = 0; i < combinedMembrane.length; i++) {
+        for (i = 0; i < combinedMembrane.length; i++) {
             if ((combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == model2) ||
                 (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == model1) ||
                 (combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == "") ||
@@ -7173,7 +7165,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         return false;
-    }
+    };
 
     var showModalWindow = function (membraneName, flag) {
 
@@ -7181,7 +7173,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         // add models without dragging
         if (flag == 2) {
-            var relatedOrganModels2 = "<p id='addModelsID'>";
+            var relatedOrganModels2 = "<p id=addModelsID>";
             for (var i = 0; i < membraneModelID.length; i++) {
 
                 // console.log("flag in showModalWindow: ", flag);
@@ -7198,7 +7190,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 if (membraneModelID[i][1] != "") {
                     var indexOfHash = membraneModelID[i][1].search("#"),
                         componentVariableName = membraneModelID[i][1].slice(indexOfHash + 1), // NHE3.J_NHE3_Na
-                        indexOfDot = componentVariableName.indexOf('.');
+                        indexOfDot = componentVariableName.indexOf(".");
 
                     variableName = "and " + componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
                 }
@@ -7217,18 +7209,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     'Model entity2: ' + membraneModelID[i][1] + '"' +
                     '>' + membraneModelID[i][0] + " " + variableName + '</a></label>'; // membraneModelID[i][0]
 
-                relatedOrganModels2 += label.innerHTML + '<br>';
+                relatedOrganModels2 += label.innerHTML + "<br>";
             }
 
-            if (relatedOrganModels2 == "<p id='addModelsID'>") {
-                relatedOrganModels2 += "Not Exist" + '<br>';
+            if (relatedOrganModels2 == "<p id=addModelsID>") {
+                relatedOrganModels2 += "Not Exist" + "<br>";
             }
 
-            $('#modalBody').empty();
+            $("#modalBody").empty();
 
             var msg = "<br><p><b>" + membraneName + " model in PMR<b><\p>";
 
-            $('#modalBody')
+            $("#modalBody")
                 .append(msg)
                 .append(relatedOrganModels2);
 
@@ -7252,12 +7244,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             var msg2 = "<p><b>" + proteinText + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
                 "<b>" + locationOfModel + "</b><\p>";
 
-            var workspaceuri = myWorkspaneName + "/" +
-                "rawfile" + "/" + "HEAD" + "/" + circleID[0];
+            var workspaceuri = myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + circleID[0];
 
-            var model = "<b>Model: </b><a href='" + workspaceuri + "' target='_blank " +
-                "data-toggle='tooltip' data-placement='right' " +
-                "title='" + proteinText + "'>" + circleID[0] + "</a>";
+            var model = "<b>Model: </b><a href=" + workspaceuri + " + target=_blank " +
+                "data-toggle=tooltip data-placement=right " +
+                "title=" + proteinText + ">" + circleID[0] + "</a>";
 
             var biological = "<p><b>Biological Meaning: </b>" + biological_meaning + "</p>";
 
@@ -7266,12 +7257,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             var species = "<p><b>Species: </b>" + speciesName + "</p>";
             var gene = "<p><b>Gene: </b>" + geneName + "</p>";
-            var protein = "<p data-toggle='tooltip' data-placement='right' title='" + proteinName + "'>" +
+            var protein = "<p data-toggle=tooltip data-placement=right title=" + proteinName + ">" +
                 "<b>Protein: </b>" + proteinText + "</p>";
 
             // Related apical or basolateral model
             var index = 0, ProteinSeq = "", requestData, PID = [],
-                baseUrl = 'https://www.ebi.ac.uk/Tools/services/rest/clustalo';
+                baseUrl = "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
 
             proteinOrMedPrID(membraneModelID, PID);
             // console.log("PID BEFORE: ", PID);
@@ -7297,10 +7288,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             // PID does NOT start with P or Q
             for (var i = 0; i < PID.length; i++) {
-                if (PID[i].charAt(0) == 'Q') continue;
+                if (PID[i].charAt(0) == "Q") continue;
 
-                if (PID[i].charAt(0) != 'P') {
-                    PID[i] = 'P' + PID[i].replace(/^0+/, ''); // Or parseInt("065", 10);
+                if (PID[i].charAt(0) != "P") {
+                    PID[i] = "P" + PID[i].replace(/^0+/, ""); // Or parseInt("065", 10);
                 }
             }
 
@@ -7311,7 +7302,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             var WSDbfetchREST = function () {
 
                 // var dbfectendpoint = "http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
-                var cors_api_url = 'http://localhost:8080/',
+                var cors_api_url = "http://localhost:8080/",
                     // dbfectendpoint = cors_api_url + "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
                     dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
 
@@ -7343,7 +7334,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 "email": "dsar941@aucklanduni.ac.nz"
                             }
 
-                            var requestUrl = baseUrl + '/run/';
+                            var requestUrl = baseUrl + "/run/";
 
                             sendEBIPostRequest(
                                 requestUrl,
@@ -7352,7 +7343,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     // console.log("jobId: ", jobId); // jobId
 
                                     var chkJobStatus = function (jobId) {
-                                        var jobIdUrl = baseUrl + '/status/' + jobId;
+                                        var jobIdUrl = baseUrl + "/status/" + jobId;
                                         sendGetRequest(
                                             jobIdUrl,
                                             function (resultObj) {
@@ -7364,7 +7355,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     }, 5000);
                                                 }
 
-                                                var pimUrl = baseUrl + '/result/' + jobId + '/pim';
+                                                var pimUrl = baseUrl + "/result/" + jobId + "/pim";
                                                 sendGetRequest(
                                                     pimUrl,
                                                     function (identityMatrix) {
@@ -7377,9 +7368,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             for (var j = 0; j < membraneModelID.length; j++) {
 
                                                                 var tempID = splitPRFromProtein(membraneModelID[j]);
-                                                                if (tempID.charAt(0) != 'P') {
-                                                                    if (tempID.charAt(0) != 'Q') {
-                                                                        tempID = 'P' + tempID.replace(/^0+/, '');
+                                                                if (tempID.charAt(0) != "P") {
+                                                                    if (tempID.charAt(0) != "Q") {
+                                                                        tempID = "P" + tempID.replace(/^0+/, "");
                                                                         // Or parseInt("065", 10)
                                                                     }
                                                                 }
@@ -7399,7 +7390,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         console.log("AFTER membraneModelID: ", membraneModelID);
 
                                                         // apical or basolateral membrane
-                                                        var membraneModel = "<p id='membraneModelsID'><b>" + membraneName + " model</b>";
+                                                        var membraneModel = "<p id=membraneModelsID><b>" + membraneName + " model</b>";
                                                         for (var i = 0; i < membraneModelObj.length; i++) {
 
                                                             // Do not display visualized models
@@ -7408,7 +7399,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                             var workspaceuri = myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
 
-                                                            var label = document.createElement('label');
+                                                            var label = document.createElement("label");
                                                             label.innerHTML = '<br><input id="' + membraneModelID[i] + '" ' +
                                                                 'type="checkbox" value="' + membraneModelID[i][0] + '">' + // membraneModelObj[i].prname
                                                                 '<a href="' + workspaceuri + '" target="_blank" ' +
@@ -7425,18 +7416,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             membraneModel += label.innerHTML;
                                                         }
 
-                                                        if (membraneModel == "<p id='membraneModelsID'><b>" + membraneName + " model</b>") {
-                                                            membraneModel += "<br>Not Exist" + '<br>';
+                                                        if (membraneModel == "<p id=membraneModelsID><b>" + membraneName + " model</b>") {
+                                                            membraneModel += "<br>Not Exist" + "<br>";
                                                         }
 
-                                                        // membraneModel += '</p>';
+                                                        // membraneModel += "</p>";
 
                                                         // console.log("alternativeModelObj: ", alternativeModelObj);
 
                                                         // alternative model
-                                                        var alternativeModel = "<p id='alternativeModelID'><b>Alternative model of " + proteinText + "</b>";
+                                                        var alternativeModel = "<p id=alternativeModelID><b>Alternative model of " + proteinText + "</b>";
                                                         if (alternativeModelObj.length == 0) {
-                                                            alternativeModel += "<br>Not Exist" + '<br>';
+                                                            alternativeModel += "<br>Not Exist" + "<br>";
                                                         }
                                                         else {
                                                             for (var i = 0; i < alternativeModelObj.length; i++) {
@@ -7444,7 +7435,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                     "/" + "rawfile" + "/" + "HEAD" + "/" + alternativeModelObj[i].modelEntity;
 
                                                                 // TODO: SPARQL query to get flux of solutes similar to modalWindowToAddModels
-                                                                var label = document.createElement('label');
+                                                                var label = document.createElement("label");
                                                                 label.innerHTML = '<br><input id="' + alternativeModelObj[i].modelEntity + '" ' +
                                                                     'type="checkbox" value="' + alternativeModelObj[i].modelEntity + '">' +
                                                                     '<a href="' + workspaceuri + '" target="_blank" ' +
@@ -7458,14 +7449,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             }
                                                         }
 
-                                                        // alternativeModel += '</p>';
+                                                        // alternativeModel += "</p>";
 
                                                         // console.log("relatedModelObj: ", relatedModelObj);
 
                                                         // related organ models (kidney, lungs, etc) in PMR
-                                                        var relatedOrganModel = "<p id='relatedOrganModelID'><b>" + typeOfModel + " model in PMR</b>";
+                                                        var relatedOrganModel = "<p id=relatedOrganModelID><b>" + typeOfModel + " model in PMR</b>";
                                                         if (relatedModelObj.length == 1) { // includes own protein name
-                                                            relatedOrganModel += "<br>Not Exist" + '<br>';
+                                                            relatedOrganModel += "<br>Not Exist" + "<br>";
                                                         }
                                                         else {
                                                             for (var i = 0; i < relatedModelObj.length; i++) {
@@ -7476,7 +7467,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 var workspaceuri = relatedModelObj[i].workspaceName +
                                                                     "/" + "rawfile" + "/" + "HEAD" + "/" + relatedModelObj[i].modelEntity;
 
-                                                                var label = document.createElement('label');
+                                                                var label = document.createElement("label");
                                                                 label.innerHTML = '<br><a href="' + workspaceuri + '" target="_blank" ' +
                                                                     'data-toggle="tooltip" data-placement="right" ' +
                                                                     'title="Protein name: ' + relatedModelObj[i].prname + '\n' +
@@ -7488,11 +7479,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             }
                                                         }
 
-                                                        // relatedModelObj += '</p>';
+                                                        // relatedModelObj += "</p>";
 
-                                                        $('#modalBody').empty();
+                                                        $("#modalBody").empty();
 
-                                                        $('#modalBody')
+                                                        $("#modalBody")
                                                             .append(msg2)
                                                             .append(model)
                                                             .append(biological)
@@ -7502,7 +7493,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                         var msg3 = "<br><p><b>Recommendations/suggestions based on existing models in PMR<b><\p>";
 
-                                                        $('#modalBody')
+                                                        $("#modalBody")
                                                             .append(msg3)
                                                             .append(membraneModel)
                                                             .append(alternativeModel)
@@ -7539,7 +7530,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             return;
         }
-    }
+    };
 
     // circles, polygons and arrows move back if close clicked
     var moveBack = function () {
@@ -7618,7 +7609,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     .attr("y", dytext2[icircleGlobal]);
             }
         }
-    }
+    };
 
     // retain color of membranes
     var membraneColorBack = function () {
@@ -7646,7 +7637,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 break;
             }
         }
-    }
+    };
 
     // rearrange circles, polygons, and arrows for a change
     var circleRearrange = function () {
@@ -7658,7 +7649,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             dy1lineinitial2 = 233.3333282470703,
             dytextinitial = 198.3333282470703,
             dytextinitial2 = 237.3333282470703;
-        for (var i = 0; i < circlewithlineg.length; i++) {
+        for (i = 0; i < circlewithlineg.length; i++) {
             if (circlewithlineg[i].attr("membrane") == apicalID) {
                 console.log("apical !");
 
@@ -7746,7 +7737,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             dy1lineinitialb2 = 233.3333282470703,
             dytextinitialb = 198.3333282470703,
             dytextinitialb2 = 237.3333282470703;
-        for (var i = 0; i < circlewithlineg.length; i++) {
+        for (i = 0; i < circlewithlineg.length; i++) {
             if (circlewithlineg[i].attr("membrane") == basolateralID) {
                 console.log("baso !");
 
@@ -7828,7 +7819,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 dytextinitialb2 += ydistance;
             }
         }
-    }
+    };
 
     // reinitialize variable for next iteration
     var reinitVariable = function () {
@@ -7847,7 +7838,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         relatedModelEntity = [];
         cotransporterList = [];
-    }
+    };
 
     var Modal = function (options) {
 
@@ -7927,12 +7918,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 console.log("second save button clicked!");
 
                 // add models without dragging
-                for (var i = 0; i < $('#addModelsID input').length; i++) {
-                    if ($('#addModelsID input')[i].checked) {
+                for (i = 0; i < $("#addModelsID input").length; i++) {
+                    if ($("#addModelsID input")[i].checked) {
 
                         console.log("add models without dragging!!");
 
-                        var cTHIS = $('#addModelsID input')[i].id;
+                        var cTHIS = $("#addModelsID input")[i].id;
                         console.log("cTHIS AFTER: ", cTHIS);
 
                         var circleID = cTHIS.split(",");
@@ -7956,8 +7947,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             sink_fma2: circleID[7], // sink FMA uri => cotransporter or empty otherwise
                             solute_chebi2: circleID[11], // solute CHEBI uri
                             solute_text2: circleID[13] // solute text using the CHEBI uri from OLS
-                        })
-
+                        });
                         // combinedMembrane = uniqueifyCombinedMembrane(combinedMembrane);
 
                         console.log("combinedMembrane in addModelsID input: ", combinedMembrane);
@@ -7971,42 +7961,42 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // apical or basolateral membrane models
-                for (var i = 0; i < $('#membraneModelsID input').length; i++) {
-                    if ($('#membraneModelsID input')[i].checked) {
+                for (i = 0; i < $("#membraneModelsID input").length; i++) {
+                    if ($("#membraneModelsID input")[i].checked) {
 
                         console.log("Apical or Basolateral membrane!!");
 
                         // paracellular
                         if ($(cthis).attr("membrane") == paracellularID) {
-                            $(cthis).attr("idParacellular", $('#membraneModelsID input')[i].id);
+                            $(cthis).attr("idParacellular", $("#membraneModelsID input")[i].id);
                         }
                         else {
-                            $(cthis).attr("id", $('#membraneModelsID input')[i].id);
+                            $(cthis).attr("id", $("#membraneModelsID input")[i].id);
                         }
 
-                        $(cthis).attr("id", $('#membraneModelsID input')[i].id);
+                        $(cthis).attr("id", $("#membraneModelsID input")[i].id);
                         console.log("cthis AFTER: ", cthis);
                     }
                 }
 
                 // alternative models
-                for (var i = 0; i < $('#alternativeModelID input').length; i++) {
-                    if ($('#alternativeModelID input')[i].checked) {
+                for (i = 0; i < $("#alternativeModelID input").length; i++) {
+                    if ($("#alternativeModelID input")[i].checked) {
 
                         console.log("Alternative model!!");
 
-                        $(cthis).attr("id", $('#alternativeModelID input')[i].id);
+                        $(cthis).attr("id", $("#alternativeModelID input")[i].id);
                         console.log("cthis AFTER: ", cthis);
                     }
                 }
 
                 // related organ models in PMR
-                for (var i = 0; i < $('#relatedOrganModelID input').length; i++) {
-                    if ($('#relatedOrganModelID input')[i].checked) {
+                for (i = 0; i < $("#relatedOrganModelID input").length; i++) {
+                    if ($("#relatedOrganModelID input")[i].checked) {
 
                         console.log("Related organ model!!");
 
-                        $(cthis).attr("id", $('#relatedOrganModelID input')[i].id);
+                        $(cthis).attr("id", $("#relatedOrganModelID input")[i].id);
                         console.log("cthis AFTER: ", cthis);
                     }
                 }
@@ -8302,8 +8292,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                     for (var i = 0; i < combinedMembrane.length; i++) {
                         var textvaluechk = combinedMembrane[i].med_pr_text;
-                        var indexOfParen = textvaluechk.indexOf('(');
-                        textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + ' (' + combinedMembrane[i].med_pr_text_syn + ')';
+                        var indexOfParen = textvaluechk.indexOf("(");
+                        textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + " (" + combinedMembrane[i].med_pr_text_syn + ")";
 
                         checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
                         checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
@@ -8358,7 +8348,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 // reinitialization
                 reinitVariable();
                 return;
-            })
+            });
         };
 
         /**
@@ -8366,7 +8356,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
          * @param {String} html New header text.
          */
         $this.setHeader = function (html) {
-            $this.window.find('.modal-title').html(html);
+            $this.window.find(".modal-title").html(html);
         };
 
         /**
@@ -8374,7 +8364,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
          * @param {String} html New body HTML
          */
         $this.setBody = function (html) {
-            $this.window.find('.modal-body').html(html);
+            $this.window.find(".modal-body").html(html);
         };
 
         /**
@@ -8382,7 +8372,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
          * @param {String} html New footer HTML
          */
         $this.setFooter = function (html) {
-            $this.window.find('.modal-footer').html(html);
+            $this.window.find(".modal-footer").html(html);
         };
 
         /**
@@ -8390,28 +8380,28 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
          * @returns {jQuery} The body element
          */
         $this.getBody = function () {
-            return $this.window.find('.modal-body');
+            return $this.window.find(".modal-body");
         };
 
         /**
          * Show modal window
          */
         $this.show = function () {
-            $this.window.modal('show');
+            $this.window.modal("show");
         };
 
         /**
          * Hide modal window
          */
         $this.hide = function () {
-            $this.window.modal('hide');
+            $this.window.modal("hide");
         };
 
         /**
          * Toggle modal window
          */
         $this.toggle = function () {
-            $this.window.modal('toggle');
+            $this.window.modal("toggle");
         };
 
         $this.selector = "#" + $this.options.id;
@@ -8450,7 +8440,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
             }
         }
-    }
+    };
 
     // display modal window after clicking either apical or basolateral membrane
     function modalWindowToAddModels(located_in) {
@@ -8464,29 +8454,29 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             membraneName = "Basolateral";
 
         var m = new Modal({
-            id: 'myModal',
-            header: 'Recommender system',
-            footer: 'My footer',
-            footerCloseButton: 'Close',
-            footerSaveButton: 'Save'
+            id: "myModal",
+            header: "Recommender system",
+            footer: "My footer",
+            footerCloseButton: "Close",
+            footerSaveButton: "Save"
         });
 
-        $('#myModal').modal({backdrop: 'static', keyboard: false});
-        m.getBody().html('<div id="modalBody"></div>');
+        $("#myModal").modal({backdrop: "static", keyboard: false});
+        m.getBody().html("<div id=modalBody></div>");
         m.show();
 
         showLoading("#modalBody");
 
-        var query = 'PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>' +
-            'SELECT ?modelEntity ?biological ' +
-            'WHERE { GRAPH ?g { ' +
-            '?entity semsim:hasPhysicalDefinition <' + located_in + '>.' +
-            '?mediator semsim:hasPhysicalEntityReference ?entity.' +
-            '?process semsim:hasMediatorParticipant ?mediator.' +
-            '?property semsim:physicalPropertyOf ?process.' +
-            '?modelEntity semsim:isComputationalComponentFor ?property.' +
-            '?modelEntity <http://purl.org/dc/terms/description> ?biological. ' +
-            '}}'
+        var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "SELECT ?modelEntity ?biological " +
+            "WHERE { GRAPH ?g { " +
+            "?entity semsim:hasPhysicalDefinition <" + located_in + ">." +
+            "?mediator semsim:hasPhysicalEntityReference ?entity." +
+            "?process semsim:hasMediatorParticipant ?mediator." +
+            "?property semsim:physicalPropertyOf ?process." +
+            "?modelEntity semsim:isComputationalComponentFor ?property." +
+            "?modelEntity <http://purl.org/dc/terms/description> ?biological. " +
+            "}}";
 
         sendPostRequest(
             endpoint,
@@ -8506,9 +8496,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             }, true);
 
-        jQuery(window).trigger('resize');
+        jQuery(window).trigger("resize");
     }
-}
+};
 
 exports.epithelialPlatform = epithelialPlatform;
 
@@ -8544,8 +8534,6 @@ var solutesBouncing = function (newg, solutes) {
         });
     }
 
-    console.log(nodes);
-
     var simulation = d3.forceSimulation()
         .force("charge", d3.forceManyBody().strength(0))
         .force("gravity", d3.forceManyBody().strength(0));
@@ -8570,7 +8558,7 @@ var solutesBouncing = function (newg, solutes) {
         .nodes(nodes)
         .on("tick", tick);
 
-    function tick(e) {
+    function tick() {
         simulation.alpha(0.1);
         text
             .each(gravity())
@@ -8596,7 +8584,7 @@ var solutesBouncing = function (newg, solutes) {
             d.y = d.y + (-1 * d.speedY);
         };
     }
-}
+};
 
 exports.solutesBouncing = solutesBouncing;
 

@@ -26,8 +26,6 @@ var solutesBouncing = function (newg, solutes) {
         });
     }
 
-    console.log(nodes);
-
     var simulation = d3.forceSimulation()
         .force("charge", d3.forceManyBody().strength(0))
         .force("gravity", d3.forceManyBody().strength(0));
@@ -52,7 +50,7 @@ var solutesBouncing = function (newg, solutes) {
         .nodes(nodes)
         .on("tick", tick);
 
-    function tick(e) {
+    function tick() {
         simulation.alpha(0.1);
         text
             .each(gravity())
@@ -78,6 +76,6 @@ var solutesBouncing = function (newg, solutes) {
             d.y = d.y + (-1 * d.speedY);
         };
     }
-}
+};
 
 exports.solutesBouncing = solutesBouncing;

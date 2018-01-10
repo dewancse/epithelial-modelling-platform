@@ -39,7 +39,7 @@ var uniqueify = function (es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // remove duplicate model entity and biological meaning
 var uniqueifyCombinedMembrane = function (es) {
@@ -52,16 +52,16 @@ var uniqueifyCombinedMembrane = function (es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // parse text from the epithelial name
 var parserFmaNameText = function (fma) {
     var indexOfHash = fma.name.search("#"),
         srctext = fma.name.slice(indexOfHash + 1),
-        indexOfdot = srctext.indexOf('.');
+        indexOfdot = srctext.indexOf(".");
 
     return srctext.slice(indexOfdot + 1);
-}
+};
 
 // extract species, gene, and protein names
 var parseModelName = function (modelEntity) {
@@ -69,7 +69,7 @@ var parseModelName = function (modelEntity) {
         modelName = modelEntity.slice(0, indexOfHash);
 
     return modelName;
-}
+};
 
 // process table headers
 var headTitle = function () {
@@ -86,10 +86,10 @@ var headTitle = function () {
     head.push("Protein");
 
     return head;
-}
+};
 
 // remove duplicate model entity and biological meaning
-function uniqueifySrcSnkMed(es) {
+var uniqueifySrcSnkMed = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -99,10 +99,10 @@ function uniqueifySrcSnkMed(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // remove duplicate model2DArray
-function uniqueifymodel2DArray(es) {
+var uniqueifymodel2DArray = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -112,7 +112,7 @@ function uniqueifymodel2DArray(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // separate cellml model and variable name from a model entity
 var modelVariableName = function (element) {
@@ -121,14 +121,14 @@ var modelVariableName = function (element) {
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
         componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
-        indexOfDot = componentVariableName.indexOf('.'),
+        indexOfDot = componentVariableName.indexOf("."),
         variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
 
     return [cellmlModelName, variableName];
-}
+};
 
 // remove duplicate entity (cellml model and variable name)
-function uniqueifyjsonModel(es) {
+var uniqueifyjsonModel = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -140,10 +140,10 @@ function uniqueifyjsonModel(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // remove duplicate model entity and biological meaning
-function uniqueifyModelEntity(es) {
+var uniqueifyModelEntity = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -154,10 +154,10 @@ function uniqueifyModelEntity(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // Remove duplicate fma
-function uniqueifyEpithelial(es) {
+var uniqueifyEpithelial = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -167,10 +167,10 @@ function uniqueifyEpithelial(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // Remove duplicate links
-function uniqueifySVG(es) {
+var uniqueifySVG = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -180,10 +180,10 @@ function uniqueifySVG(es) {
         retval.push(e);
     });
     return retval;
-}
+};
 
 // Remove duplicate links
-function uniqueifyjsonFlux(es) {
+var uniqueifyjsonFlux = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -196,7 +196,7 @@ function uniqueifyjsonFlux(es) {
             retval.push(e);
     });
     return retval;
-}
+};
 
 // Create anchor tag
 var createAnchor = function (value) {
@@ -219,22 +219,22 @@ var searchFn = function (searchItem, arrayOfItems) {
 };
 
 // TODO: temp solution, fix this in svg
-function getTextWidth(text, fontSize, fontFace) {
-    var a = document.createElement('canvas'); // $("<canvas/>");
-    var b = a.getContext('2d');
-    b.font = fontSize + 'px ' + fontFace;
+var getTextWidth = function (text, fontSize, fontFace) {
+    var a = document.createElement("canvas"); // $("<canvas/>");
+    var b = a.getContext("2d");
+    b.font = fontSize + "px " + fontFace;
     return b.measureText(text).width;
-}
+};
 
 // Utility to calculate number of iterations
-function iteration(length) {
+var iteration = function (length) {
     var sum = 0;
     for (var i = 0; i < length; i++) {
         sum = sum + (length - i - 1);
     }
 
     return sum;
-}
+};
 
 var isExist = function (element, templistOfModel) {
     // console.log("element: ", element);
@@ -242,14 +242,14 @@ var isExist = function (element, templistOfModel) {
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
         componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
-        indexOfDot = componentVariableName.indexOf('.'),
+        indexOfDot = componentVariableName.indexOf("."),
         variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
 
     for (var i = 0; i < templistOfModel.length; i++) {
         var indexOfHash2 = templistOfModel[i].search("#"),
             cellmlModelName2 = templistOfModel[i].slice(0, indexOfHash2), // weinstein_1995.cellml
             componentVariableName2 = templistOfModel[i].slice(indexOfHash2 + 1), // NHE3.J_NHE3_Na
-            indexOfDot2 = componentVariableName2.indexOf('.'),
+            indexOfDot2 = componentVariableName2.indexOf("."),
             variableName2 = componentVariableName2.slice(indexOfDot2 + 1); // J_NHE3_Na
 
         if (cellmlModelName == cellmlModelName2 && variableName == variableName2) {
@@ -258,21 +258,21 @@ var isExist = function (element, templistOfModel) {
     }
 
     return false;
-}
+};
 
 var isExistModel2DArray = function (element, model2DArray) {
     // remove duplicate components with same variable
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
         componentVariableName = element.slice(indexOfHash + 1), // NHE3.J_NHE3_Na
-        indexOfDot = componentVariableName.indexOf('.'),
+        indexOfDot = componentVariableName.indexOf("."),
         variableName = componentVariableName.slice(indexOfDot + 1); // J_NHE3_Na
 
     for (var i = 0; i < model2DArray.length; i++) {
         var indexOfHash2 = model2DArray[i][1].search("#"),
             cellmlModelName2 = model2DArray[i][1].slice(0, indexOfHash2), // weinstein_1995.cellml
             componentVariableName2 = model2DArray[i][1].slice(indexOfHash2 + 1), // NHE3.J_NHE3_Na
-            indexOfDot2 = componentVariableName2.indexOf('.'),
+            indexOfDot2 = componentVariableName2.indexOf("."),
             variableName2 = componentVariableName2.slice(indexOfDot2 + 1); // J_NHE3_Na
 
         if (cellmlModelName == cellmlModelName2 && variableName == variableName2) {
@@ -281,7 +281,7 @@ var isExistModel2DArray = function (element, model2DArray) {
     }
 
     return false;
-}
+};
 
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;

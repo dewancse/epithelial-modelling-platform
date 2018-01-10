@@ -11,10 +11,10 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
     // remove duplicate
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
         return modelEntityNameArray.indexOf(item) == pos;
-    })
+    });
 
-    console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
-    console.log("visualization in model2DArray: ", model2DArray);
+    // console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
+    // console.log("visualization in model2DArray: ", model2DArray);
 
     // Rearrange items in compartment and located_in
     for (var i = 0; i < model2DArray.length; i++) {
@@ -38,7 +38,7 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
     }
 
     for (var ix = 0; ix < modelEntityNameArray.length; ix++) {
-        for (var i = 0; i < model2DArray.length; i++) {
+        for (i = 0; i < model2DArray.length; i++) {
             if (modelEntityNameArray[ix] == model2DArray[i][1]) {
 
                 for (var j = 2; j < model2DArray[i].length; j++) {
@@ -74,12 +74,11 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
     });
 
     // Making edges ...
-    console.log("nodes: ", nodes);
-    console.log("links: ", links);
+    // console.log("nodes: ", nodes);
+    // console.log("links: ", links);
 
     // SVG graph
-    var g = $("#svgSimilarityModels"),
-        width = 2000, // 1200
+    var width = 2000, // 1200
         height = 900; // 700
 
     var svg = d3.select("#svgSimilarityModels").append("svg")
@@ -169,7 +168,7 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
                     return 10;
                 }
             }
-        })
+        });
 
     // add the text
     node.append("text")
@@ -231,6 +230,6 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
 
     // Empty list
     modelEntityNameArray = [];
-}
+};
 
 exports.similarityModels = similarityModels;
