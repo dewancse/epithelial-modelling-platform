@@ -2981,7 +2981,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     combinedMembrane = uniqueifyCombinedMembrane(combinedMembrane);
 
-    // console.log("combinedMembrane: ", combinedMembrane);
+    console.log("combinedMembrane: ", combinedMembrane);
 
     var g = $("#svgVisualize"),
         wth = 2000, // 1200
@@ -5632,7 +5632,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         if ($(this).prop("tagName") == "text") {
-            circlewithlineg[icircleGlobal] // text
+            circlewithlineg[icircleGlobal] // text (probably for paracellular flux)
                 .attr("x", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("x")) + dx)
                 .attr("y", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("y")) + dy);
         }
@@ -7840,6 +7840,175 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         cotransporterList = [];
     };
 
+    var combinedMemFunc2 = function () {
+
+        model_entity = combinedMembrane[icircleGlobal].model_entity;
+
+        if (combinedMembrane[icircleGlobal].model_entity2 != undefined)
+            model_entity2 = combinedMembrane[icircleGlobal].model_entity2;
+        else model_entity2 = "";
+
+        var mediator_fma = combinedMembrane[icircleGlobal].med_fma,
+            mediator_pr = combinedMembrane[icircleGlobal].med_pr,
+            mediator_pr_text = combinedMembrane[icircleGlobal].med_pr_text,
+            mediator_pr_text_syn = combinedMembrane[icircleGlobal].med_pr_text_syn,
+            protein_name = combinedMembrane[icircleGlobal].protein_name,
+
+            solute_chebi = combinedMembrane[icircleGlobal].solute_chebi,
+            solute_chebi2 = combinedMembrane[icircleGlobal].solute_chebi2,
+            solute_text = combinedMembrane[icircleGlobal].solute_text,
+            solute_text2 = combinedMembrane[icircleGlobal].solute_text2,
+
+            textvalue = combinedMembrane[icircleGlobal].variable_text,
+            textvalue2 = combinedMembrane[icircleGlobal].variable_text2,
+            src_fma = combinedMembrane[icircleGlobal].source_fma,
+            src_fma2 = combinedMembrane[icircleGlobal].source_fma2,
+            snk_fma = combinedMembrane[icircleGlobal].sink_fma,
+            snk_fma2 = combinedMembrane[icircleGlobal].sink_fma2,
+            textWidth = getTextWidth(textvalue, 12),
+
+            tempID = icircleGlobal;
+
+        console.log("combinedMemFunc2: ", src_fma, src_fma2, snk_fma, snk_fma2, textvalue, textvalue2);
+
+        if ((src_fma == cytosolID && snk_fma == interstitialID) &&
+            ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == cytosolID && snk_fma2 == interstitialID))) {
+
+            console.log("combinedMemFunc2: ", xvalue, yvalueb, cyvalueb);
+
+            var lineg = newg.append("g");
+            linewithlineg[icircleGlobal] = lineg.append("line")
+                .attr("id", "linewithlineg" + tempID)
+                .attr("x1", dx1line[icircleGlobal])
+                .attr("y1", dy1line[icircleGlobal])
+                .attr("x2", dx2line[icircleGlobal])
+                .attr("y2", dy2line[icircleGlobal])
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#end)")
+                .attr("cursor", "pointer");
+
+            var linegtext = lineg.append("g");
+            linewithtextg[icircleGlobal] = linegtext.append("text")
+                .attr("id", "linewithtextg" + tempID)
+                .attr("x", dxtext[icircleGlobal])
+                .attr("y", dytext[icircleGlobal])
+                .attr("font-family", "Times New Roman")
+                .attr("font-size", "12px")
+                .attr("font-weight", "bold")
+                .attr("fill", "red")
+                .attr("cursor", "pointer")
+                .text(solute_text);
+
+            var linegcircle = lineg.append("g");
+            circlewithlineg[icircleGlobal] = linegcircle.append("circle")
+                .attr("id", function (d) {
+                    return [
+                        model_entity, model_entity2,
+                        textvalue, textvalue2,
+                        src_fma, snk_fma, src_fma2, snk_fma2,
+                        mediator_fma, mediator_pr,
+                        solute_chebi, solute_chebi2, solute_text, solute_text2,
+                        mediator_pr_text, mediator_pr_text_syn, protein_name
+                    ];
+                })
+                .attr("index", tempID)
+                .attr("membrane", basolateralID)
+                .attr("cx", dx[icircleGlobal])
+                .attr("cy", dy[icircleGlobal])
+                .attr("r", radius)
+                .attr("fill", "orange")
+                .attr("stroke-width", 20)
+                .attr("cursor", "move")
+                .on("mouseover", function () {
+                    div.style("display", "inline");
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", 1);
+
+                    var id = d3.select(this)._groups[0][0].id,
+                        indexOfComma = id.indexOf(","),
+                        tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                            "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                    div.html(
+                        "<b>CellML </b> " +
+                        "<a href=" + tempworkspace + " + target=_blank>" +
+                        "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                        "<br/>" +
+                        "<b>SEDML </b> " +
+                        "<a href=" + uriSEDML + " + target=_blank>" +
+                        "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                        "<br/>" +
+                        "<b>Click middle mouse to close</b>")
+                        .style("left", d3.mouse(this)[0] + 540 + "px")
+                        .style("top", d3.mouse(this)[1] + 90 + "px");
+                });
+
+            // protein name inside this circle
+            circlewithtext[icircleGlobal] = linegcircle.append("text")
+                .attr("id", "circlewithtext" + tempID)
+                .attr("x", dxcircletext[icircleGlobal])
+                .attr("y", dycircletext[icircleGlobal])
+                .attr("font-size", "10px")
+                .attr("fill", "red")
+                .attr("fontWeight", "bold")
+                .attr("cursor", "move")
+                .text(mediator_pr_text_syn);
+
+            if (textvalue2 == "flux") {
+                console.log("combinedMemFunc2 textvalue2 == flux");
+                linewithlineg2[icircleGlobal] = "";
+                linewithtextg2[icircleGlobal] = "";
+                dx1line2[icircleGlobal] = "";
+                dy1line2[icircleGlobal] = "";
+                dx2line2[icircleGlobal] = "";
+                dy2line2[icircleGlobal] = "";
+                dxtext2[icircleGlobal] = "";
+                dytext2[icircleGlobal] = "";
+            }
+
+            if (textvalue2 != "flux") {
+                console.log("combinedMemFunc2 textvalue2 != flux");
+                var lineg2 = lineg.append("g");
+                linewithlineg2[icircleGlobal] = lineg2.append("line")
+                    .attr("id", "linewithlineg2" + tempID)
+                    .attr("x1", dx1line2[icircleGlobal])
+                    .attr("y1", dy1line2[icircleGlobal])
+                    .attr("x2", dx2line2[icircleGlobal])
+                    .attr("y2", dy2line2[icircleGlobal])
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("marker-end", "url(#end)")
+                    .attr("cursor", "pointer");
+
+                var linegtext2 = lineg2.append("g");
+                linewithtextg2[icircleGlobal] = linegtext2.append("text")
+                    .attr("id", "linewithtextg2" + tempID)
+                    .attr("x", dxtext2[icircleGlobal])
+                    .attr("y", dytext2[icircleGlobal])
+                    .attr("font-family", "Times New Roman")
+                    .attr("font-size", "12px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "red")
+                    .attr("cursor", "pointer")
+                    .text(solute_text2);
+            }
+
+            // increment y-axis of line and circle
+            yvalueb += ydistance;
+            cyvalueb += ydistance;
+
+            console.log("combinedMemFunc2:");
+            console.log("circlewithlineg: ", circlewithlineg);
+            console.log("circlewithtext: ", circlewithtext);
+            console.log("linewithlineg: ", linewithlineg);
+            console.log("linewithlineg2: ", linewithlineg2);
+            console.log("linewithtextg: ", linewithtextg);
+            console.log("linewithtextg2: ", linewithtextg2);
+        }
+    }
+
     var Modal = function (options) {
 
         var $this = this;
@@ -8122,6 +8291,60 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 // TODO: circle placement and rearrangement
                 if ($(cthis).attr("membrane") == apicalID) {
 
+                    var length = newg._groups[0][0].childNodes.length;
+                    for (var i = 0; i < length; i++) {
+
+                        if (newg._groups[0][0].childNodes[i].firstChild == undefined)
+                            continue;
+
+                        if (newg._groups[0][0].childNodes[i].firstChild.id == "linewithlineg" + icircleGlobal) {
+                            console.log("index of i: ", i);
+
+                            dx[icircleGlobal] = circlewithlineg[icircleGlobal].attr("cx");
+                            dy[icircleGlobal] = circlewithlineg[icircleGlobal].attr("cy");
+
+                            dxcircletext[icircleGlobal] = circlewithtext[icircleGlobal].attr("x");
+                            dycircletext[icircleGlobal] = circlewithtext[icircleGlobal].attr("y");
+
+                            dx1line[icircleGlobal] = linewithlineg[icircleGlobal].attr("x1");
+                            dy1line[icircleGlobal] = linewithlineg[icircleGlobal].attr("y1");
+                            dx2line[icircleGlobal] = linewithlineg[icircleGlobal].attr("x2");
+                            dy2line[icircleGlobal] = linewithlineg[icircleGlobal].attr("y2");
+
+                            dxtext[icircleGlobal] = linewithtextg[icircleGlobal].attr("x");
+                            dytext[icircleGlobal] = linewithtextg[icircleGlobal].attr("y");
+
+                            if (combinedMembrane[icircleGlobal].variable_text2 == "flux") {
+                                console.log("IF combinedMembrane[icircleGlobal].variable_text2 == flux");
+                                linewithlineg2[icircleGlobal] = "";
+                                linewithtextg2[icircleGlobal] = "";
+                                dx1line2[icircleGlobal] = "";
+                                dy1line2[icircleGlobal] = "";
+                                dx2line2[icircleGlobal] = "";
+                                dy2line2[icircleGlobal] = "";
+                                dxtext2[icircleGlobal] = "";
+                                dytext2[icircleGlobal] = "";
+                            }
+                            else {
+                                console.log("ELSE combinedMembrane[icircleGlobal].variable_text2 == flux");
+                                dx1line2[icircleGlobal] = linewithlineg2[icircleGlobal].attr("x1");
+                                dy1line2[icircleGlobal] = linewithlineg2[icircleGlobal].attr("y1");
+                                dx2line2[icircleGlobal] = linewithlineg2[icircleGlobal].attr("x2");
+                                dy2line2[icircleGlobal] = linewithlineg2[icircleGlobal].attr("y2");
+
+                                dxtext2[icircleGlobal] = linewithtextg2[icircleGlobal].attr("x2");
+                                dytext2[icircleGlobal] = linewithtextg2[icircleGlobal].attr("y2");
+                            }
+
+                            newg._groups[0][0].childNodes[i].remove();
+                            combinedMemFunc2(icircleGlobal);
+
+                            // combinedMemFunc2(icircleGlobal);
+
+                            break;
+                        }
+                    }
+
                     console.log("drag apical to basolateral!");
                     console.log("yvalueb, cyvalueb, circlewithlineg: ", yvalueb, cyvalueb, circlewithlineg);
 
@@ -8131,65 +8354,65 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .duration(1000)
                         .style("stroke", "orange");
 
-                    // line 1
-                    dx1line[icircleGlobal] = xvalue + width;
-                    dy1line[icircleGlobal] = yvalueb;
-                    dx2line[icircleGlobal] = xvalue + width + lineLen;
-                    dy2line[icircleGlobal] = yvalueb;
-                    linewithlineg[icircleGlobal]
-                        .attr("x1", dx1line[icircleGlobal])
-                        .attr("y1", dy1line[icircleGlobal])
-                        .attr("x2", dx2line[icircleGlobal])
-                        .attr("y2", dy2line[icircleGlobal])
-
-                    // text 1
-                    dxtext[icircleGlobal] = xvalue + lineLen + 10 + width;
-                    dytext[icircleGlobal] = yvalueb + 5;
-                    linewithtextg[icircleGlobal]
-                        .attr("x", dxtext[icircleGlobal])
-                        .attr("y", dytext[icircleGlobal])
-
-                    // circle
-                    dx[icircleGlobal] = cxvalue + width;
-                    dy[icircleGlobal] = cyvalueb + radius;
-                    circlewithlineg[icircleGlobal]
-                        .attr("cx", dx[icircleGlobal])
-                        .attr("cy", dy[icircleGlobal])
-                        .attr("membrane", basolateralID)
-                        .attr("fill", "orange")
-
-                    // circle text
-                    dxcircletext[icircleGlobal] = dx[icircleGlobal] - 15;
-                    // dycircletext[icircleGlobal] = dy[icircleGlobal] + 23;
-                    circlewithtext[icircleGlobal]
-                        .transition()
-                        .delay(1000)
-                        .duration(1000)
-                        .attr("x", dxcircletext[icircleGlobal])
-                        .attr("y", dycircletext[icircleGlobal])
-
-                    if (linewithlineg2[icircleGlobal] != undefined) {
-
-                        if (linewithlineg2[icircleGlobal] != "") {
-                            // line 2
-                            dx1line2[icircleGlobal] = xvalue + width;
-                            dy1line2[icircleGlobal] = yvalueb + radius * 2;
-                            dx2line2[icircleGlobal] = xvalue + width + lineLen;
-                            dy2line2[icircleGlobal] = yvalueb + radius * 2;
-                            linewithlineg2[icircleGlobal]
-                                .attr("x1", dx1line2[icircleGlobal])
-                                .attr("y1", dy1line2[icircleGlobal])
-                                .attr("x2", dx2line2[icircleGlobal])
-                                .attr("y2", dy2line2[icircleGlobal])
-
-                            // text 2
-                            dxtext2[icircleGlobal] = xvalue + lineLen + 10 + width;
-                            dytext2[icircleGlobal] = yvalueb + radius * 2 + markerHeight;
-                            linewithtextg2[icircleGlobal]
-                                .attr("x", dxtext2[icircleGlobal])
-                                .attr("y", dytext2[icircleGlobal])
-                        }
-                    }
+                    // // line 1
+                    // dx1line[icircleGlobal] = xvalue + width;
+                    // dy1line[icircleGlobal] = yvalueb;
+                    // dx2line[icircleGlobal] = xvalue + width + lineLen;
+                    // dy2line[icircleGlobal] = yvalueb;
+                    // linewithlineg[icircleGlobal]
+                    //     .attr("x1", dx1line[icircleGlobal])
+                    //     .attr("y1", dy1line[icircleGlobal])
+                    //     .attr("x2", dx2line[icircleGlobal])
+                    //     .attr("y2", dy2line[icircleGlobal])
+                    //
+                    // // text 1
+                    // dxtext[icircleGlobal] = xvalue + lineLen + 10 + width;
+                    // dytext[icircleGlobal] = yvalueb + 5;
+                    // linewithtextg[icircleGlobal]
+                    //     .attr("x", dxtext[icircleGlobal])
+                    //     .attr("y", dytext[icircleGlobal])
+                    //
+                    // // circle
+                    // dx[icircleGlobal] = cxvalue + width;
+                    // dy[icircleGlobal] = cyvalueb + radius;
+                    // circlewithlineg[icircleGlobal]
+                    //     .attr("cx", dx[icircleGlobal])
+                    //     .attr("cy", dy[icircleGlobal])
+                    //     .attr("membrane", basolateralID)
+                    //     .attr("fill", "orange")
+                    //
+                    // // circle text
+                    // dxcircletext[icircleGlobal] = dx[icircleGlobal] - 15;
+                    // // dycircletext[icircleGlobal] = dy[icircleGlobal] + 23;
+                    // circlewithtext[icircleGlobal]
+                    //     .transition()
+                    //     .delay(1000)
+                    //     .duration(1000)
+                    //     .attr("x", dxcircletext[icircleGlobal])
+                    //     .attr("y", dycircletext[icircleGlobal])
+                    //
+                    // if (linewithlineg2[icircleGlobal] != undefined) {
+                    //
+                    //     if (linewithlineg2[icircleGlobal] != "") {
+                    //         // line 2
+                    //         dx1line2[icircleGlobal] = xvalue + width;
+                    //         dy1line2[icircleGlobal] = yvalueb + radius * 2;
+                    //         dx2line2[icircleGlobal] = xvalue + width + lineLen;
+                    //         dy2line2[icircleGlobal] = yvalueb + radius * 2;
+                    //         linewithlineg2[icircleGlobal]
+                    //             .attr("x1", dx1line2[icircleGlobal])
+                    //             .attr("y1", dy1line2[icircleGlobal])
+                    //             .attr("x2", dx2line2[icircleGlobal])
+                    //             .attr("y2", dy2line2[icircleGlobal])
+                    //
+                    //         // text 2
+                    //         dxtext2[icircleGlobal] = xvalue + lineLen + 10 + width;
+                    //         dytext2[icircleGlobal] = yvalueb + radius * 2 + markerHeight;
+                    //         linewithtextg2[icircleGlobal]
+                    //             .attr("x", dxtext2[icircleGlobal])
+                    //             .attr("y", dytext2[icircleGlobal])
+                    //     }
+                    // }
 
                     // decrement y-axis of line and circle
                     yvalue -= ydistance;
@@ -8319,6 +8542,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 //     if (newg._groups[0][0].childNodes[i].firstChild == undefined)
                 //         continue;
                 //
+                //     console.log("Testing circlewithlineg: ", circlewithlineg[icircleGlobal].attr("id"));
+                //     console.log("Testing linewithlineg: ", linewithlineg[icircleGlobal].attr("id"));
                 //     if (newg._groups[0][0].childNodes[i].firstChild.id == "linewithlineg" + icircleGlobal) {
                 //         console.log("index of i: ", i);
                 //
@@ -8332,18 +8557,60 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 //
                 //         newg._groups[0][0].childNodes[i].remove();
                 //
-                //         circlewithlineg.splice(icircleGlobal, 1);
-                //         circlewithtext.splice(icircleGlobal, 1);
-                //         linewithlineg.splice(icircleGlobal, 1);
-                //         linewithlineg2.splice(icircleGlobal, 1);
-                //         linewithtextg.splice(icircleGlobal, 1);
-                //         linewithtextg2.splice(icircleGlobal, 1);
-                //
                 //         combinedMemFunc(icircleGlobal);
                 //     }
                 // }
 
-                console.log("circlewithlineg, linewithlineg: ", circlewithlineg, linewithlineg);
+                // var length = newg._groups[0][0].childNodes.length;
+                // for (var i = 0; i < length; i++) {
+                //
+                //     if (newg._groups[0][0].childNodes[i].firstChild == undefined)
+                //         continue;
+                //
+                //     if (newg._groups[0][0].childNodes[i].firstChild.id == undefined)
+                //         continue;
+                //
+                //     console.log("OUTSIDE index of i: ", i);
+                //     if (newg._groups[0][0].childNodes[i].firstChild.id == "linewithlineg" + icircleGlobal) {
+                //         console.log("INSIDE index of i: ", i);
+                //
+                //         dx[icircleGlobal] = circlewithlineg[icircleGlobal].attr("cx");
+                //         dy[icircleGlobal] = circlewithlineg[icircleGlobal].attr("cy");
+                //
+                //         dxcircletext[icircleGlobal] = circlewithtext[icircleGlobal].attr("x");
+                //         dycircletext[icircleGlobal] = circlewithtext[icircleGlobal].attr("y");
+                //
+                //         dx1line[icircleGlobal] = linewithlineg[icircleGlobal].attr("x1");
+                //         dy1line[icircleGlobal] = linewithlineg[icircleGlobal].attr("y1");
+                //         dx2line[icircleGlobal] = linewithlineg[icircleGlobal].attr("x2");
+                //         dy2line[icircleGlobal] = linewithlineg[icircleGlobal].attr("y2");
+                //
+                //         dx1line2[icircleGlobal] = linewithlineg2[icircleGlobal].attr("x1");
+                //         dy1line2[icircleGlobal] = linewithlineg2[icircleGlobal].attr("y1");
+                //         dx2line2[icircleGlobal] = linewithlineg2[icircleGlobal].attr("x2");
+                //         dy2line2[icircleGlobal] = linewithlineg2[icircleGlobal].attr("y2");
+                //
+                //         dxtext[icircleGlobal] = linewithtextg[icircleGlobal].attr("x");
+                //         dytext[icircleGlobal] = linewithtextg[icircleGlobal].attr("y");
+                //
+                //         dxtext2[icircleGlobal] = linewithtextg2[icircleGlobal].attr("x2");
+                //         dytext2[icircleGlobal] = linewithtextg2[icircleGlobal].attr("y2");
+                //
+                //         newg._groups[0][0].childNodes[i].remove();
+                //         combinedMemFunc(icircleGlobal);
+                //
+                //         // combinedMemFunc2(icircleGlobal);
+                //
+                //         break;
+                //     }
+                // }
+
+                console.log("circlewithlineg: ", circlewithlineg);
+                console.log("circlewithtext: ", circlewithtext);
+                console.log("linewithlineg: ", linewithlineg);
+                console.log("linewithlineg2: ", linewithlineg2);
+                console.log("linewithtextg: ", linewithtextg);
+                console.log("linewithtextg2: ", linewithtextg2);
 
                 // reinitialization
                 reinitVariable();
@@ -8413,7 +8680,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         $this.setHeader($this.options.header);
     }
 
-    // TODO: similar to relatedMembrane2. Combine this with relatedMembrane
+// TODO: similar to relatedMembrane2. Combine this with relatedMembrane
     var addModels = function (membrane, membraneName, fluxList, flag) {
 
         // console.log("addModels: ", membrane, membraneName);
@@ -8442,7 +8709,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     };
 
-    // display modal window after clicking either apical or basolateral membrane
+// display modal window after clicking either apical or basolateral membrane
     function modalWindowToAddModels(located_in) {
 
         console.log("located_in: ", located_in);
