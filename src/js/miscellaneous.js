@@ -1,44 +1,10 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
+
 // Show loading icon inside element identified by 'selector'.
 var showLoading = function (selector) {
     $(selector).html("<div class='text-center'><img src='../src/img/ajax-loader.gif'></div>");
-};
-
-// Find the current active menu button
-var activeMenu = function () {
-    for (var i = 0; i < $("#ulistItems li").length; i++) {
-        if ($($("#ulistItems li")[i]).attr("class") === "active")
-            return $("#ulistItems li")[i].id;
-    }
-};
-
-// Remove the class 'active' from source to target button
-var switchMenuToActive = function (source, target) {
-    var classes = $(source).attr("class");
-    classes = classes.replace(new RegExp("active", "g"), "");
-    $(source).addClass(classes);
-
-    // Add 'active' to target button if not already there
-    classes = $(target).attr("class");
-    if (classes != "active") {
-        classes += "active";
-        $(target).addClass(classes);
-    }
-};
-
-// remove duplicate model entity and biological meaning
-var uniqueify = function (es) {
-    var retval = [];
-    es.forEach(function (e) {
-        for (var j = 0; j < retval.length; j++) {
-            if (retval[j] === e)
-                return;
-        }
-        retval.push(e);
-    });
-    return retval;
 };
 
 // remove duplicate model entity and biological meaning
@@ -71,25 +37,8 @@ var parseModelName = function (modelEntity) {
     return modelName;
 };
 
-// process table headers
-var headTitle = function () {
-    var head = [];
-
-    // Getting first 2 head title, not i < jsonModel.head.vars.length
-    // for (var i = 0; i < 2; i++)
-    //     head.push(jsonModel.head.vars[i]);
-
-    head.push("Model_entity");
-    head.push("Biological_meaning");
-    head.push("Species");
-    head.push("Gene");
-    head.push("Protein");
-
-    return head;
-};
-
-// remove duplicate model entity and biological meaning
-var uniqueifySrcSnkMed = function (es) {
+// remove duplicate relatedModel
+var uniqueify = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
@@ -116,7 +65,6 @@ var uniqueifymodel2DArray = function (es) {
 
 // separate cellml model and variable name from a model entity
 var modelVariableName = function (element) {
-    // console.log("element: ", element);
     // remove duplicate components with same variable
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
@@ -135,20 +83,6 @@ var uniqueifyjsonModel = function (es) {
             var temp1 = modelVariableName(retval[j].Model_entity.value),
                 temp2 = modelVariableName(e.Model_entity.value);
             if (temp1[0] == temp2[0] && temp1[1] == temp2[1])
-                return;
-        }
-        retval.push(e);
-    });
-    return retval;
-};
-
-// remove duplicate model entity and biological meaning
-var uniqueifyModelEntity = function (es) {
-    var retval = [];
-    es.forEach(function (e) {
-        for (var j = 0; j < retval.length; j++) {
-            if (retval[j].fma === e.fma)
-
                 return;
         }
         retval.push(e);
@@ -237,7 +171,6 @@ var iteration = function (length) {
 };
 
 var isExist = function (element, templistOfModel) {
-    // console.log("element: ", element);
     // remove duplicate components with same variable and cellml model
     var indexOfHash = element.search("#"),
         cellmlModelName = element.slice(0, indexOfHash), // weinstein_1995.cellml
@@ -285,10 +218,7 @@ var isExistModel2DArray = function (element, model2DArray) {
 
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
-exports.headTitle = headTitle;
 exports.uniqueify = uniqueify;
-exports.uniqueifySrcSnkMed = uniqueifySrcSnkMed;
-exports.uniqueifyModelEntity = uniqueifyModelEntity;
 exports.uniqueifyEpithelial = uniqueifyEpithelial;
 exports.uniqueifySVG = uniqueifySVG;
 exports.uniqueifyjsonFlux = uniqueifyjsonFlux;
@@ -297,8 +227,6 @@ exports.searchFn = searchFn;
 exports.getTextWidth = getTextWidth;
 exports.iteration = iteration;
 exports.showLoading = showLoading;
-exports.activeMenu = activeMenu;
-exports.switchMenuToActive = switchMenuToActive;
 exports.uniqueifymodel2DArray = uniqueifymodel2DArray;
 exports.uniqueifyjsonModel = uniqueifyjsonModel;
 exports.isExist = isExist;
