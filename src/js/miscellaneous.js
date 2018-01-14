@@ -216,6 +216,17 @@ var isExistModel2DArray = function (element, model2DArray) {
     return false;
 };
 
+var circleIDsplitUtils = function (cthis, paracellularID) {
+    var circleID;
+    if (cthis.attr("membrane") == paracellularID) {
+        circleID = cthis.attr("idParacellular").split(",");
+    }
+    else {
+        circleID = cthis.prop("id").split(",");
+    }
+    return circleID;
+}
+
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
 exports.uniqueify = uniqueify;
@@ -232,3 +243,4 @@ exports.uniqueifyjsonModel = uniqueifyjsonModel;
 exports.isExist = isExist;
 exports.isExistModel2DArray = isExistModel2DArray;
 exports.uniqueifyCombinedMembrane = uniqueifyCombinedMembrane;
+exports.circleIDsplitUtils = circleIDsplitUtils;

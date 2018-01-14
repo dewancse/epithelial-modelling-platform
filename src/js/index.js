@@ -317,7 +317,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 // REMOVE duplicate cellml model and variable name (NOT component name)
                 jsonModel.results.bindings = uniqueifyjsonModel(jsonModel.results.bindings);
 
-                console.log("jsonModel in index.js: ", jsonModel);
+                // console.log("discoverModels: jsonModel -> ", jsonModel);
 
                 var discoverInnerModels = function () {
                     if (jsonModel.results.bindings.length == 0) {
@@ -344,9 +344,12 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                             }
 
                             // pig SGLT2 (PR_P31636) does not exist in PR ontology, assign mouse species instead
-                            var pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
+                            var pr_uri, endpointproteinOLS;
+                            if (jsonProteinUri.results.bindings.length == 0)
+                                pr_uri = undefined;
+                            else
+                                pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
 
-                            var endpointproteinOLS;
                             if (pr_uri != undefined)
                                 endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
                             else
@@ -600,8 +603,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     // Load the model
     mainUtils.loadModelHtml = function () {
 
-        console.log("modelEntity: ", modelEntity);
-
         var model = mainUtils.workspaceName;
 
         if (model == undefined)
@@ -616,7 +617,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             query,
             function (jsonProteinUri) {
 
-                console.log("jsonProteinUri: ", jsonProteinUri);
+                // console.log("loadModelHtml: jsonProteinUri -> ", jsonProteinUri);
 
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0)
@@ -633,7 +634,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                     endpointproteinOLS,
                     function (jsonProtein) {
 
-                        console.log("jsonProtein: ", jsonProtein);
+                        // console.log("loadModelHtml: jsonProtein -> ", jsonProtein);
 
                         var endpointgeneOLS;
                         if (jsonProtein._embedded == undefined)
@@ -1015,14 +1016,13 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
         }
 
-        // console.log("loadEpithelial in model2DArr: ", model2DArray);
-        // console.log("loadEpithelial in modelEntityNameArray: ", modelEntityNameArray);
-        // console.log("loadEpithelial in modelEntityFullNameArray: ", modelEntityFullNameArray);
-        // console.log("loadEpithelial in templistOfModel: ", templistOfModel);
+        console.log("loadEpithelial: model2DArr -> ", model2DArray);
+        console.log("loadEpithelial: modelEntityNameArray -> ", modelEntityNameArray);
+        console.log("loadEpithelial: modelEntityFullNameArray -> ", modelEntityFullNameArray);
+        console.log("loadEpithelial: templistOfModel -> ", templistOfModel);
 
-        var source_fma = [], sink_fma = [], med_fma = [], med_pr = [],
-            source_fma2 = [], sink_fma2 = [], solute_chebi = [],
-            index = 0, counter = 0,
+        var source_fma = [], sink_fma = [], med_fma = [], med_pr = [], source_fma2 = [],
+            sink_fma2 = [], solute_chebi = [], index = 0, counter = 0,
             membrane = [], apicalMembrane = [], basolateralMembrane = [];
 
         // empty platform as no model is selected
@@ -1241,7 +1241,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                             query,
                             function (jsonObjFlux) {
 
-                                console.log("jsonObjFlux in index.js: ", jsonObjFlux);
+                                console.log("srcDescMediatorOfFluxes: jsonObjFlux -> ", jsonObjFlux);
 
                                 var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
                                 var indexofColon = chebi_uri.indexOf("CHEBI:");
@@ -1324,7 +1324,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                         med_pr = uniqueifyEpithelial(med_pr);
                                         med_fma = uniqueifyEpithelial(med_fma);
 
-                                        console.log("med_pr in index.js: ", med_pr[0], med_pr);
+                                        console.log("srcDescMediatorOfFluxes: med_pr -> ", med_pr[0], med_pr);
 
                                         var medURI, endpointOLS, srctext, temp_med_pr, med_pr_text_syn, tempvar;
 
@@ -1348,7 +1348,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                             endpointOLS,
                                             function (jsonObjOLSMedPr) {
 
-                                                console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr);
+                                                console.log("srcDescMediatorOfFluxes: jsonObjOLSMedPr -> ", jsonObjOLSMedPr);
 
                                                 index++;
 
@@ -1514,7 +1514,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                             endpoint,
                             query,
                             function (jsonObjCon) {
-                                console.log("jsonObjCon in index.js: ", jsonObjCon);
+                                console.log("srcDescMediatorOfFluxes: jsonObjCon -> ", jsonObjCon);
 
                                 for (var i in jsonObjCon.results.bindings) {
                                     if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
