@@ -1080,7 +1080,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
         speciesList = [],
         geneList = [],
         proteinList = [],
-        listOfURIs = [],
+        listOfProteinURIs = [],
         head = [],
         discIndex = 0;
 
@@ -1164,7 +1164,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
                 speciesList = [];
                 geneList = [];
                 proteinList = [];
-                listOfURIs = [];
+                listOfProteinURIs = [];
                 head = [];
 
                 discIndex = 0; // discIndex to index each Model_entity
@@ -1286,7 +1286,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
 
         if (!sessionStorage.getItem("searchListContent")) {
 
-            // console.log("loadSearchHtml IF");
+            console.log("loadSearchHtml IF");
 
             sendGetRequest(
                 searchHtml,
@@ -1296,10 +1296,11 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
                 false);
         }
         else {
-            // console.log("loadSearchHtml ELSE");
+            console.log("loadSearchHtml ELSE");
 
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
+            filterByProtein(); // reload protein in the dropdown list
             mainUtils.showDiscoverModels(
                 head,
                 modelEntity,
@@ -1307,7 +1308,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
                 speciesList,
                 geneList,
                 proteinList,
-                listOfURIs);
+                listOfProteinURIs);
         }
     };
 
@@ -1339,7 +1340,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
 
                 var discoverInnerModels = function () {
                     if (jsonModel.results.bindings.length == 0) {
-                        mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfURIs);
+                        mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfProteinURIs);
                         return;
                     }
 
@@ -1399,7 +1400,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
 
                                                     // protein uri
                                                     if (pr_uri != undefined)
-                                                        listOfURIs.push(pr_uri);
+                                                        listOfProteinURIs.push(pr_uri);
 
                                                     // model and biological meaning
                                                     modelEntity.push(jsonModel.results.bindings[discIndex].Model_entity.value);
@@ -1438,14 +1439,14 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
                                                         speciesList,
                                                         geneList,
                                                         proteinList,
-                                                        listOfURIs);
+                                                        listOfProteinURIs);
 
                                                     discIndex++; // increment index of modelEntity
 
                                                     if (discIndex == jsonModel.results.bindings.length) {
 
-                                                        listOfURIs = listOfURIs.filter(function (item, pos) {
-                                                            return listOfURIs.indexOf(item) == pos;
+                                                        listOfProteinURIs = listOfProteinURIs.filter(function (item, pos) {
+                                                            return listOfProteinURIs.indexOf(item) == pos;
                                                         });
 
                                                         filterByProtein();
@@ -1470,7 +1471,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
     };
 
     // Show discovered models from PMR
-    mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfURIs) {
+    mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfProteinURIs) {
 
         // Empty search result
         if (head.length == 0) {
@@ -1510,7 +1511,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
                 if (j == 0) {
                     tr.append($("<td/>")
                         .append($("<label/>")
-                            .html("<input id=" + modelEntity[i] + " uri=" + listOfURIs[i] + " type=checkbox " +
+                            .html("<input id=" + modelEntity[i] + " uri=" + listOfProteinURIs[i] + " type=checkbox " +
                                 "data-action=search value=" + modelEntity[i] + " + class=checkbox>")));
                 }
 
@@ -1890,6 +1891,8 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
     // Filter search results
     mainUtils.filterSearchHtml = function () {
 
+        console.log("mainUtils.filterSearchHtml!");
+
         if ($("#membraneId").val() == "all") {
             $("table tr").show();
         }
@@ -1913,7 +1916,9 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
 
     // Filter dropdown list in the search html
     var filterByProtein = function () {
-        // Initializing the dropdown list
+        console.log("filterByProtein!");
+
+        // Initialize dropdown list
         $("#membraneId").empty();
         $("#membraneId").append("<option value=all>select all</option>");
 
@@ -1927,7 +1932,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
         });
 
         for (var i in tmpProteinList) {
-            $("#membraneId").append("<option value=" + listOfURIs[i] + ">" + tmpProteinList[i] + "</option>");
+            $("#membraneId").append("<option value=" + listOfProteinURIs[i] + ">" + tmpProteinList[i] + "</option>");
         }
     };
 
@@ -3305,9 +3310,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // tooltip
-    var div = d3.select("#svgVisualize").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    // var div = d3.select("#svgVisualize").append("div")
+    //     .attr("class", "tooltip")
+    //     .style("opacity", 0);
 
     $(document).on({
         mousedown: function () {
@@ -7825,7 +7830,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 // circle placement and rearrangement
                 if ($(cthis).attr("membrane") == apicalID) {
-                  linebasolateral
+                    linebasolateral
                         .transition()
                         .delay(1000)
                         .duration(1000)

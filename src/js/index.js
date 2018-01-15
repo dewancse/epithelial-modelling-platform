@@ -62,7 +62,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         speciesList = [],
         geneList = [],
         proteinList = [],
-        listOfURIs = [],
+        listOfProteinURIs = [],
         head = [],
         discIndex = 0;
 
@@ -146,7 +146,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 speciesList = [];
                 geneList = [];
                 proteinList = [];
-                listOfURIs = [];
+                listOfProteinURIs = [];
                 head = [];
 
                 discIndex = 0; // discIndex to index each Model_entity
@@ -268,7 +268,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         if (!sessionStorage.getItem("searchListContent")) {
 
-            // console.log("loadSearchHtml IF");
+            console.log("loadSearchHtml IF");
 
             sendGetRequest(
                 searchHtml,
@@ -278,10 +278,11 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 false);
         }
         else {
-            // console.log("loadSearchHtml ELSE");
+            console.log("loadSearchHtml ELSE");
 
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
+            filterByProtein(); // reload protein in the dropdown list
             mainUtils.showDiscoverModels(
                 head,
                 modelEntity,
@@ -289,7 +290,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 speciesList,
                 geneList,
                 proteinList,
-                listOfURIs);
+                listOfProteinURIs);
         }
     };
 
@@ -321,7 +322,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                 var discoverInnerModels = function () {
                     if (jsonModel.results.bindings.length == 0) {
-                        mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfURIs);
+                        mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfProteinURIs);
                         return;
                     }
 
@@ -381,7 +382,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                                                     // protein uri
                                                     if (pr_uri != undefined)
-                                                        listOfURIs.push(pr_uri);
+                                                        listOfProteinURIs.push(pr_uri);
 
                                                     // model and biological meaning
                                                     modelEntity.push(jsonModel.results.bindings[discIndex].Model_entity.value);
@@ -420,14 +421,14 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                         speciesList,
                                                         geneList,
                                                         proteinList,
-                                                        listOfURIs);
+                                                        listOfProteinURIs);
 
                                                     discIndex++; // increment index of modelEntity
 
                                                     if (discIndex == jsonModel.results.bindings.length) {
 
-                                                        listOfURIs = listOfURIs.filter(function (item, pos) {
-                                                            return listOfURIs.indexOf(item) == pos;
+                                                        listOfProteinURIs = listOfProteinURIs.filter(function (item, pos) {
+                                                            return listOfProteinURIs.indexOf(item) == pos;
                                                         });
 
                                                         filterByProtein();
@@ -452,7 +453,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     };
 
     // Show discovered models from PMR
-    mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfURIs) {
+    mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfProteinURIs) {
 
         // Empty search result
         if (head.length == 0) {
@@ -492,7 +493,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 if (j == 0) {
                     tr.append($("<td/>")
                         .append($("<label/>")
-                            .html("<input id=" + modelEntity[i] + " uri=" + listOfURIs[i] + " type=checkbox " +
+                            .html("<input id=" + modelEntity[i] + " uri=" + listOfProteinURIs[i] + " type=checkbox " +
                                 "data-action=search value=" + modelEntity[i] + " + class=checkbox>")));
                 }
 
@@ -872,6 +873,8 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     // Filter search results
     mainUtils.filterSearchHtml = function () {
 
+        console.log("mainUtils.filterSearchHtml!");
+
         if ($("#membraneId").val() == "all") {
             $("table tr").show();
         }
@@ -895,7 +898,9 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
     // Filter dropdown list in the search html
     var filterByProtein = function () {
-        // Initializing the dropdown list
+        console.log("filterByProtein!");
+
+        // Initialize dropdown list
         $("#membraneId").empty();
         $("#membraneId").append("<option value=all>select all</option>");
 
@@ -909,7 +914,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         });
 
         for (var i in tmpProteinList) {
-            $("#membraneId").append("<option value=" + listOfURIs[i] + ">" + tmpProteinList[i] + "</option>");
+            $("#membraneId").append("<option value=" + listOfProteinURIs[i] + ">" + tmpProteinList[i] + "</option>");
         }
     };
 

@@ -1,6 +1,7 @@
 /**
  * Created by Dewan Sarwar on 18/12/2017.
  * Automated test cases by Selenium
+ * How to execute: node test/functionaltest.js
  */
 var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 var baseUrl = "http://localhost:63342/epithelial-modelling-platform/src/index.html";
