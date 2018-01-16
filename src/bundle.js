@@ -1084,6 +1084,8 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
         head = [],
         discIndex = 0;
 
+    var totalCheckboxes, numberOfChecked, numberOfNotChecked;
+
     mainUtils.loadHomeHtml = function () {
         showLoading("#main-content");
         sendGetRequest(
@@ -1128,6 +1130,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
 
     $(document).on({
         click: function () {
+
             // If there"s an action with the given name, call it
             if (typeof actions[event.target.dataset.action] === "function") {
                 actions[event.target.dataset.action].call(this, event);
@@ -1890,14 +1893,16 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
 
     // Filter search results
     mainUtils.filterSearchHtml = function () {
-
         console.log("mainUtils.filterSearchHtml!");
 
         if ($("#membraneId").val() == "all") {
             $("table tr").show();
+            console.log("IF: ", $("#membraneId").val());
         }
         else {
             var selectedprotein = $("#membraneId option:selected").val();
+
+            console.log("selectedprotein: ", selectedprotein);
 
             for (var i = 1; i < $("table tr").length; i++) {
 
@@ -1912,7 +1917,7 @@ var sendPostRequest = __webpack_require__(2).sendPostRequest;
                 }
             }
         }
-    };
+    }
 
     // Filter dropdown list in the search html
     var filterByProtein = function () {
@@ -3002,6 +3007,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .attr("height", hth);
 
     var newg = svg.append("g")
+        .attr("id", "newgid")
         .data([{x: w / 3, y: height / 3}]);
 
     // draw svg platform
@@ -3324,6 +3330,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         },
 
         click: function () {
+
+            var totalCheckboxes = $("input:checkbox").length,
+                numberOfChecked = $("input:checkbox:checked").length,
+                numberOfNotChecked = totalCheckboxes - numberOfChecked;
+
+            console.log("totalCheckboxes, numberOfChecked, numberNotChecked in epithelial.js: ", totalCheckboxes, numberOfChecked, numberOfNotChecked);
+
             // Change marker direction and text position
             if (event.target.localName == "line" && event.target.nodeName == "line") {
                 // console.log("event.srcElement.id: ", event.srcElement.id);
@@ -7808,22 +7821,21 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     combinedMembrane[icircleGlobal].solute_text2 = circleID[13]; // solute text using the CHEBI uri from OLS
                 }
 
-                var length = newg._groups[0][0].childNodes.length;
                 console.log("icircleGlobal: ", icircleGlobal);
                 console.log("combinedMembrane: ", combinedMembrane);
                 console.log("circlewithlineg: ", circlewithlineg);
-                console.log("newg._groups[0][0].childNodes: ", newg._groups[0][0].childNodes);
-                for (var i = 0; i < length; i++) {
+                console.log("$('#newgid').prop('childNodes'): ", $('#newgid').prop('childNodes'));
+                for (var i = 0; i < $('#newgid').prop('childNodes').length; i++) {
 
-                    if (newg._groups[0][0].childNodes[i].firstChild == undefined)
+                    if ($('#newgid').prop('childNodes')[i].firstChild == undefined)
                         continue;
 
-                    console.log("newg._groups[0][0].childNodes[i].firstChild.id: ",
-                        newg._groups[0][0].childNodes[i].firstChild.id);
+                    console.log("$('#newgid').prop('childNodes')[i].firstChild.id: ",
+                        $('#newgid').prop('childNodes')[i].firstChild.id);
 
-                    if (newg._groups[0][0].childNodes[i].firstChild.id == "linewithlineg" + icircleGlobal) {
+                    if ($('#newgid').prop('childNodes')[i].firstChild.id == "linewithlineg" + icircleGlobal) {
                         console.log("index of i: ", i);
-                        newg._groups[0][0].childNodes[i].remove();
+                        $('#newgid').prop('childNodes')[i].remove();
                         // break;
                     }
                 }

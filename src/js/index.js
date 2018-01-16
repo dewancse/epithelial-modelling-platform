@@ -66,6 +66,8 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         head = [],
         discIndex = 0;
 
+    var totalCheckboxes, numberOfChecked, numberOfNotChecked;
+
     mainUtils.loadHomeHtml = function () {
         showLoading("#main-content");
         sendGetRequest(
@@ -110,6 +112,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
     $(document).on({
         click: function () {
+
             // If there"s an action with the given name, call it
             if (typeof actions[event.target.dataset.action] === "function") {
                 actions[event.target.dataset.action].call(this, event);
@@ -872,14 +875,16 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
     // Filter search results
     mainUtils.filterSearchHtml = function () {
-
         console.log("mainUtils.filterSearchHtml!");
 
         if ($("#membraneId").val() == "all") {
             $("table tr").show();
+            console.log("IF: ", $("#membraneId").val());
         }
         else {
             var selectedprotein = $("#membraneId option:selected").val();
+
+            console.log("selectedprotein: ", selectedprotein);
 
             for (var i = 1; i < $("table tr").length; i++) {
 
@@ -894,7 +899,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 }
             }
         }
-    };
+    }
 
     // Filter dropdown list in the search html
     var filterByProtein = function () {
