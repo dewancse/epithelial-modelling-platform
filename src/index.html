@@ -84,18 +84,13 @@
 <!-- home scripts -->
 <script src="bundle.js"></script>
 
-<!--&lt;!&ndash; PhantomJS and Mocha &ndash;&gt;-->
-<!--<div id="mocha"></div>-->
-<!--<script src="../test/unittest.js"></script>-->
-
 <!-- PhantomJS and Mocha -->
 <div id="mocha"></div>
-<script src="../node_modules/mocha/mocha.js"></script>
-<script src="../node_modules/chai/chai.js"></script>
 <script>
     mocha.ui('bdd');
     mocha.reporter('html');
     var expect = chai.expect;
+    var assert = chai.assert;
 </script>
 <script src="../test/unittest.js"></script>
 <script>
@@ -106,6 +101,3 @@
         mocha.run();
     }
 </script>
-
-</body>
-</html>

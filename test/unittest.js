@@ -6,19 +6,39 @@
  * http://mochajs.org/#getting-started
  * git commit and push; Travis will automate  continuous testing
  */
-// mocha.ui('bdd');
-// mocha.reporter('html');
-// var expect = chai.expect;
-// var assert = chai.assert;
-//
-// var mochaRunFunc = function () {
-//     if (window.mochaPhantomJS) {
-//         mochaPhantomJS.run();
-//     }
-//     else {
-//         mocha.run();
-//     }
-// };
+
+describe("DOM Tests", function () {
+    var el = document.createElement("div");
+    el.id = "myDiv";
+    el.innerHTML = "Hi there!";
+    el.style.background = "#ccc";
+    document.body.appendChild(el);
+
+    var myEl = document.getElementById('myDiv');
+    it("is in the DOM", function () {
+        expect(myEl).to.not.equal(null);
+    });
+
+    it("is a child of the body", function () {
+        expect(myEl.parentElement).to.equal(document.body);
+    });
+
+    it("has the right text", function () {
+        expect(myEl.innerHTML).to.equal("Hi there!");
+    });
+
+    it("has the right background", function () {
+        expect(myEl.style.background).to.equal("rgb(204, 204, 204)");
+    });
+});
+
+describe('Array', function () {
+    describe('#indexOf()', function () {
+        it('should return -1 when the value is not present', function () {
+            assert.equal([1, 2, 3].indexOf(4), -1);
+        });
+    });
+});
 
 // link tests for MODEL DISCOVERY, LOAD MODELS, and DOCUMENTATION
 describe("link Tests", function () {
@@ -27,16 +47,34 @@ describe("link Tests", function () {
             if (event.srcElement.href == $('li#listDiscovery a')[0].href) {
                 it("#listDiscovery", function () {
                     expect($('li#listDiscovery a')[0].href).to.equal(event.srcElement.href);
+                    if ($('li#listDiscovery a')[0].href == event.srcElement.href) {
+                        console.log("#listDiscovery: test passed");
+                    }
+                    else {
+                        console.log("#listDiscovery: test failed");
+                    }
                 });
             }
             if (event.srcElement.href == $('li#listModels a')[0].href) {
                 it("#listModels", function () {
                     expect($('li#listModels a')[0].href).to.equal(event.srcElement.href);
+                    if ($('li#listModels a')[0].href == event.srcElement.href) {
+                        console.log("#listModels: test passed");
+                    }
+                    else {
+                        console.log("#listModels: test failed");
+                    }
                 });
             }
             if (event.srcElement.href == $('li#documentation a')[0].href) {
                 it("#documentation", function () {
                     expect($('li#documentation a')[0].href).to.equal(event.srcElement.href);
+                    if ($('li#documentation a')[0].href == event.srcElement.href) {
+                        console.log("#documentation: test passed");
+                    }
+                    else {
+                        console.log("#documentation: test failed");
+                    }
                 });
             }
 
@@ -59,50 +97,56 @@ describe("link Tests", function () {
     });
 });
 
-// // TODO: Test 2.1.3! Page reloads after selecting a dropdown item
-// describe("filter Tests", function () {
-//     document.addEventListener('click', function (event) {
-//     });
-// });
-//
-// // recommender window tests when save/close clicked
-// describe("recommender window Tests", function () {
-//     document.addEventListener('click', function (event) {
-//         if (event.srcElement.id == "saveID") {
-//             it("#saveID", function () {
-//                 expect(false).to.equal($("#myWelcomeModal").data('bs.modal').isShown);
-//             });
-//             mochaRunFunc();
-//         }
-//         if (event.srcElement.id == "closeID") {
-//             it("#closeID", function () {
-//                 expect(false).to.equal($("#myWelcomeModal").data('bs.modal').isShown);
-//             });
-//             mochaRunFunc();
-//         }
-//         if (event.srcElement.id == "msaveID") {
-//             it("#msaveID", function () {
-//                 expect(false).to.equal($("#myModal").data('bs.modal').isShown);
-//             });
-//             mochaRunFunc();
-//         }
-//         if (event.srcElement.id == "mcloseID") {
-//             it("#mcloseID", function () {
-//                 expect(false).to.equal($("#myModal").data('bs.modal').isShown);
-//             });
-//             mochaRunFunc();
-//         }
-//     });
-// });
-//
-// // Test 7 - drag a circle from apical to basolateral membrane
-// describe("Test 7", function () {
-//     document.addEventListener('click', function (event) {
-//     });
-// });
-//
-// // Test 8 - drag a circle from apical to basolateral membrane
-// describe("Test 8", function () {
-//     document.addEventListener('click', function (event) {
-//     });
-// });
+// recommender window tests when save/close clicked
+describe("recommender window Tests", function () {
+    document.addEventListener('click', function (event) {
+        if (event.srcElement.id == "saveID") {
+            it("#saveID", function () {
+                expect(false).to.equal($("#myWelcomeModal").data('bs.modal').isShown);
+                if ($("#myWelcomeModal").data('bs.modal').isShown == false) {
+                    console.log("#saveID: test passed");
+                }
+                else {
+                    console.log("#saveID: test failed");
+                }
+            });
+            // mochaRunFunc();
+        }
+        if (event.srcElement.id == "closeID") {
+            it("#closeID", function () {
+                expect(false).to.equal($("#myWelcomeModal").data('bs.modal').isShown);
+                if ($("#myWelcomeModal").data('bs.modal').isShown == false) {
+                    console.log("#closeID: test passed");
+                }
+                else {
+                    console.log("#closeID: test failed");
+                }
+            });
+            // mochaRunFunc();
+        }
+        if (event.srcElement.id == "msaveID") {
+            it("#msaveID", function () {
+                expect(false).to.equal($("#myModal").data('bs.modal').isShown);
+                if ($("#myModal").data('bs.modal').isShown == false) {
+                    console.log("#msaveID: test passed");
+                }
+                else {
+                    console.log("#msaveID: test failed");
+                }
+            });
+            // mochaRunFunc();
+        }
+        if (event.srcElement.id == "mcloseID") {
+            it("#mcloseID", function () {
+                expect(false).to.equal($("#myModal").data('bs.modal').isShown);
+                if ($("#myModal").data('bs.modal').isShown == false) {
+                    console.log("#mcloseID: test passed");
+                }
+                else {
+                    console.log("#mcloseID: test failed");
+                }
+            });
+            // mochaRunFunc();
+        }
+    });
+});

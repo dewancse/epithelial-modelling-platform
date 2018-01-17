@@ -4,6 +4,7 @@ dist: trusty
 JavaScript:
   - "1.7"
 install:
+  - npm install
   - npm install -g d3
   - npm install -g jquery
   - npm install -g jquery-ui-dist
