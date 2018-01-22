@@ -240,6 +240,8 @@ var concentrationOPBSPARQL = function (cellmlModelEntity, model) {
         "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
         "<" + model + ">  <http://www.obofoundry.org/ro/ro.owl#modelOf> ?protein. " +
         "}";
+
+    return query;
 }
 
 var discoveryWithFlux = function (uriOPB) {
@@ -615,3 +617,4 @@ exports.endpoint = endpoint;
 exports.processCombinedMembrane = processCombinedMembrane;
 exports.relatedMembraneModelSPARQL = relatedMembraneModelSPARQL;
 exports.modalWindowToAddModelsSPARQL = modalWindowToAddModelsSPARQL;
+exports.concentrationOPBSPARQL = concentrationOPBSPARQL;

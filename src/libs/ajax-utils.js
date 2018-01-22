@@ -39,6 +39,29 @@ var sendPostRequest = function (requestUrl, query, responseHandler, isJsonRespon
     request.send(query); // for POST only
 };
 
+// post function to get similarity matrix
+var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
+    var request = getRequestObject();
+
+    request.onreadystatechange = function () {
+        handleResponse(request, responseHandler, isJsonResponse);
+    };
+
+    request.open("POST", requestUrl, true);
+
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "text/plain");
+
+    var data = "";
+    for (var key in query) {
+        data += encodeURIComponent(key);
+        data += "=";
+        data += encodeURIComponent(query[key]);
+        data += "&";
+    }
+    // console.log("data: ", data);
+    request.send(data); // for POST only
+}
 
 // Only calls user provided 'responseHandler'
 // function if response is ready
@@ -67,5 +90,6 @@ function handleResponse(request, responseHandler, isJsonResponse) {
 
 exports.sendGetRequest = sendGetRequest;
 exports.sendPostRequest = sendPostRequest;
+exports.sendEBIPostRequest = sendEBIPostRequest;
 exports.getRequestObject = getRequestObject;
 exports.handleResponse = handleResponse;

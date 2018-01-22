@@ -1,7 +1,6 @@
 /**
  * Created by Dewan Sarwar on 5/8/2017.
  */
-
 // Show loading icon inside element identified by 'selector'.
 var showLoading = function (selector) {
     $(selector).html("<div class='text-center'><img src='../src/img/ajax-loader.gif'></div>");
@@ -227,6 +226,271 @@ var circleIDsplitUtils = function (cthis, paracellularID) {
     return circleID;
 }
 
+// split PR_ from protein identifier
+var splitPRFromProtein = function (tempMemModelID) {
+    var indexOfPR;
+    if (tempMemModelID[9] == "") {
+        indexOfPR = tempMemModelID[16].search("PR_");
+        return tempMemModelID[16].slice(indexOfPR + 3, tempMemModelID[16].length);
+    }
+    else {
+        indexOfPR = tempMemModelID[9].search("PR_");
+        return tempMemModelID[9].slice(indexOfPR + 3, tempMemModelID[9].length);
+    }
+};
+
+// split PR_ from protein identifier
+var proteinOrMedPrID = function (membraneModelID, PID) {
+    for (var i = 0; i < membraneModelID.length; i++) {
+        if (membraneModelID[i][9] == "") {
+            var indexOfPR = membraneModelID[i][16].search("PR_"),
+                medProteinID = membraneModelID[i][16].slice(indexOfPR + 3, membraneModelID[i][16].length);
+
+            PID.push(medProteinID); // Mediator PROTEIN id
+        }
+        else {
+            var indexOfPR = membraneModelID[i][9].search("PR_"),
+                medProteinID = membraneModelID[i][9].slice(indexOfPR + 3, membraneModelID[i][9].length);
+
+            PID.push(medProteinID); // Mediator PROTEIN id
+        }
+    }
+};
+
+var findInCombinedMembrane = function (model1, model2, combinedMembrane) {
+    for (var i = 0; i < combinedMembrane.length; i++) {
+        if ((combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == model2) ||
+            (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == model1) ||
+            (combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == "") ||
+            (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == ""))
+            return true;
+    }
+
+    return false;
+};
+
+// process EBI similarity matrix
+var similarityMatrixEBI = function (identityMatrix, PID, draggedMedPrID, membraneModelObj) {
+    // console.log("Identity Matrix: ", identityMatrix);
+
+    var indexOfColon = identityMatrix.search("1:"), m, n, i, j;
+
+    // console.log("index1stBar: ", identityMatrix.slice(indexOfColon - 1, identityMatrix.length));
+    identityMatrix = identityMatrix.slice(indexOfColon - 1, identityMatrix.length);
+
+    // console.log("New Identity Matrix: ", identityMatrix);
+
+    var matrixArray = identityMatrix.match(/[(\w\:)*\d\.]+/gi),
+        proteinIndex = [],
+        twoDMatrix = [];
+
+    // console.log("matrixArray: ", matrixArray);
+
+    for (i = 0; i < matrixArray.length; i = i + PID.length + 3) // +3 for digit:, PID, and Genes and Species
+        matrixArray.splice(i, 1);
+
+    for (i = 0; i < matrixArray.length; i = i + PID.length + 2) // +2 for PID and Genes and Species
+        matrixArray.splice(i, 1);
+
+    for (i = 1; i < matrixArray.length; i = i + PID.length + 1) // +1 for PID
+        matrixArray.splice(i, 1);
+
+    // console.log("matrixArray: ", matrixArray);
+
+    for (i = 0; i < matrixArray.length; i++) {
+        if (matrixArray[i].charAt(0).match(/[A-Za-z]/gi)) {
+            proteinIndex.push([matrixArray[i], i]);
+        }
+    }
+
+    // console.log("proteinIndex: ", proteinIndex);
+
+    // 1D to 2D array
+    while (matrixArray.length) {
+        matrixArray.splice(0, 1); // remove protein ID
+        twoDMatrix.push(matrixArray.splice(0, proteinIndex.length));
+    }
+
+    for (i = 0; i < twoDMatrix.length; i++) {
+        for (j = 0; j < twoDMatrix[i].length; j++) {
+            twoDMatrix[i][j] = parseFloat(twoDMatrix[i][j]);
+        }
+    }
+
+    // console.log("twoDMatrix: ", twoDMatrix);
+
+    var similarityOBJ = [];
+    for (i = 0; i < twoDMatrix.length; i++) {
+        for (j = 0; j < twoDMatrix.length; j++) {
+            if (i == j || j < i) continue;
+
+            similarityOBJ.push({
+                "PID1": proteinIndex[i][0],
+                "PID2": proteinIndex[j][0],
+                "similarity": twoDMatrix[i][j]
+            })
+        }
+    }
+
+    // length is empty when 100% matching
+    // appended a 0 bit after its protein id and make a comparision
+    if (similarityOBJ.length != 0) {
+        for (m = 0; m < membraneModelObj.length; m++) {
+            for (n = 0; n < similarityOBJ.length; n++) {
+                if ((membraneModelObj[m].pid == similarityOBJ[n].PID1 &&
+                    draggedMedPrID == similarityOBJ[n].PID2) ||
+                    (membraneModelObj[m].pid == similarityOBJ[n].PID2 &&
+                    draggedMedPrID == similarityOBJ[n].PID1)) {
+                    membraneModelObj[m].similar = similarityOBJ[n].similarity;
+                }
+            }
+        }
+
+        // Descending sorting
+        membraneModelObj.sort(function (a, b) {
+            return b.similar - a.similar;
+        });
+    }
+
+    // console.log("AFTER membraneModelObj: ", membraneModelObj);
+
+    return similarityOBJ;
+};
+
+function d3CheckBox() {
+
+    var size = 20,
+        x = 0,
+        y = 0,
+        rx = 0,
+        ry = 0,
+        markStrokeWidth = 2,
+        boxStrokeWidth = 2,
+        checked = false,
+        clickEvent,
+        xtext = 0,
+        ytext = 0,
+        text = "Empty";
+
+    function checkBox(selection) {
+        var g = selection.append("g"),
+            box = g.append("rect")
+                .attr("width", size)
+                .attr("height", size)
+                .attr("x", x)
+                .attr("y", y)
+                .attr("rx", rx)
+                .attr("ry", ry)
+                .styles({
+                    "fill-opacity": 0,
+                    "stroke-width": boxStrokeWidth,
+                    "stroke": "black"
+                }),
+            txt = g.append("text").attr("x", xtext).attr("y", ytext).text("" + text + "");
+
+        //Data to represent the check mark
+        var coordinates = [
+            {x: x + (size / 8), y: y + (size / 3)},
+            {x: x + (size / 2.2), y: (y + size) - (size / 4)},
+            {x: (x + size) - (size / 8), y: (y + (size / 10))}
+        ];
+
+        var line = d3.line()
+            .x(function (d) {
+                return d.x;
+            })
+            .y(function (d) {
+                return d.y;
+            });
+
+        var mark = g.append("path")
+            .attr("d", line(coordinates))
+            .styles({
+                "stroke-width": markStrokeWidth,
+                "stroke": "black",
+                "fill": "none",
+                "opacity": (checked) ? 1 : 0
+            });
+
+        g.on("click", function () {
+            checked = !checked;
+            mark.style("opacity", (checked) ? 1 : 0);
+
+            if (clickEvent) {
+                clickEvent();
+            }
+
+            d3.event.stopPropagation();
+        });
+    }
+
+    checkBox.size = function (val) {
+        size = val;
+        return checkBox;
+    };
+
+    checkBox.x = function (val) {
+        x = val;
+        return checkBox;
+    };
+
+    checkBox.y = function (val) {
+        y = val;
+        return checkBox;
+    };
+
+    checkBox.rx = function (val) {
+        rx = val;
+        return checkBox;
+    };
+
+    checkBox.ry = function (val) {
+        ry = val;
+        return checkBox;
+    };
+
+    checkBox.markStrokeWidth = function (val) {
+        markStrokeWidth = val;
+        return checkBox;
+    };
+
+    checkBox.boxStrokeWidth = function (val) {
+        boxStrokeWidth = val;
+        return checkBox;
+    };
+
+    checkBox.checked = function (val) {
+        if (val === undefined) {
+            return checked;
+        } else {
+            checked = val;
+            return checkBox;
+        }
+    };
+
+    checkBox.clickEvent = function (val) {
+        clickEvent = val;
+        return checkBox;
+    };
+
+    checkBox.xtext = function (val) {
+        xtext = val;
+        return checkBox;
+    };
+
+    checkBox.ytext = function (val) {
+        ytext = val;
+        return checkBox;
+    };
+
+    checkBox.text = function (val) {
+        text = val;
+        return checkBox;
+    };
+
+    return checkBox;
+}
+
 exports.parseModelName = parseModelName;
 exports.parserFmaNameText = parserFmaNameText;
 exports.uniqueify = uniqueify;
@@ -244,3 +508,8 @@ exports.isExist = isExist;
 exports.isExistModel2DArray = isExistModel2DArray;
 exports.uniqueifyCombinedMembrane = uniqueifyCombinedMembrane;
 exports.circleIDsplitUtils = circleIDsplitUtils;
+exports.splitPRFromProtein = splitPRFromProtein;
+exports.proteinOrMedPrID = proteinOrMedPrID;
+exports.findInCombinedMembrane = findInCombinedMembrane;
+exports.similarityMatrixEBI = similarityMatrixEBI;
+exports.d3CheckBox = d3CheckBox;

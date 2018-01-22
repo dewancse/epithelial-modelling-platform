@@ -4,15 +4,19 @@
 var solutesBouncing = require("./solutesBouncing.js").solutesBouncing;
 var getTextWidth = require("./miscellaneous.js").getTextWidth;
 var uniqueify = require("./miscellaneous.js").uniqueify;
+var splitPRFromProtein = require("./miscellaneous.js").splitPRFromProtein;
+var d3CheckBox = require("./miscellaneous.js").d3CheckBox;
+var proteinOrMedPrID = require("./miscellaneous.js").proteinOrMedPrID;
+var findInCombinedMembrane = require("./miscellaneous.js").findInCombinedMembrane;
+var similarityMatrixEBI = require("./miscellaneous.js").similarityMatrixEBI;
 var uniqueifyCombinedMembrane = require("./miscellaneous.js").uniqueifyCombinedMembrane;
 var uniqueifyjsonFlux = require("./miscellaneous.js").uniqueifyjsonFlux;
 var circleIDsplitUtils = require("./miscellaneous.js").circleIDsplitUtils;
 var sendPostRequest = require("../libs/ajax-utils.js").sendPostRequest;
+var sendEBIPostRequest = require("../libs/ajax-utils.js").sendEBIPostRequest;
 var sendGetRequest = require("../libs/ajax-utils.js").sendGetRequest;
 var showLoading = require("./miscellaneous.js").showLoading;
 var uniqueifyEpithelial = require("./miscellaneous.js").uniqueifyEpithelial;
-var getRequestObject = require("../libs/ajax-utils.js").getRequestObject;
-var handleResponse = require("../libs/ajax-utils.js").handleResponse;
 var isExist = require("./miscellaneous.js").isExist;
 var apicalID = require("./sparqlUtils.js").apicalID;
 var basolateralID = require("./sparqlUtils.js").basolateralID;
@@ -73,17 +77,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var w = 800,
         h = height + 500; // Init 400 + 500 = 900
 
-    var prevHeight = height;
+    // change epithelial cell height
+    var prevHeight = height, lengthOfApicalMem = 0, lengthOfBasoMem = 0;
 
-    var lengthOfApicalMem = 0, lengthOfBasoMem = 0;
-    for (i = 0; i < combinedMembrane.length; i++) {
+    for (var i = 0; i < combinedMembrane.length; i++) {
         if (combinedMembrane[i].med_fma == apicalID)
             lengthOfApicalMem++;
         else if (combinedMembrane[i].med_fma == basolateralID)
             lengthOfBasoMem++;
     }
 
-    // console.log("lengthOfApicalMem, lengthOfBasoMem: ", lengthOfApicalMem, lengthOfBasoMem);
+    console.log("lengthOfApicalMem, lengthOfBasoMem: ", lengthOfApicalMem, lengthOfBasoMem);
 
     if (lengthOfApicalMem > lengthOfBasoMem && lengthOfApicalMem > 4)
         height += 50 * (lengthOfApicalMem - 4);
@@ -96,7 +100,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         hth += (height - prevHeight);
     }
 
-    // console.log("Prev and Height: ", prevHeight, height, h, hth);
+    console.log("Prev and Height: ", prevHeight, height, h, hth);
 
     var svg = d3.select("#svgVisualize").append("svg")
         .attr("width", wth)
@@ -110,42 +114,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var markerWidth = 4, markerHeight = 4;
     svgPlatform(svg, newg, height, width, w, h, markerWidth, markerHeight);
 
-    var solutes = [];
-
-    for (i = 0; i < concentration_fma.length; i++) {
-
-        // luminal(1), cytosol(2), interstitial(3), paracellular(4), paracellular2(5)
-        for (var j = 1; j <= 5; j++) {
-            if (concentration_fma[i].fma == $("rect")[j].id) {
-                break;
-            }
-        }
-
-        // compartments
-        if (concentration_fma[i].fma == $("rect")[j].id) {
-            var xrect = $("rect")[j].x.baseVal.value;
-            var yrect = $("rect")[j].y.baseVal.value;
-            var xwidth = $("rect")[j].width.baseVal.value;
-            var yheight = $("rect")[j].height.baseVal.value;
-
-            var indexOfHash = concentration_fma[i].name.search("#");
-            var value = concentration_fma[i].name.slice(indexOfHash + 1);
-            var indexOfdot = value.indexOf(".");
-            value = value.slice(indexOfdot + 1);
-
-            solutes.push(
-                {
-                    compartment: $("rect")[j].id,
-                    xrect: xrect,
-                    yrect: yrect,
-                    width: xwidth,
-                    height: yheight,
-                    value: value
-                });
-        }
-    }
-
-    solutesBouncing(newg, solutes);
+    // solutes bouncing on the platform
+    solutesBouncing(newg, concentration_fma);
 
     // line apical and basolateral
     var x = $("rect")[0].x.baseVal.value;
@@ -206,18 +176,15 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .attr("opacity", 0.5);
 
     // Circle and line arrow from lumen to cytosol
-    var xrect = $("rect")[0].x.baseVal.value;
-    var yrect = $("rect")[0].y.baseVal.value;
-
-    // console.log("$(rect)", $("rect"));
-    // console.log("$(line)", $("line"));
+    var xrect = $("rect")[0].x.baseVal.value,
+        yrect = $("rect")[0].y.baseVal.value;
 
     // Paracellular membrane
-    var xprect = $("rect")[4].x.baseVal.value;
-    var yprect = $("rect")[4].y.baseVal.value;
-    var xpvalue = xprect + 10;
-    var ypvalue = yprect + 25;
-    var ypdistance = 35;
+    var xprect = $("rect")[4].x.baseVal.value,
+        yprect = $("rect")[4].y.baseVal.value,
+        xpvalue = xprect + 10,
+        ypvalue = yprect + 25,
+        ypdistance = 35;
 
     var radius = 20,
         lineLen = 50, polygonlineLen = 60, pcellLen = 100,
@@ -277,168 +244,34 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // INITIAL call
     combinedMemChk(0);
 
-    function d3CheckBox() {
-
-        var size = 20,
-            x = 0,
-            y = 0,
-            rx = 0,
-            ry = 0,
-            markStrokeWidth = 2,
-            boxStrokeWidth = 2,
-            checked = false,
-            clickEvent,
-            xtext = 0,
-            ytext = 0,
-            text = "Empty";
-
-        function checkBox(selection) {
-            var g = selection.append("g"),
-                box = g.append("rect")
-                    .attr("width", size)
-                    .attr("height", size)
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("rx", rx)
-                    .attr("ry", ry)
-                    .styles({
-                        "fill-opacity": 0,
-                        "stroke-width": boxStrokeWidth,
-                        "stroke": "black"
-                    }),
-                txt = g.append("text").attr("x", xtext).attr("y", ytext).text("" + text + "");
-
-            //Data to represent the check mark
-            var coordinates = [
-                {x: x + (size / 8), y: y + (size / 3)},
-                {x: x + (size / 2.2), y: (y + size) - (size / 4)},
-                {x: (x + size) - (size / 8), y: (y + (size / 10))}
-            ];
-
-            var line = d3.line()
-                .x(function (d) {
-                    return d.x;
-                })
-                .y(function (d) {
-                    return d.y;
-                });
-
-            var mark = g.append("path")
-                .attr("d", line(coordinates))
-                .styles({
-                    "stroke-width": markStrokeWidth,
-                    "stroke": "black",
-                    "fill": "none",
-                    "opacity": (checked) ? 1 : 0
-                });
-
-            g.on("click", function () {
-                checked = !checked;
-                mark.style("opacity", (checked) ? 1 : 0);
-
-                if (clickEvent) {
-                    clickEvent();
-                }
-
-                d3.event.stopPropagation();
-            });
-        }
-
-        checkBox.size = function (val) {
-            size = val;
-            return checkBox;
-        };
-
-        checkBox.x = function (val) {
-            x = val;
-            return checkBox;
-        };
-
-        checkBox.y = function (val) {
-            y = val;
-            return checkBox;
-        };
-
-        checkBox.rx = function (val) {
-            rx = val;
-            return checkBox;
-        };
-
-        checkBox.ry = function (val) {
-            ry = val;
-            return checkBox;
-        };
-
-        checkBox.markStrokeWidth = function (val) {
-            markStrokeWidth = val;
-            return checkBox;
-        };
-
-        checkBox.boxStrokeWidth = function (val) {
-            boxStrokeWidth = val;
-            return checkBox;
-        };
-
-        checkBox.checked = function (val) {
-            if (val === undefined) {
-                return checked;
-            } else {
-                checked = val;
-                return checkBox;
-            }
-        };
-
-        checkBox.clickEvent = function (val) {
-            clickEvent = val;
-            return checkBox;
-        };
-
-        checkBox.xtext = function (val) {
-            xtext = val;
-            return checkBox;
-        };
-
-        checkBox.ytext = function (val) {
-            ytext = val;
-            return checkBox;
-        };
-
-        checkBox.text = function (val) {
-            text = val;
-            return checkBox;
-        };
-
-        return checkBox;
-    }
-
     // tooltip
     // var div = d3.select("#svgVisualize").append("div")
     //     .attr("class", "tooltip")
     //     .style("opacity", 0);
 
-    $(document).on({
-        mousedown: function () {
-            // console.log("mousedown: ", event.which);
+    // closing tooltip
+    $(document).on("mousedown", function () {
+        // console.log("mousedown: ", event.which);
 
-            // 1 => left click, 2 => middle click, 3 => right click
-            if (event.which == 2)
-                div.style("display", "none");
-        },
+        // 1 => left click, 2 => middle click, 3 => right click
+        if (event.which == 2)
+            div.style("display", "none");
+    });
 
-        click: function () {
+    // add models without dragging
+    $(document).on("click", function () {
 
-            var totalCheckboxes = $("input:checkbox").length,
-                numberOfChecked = $("input:checkbox:checked").length,
-                numberOfNotChecked = totalCheckboxes - numberOfChecked;
+        var totalCheckboxes = $("input:checkbox").length,
+            numberOfChecked = $("input:checkbox:checked").length,
+            numberOfNotChecked = totalCheckboxes - numberOfChecked;
 
-            console.log("totalCheckboxes, numberOfChecked, numberNotChecked in epithelial.js: ", totalCheckboxes, numberOfChecked, numberOfNotChecked);
+        console.log("totalCheckboxes, numberOfChecked, numberNotChecked in epithelial.js: ", totalCheckboxes, numberOfChecked, numberOfNotChecked);
 
-            // Change marker direction and text position
-            if (event.target.localName == "line" && event.target.nodeName == "line") {
-                // console.log("event.srcElement.id: ", event.srcElement.id);
-                if (event.srcElement.id == apicalID || event.srcElement.id == basolateralID);
-                modalWindowToAddModels(event.srcElement.id);
-            }
+        // Change marker direction and text position
+        if (event.target.localName == "line" && event.target.nodeName == "line") {
+            // console.log("event.srcElement.id: ", event.srcElement.id);
+            if (event.srcElement.id == apicalID || event.srcElement.id == basolateralID);
+            modalWindowToAddModels(event.srcElement.id);
         }
     });
 
@@ -2987,30 +2820,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                         function (jsonPr) {
 
                                             var endpointgeneOLS;
-                                            if (jsonPr._embedded == undefined) {
+                                            if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.has_gene_template == undefined)
                                                 endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-                                            }
-                                            else {
-                                                if (jsonPr._embedded.terms[0]._links.has_gene_template != undefined)
-                                                    endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
-                                                else
-                                                    endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-                                            }
+                                            else
+                                                endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
 
                                             sendGetRequest(
                                                 endpointgeneOLS,
                                                 function (jsonGene) {
 
                                                     var endpointspeciesOLS;
-                                                    if (jsonPr._embedded == undefined) {
+                                                    if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.only_in_taxon == undefined)
                                                         endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-                                                    }
-                                                    else {
-                                                        if (jsonPr._embedded.terms[0]._links.only_in_taxon != undefined)
-                                                            endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
-                                                        else
-                                                            endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-                                                    }
+                                                    else
+                                                        endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
 
                                                     sendGetRequest(
                                                         endpointspeciesOLS,
@@ -3023,15 +2846,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                 proteinText = proteinText.slice(0, proteinText.indexOf("(") - 1);
                                                             }
 
-                                                            if (jsonModel.results.bindings.length == 0) {
+                                                            if (jsonModel.results.bindings.length == 0)
                                                                 biological_meaning = "";
-                                                            }
                                                             else {
                                                                 biological_meaning = jsonModel.results.bindings[0].Biological_meaning.value;
 
-                                                                if (circleID[1] == "") {
+                                                                if (circleID[1] == "")
                                                                     biological_meaning2 = "";
-                                                                }
                                                                 else
                                                                     biological_meaning2 = jsonModel.results.bindings[0].Biological_meaning2.value;
                                                             }
@@ -3453,10 +3274,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     endpointprOLS,
                     function (jsonPr) {
 
-                        var query = relatedMembraneModelSPARQL(
-                            modelEntityObj[idMembrane].model_entity,
-                            modelEntityObj[idMembrane].model_entity2
-                        );
+                        var query = relatedMembraneModelSPARQL(modelEntityObj[idMembrane].model_entity, modelEntityObj[idMembrane].model_entity2);
 
                         sendPostRequest(
                             endpoint,
@@ -3823,161 +3641,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }, true);
     };
 
-    // post function to get similarity matrix
-    var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
-        var request = getRequestObject();
-
-        request.onreadystatechange = function () {
-            handleResponse(request, responseHandler, isJsonResponse);
-        };
-
-        request.open("POST", requestUrl, true);
-
-        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        request.setRequestHeader("Accept", "text/plain");
-
-        var data = "";
-        for (var key in query) {
-            data += encodeURIComponent(key);
-            data += "=";
-            data += encodeURIComponent(query[key]);
-            data += "&";
-        }
-        // console.log("data: ", data);
-        request.send(data); // for POST only
-    }
-
-    // split PR_ from protein identifier
-    var proteinOrMedPrID = function (membraneModelID, PID) {
-        for (var i = 0; i < membraneModelID.length; i++) {
-            if (membraneModelID[i][9] == "") {
-                var indexOfPR = membraneModelID[i][16].search("PR_"),
-                    medProteinID = membraneModelID[i][16].slice(indexOfPR + 3, membraneModelID[i][16].length);
-
-                PID.push(medProteinID); // Mediator PROTEIN id
-            }
-            else {
-                var indexOfPR = membraneModelID[i][9].search("PR_"),
-                    medProteinID = membraneModelID[i][9].slice(indexOfPR + 3, membraneModelID[i][9].length);
-
-                PID.push(medProteinID); // Mediator PROTEIN id
-            }
-        }
-    };
-
-    // split PR_ from protein identifier
-    var splitPRFromProtein = function (tempMemModelID) {
-        var indexOfPR;
-        if (tempMemModelID[9] == "") {
-            indexOfPR = tempMemModelID[16].search("PR_");
-            return tempMemModelID[16].slice(indexOfPR + 3, tempMemModelID[16].length);
-        }
-        else {
-            indexOfPR = tempMemModelID[9].search("PR_");
-            return tempMemModelID[9].slice(indexOfPR + 3, tempMemModelID[9].length);
-        }
-    };
-
-    // process EBI similarity matrix
-    var similarityMatrixEBI = function (identityMatrix, PID, draggedMedPrID) {
-        // console.log("Identity Matrix: ", identityMatrix);
-
-        var indexOfColon = identityMatrix.search("1:"), m, n;
-
-        // console.log("index1stBar: ", identityMatrix.slice(indexOfColon - 1, identityMatrix.length));
-        identityMatrix = identityMatrix.slice(indexOfColon - 1, identityMatrix.length);
-
-        // console.log("New Identity Matrix: ", identityMatrix);
-
-        var matrixArray = identityMatrix.match(/[(\w\:)*\d\.]+/gi),
-            proteinIndex = [],
-            twoDMatrix = [];
-
-        // console.log("matrixArray: ", matrixArray);
-
-        for (i = 0; i < matrixArray.length; i = i + PID.length + 3) // +3 for digit:, PID, and Genes and Species
-            matrixArray.splice(i, 1);
-
-        for (i = 0; i < matrixArray.length; i = i + PID.length + 2) // +2 for PID and Genes and Species
-            matrixArray.splice(i, 1);
-
-        for (i = 1; i < matrixArray.length; i = i + PID.length + 1) // +1 for PID
-            matrixArray.splice(i, 1);
-
-        // console.log("matrixArray: ", matrixArray);
-
-        for (i = 0; i < matrixArray.length; i++) {
-            if (matrixArray[i].charAt(0).match(/[A-Za-z]/gi)) {
-                proteinIndex.push([matrixArray[i], i]);
-            }
-        }
-
-        // console.log("proteinIndex: ", proteinIndex);
-
-        // 1D to 2D array
-        while (matrixArray.length) {
-            matrixArray.splice(0, 1); // remove protein ID
-            twoDMatrix.push(matrixArray.splice(0, proteinIndex.length));
-        }
-
-        for (i = 0; i < twoDMatrix.length; i++) {
-            for (j = 0; j < twoDMatrix[i].length; j++) {
-                twoDMatrix[i][j] = parseFloat(twoDMatrix[i][j]);
-            }
-        }
-
-        // console.log("twoDMatrix: ", twoDMatrix);
-
-        var similarityOBJ = [];
-        for (i = 0; i < twoDMatrix.length; i++) {
-            for (j = 0; j < twoDMatrix.length; j++) {
-                if (i == j || j < i) continue;
-
-                similarityOBJ.push({
-                    "PID1": proteinIndex[i][0],
-                    "PID2": proteinIndex[j][0],
-                    "similarity": twoDMatrix[i][j]
-                })
-            }
-        }
-
-        // length is empty when 100% matching
-        // appended a 0 bit after its protein id and make a comparision
-        if (similarityOBJ.length != 0) {
-            for (m = 0; m < membraneModelObj.length; m++) {
-                for (n = 0; n < similarityOBJ.length; n++) {
-                    if ((membraneModelObj[m].pid == similarityOBJ[n].PID1 &&
-                        draggedMedPrID == similarityOBJ[n].PID2) ||
-                        (membraneModelObj[m].pid == similarityOBJ[n].PID2 &&
-                        draggedMedPrID == similarityOBJ[n].PID1)) {
-                        membraneModelObj[m].similar = similarityOBJ[n].similarity;
-                    }
-                }
-            }
-
-            // Descending sorting
-            membraneModelObj.sort(function (a, b) {
-                return b.similar - a.similar;
-            });
-        }
-
-        // console.log("AFTER membraneModelObj: ", membraneModelObj);
-
-        return similarityOBJ;
-    };
-
-    var findInCombinedMembrane = function (model1, model2) {
-        for (i = 0; i < combinedMembrane.length; i++) {
-            if ((combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == model2) ||
-                (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == model1) ||
-                (combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == "") ||
-                (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == ""))
-                return true;
-        }
-
-        return false;
-    };
-
     var showModalWindow = function (membraneName, flag) {
 
         console.log("flag in showModalWindow: ", flag);
@@ -3992,7 +3655,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 // console.log("membraneModelID: ", membraneModelID);
 
                 // Do not display already visualized models on the apical or basolateral membrane
-                if (findInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1]))
+                if (findInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], combinedMembrane))
                     continue;
 
                 var workspaceuri = myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
@@ -4158,7 +3821,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     function (identityMatrix) {
 
                                                         var similarityOBJ = similarityMatrixEBI(
-                                                            identityMatrix, PID, draggedMedPrID);
+                                                            identityMatrix, PID, draggedMedPrID, membraneModelObj);
 
                                                         var tempList = [];
                                                         for (var i = 0; i < membraneModelObj.length; i++) {
@@ -4191,7 +3854,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         for (var i = 0; i < membraneModelObj.length; i++) {
 
                                                             // Do not display visualized models
-                                                            if (findInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1]))
+                                                            if (findInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], combinedMembrane))
                                                                 continue;
 
                                                             var workspaceuri = myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
@@ -5068,7 +4731,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         $this.window = $($this.selector);
         $this.setHeader($this.options.header);
-    }
+    };
 
     // TODO: similar to relatedMembrane2. Combine this with relatedMembrane
     var addModels = function (membrane, membraneName, fluxList, flag) {

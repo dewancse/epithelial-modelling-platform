@@ -1,14 +1,46 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
-
-var solutesBouncing = function (newg, solutes) {
+var solutesBouncing = function (newg, concentration_fma) {
 
     var m = 10,
         maxSpeed = 1,
         color = d3.scaleOrdinal(d3.schemeCategory20).domain(d3.range(m));
 
-    var nodes = [];
+    var nodes = [], solutes = [];
+
+    for (i = 0; i < concentration_fma.length; i++) {
+
+        // luminal(1), cytosol(2), interstitial(3), paracellular(4), paracellular2(5)
+        for (var j = 1; j <= 5; j++) {
+            if (concentration_fma[i].uri == $("rect")[j].id) {
+                break;
+            }
+        }
+
+        // compartments
+        if (concentration_fma[i].uri == $("rect")[j].id) {
+            var xrect = $("rect")[j].x.baseVal.value;
+            var yrect = $("rect")[j].y.baseVal.value;
+            var xwidth = $("rect")[j].width.baseVal.value;
+            var yheight = $("rect")[j].height.baseVal.value;
+
+            var indexOfHash = concentration_fma[i].name.search("#");
+            var value = concentration_fma[i].name.slice(indexOfHash + 1);
+            var indexOfdot = value.indexOf(".");
+            value = value.slice(indexOfdot + 1);
+
+            solutes.push(
+                {
+                    compartment: $("rect")[j].id,
+                    xrect: xrect,
+                    yrect: yrect,
+                    width: xwidth,
+                    height: yheight,
+                    value: value
+                });
+        }
+    }
 
     for (var i = 0; i < solutes.length; i++) {
         nodes.push({

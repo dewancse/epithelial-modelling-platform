@@ -40,8 +40,9 @@ var endpoint = require("./sparqlUtils.js").endpoint;
 var sendGetRequest = require("./../libs/ajax-utils.js").sendGetRequest;
 var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
-(function (global) {
-    "use strict";
+"use strict";
+
+var EMP = (function (global) {
 
     var mainUtils = {}, // namespace for utility
         templistOfModel = [], // delete operation
@@ -56,7 +57,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         lengthOfLoadModelTable, // switching between pages
         visualizedModelsOnPlatform = [];
 
-    // variables for Model Discovery
+    // MODEL DISCOVERY
     var modelEntity = [],
         biologicalMeaning = [],
         speciesList = [],
@@ -64,10 +65,9 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         proteinList = [],
         listOfProteinURIs = [],
         head = [],
-        discIndex = 0;
+        discoverIndex = 0;
 
-    var totalCheckboxes, numberOfChecked, numberOfNotChecked;
-
+    // HOME: load the home page
     mainUtils.loadHomeHtml = function () {
         showLoading("#main-content");
         sendGetRequest(
@@ -78,6 +78,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             false);
     };
 
+    // DOCUMENTATION: load documentation from github
     mainUtils.loadDocumentation = function () {
         var uri = "https://github.com/dewancse/epithelial-modelling-platform";
         $("#main-content").html("Documentation can be found at " +
@@ -110,56 +111,8 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         $(".dropdown-toggle").dropdown();
     });
 
-    $(document).on({
-        click: function () {
-
-            // If there"s an action with the given name, call it
-            if (typeof actions[event.target.dataset.action] === "function") {
-                actions[event.target.dataset.action].call(this, event);
-            }
-        },
-
-        keydown: function () {
-            // semantic annotation based on search items
-            if (event.key == "Enter") {
-
-                var uriOPB, uriCHEBI, keyValue;
-                var searchTxt = document.getElementById("searchTxt").value;
-
-                // set local storage
-                sessionStorage.setItem("searchTxtContent", searchTxt);
-
-                // dictionary object
-
-                for (var i in dictionary) {
-                    var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
-                        key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
-
-                    if (key1 != -1 && key2 != -1) {
-                        uriOPB = dictionary[i].opb;
-                        uriCHEBI = dictionary[i].chebi;
-                        keyValue = dictionary[i].key1;
-                    }
-                }
-
-                showLoading("#searchList");
-
-                modelEntity = [];
-                biologicalMeaning = [];
-                speciesList = [];
-                geneList = [];
-                proteinList = [];
-                listOfProteinURIs = [];
-                head = [];
-
-                discIndex = 0; // discIndex to index each Model_entity
-
-                mainUtils.discoverModels(uriOPB, uriCHEBI, keyValue);
-            }
-        }
-    });
-
-    // Event handling for MODEL DISCOVERY and LOAD MODELS
+    // ACTIONS: event handling for MODEL DISCOVERY and LOAD MODELS
+    // Retrieve and save model name for clicking a checkbox in MODEL DISCOVERY and LOAD MODELS
     var actions = {
 
         search: function (event) {
@@ -266,7 +219,193 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    // Load search html
+    // ACTIONS: if there is an action with the given name, call it
+    $(document).on("click", function () {
+        if (typeof actions[event.target.dataset.action] === "function")
+            actions[event.target.dataset.action].call(this, event);
+    });
+
+    // MODEL DISCOVERY: enter search texts
+    $(document).on("keydown", function () {
+        if (event.key == "Enter") {
+
+            var uriOPB, uriCHEBI, keyValue;
+            var searchTxt = document.getElementById("searchTxt").value;
+
+            // set local storage
+            sessionStorage.setItem("searchTxtContent", searchTxt);
+
+            // dictionary object
+            for (var i in dictionary) {
+                var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
+                    key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
+
+                if (key1 != -1 && key2 != -1) {
+                    uriOPB = dictionary[i].opb;
+                    uriCHEBI = dictionary[i].chebi;
+                    keyValue = dictionary[i].key1;
+                }
+            }
+
+            showLoading("#searchList");
+
+            modelEntity = [];
+            biologicalMeaning = [];
+            speciesList = [];
+            geneList = [];
+            proteinList = [];
+            listOfProteinURIs = [];
+            head = [];
+
+            discoverIndex = 0; // discoverIndex to index each Model_entity
+
+            var query;
+            if (uriCHEBI == "") { // model discovery with 'flux'
+                query = discoveryWithFlux(uriOPB);
+            }
+            else {
+                if (keyValue == "flux") { // model discovery with 'flux of sodium', etc.
+                    query = discoveryWithFluxOfSolute(uriCHEBI)
+                }
+                else { // model disocvery with 'concentration of sodium', etc.
+                    query = discoveryWithConcentrationOfSolute(uriCHEBI);
+                }
+            }
+
+            // Model
+            sendPostRequest(
+                endpoint,
+                query,
+                function (jsonModel) {
+                    // REMOVE duplicate cellml model and variable name (NOT component name)
+                    jsonModel.results.bindings = uniqueifyjsonModel(jsonModel.results.bindings);
+                    mainUtils.discoverModels(jsonModel);
+                },
+                true);
+        }
+    });
+
+    // MODEL DISCOVERY: SPARQL queries to retrieve search results from PMR
+    mainUtils.discoverModels = function (jsonModel) {
+
+        if (jsonModel.results.bindings.length == 0) {
+            mainUtils.showDiscoverModels();
+            return;
+        }
+
+        var model = parseModelName(jsonModel.results.bindings[discoverIndex].Model_entity.value);
+        model = model + "#" + model.slice(0, model.indexOf("."));
+
+        var query = "SELECT ?Protein WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }";
+
+        sendPostRequest(
+            endpoint,
+            query,
+            function (jsonProteinUri) {
+
+                if (jsonProteinUri.results.bindings.length == 0) {
+                    discoverIndex++;
+
+                    if (discoverIndex != jsonModel.results.bindings.length) {
+                        mainUtils.discoverModels(jsonModel);
+                    }
+                }
+
+                // pig SGLT2 (PR_P31636) does not exist in PR ontology, assign mouse species instead
+                var pr_uri, endpointproteinOLS;
+                if (jsonProteinUri.results.bindings.length == 0) {
+                    pr_uri = undefined;
+                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                }
+                else {
+                    pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
+                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
+
+                    // dropdown list
+                    listOfProteinURIs.push(pr_uri);
+                }
+
+                sendGetRequest(
+                    endpointproteinOLS,
+                    function (jsonProtein) {
+
+                        var endpointgeneOLS;
+                        if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
+                            endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
+                        else
+                            endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+
+                        sendGetRequest(
+                            endpointgeneOLS,
+                            function (jsonGene) {
+
+                                var endpointspeciesOLS;
+                                if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
+                                    endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
+                                else
+                                    endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+
+                                sendGetRequest(
+                                    endpointspeciesOLS,
+                                    function (jsonSpecies) {
+
+                                        // model and biological meaning
+                                        modelEntity.push(jsonModel.results.bindings[discoverIndex].Model_entity.value);
+                                        biologicalMeaning.push(jsonModel.results.bindings[discoverIndex].Biological_meaning.value);
+
+                                        // species
+                                        if (jsonSpecies._embedded == undefined)
+                                            speciesList.push("Undefined");
+                                        else
+                                            speciesList.push(jsonSpecies._embedded.terms[0].label);
+
+                                        // gene
+                                        if (jsonGene._embedded == undefined)
+                                            geneList.push("Undefined");
+                                        else {
+                                            var geneName = jsonGene._embedded.terms[0].label;
+                                            geneName = geneName.slice(0, geneName.indexOf("(") - 1);
+                                            geneList.push(geneName);
+                                        }
+
+                                        // protein
+                                        if (jsonProtein._embedded == undefined)
+                                            proteinList.push("Undefined");
+                                        else {
+                                            var proteinName = jsonProtein._embedded.terms[0].label;
+                                            proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
+                                            proteinList.push(proteinName);
+                                        }
+
+                                        head = ["Model_entity", "Biological_meaning", "Species", "Gene", "Protein"];
+
+                                        mainUtils.showDiscoverModels();
+
+                                        discoverIndex++; // increment index of modelEntity
+
+                                        if (discoverIndex == jsonModel.results.bindings.length) {
+
+                                            listOfProteinURIs = listOfProteinURIs.filter(function (item, pos) {
+                                                return listOfProteinURIs.indexOf(item) == pos;
+                                            });
+
+                                            // dropdown list
+                                            filterByProtein();
+                                            return;
+                                        }
+
+                                        mainUtils.discoverModels(jsonModel); // callback
+                                    },
+                                    true);
+                            },
+                            true);
+                    },
+                    true);
+            },
+            true);
+    };
+
+    // MODEL DISCOVERY: load the search html
     mainUtils.loadSearchHtml = function () {
 
         if (!sessionStorage.getItem("searchListContent")) {
@@ -297,173 +436,12 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    mainUtils.discoverModels = function (uriOPB, uriCHEBI, keyValue) {
-
-        var query;
-        if (uriCHEBI == "") { // model discovery with 'flux'
-            query = discoveryWithFlux(uriOPB);
-        }
-        else {
-            if (keyValue == "flux") { // model discovery with 'flux of sodium', etc.
-                query = discoveryWithFluxOfSolute(uriCHEBI)
-            }
-            else { // model disocvery with 'concentration of sodium', etc.
-                query = discoveryWithConcentrationOfSolute(uriCHEBI);
-            }
-        }
-
-        // Model
-        sendPostRequest(
-            endpoint,
-            query,
-            function (jsonModel) {
-
-                // REMOVE duplicate cellml model and variable name (NOT component name)
-                jsonModel.results.bindings = uniqueifyjsonModel(jsonModel.results.bindings);
-
-                // console.log("discoverModels: jsonModel -> ", jsonModel);
-
-                var discoverInnerModels = function () {
-                    if (jsonModel.results.bindings.length == 0) {
-                        mainUtils.showDiscoverModels(head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfProteinURIs);
-                        return;
-                    }
-
-                    var model = parseModelName(jsonModel.results.bindings[discIndex].Model_entity.value);
-                    model = model + "#" + model.slice(0, model.indexOf("."));
-
-                    query = "SELECT ?Protein WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }";
-
-                    sendPostRequest(
-                        endpoint,
-                        query,
-                        function (jsonProteinUri) {
-
-                            if (jsonProteinUri.results.bindings.length == 0) {
-                                discIndex++;
-
-                                if (discIndex != jsonModel.results.bindings.length) {
-                                    discoverInnerModels();
-                                }
-                            }
-
-                            // pig SGLT2 (PR_P31636) does not exist in PR ontology, assign mouse species instead
-                            var pr_uri, endpointproteinOLS;
-                            if (jsonProteinUri.results.bindings.length == 0)
-                                pr_uri = undefined;
-                            else
-                                pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-
-                            if (pr_uri != undefined)
-                                endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
-                            else
-                                endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-
-                            sendGetRequest(
-                                endpointproteinOLS,
-                                function (jsonProtein) {
-
-                                    var endpointgeneOLS;
-                                    if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
-                                        endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
-                                    else
-                                        endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-
-                                    sendGetRequest(
-                                        endpointgeneOLS,
-                                        function (jsonGene) {
-
-                                            var endpointspeciesOLS;
-                                            if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
-                                                endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
-                                            else
-                                                endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-
-                                            sendGetRequest(
-                                                endpointspeciesOLS,
-                                                function (jsonSpecies) {
-
-                                                    // protein uri
-                                                    if (pr_uri != undefined)
-                                                        listOfProteinURIs.push(pr_uri);
-
-                                                    // model and biological meaning
-                                                    modelEntity.push(jsonModel.results.bindings[discIndex].Model_entity.value);
-                                                    biologicalMeaning.push(jsonModel.results.bindings[discIndex].Biological_meaning.value);
-
-                                                    // species
-                                                    if (jsonSpecies._embedded == undefined)
-                                                        speciesList.push("Undefined");
-                                                    else
-                                                        speciesList.push(jsonSpecies._embedded.terms[0].label);
-
-                                                    // gene
-                                                    if (jsonGene._embedded == undefined)
-                                                        geneList.push("Undefined");
-                                                    else {
-                                                        var geneName = jsonGene._embedded.terms[0].label;
-                                                        geneName = geneName.slice(0, geneName.indexOf("(") - 1);
-                                                        geneList.push(geneName);
-                                                    }
-
-                                                    // protein
-                                                    if (jsonProtein._embedded == undefined)
-                                                        proteinList.push("Undefined");
-                                                    else {
-                                                        var proteinName = jsonProtein._embedded.terms[0].label;
-                                                        proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
-                                                        proteinList.push(proteinName);
-                                                    }
-
-                                                    head = ["Model_entity", "Biological_meaning", "Species", "Gene", "Protein"];
-
-                                                    mainUtils.showDiscoverModels(
-                                                        head,
-                                                        modelEntity,
-                                                        biologicalMeaning,
-                                                        speciesList,
-                                                        geneList,
-                                                        proteinList,
-                                                        listOfProteinURIs);
-
-                                                    discIndex++; // increment index of modelEntity
-
-                                                    if (discIndex == jsonModel.results.bindings.length) {
-
-                                                        listOfProteinURIs = listOfProteinURIs.filter(function (item, pos) {
-                                                            return listOfProteinURIs.indexOf(item) == pos;
-                                                        });
-
-                                                        filterByProtein();
-                                                        return;
-                                                    }
-
-                                                    discoverInnerModels(); // callback
-                                                },
-                                                true);
-                                        },
-                                        true);
-                                },
-                                true);
-                        },
-                        true);
-
-                }; // end of discoverInnerModels function
-
-                discoverInnerModels(); // first call
-            },
-            true);
-    };
-
-    // Show discovered models from PMR
-    mainUtils.showDiscoverModels = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfProteinURIs) {
+    // MODEL DISCOVERY: display discovered models from PMR
+    mainUtils.showDiscoverModels = function () {
 
         // Empty search result
         if (head.length == 0) {
-            $("#searchList").html(
-                "<section class=container-fluid><label><br>No Search Results!</label></section>"
-            );
-
+            $("#searchList").html("<section class=container-fluid><label><br>No Search Results!</label></section>");
             return;
         }
 
@@ -519,13 +497,13 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         sessionStorage.setItem("searchListContent", $("#main-content").html());
     };
 
-    // Load the view
+    // VIEW MODEL: load the view page to display details of a selected model
     mainUtils.loadViewHtml = function () {
 
         var cellmlModel = mainUtils.workspaceName;
 
         if (cellmlModel == undefined) {
-            $("#main-content").html("Please select a model from Model Discovery");
+            $("#main-content").html("Please select a model from MODEL DISCOVERY");
 
             return;
         }
@@ -550,47 +528,57 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             true);
     };
 
-    // extension of loadModelHtml function
-    var findCompartmentLoc = function (jsonObjComp, jsonObjLoc, tempidWithStr, protein, species, gene) {
-        var tempComp = "", counterOLS = 0;
-        for (var i in jsonObjComp.results.bindings) {
-            var fma_uri = jsonObjComp.results.bindings[i].Compartment.value;
+    // LOAD MODELS: extract compartments and locations
+    // extension of mainUtils.loadModelHtml function
+    var compartmentandlocation = function (compartment, location, protein, species, gene) {
+
+        var tempCompartment = "", counterOLS = 0;
+
+        for (var i in compartment) {
+
+            var fma_uri = compartment[i].Compartment.value;
             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
 
             var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+
             sendGetRequest(
                 endpointOLS,
                 function (jsonObjOLS) {
 
                     counterOLS++;
-                    tempComp += jsonObjOLS._embedded.terms[0].label;
-                    if (counterOLS < jsonObjComp.results.bindings.length) tempComp += ", ";
-                    else tempComp += "";
+                    tempCompartment += jsonObjOLS._embedded.terms[0].label;
 
-                    if (counterOLS == jsonObjComp.results.bindings.length) {
-                        var tempLoc = "", counterOLSLoc = 0;
-                        for (var i in jsonObjLoc.results.bindings) {
-                            var fma_uri = jsonObjLoc.results.bindings[i].Located_in.value;
+                    if (counterOLS < compartment.length) tempCompartment += ", ";
+                    else tempCompartment += "";
+
+                    if (counterOLS == compartment.length) {
+
+                        var tempLocation = "", counterOLSLoc = 0;
+                        for (var i in location) {
+
+                            var fma_uri = location[i].Located_in.value;
                             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
 
                             var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+
                             sendGetRequest(
                                 endpointOLS,
-                                function (jsonObjOLSLoc) {
+                                function (jsonObjOLSLocation) {
 
                                     counterOLSLoc++;
-                                    tempLoc += jsonObjOLSLoc._embedded.terms[0].label;
-                                    if (counterOLSLoc < jsonObjLoc.results.bindings.length) tempLoc += ", ";
-                                    else tempLoc += "";
+                                    tempLocation += jsonObjOLSLocation._embedded.terms[0].label;
 
-                                    if (counterOLSLoc == jsonObjLoc.results.bindings.length) {
+                                    if (counterOLSLoc < location.length) tempLocation += ", ";
+                                    else tempLocation += "";
+
+                                    if (counterOLSLoc == location.length) {
                                         var jsonObj = {
-                                            "Model_entity": tempidWithStr,
+                                            "Model_entity": mainUtils.tempidWithStr,
                                             "Protein": protein,
                                             "Species": species,
                                             "Gene": gene,
-                                            "Compartment": tempComp,
-                                            "Located_in": tempLoc
+                                            "Compartment": tempCompartment,
+                                            "Located_in": tempLocation
                                         };
 
                                         mainUtils.showModel(jsonObj);
@@ -604,14 +592,12 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    // Load the model
+    // LOAD MODELS: load a selected model
     mainUtils.loadModelHtml = function () {
 
         var model = mainUtils.workspaceName;
 
-        if (model == undefined)
-            model = undefined;
-        else
+        if (model != undefined)
             model = model + "#" + model.slice(0, model.indexOf("."));
 
         var query = "SELECT ?Protein WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }";
@@ -621,53 +607,41 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             query,
             function (jsonProteinUri) {
 
-                // console.log("loadModelHtml: jsonProteinUri -> ", jsonProteinUri);
-
                 var pr_uri, endpointproteinOLS;
-                if (jsonProteinUri.results.bindings.length == 0)
+                if (jsonProteinUri.results.bindings.length == 0) {
                     pr_uri = undefined;
-                else
-                    pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-
-                if (pr_uri != undefined)
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
-                else
                     endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                }
+                else {
+                    pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
+                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
+                }
 
                 sendGetRequest(
                     endpointproteinOLS,
                     function (jsonProtein) {
 
-                        // console.log("loadModelHtml: jsonProtein -> ", jsonProtein);
-
                         var endpointgeneOLS;
-                        if (jsonProtein._embedded == undefined)
+                        if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.has_gene_template == undefined)
                             endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-                        else {
-                            if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
-                                endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
-                            else
-                                endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-                        }
+                        else
+                            endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
 
                         sendGetRequest(
                             endpointgeneOLS,
                             function (jsonGene) {
 
                                 var endpointspeciesOLS;
-                                if (jsonProtein._embedded == undefined) {
+                                if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.only_in_taxon == undefined)
                                     endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-                                }
-                                else {
-                                    if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
-                                        endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
-                                    else
-                                        endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
-                                }
+                                else
+                                    endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
 
                                 sendGetRequest(
                                     endpointspeciesOLS,
                                     function (jsonSpecies) {
+
+                                        // console.log("loadModelHtml: jsonSpecies -> ", jsonSpecies);
 
                                         var query = "SELECT ?Compartment " +
                                             "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }";
@@ -675,7 +649,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                         sendPostRequest(
                                             endpoint,
                                             query,
-                                            function (jsonObjComp) {
+                                            function (jsonObjCompartment) {
 
                                                 var query = "SELECT ?Located_in " +
                                                     "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in. }";
@@ -683,14 +657,16 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                 sendPostRequest(
                                                     endpoint,
                                                     query,
-                                                    function (jsonObjLoc) {
+                                                    function (jsonObjLocation) {
+
                                                         sendGetRequest(
                                                             modelHtml,
                                                             function (modelHtmlContent) {
+
                                                                 $("#main-content").html(modelHtmlContent);
 
-                                                                if (jsonObjComp.results.bindings.length == 0 &&
-                                                                    jsonObjLoc.results.bindings.length == 0) {
+                                                                if (jsonObjCompartment.results.bindings.length == 0 &&
+                                                                    jsonObjLocation.results.bindings.length == 0) {
                                                                     var jsonObj = {};
                                                                     mainUtils.showModel(jsonObj);
                                                                 }
@@ -705,12 +681,11 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                                     gene = "Undefined";
                                                                 else {
                                                                     var geneName = jsonGene._embedded.terms[0].label;
-                                                                    var indexOfParen = geneName.indexOf("(");
-                                                                    geneName = geneName.slice(0, indexOfParen - 1);
+                                                                    geneName = geneName.slice(0, geneName.indexOf("(") - 1);
                                                                     gene = geneName;
                                                                 }
 
-                                                                if (jsonProtein._embedded == undefined) // jsonProtein._embedded.terms.length
+                                                                if (jsonProtein._embedded == undefined)
                                                                     protein = "Undefined";
                                                                 else {
                                                                     var proteinName = jsonProtein._embedded.terms[0].label;
@@ -718,8 +693,13 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                                     protein = proteinName;
                                                                 }
 
-                                                                // compartment and location in load model
-                                                                findCompartmentLoc(jsonObjComp, jsonObjLoc, mainUtils.tempidWithStr, protein, species, gene);
+                                                                // compartment and location in LOAD MODELS
+                                                                compartmentandlocation(
+                                                                    jsonObjCompartment.results.bindings,
+                                                                    jsonObjLocation.results.bindings,
+                                                                    protein,
+                                                                    species,
+                                                                    gene);
                                                             },
                                                             false);
                                                     },
@@ -736,9 +716,10 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             true);
     };
 
-    // Show selected models
+    // LOAD MODELS: display a selected model
     mainUtils.showModel = function (jsonObj) {
 
+        // add this model temporarily to display in MODEL DISCOVERY when deleted
         if (modelEntityInLoadModels.indexOf(jsonObj.Model_entity) == -1) {
             var index = modelEntity.indexOf(jsonObj.Model_entity);
             modelEntityInLoadModels.push([
@@ -749,6 +730,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 proteinList[index]]);
         }
 
+        // delete this model to hide in MODEL DISCOVERY when revisited
         if (modelEntity.indexOf(jsonObj.Model_entity) != -1) {
             var index = modelEntity.indexOf(jsonObj.Model_entity);
             modelEntity.splice(index, 1);
@@ -760,8 +742,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         // Empty result
         if ($.isEmptyObject(jsonObj)) {
-            $("#modelList").html("Please load models from Model Discovery");
-
+            $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
 
@@ -800,12 +781,10 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                     "name=attribute class=attribute data-action=model value=" + modelEntityName + " >"));
             }
 
-            if (head[i] == "Model_entity") {
+            if (head[i] == "Model_entity")
                 model.push(modelEntityName);
-            }
-            else {
+            else
                 model.push(jsonObj[head[i]]);
-            }
         }
 
         // 1D to 2D array
@@ -860,20 +839,19 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
         // Uncheck checkboxes when back from Similarity models
         for (i = 0; i < $("table tr td label").length; i++) {
-            if ($("table tr td label")[i].firstChild.checked == true) {
+            if ($("table tr td label")[i].firstChild.checked == true)
                 $("table tr td label")[i].firstChild.checked = false;
-            }
         }
 
         lengthOfLoadModelTable = $("table tr").length;
         if (lengthOfLoadModelTable == 1) {
             mainUtils.workspaceName = "";
-            $("#modelList").html("Please load models from Model Discovery");
+            $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
     };
 
-    // Filter search results
+    // FILTER BY PROTEIN: filter search results in MODEL DISCOVERY
     mainUtils.filterSearchHtml = function () {
         console.log("mainUtils.filterSearchHtml!");
 
@@ -891,17 +869,15 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 var tempstr = $("table tr")[i];
                 tempstr = $($(tempstr).find("input")).attr("uri");
 
-                if (selectedprotein == tempstr) {
+                if (selectedprotein == tempstr)
                     $("table tr")[i].hidden = false;
-                }
-                else {
+                else
                     $("table tr")[i].hidden = true;
-                }
             }
         }
-    }
+    };
 
-    // Filter dropdown list in the search html
+    // FILTER BY PROTEIN: filter dropdown list in MODEL DISCOVERY
     var filterByProtein = function () {
         console.log("filterByProtein!");
 
@@ -923,10 +899,11 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         }
     };
 
-    // Delete model
+    // DELETE MODEL: delete a selected model in LOAD MODELS
     mainUtils.deleteRowModelHtml = function () {
 
         templistOfModel.forEach(function (element, tempIndex) {
+
             for (var i = 0; i < $("table tr").length; i++) {
 
                 if ($("table tr")[i].id == element) {
@@ -935,9 +912,8 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                     // Remove from model2DArray
                     model2DArray.forEach(function (elem, index) {
-                        if (element == elem[1]) {
+                        if (element == elem[1])
                             model2DArray.splice(index, 1);
-                        }
                     });
 
                     // Remove from templistOfModel
@@ -971,17 +947,18 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
         lengthOfLoadModelTable = $("table tr").length;
         if (lengthOfLoadModelTable == 1) {
             mainUtils.workspaceName = "";
-            $("#modelList").html("Please load models from Model Discovery");
+            $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
     };
 
-    // Load the SVG model
+    // MODEL OF SIMILARITY: load the SVG diagram through similarityModels function
     mainUtils.loadSimilarityHtml = function () {
 
         sendGetRequest(
             similarityHtml,
             function (similarityHtmlContent) {
+
                 $("#main-content").html(similarityHtmlContent);
 
                 sendGetRequest(
@@ -999,13 +976,13 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             false);
     };
 
-    // Load the epithelial
+    // EPITHELIAL PLATFORM: load the epithelial html
     mainUtils.loadEpithelialHtml = function () {
 
         // make empty list in LOAD MODELS
         if (lengthOfLoadModelTable == 2) {
             mainUtils.workspaceName = "";
-            $("#modelList").html("Please load models from Model Discovery");
+            $("#modelList").html("Please load models from MODEL DISCOVERY");
         }
 
         sendGetRequest(
@@ -1018,6 +995,8 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
     };
 
     var concentration_fma = [];
+    // EPITHELIAL PLATFORM: determine source, mediator and destination of fluxes
+    // create objects for fluxes and cotransporters and call epithelial platform interface
     mainUtils.loadEpithelial = function () {
 
         // remove model name, keep only solutes
@@ -1026,17 +1005,13 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             modelEntityNameArray[i] = modelEntityNameArray[i].slice(indexOfHash + 1);
         }
 
-        console.log("loadEpithelial: model2DArr -> ", model2DArray);
-        console.log("loadEpithelial: modelEntityNameArray -> ", modelEntityNameArray);
-        console.log("loadEpithelial: modelEntityFullNameArray -> ", modelEntityFullNameArray);
-        console.log("loadEpithelial: templistOfModel -> ", templistOfModel);
-
         var source_fma = [], sink_fma = [], med_fma = [], med_pr = [], source_fma2 = [],
             sink_fma2 = [], solute_chebi = [], index = 0, counter = 0,
             membrane = [], apicalMembrane = [], basolateralMembrane = [];
 
         // empty platform as no model is selected
         if (modelEntityFullNameArray.length == 0) {
+
             epithelialPlatform(
                 combinedMembrane,
                 concentration_fma,
@@ -1049,11 +1024,12 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
             return;
         }
 
-        // remove visualized solutes in the next iteration in Load Model page
+        // remove visualized solutes in the next iteration in Load Model
         var rmFromModelEntityFullNameArray = function (membrane, concentration_fma) {
 
             for (var i in membrane) {
                 for (var j in modelEntityFullNameArray) {
+
                     if (membrane[i].model_entity == modelEntityFullNameArray[j]) {
 
                         // add models to delete from Load Models table row
@@ -1067,23 +1043,20 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                         // Remove from model2DArray
                         model2DArray.forEach(function (elem, index) {
-                            if (membrane[i].model_entity == elem[1]) {
+                            if (membrane[i].model_entity == elem[1])
                                 model2DArray.splice(index, 1);
-                            }
                         });
 
                         // Remove from templistOfModel
                         templistOfModel.forEach(function (elem, index) {
-                            if (membrane[i].model_entity == elem) {
+                            if (membrane[i].model_entity == elem)
                                 templistOfModel.splice(index, 1);
-                            }
                         });
 
                         // Remove from modelEntity
                         modelEntity.forEach(function (elem, index) {
-                            if (membrane[i].model_entity == elem) {
+                            if (membrane[i].model_entity == elem)
                                 modelEntity.splice(index, 1);
-                            }
                         });
                     }
                 }
@@ -1091,6 +1064,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
             for (var i in concentration_fma) {
                 for (var j in modelEntityFullNameArray) {
+
                     if (concentration_fma[i].name == modelEntityFullNameArray[j]) {
 
                         // add models to delete from Load Models table row
@@ -1104,25 +1078,25 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                         // Remove from model2DArray
                         model2DArray.forEach(function (elem, index) {
-                            if (concentration_fma[i].name == elem[1]) {
+                            if (concentration_fma[i].name == elem[1])
                                 model2DArray.splice(index, 1);
-                            }
                         });
 
                         // Remove from modelEntity
                         modelEntity.forEach(function (elem, index) {
-                            if (concentration_fma[i].name == elem) {
+                            if (concentration_fma[i].name == elem)
                                 modelEntity.splice(index, 1);
-                            }
                         });
                     }
                 }
             }
         };
 
+        // make cotransporters between fluxes
         mainUtils.makecotransporter = function (membrane1, membrane2) {
 
             var query = makecotransporterSPARQL(membrane1.model_entity, membrane2.model_entity);
+
             sendPostRequest(
                 endpoint,
                 query,
@@ -1134,17 +1108,14 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                     for (var m in jsonObj.results.bindings) {
                         var tmpuri = jsonObj.results.bindings[m].med_entity_uri.value;
 
-                        if (tmpuri.indexOf(partOfProteinUri) != -1) {
+                        if (tmpuri.indexOf(partOfProteinUri) != -1)
                             tempProtein.push(jsonObj.results.bindings[m].med_entity_uri.value);
-                        }
 
-                        if (tmpuri.indexOf(apicalID) != -1) {
+                        if (tmpuri.indexOf(apicalID) != -1)
                             tempApical.push(jsonObj.results.bindings[m].med_entity_uri.value);
-                        }
 
-                        if (tmpuri.indexOf(basolateralID) != -1) {
+                        if (tmpuri.indexOf(basolateralID) != -1)
                             tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uri.value);
-                        }
                     }
 
                     // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
@@ -1162,6 +1133,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                         tmp_med_pr_text_syn = membrane2.med_pr_text_syn;
                     }
 
+                    // co-transporter
                     var membraneOBJ = {
                         solute_chebi: membrane1.solute_chebi,
                         solute_text: membrane1.solute_text,
@@ -1185,14 +1157,12 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                     for (var i in tempProtein) {
 
                         // cotransporter in apical membrane
-                        if (tempProtein.length != 0 && tempApical.length != 0) {
+                        if (tempProtein.length != 0 && tempApical.length != 0)
                             apicalMembrane.push(membraneOBJ);
-                        }
 
                         // cotransporter in basolateral membrane
-                        if (tempProtein.length != 0 && tempBasolateral.length != 0) {
+                        if (tempProtein.length != 0 && tempBasolateral.length != 0)
                             basolateralMembrane.push(membraneOBJ);
-                        }
                     }
 
                     if (membrane1.med_pr == membrane2.med_pr && membrane1.model_entity == membrane2.model_entity) {
@@ -1210,6 +1180,12 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                     if (counter == iteration(membrane.length)) {
 
+                        console.log("mainUtils.makecotransporter: membrane -> ", membrane);
+                        console.log("mainUtils.makecotransporter: model2DArr -> ", model2DArray);
+                        console.log("mainUtils.makecotransporter: modelEntityNameArray -> ", modelEntityNameArray);
+                        console.log("mainUtils.makecotransporter: modelEntityFullNameArray -> ", modelEntityFullNameArray);
+                        console.log("mainUtils.makecotransporter: templistOfModel -> ", templistOfModel);
+
                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
                         epithelialPlatform(
@@ -1226,6 +1202,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 true);
         };
 
+        // determine source, mediator and destionation of fluxes
         mainUtils.srcDescMediatorOfFluxes = function () {
 
             var model, query, i;
@@ -1242,6 +1219,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 endpoint,
                 query,
                 function (jsonObjOPB) {
+
                     if (jsonObjOPB.results.bindings[0].opb.value == fluxOPB) {
 
                         query = srcDescMediatorOfFluxesSPARQL(modelEntityFullNameArray[index], model);
@@ -1251,21 +1229,24 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                             query,
                             function (jsonObjFlux) {
 
-                                console.log("srcDescMediatorOfFluxes: jsonObjFlux -> ", jsonObjFlux);
+                                // console.log("srcDescMediatorOfFluxes: jsonObjFlux -> ", jsonObjFlux);
 
-                                var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
-                                var indexofColon = chebi_uri.indexOf("CHEBI:");
+                                var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value,
+                                    indexofColon = chebi_uri.indexOf("CHEBI:");
                                 chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
                                 var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+
                                 sendGetRequest(
                                     endpointOLS,
                                     function (jsonObjOLSChebi) {
 
                                         // Name of a solute CHEBI from OLS
                                         for (var i in jsonObjFlux.results.bindings) {
+
                                             var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
                                                 solute_chebi_name;
+
                                             for (var m = 0; m < temparr.length; m++) {
                                                 if (temparr[m].slice(-1) == "+" || temparr[m].slice(-1) == "-") {
                                                     solute_chebi_name = temparr[m];
@@ -1276,30 +1257,27 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                             if (jsonObjFlux.results.bindings[i].solute_chebi == undefined)
                                                 solute_chebi.push("");
                                             else
-                                                solute_chebi.push(
-                                                    {
+                                                solute_chebi.push({
                                                         name: solute_chebi_name,
-                                                        fma: jsonObjFlux.results.bindings[i].solute_chebi.value
+                                                        uri: jsonObjFlux.results.bindings[i].solute_chebi.value
                                                     }
                                                 );
 
                                             if (jsonObjFlux.results.bindings[i].source_fma == undefined)
                                                 source_fma.push("");
                                             else
-                                                source_fma.push(
-                                                    {
+                                                source_fma.push({
                                                         name: modelEntityFullNameArray[index],
-                                                        fma: jsonObjFlux.results.bindings[i].source_fma.value
+                                                        uri: jsonObjFlux.results.bindings[i].source_fma.value
                                                     }
                                                 );
 
                                             if (jsonObjFlux.results.bindings[i].sink_fma == undefined)
                                                 sink_fma.push("");
                                             else
-                                                sink_fma.push(
-                                                    {
+                                                sink_fma.push({
                                                         name: modelEntityFullNameArray[index],
-                                                        fma: jsonObjFlux.results.bindings[i].sink_fma.value
+                                                        uri: jsonObjFlux.results.bindings[i].sink_fma.value
                                                     }
                                                 );
 
@@ -1313,14 +1291,13 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                     med_pr.push({
                                                         // name of med_pr from OLS
                                                         name: modelEntityFullNameArray[index],
-                                                        fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
+                                                        uri: jsonObjFlux.results.bindings[i].med_entity_uri.value
                                                     });
                                                 }
                                                 else {
-                                                    med_fma.push(
-                                                        {
+                                                    med_fma.push({
                                                             name: modelEntityFullNameArray[index],
-                                                            fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
+                                                            uri: jsonObjFlux.results.bindings[i].med_entity_uri.value
                                                         }
                                                     );
                                                 }
@@ -1334,14 +1311,14 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                         med_pr = uniqueifyEpithelial(med_pr);
                                         med_fma = uniqueifyEpithelial(med_fma);
 
-                                        console.log("srcDescMediatorOfFluxes: med_pr -> ", med_pr[0], med_pr);
+                                        // console.log("srcDescMediatorOfFluxes: med_pr -> ", med_pr[0], med_pr);
 
                                         var medURI, endpointOLS, srctext, temp_med_pr, med_pr_text_syn, tempvar;
 
                                         if (med_pr[0] == undefined)
                                             medURI = jsonObjFlux.results.bindings[0].protein.value;
                                         else
-                                            medURI = med_pr[0].fma;
+                                            medURI = med_pr[0].uri;
 
                                         if (medURI.indexOf(partOfCHEBIUri) != -1) {
                                             chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(medURI.indexOf("CHEBI:") + 6);
@@ -1358,7 +1335,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                             endpointOLS,
                                             function (jsonObjOLSMedPr) {
 
-                                                console.log("srcDescMediatorOfFluxes: jsonObjOLSMedPr -> ", jsonObjOLSMedPr);
+                                                // console.log("srcDescMediatorOfFluxes: jsonObjOLSMedPr -> ", jsonObjOLSMedPr);
 
                                                 index++;
 
@@ -1369,30 +1346,26 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                         srctext = parserFmaNameText(source_fma[0]); // get this from OLS;
 
                                                         // No mediator protein in NHE3, SGLT models
-                                                        if (med_pr[0] == undefined)
-                                                            temp_med_pr = undefined;
-                                                        else {
-                                                            temp_med_pr = med_pr[0].fma;
-                                                        }
+                                                        if (med_pr[0] == undefined) temp_med_pr = undefined;
+                                                        else temp_med_pr = med_pr[0].uri;
 
                                                         console.log("med_pr, temp_med_pr in index.js: ", med_pr, temp_med_pr);
 
-                                                        if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
+                                                        if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined)
                                                             med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
-                                                        }
                                                         else {
                                                             tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
                                                             med_pr_text_syn = tempvar[0].toUpperCase();
                                                         }
 
                                                         membrane.push({
-                                                            solute_chebi: solute_chebi[0].fma,
+                                                            solute_chebi: solute_chebi[0].uri,
                                                             solute_text: solute_chebi[0].name,
                                                             variable_text: srctext,
-                                                            source_fma: source_fma[0].fma,
+                                                            source_fma: source_fma[0].uri,
                                                             model_entity: source_fma[0].name,
-                                                            sink_fma: sink_fma[0].fma,
-                                                            med_fma: med_fma[0].fma,
+                                                            sink_fma: sink_fma[0].uri,
+                                                            med_fma: med_fma[0].uri,
                                                             med_pr: temp_med_pr,
                                                             med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
                                                             med_pr_text_syn: med_pr_text_syn,
@@ -1406,42 +1379,38 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                     else { // same solute co-transporter
 
                                                         // Swap if source and sink have same direction
-                                                        if (source_fma[0].fma == sink_fma[0].fma) {
+                                                        if (source_fma[0].uri == sink_fma[0].uri) {
 
-                                                            var tempFMA = sink_fma[0].fma,
+                                                            var tempFMA = sink_fma[0].uri,
                                                                 tempName = sink_fma[0].name;
 
-                                                            sink_fma[0].fma = sink_fma[1].fma;
+                                                            sink_fma[0].uri = sink_fma[1].uri;
                                                             sink_fma[0].name = sink_fma[1].name;
-                                                            sink_fma[1].fma = tempFMA;
+                                                            sink_fma[1].uri = tempFMA;
                                                             sink_fma[1].name = tempName;
                                                         }
 
                                                         for (i = 0; i < source_fma.length; i++) {
                                                             srctext = parserFmaNameText(source_fma[i]);
 
-                                                            if (med_pr[0] == undefined)
-                                                                temp_med_pr = undefined;
-                                                            else {
-                                                                temp_med_pr = med_pr[0].fma;
-                                                            }
+                                                            if (med_pr[0] == undefined) temp_med_pr = undefined;
+                                                            else temp_med_pr = med_pr[0].uri;
 
-                                                            if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
+                                                            if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined)
                                                                 med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
-                                                            }
                                                             else {
                                                                 tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
                                                                 med_pr_text_syn = tempvar[0].toUpperCase();
                                                             }
 
                                                             membrane.push({
-                                                                solute_chebi: solute_chebi[0].fma,
+                                                                solute_chebi: solute_chebi[0].uri,
                                                                 solute_text: solute_chebi[0].name,
                                                                 variable_text: srctext,
-                                                                source_fma: source_fma[i].fma,
+                                                                source_fma: source_fma[i].uri,
                                                                 model_entity: source_fma[i].name,
-                                                                sink_fma: sink_fma[i].fma,
-                                                                med_fma: med_fma[0].fma,
+                                                                sink_fma: sink_fma[i].uri,
+                                                                med_fma: med_fma[0].uri,
                                                                 med_pr: temp_med_pr,
                                                                 med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
                                                                 med_pr_text_syn: med_pr_text_syn,
@@ -1462,18 +1431,18 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
 
                                                 if (index == modelEntityFullNameArray.length) {
 
+                                                    console.log("loadEpithelial: membrane -> ", membrane);
+                                                    console.log("loadEpithelial: model2DArr -> ", model2DArray);
+                                                    console.log("loadEpithelial: modelEntityNameArray -> ", modelEntityNameArray);
+                                                    console.log("loadEpithelial: modelEntityFullNameArray -> ", modelEntityFullNameArray);
+                                                    console.log("loadEpithelial: templistOfModel -> ", templistOfModel);
+
                                                     // special case: one flux is chosen
                                                     if (membrane.length <= 1) {
 
                                                         console.log("membrane.length <= 1 membrane: ", membrane);
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
-
-                                                        console.log("membrane: ", membrane);
-                                                        console.log("model2DArr: ", model2DArray);
-                                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
-                                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
-                                                        console.log("templistOfModel: ", templistOfModel);
 
                                                         epithelialPlatform(
                                                             combinedMembrane,
@@ -1489,12 +1458,6 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                                         console.log("membrane.length >= 1 membrane: ", membrane);
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
-
-                                                        console.log("membrane: ", membrane);
-                                                        console.log("model2DArr: ", model2DArray);
-                                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
-                                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
-                                                        console.log("templistOfModel: ", templistOfModel);
 
                                                         for (var i = 0; i < membrane.length; i++) {
                                                             for (var j = i + 1; j < membrane.length; j++) {
@@ -1515,7 +1478,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                             true);
                     }
 
-                    // concentration OPB
+                    // make a concentration object to semantically place solutes in the respective compartment
                     else if (jsonObjOPB.results.bindings[0].opb.value == concentrationOPB) {
 
                         query = concentrationOPBSPARQL(modelEntityFullNameArray[index], model);
@@ -1530,26 +1493,17 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                                     if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
                                         concentration_fma.push("");
                                     else
-                                        concentration_fma.push(
-                                            {
-                                                name: modelEntityFullNameArray[index],
-                                                fma: jsonObjCon.results.bindings[i].concentration_fma.value
-                                            }
-                                        );
+                                        concentration_fma.push({
+                                            name: modelEntityFullNameArray[index],
+                                            uri: jsonObjCon.results.bindings[i].concentration_fma.value
+                                        });
                                 }
 
                                 index++;
 
                                 if (index == modelEntityFullNameArray.length) {
 
-                                    console.log("concentration OPB: ", membrane);
                                     rmFromModelEntityFullNameArray(membrane, concentration_fma);
-
-                                    console.log("model2DArr: ", model2DArray);
-                                    console.log("modelEntityNameArray: ", modelEntityNameArray);
-                                    console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
-                                    console.log("templistOfModel: ", templistOfModel);
-                                    console.log("concentration_fma: ", concentration_fma);
 
                                     epithelialPlatform(
                                         combinedMembrane,
@@ -1571,7 +1525,7 @@ var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
                 true);
         };
 
-        mainUtils.srcDescMediatorOfFluxes(); // first call
+        mainUtils.srcDescMediatorOfFluxes(); // initial call
     };
 
     // Expose utility to the global object

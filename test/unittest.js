@@ -6,7 +6,6 @@
  * http://mochajs.org/#getting-started
  * git commit and push; Travis will automate  continuous testing
  */
-
 describe("DOM Tests", function () {
     var el = document.createElement("div");
     el.id = "myDiv";
