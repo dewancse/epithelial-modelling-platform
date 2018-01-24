@@ -1,9 +1,9 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
-var createAnchor = require("./miscellaneous.js").createAnchor;
-var searchFn = require("./miscellaneous.js").searchFn;
+var miscellaneous = require("./miscellaneous.js");
 
+// TODO: change this function later and make it readable
 // Show a selected entry from search results
 var viewModel = function (jsonObj) {
 
@@ -11,7 +11,6 @@ var viewModel = function (jsonObj) {
 
     for (var i = 0; i < jsonObj.head.vars.length; i++) {
         var divHead = $("<div/>").addClass("h4").css("font-weight", "bold");
-
         var divText = $("<div/>").addClass("p");
 
         divHead.append(jsonObj.head.vars[i]);
@@ -35,14 +34,14 @@ var viewModel = function (jsonObj) {
 
             // TODO: regular expression to validate a URL
             if (tempValue.indexOf("http") != -1) {
-                var aText = createAnchor(tempValue);
+                var aText = miscellaneous.createAnchor(tempValue);
                 tempArrayOfURL.push(tempValue);
-                if (searchFn(tempValue, tempArrayOfURL) <= 1)
+                if (miscellaneous.searchFn(tempValue, tempArrayOfURL) <= 1)
                     divText.append(aText);
             }
             else {
                 tempArray.push(tempValue);
-                if (searchFn(tempValue, tempArray) <= 1)
+                if (miscellaneous.searchFn(tempValue, tempArray) <= 1)
                     divText.append(tempValue);
             }
 

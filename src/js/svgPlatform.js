@@ -1,18 +1,7 @@
 /**
  * Created by Dewan Sarwar on 14/01/2018.
  */
-var apicalID = require("./sparqlUtils.js").apicalID;
-var basolateralID = require("./sparqlUtils.js").basolateralID;
-var partOfProteinUri = require("./sparqlUtils.js").partOfProteinUri;
-var partOfGOUri = require("./sparqlUtils.js").partOfGOUri;
-var partOfCHEBIUri = require("./sparqlUtils.js").partOfCHEBIUri;
-var paracellularID = require("./sparqlUtils.js").paracellularID;
-var luminalID = require("./sparqlUtils.js").luminalID;
-var cytosolID = require("./sparqlUtils.js").cytosolID;
-var interstitialID = require("./sparqlUtils.js").interstitialID;
-var Nachannel = require("./sparqlUtils.js").Nachannel;
-var Clchannel = require("./sparqlUtils.js").Clchannel;
-var Kchannel = require("./sparqlUtils.js").Kchannel;
+var sparqlUtils = require("./sparqlUtils.js");
 
 var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerHeight) {
     var newgdefs = svg.append("g");
@@ -46,7 +35,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
 
     // Extracellular rectangle
     var extracellular = newg.append("rect")
-        .attr("id", luminalID)
+        .attr("id", sparqlUtils.luminalID)
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", w / 3 - 30)
@@ -67,7 +56,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
 
     // Intracellular rectangle
     var intracellular = newg.append("rect")
-        .attr("id", cytosolID)
+        .attr("id", sparqlUtils.cytosolID)
         .attr("x", w / 3 + 30)
         .attr("y", height / 3 + 20)
         .attr("width", width - 60)
@@ -88,7 +77,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
 
     // Interstitial fluid rectangle
     var interstitial = newg.append("rect")
-        .attr("id", interstitialID)
+        .attr("id", sparqlUtils.interstitialID)
         .attr("x", w / 3 + width + 30)
         .attr("y", 0)
         .attr("width", w - (w / 3 + width + 30))
@@ -109,7 +98,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
 
     // Paracellular rectangle
     var paracellular = newg.append("rect")
-        .attr("id", paracellularID)
+        .attr("id", sparqlUtils.paracellularID)
         .attr("x", w / 3 - 10)
         .attr("y", height / 3 + height + 30)
         .attr("width", width + 20)
@@ -130,7 +119,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
 
     // Paracellular rectangle
     var paracellular2 = newg.append("rect")
-        .attr("id", paracellularID)
+        .attr("id", sparqlUtils.paracellularID)
         .attr("x", w / 3 - 10)
         .attr("y", 0)
         .attr("width", width + 20)

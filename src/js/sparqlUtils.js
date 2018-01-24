@@ -191,7 +191,7 @@ var makecotransporterSPARQL = function (membrane1, membrane2) {
         "}}";
 
     return query;
-}
+};
 
 var srcDescMediatorOfFluxesSPARQL = function (cellmlModelEntity, model) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -216,7 +216,7 @@ var srcDescMediatorOfFluxesSPARQL = function (cellmlModelEntity, model) {
         "}";
 
     return query;
-}
+};
 
 var opbSPARQL = function (cellmlModelEntity) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -226,7 +226,7 @@ var opbSPARQL = function (cellmlModelEntity) {
         "}";
 
     return query;
-}
+};
 
 var concentrationOPBSPARQL = function (cellmlModelEntity, model) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -242,7 +242,7 @@ var concentrationOPBSPARQL = function (cellmlModelEntity, model) {
         "}";
 
     return query;
-}
+};
 
 var discoveryWithFlux = function (uriOPB) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -255,7 +255,7 @@ var discoveryWithFlux = function (uriOPB) {
         "}";
 
     return query;
-}
+};
 
 var discoveryWithFluxOfSolute = function (uriCHEBI) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -271,7 +271,7 @@ var discoveryWithFluxOfSolute = function (uriCHEBI) {
         "}}";
 
     return query;
-}
+};
 
 var discoveryWithConcentrationOfSolute = function (uriCHEBI) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -285,7 +285,7 @@ var discoveryWithConcentrationOfSolute = function (uriCHEBI) {
         "}";
 
     return query;
-}
+};
 
 var loadViewHtmlSPARQL = function (cellmlModel) {
     var query = "SELECT ?Workspace ?Model_entity ?Title ?Author ?Abstract ?Keyword ?Protein ?Compartment " +
@@ -302,7 +302,7 @@ var loadViewHtmlSPARQL = function (cellmlModel) {
         "}}";
 
     return query;
-}
+};
 
 var circleIDmyWelcomeWindowSPARQL = function (circleID, cellmlModel) {
     var query;
@@ -322,7 +322,7 @@ var circleIDmyWelcomeWindowSPARQL = function (circleID, cellmlModel) {
             "}}"
     }
     return query;
-}
+};
 
 var relatedMembraneSPARQL = function (fstCHEBI, sndCHEBI, membrane) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -347,7 +347,7 @@ var relatedMembraneSPARQL = function (fstCHEBI, sndCHEBI, membrane) {
         "}}";
 
     return query;
-}
+};
 
 var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, membrane, combinedMembrane) {
 
@@ -497,7 +497,7 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
         combinedMembrane.push(paracellularMembrane[i]);
 
     return combinedMembrane;
-}
+};
 
 var relatedMembraneModelSPARQL = function (model_entity, model_entity2) {
     var query;
@@ -562,7 +562,7 @@ var relatedMembraneModelSPARQL = function (model_entity, model_entity2) {
     }
 
     return query;
-}
+};
 
 var modalWindowToAddModelsSPARQL = function (located_in) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -577,7 +577,7 @@ var modalWindowToAddModelsSPARQL = function (located_in) {
         "}}";
 
     return query;
-}
+};
 
 exports.makecotransporterSPARQL = makecotransporterSPARQL;
 exports.srcDescMediatorOfFluxesSPARQL = srcDescMediatorOfFluxesSPARQL;

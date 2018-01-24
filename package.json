@@ -2,7 +2,7 @@
   "name": "epithelial-modelling-platform",
   "version": "0.0.1",
   "description": "A web-based epithelial transport discovery, exploration and assembly tool",
-  "main": "./src/recommender.html",
+  "main": "./src/index.html",
   "scripts": {
     "build": "node ./src/js/server.js"
   },

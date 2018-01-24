@@ -1,10 +1,9 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
-var uniqueifySVG = require("./miscellaneous.js").uniqueifySVG;
+var miscellaneous = require("./miscellaneous.js");
 
 var similarityModels = function (model2DArray, modelEntityNameArray) {
-
 
     var links = [];
 
@@ -12,9 +11,6 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
     modelEntityNameArray = modelEntityNameArray.filter(function (item, pos) {
         return modelEntityNameArray.indexOf(item) == pos;
     });
-
-    // console.log("visualization in modelEntityNameArray: ", modelEntityNameArray);
-    // console.log("visualization in model2DArray: ", model2DArray);
 
     // Rearrange items in compartment and located_in
     for (var i = 0; i < model2DArray.length; i++) {
@@ -60,7 +56,7 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
         }
     }
 
-    links = uniqueifySVG(links);
+    links = miscellaneous.uniqueifySVG(links);
 
     var nodes = {};
 
@@ -72,10 +68,6 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
         link.target = nodes[link.target] ||
             (nodes[link.target] = {name: link.target});
     });
-
-    // Making edges ...
-    // console.log("nodes: ", nodes);
-    // console.log("links: ", links);
 
     // SVG graph
     var width = 2000, // 1200

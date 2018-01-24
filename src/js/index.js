@@ -1,44 +1,12 @@
 /**
  * Created by dsar941 on 9/8/2016.
  */
-var parseModelName = require("./miscellaneous.js").parseModelName;
-var parserFmaNameText = require("./miscellaneous.js").parserFmaNameText;
-var uniqueifyEpithelial = require("./miscellaneous.js").uniqueifyEpithelial;
-var uniqueifymodel2DArray = require("./miscellaneous.js").uniqueifymodel2DArray;
-var uniqueifyjsonModel = require("./miscellaneous.js").uniqueifyjsonModel;
-var isExist = require("./miscellaneous.js").isExist;
-var isExistModel2DArray = require("./miscellaneous.js").isExistModel2DArray;
-var iteration = require("./miscellaneous.js").iteration;
-var viewModel = require("./viewModel.js").viewModel;
-var similarityModels = require("./similarityModels.js").similarityModels;
-var epithelialPlatform = require("./epithelialPlatform.js").epithelialPlatform;
-var showLoading = require("./miscellaneous.js").showLoading;
-var makecotransporterSPARQL = require("./sparqlUtils.js").makecotransporterSPARQL;
-var srcDescMediatorOfFluxesSPARQL = require("./sparqlUtils.js").srcDescMediatorOfFluxesSPARQL;
-var opbSPARQL = require("./sparqlUtils.js").opbSPARQL;
-var concentrationOPBSPARQL = require("./sparqlUtils.js").concentrationOPBSPARQL;
-var discoveryWithFlux = require("./sparqlUtils.js").discoveryWithFlux;
-var discoveryWithFluxOfSolute = require("./sparqlUtils.js").discoveryWithFluxOfSolute;
-var discoveryWithConcentrationOfSolute = require("./sparqlUtils.js").discoveryWithConcentrationOfSolute;
-var loadViewHtmlSPARQL = require("./sparqlUtils.js").loadViewHtmlSPARQL;
-var dictionary = require("./sparqlUtils.js").dictionary;
-var homeHtml = require("./sparqlUtils.js").homeHtml;
-var viewHtml = require("./sparqlUtils.js").viewHtml;
-var modelHtml = require("./sparqlUtils.js").modelHtml;
-var searchHtml = require("./sparqlUtils.js").searchHtml;
-var similarityHtml = require("./sparqlUtils.js").similarityHtml;
-var epithelialHtml = require("./sparqlUtils.js").epithelialHtml;
-var apicalID = require("./sparqlUtils.js").apicalID;
-var basolateralID = require("./sparqlUtils.js").basolateralID;
-var partOfProteinUri = require("./sparqlUtils.js").partOfProteinUri;
-var partOfGOUri = require("./sparqlUtils.js").partOfGOUri;
-var partOfCHEBIUri = require("./sparqlUtils.js").partOfCHEBIUri;
-var fluxOPB = require("./sparqlUtils.js").fluxOPB;
-var concentrationOPB = require("./sparqlUtils.js").concentrationOPB;
-var endpoint = require("./sparqlUtils.js").endpoint;
-
-var sendGetRequest = require("./../libs/ajax-utils.js").sendGetRequest;
-var sendPostRequest = require("./../libs/ajax-utils.js").sendPostRequest;
+var miscellaneous = require("./miscellaneous.js");
+var viewModel = require("./viewModel.js");
+var similarityModels = require("./similarityModels.js");
+var epithelialPlatform = require("./epithelialPlatform.js");
+var ajaxUtils = require("./../libs/ajax-utils.js");
+var sparqlUtils = require("./sparqlUtils.js");
 
 "use strict";
 
@@ -48,7 +16,7 @@ var EMP = (function (global) {
         templistOfModel = [], // delete operation
         model = [], // selected models in Load Models
         model2DArray = [],
-        combinedMembrane = []; // combine all membranes in epithelialPlatform.js
+        combinedMembrane = []; // combine all membranes in epithelialPlatform.epithelialPlatform.js
 
     var modelEntityName, // search action
         modelEntityNameArray = [], // model action
@@ -69,9 +37,9 @@ var EMP = (function (global) {
 
     // HOME: load the home page
     mainUtils.loadHomeHtml = function () {
-        showLoading("#main-content");
-        sendGetRequest(
-            homeHtml,
+        miscellaneous.showLoading("#main-content");
+        ajaxUtils.sendGetRequest(
+            sparqlUtils.homeHtml,
             function (homeHtmlContent) {
                 $("#main-content").html(homeHtmlContent);
             },
@@ -89,15 +57,15 @@ var EMP = (function (global) {
     $(document).ready(function () {
 
         // On first load, show home view
-        showLoading("#main-content");
+        miscellaneous.showLoading("#main-content");
 
         if (sessionStorage.getItem("searchListContent")) {
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
         }
         else {
             // homepage
-            sendGetRequest(
-                homeHtml,
+            ajaxUtils.sendGetRequest(
+                sparqlUtils.homeHtml,
                 function (homeHtmlContent) {
                     $("#main-content").html(homeHtmlContent);
 
@@ -144,7 +112,7 @@ var EMP = (function (global) {
                 if (event.target.checked) {
 
                     // filter duplicate cellml component for a variable and a model name
-                    if (!isExist(event.target.value, templistOfModel)) {
+                    if (!miscellaneous.isExist(event.target.value, templistOfModel)) {
                         templistOfModel.push(event.target.value);
 
                         // @modelEntityNameArray for similarity graph
@@ -178,7 +146,7 @@ var EMP = (function (global) {
                         $(".attribute")[i].checked = true;
 
                         // filter duplicate cellml component for a variable and a model name
-                        if (!isExist($(".attribute")[i].value, templistOfModel)) {
+                        if (!miscellaneous.isExist($(".attribute")[i].value, templistOfModel)) {
                             templistOfModel.push($(".attribute")[i].value);
 
                             // @modelEntityNameArray for similarity graph
@@ -236,18 +204,18 @@ var EMP = (function (global) {
             sessionStorage.setItem("searchTxtContent", searchTxt);
 
             // dictionary object
-            for (var i in dictionary) {
-                var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
-                    key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
+            for (var i in sparqlUtils.dictionary) {
+                var key1 = searchTxt.indexOf("" + sparqlUtils.dictionary[i].key1 + ""),
+                    key2 = searchTxt.indexOf("" + sparqlUtils.dictionary[i].key2 + "");
 
                 if (key1 != -1 && key2 != -1) {
-                    uriOPB = dictionary[i].opb;
-                    uriCHEBI = dictionary[i].chebi;
-                    keyValue = dictionary[i].key1;
+                    uriOPB = sparqlUtils.dictionary[i].opb;
+                    uriCHEBI = sparqlUtils.dictionary[i].chebi;
+                    keyValue = sparqlUtils.dictionary[i].key1;
                 }
             }
 
-            showLoading("#searchList");
+            miscellaneous.showLoading("#searchList");
 
             modelEntity = [];
             biologicalMeaning = [];
@@ -261,24 +229,24 @@ var EMP = (function (global) {
 
             var query;
             if (uriCHEBI == "") { // model discovery with 'flux'
-                query = discoveryWithFlux(uriOPB);
+                query = sparqlUtils.discoveryWithFlux(uriOPB);
             }
             else {
                 if (keyValue == "flux") { // model discovery with 'flux of sodium', etc.
-                    query = discoveryWithFluxOfSolute(uriCHEBI)
+                    query = sparqlUtils.discoveryWithFluxOfSolute(uriCHEBI)
                 }
                 else { // model disocvery with 'concentration of sodium', etc.
-                    query = discoveryWithConcentrationOfSolute(uriCHEBI);
+                    query = sparqlUtils.discoveryWithConcentrationOfSolute(uriCHEBI);
                 }
             }
 
             // Model
-            sendPostRequest(
-                endpoint,
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonModel) {
                     // REMOVE duplicate cellml model and variable name (NOT component name)
-                    jsonModel.results.bindings = uniqueifyjsonModel(jsonModel.results.bindings);
+                    jsonModel.results.bindings = miscellaneous.uniqueifyjsonModel(jsonModel.results.bindings);
                     mainUtils.discoverModels(jsonModel);
                 },
                 true);
@@ -293,13 +261,13 @@ var EMP = (function (global) {
             return;
         }
 
-        var model = parseModelName(jsonModel.results.bindings[discoverIndex].Model_entity.value);
+        var model = miscellaneous.parseModelName(jsonModel.results.bindings[discoverIndex].Model_entity.value);
         model = model + "#" + model.slice(0, model.indexOf("."));
 
         var query = "SELECT ?Protein WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }";
 
-        sendPostRequest(
-            endpoint,
+        ajaxUtils.sendPostRequest(
+            sparqlUtils.endpoint,
             query,
             function (jsonProteinUri) {
 
@@ -325,7 +293,7 @@ var EMP = (function (global) {
                     listOfProteinURIs.push(pr_uri);
                 }
 
-                sendGetRequest(
+                ajaxUtils.sendGetRequest(
                     endpointproteinOLS,
                     function (jsonProtein) {
 
@@ -335,7 +303,7 @@ var EMP = (function (global) {
                         else
                             endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
 
-                        sendGetRequest(
+                        ajaxUtils.sendGetRequest(
                             endpointgeneOLS,
                             function (jsonGene) {
 
@@ -345,7 +313,7 @@ var EMP = (function (global) {
                                 else
                                     endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
 
-                                sendGetRequest(
+                                ajaxUtils.sendGetRequest(
                                     endpointspeciesOLS,
                                     function (jsonSpecies) {
 
@@ -412,8 +380,8 @@ var EMP = (function (global) {
 
             console.log("loadSearchHtml IF");
 
-            sendGetRequest(
-                searchHtml,
+            ajaxUtils.sendGetRequest(
+                sparqlUtils.searchHtml,
                 function (searchHtmlContent) {
                     $("#main-content").html(searchHtmlContent);
                 },
@@ -510,18 +478,18 @@ var EMP = (function (global) {
 
         cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf("."));
 
-        var query = loadViewHtmlSPARQL(cellmlModel);
+        var query = sparqlUtils.loadViewHtmlSPARQL(cellmlModel);
 
-        showLoading("#main-content");
-        sendPostRequest(
-            endpoint,
+        miscellaneous.showLoading("#main-content");
+        ajaxUtils.sendPostRequest(
+            sparqlUtils.endpoint,
             query,
             function () {
-                sendGetRequest(
-                    viewHtml,
+                ajaxUtils.sendGetRequest(
+                    sparqlUtils.viewHtml,
                     function (viewHtmlContent) {
                         $("#main-content").html(viewHtmlContent);
-                        sendPostRequest(endpoint, query, viewModel, true);
+                        ajaxUtils.sendPostRequest(sparqlUtils.endpoint, query, viewModel.viewModel, true);
                     },
                     false);
             },
@@ -541,7 +509,7 @@ var EMP = (function (global) {
 
             var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
 
-            sendGetRequest(
+            ajaxUtils.sendGetRequest(
                 endpointOLS,
                 function (jsonObjOLS) {
 
@@ -561,7 +529,7 @@ var EMP = (function (global) {
 
                             var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
 
-                            sendGetRequest(
+                            ajaxUtils.sendGetRequest(
                                 endpointOLS,
                                 function (jsonObjOLSLocation) {
 
@@ -602,8 +570,8 @@ var EMP = (function (global) {
 
         var query = "SELECT ?Protein WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein. }";
 
-        sendPostRequest(
-            endpoint,
+        ajaxUtils.sendPostRequest(
+            sparqlUtils.endpoint,
             query,
             function (jsonProteinUri) {
 
@@ -617,7 +585,7 @@ var EMP = (function (global) {
                     endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
                 }
 
-                sendGetRequest(
+                ajaxUtils.sendGetRequest(
                     endpointproteinOLS,
                     function (jsonProtein) {
 
@@ -627,7 +595,7 @@ var EMP = (function (global) {
                         else
                             endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
 
-                        sendGetRequest(
+                        ajaxUtils.sendGetRequest(
                             endpointgeneOLS,
                             function (jsonGene) {
 
@@ -637,7 +605,7 @@ var EMP = (function (global) {
                                 else
                                     endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
 
-                                sendGetRequest(
+                                ajaxUtils.sendGetRequest(
                                     endpointspeciesOLS,
                                     function (jsonSpecies) {
 
@@ -646,21 +614,21 @@ var EMP = (function (global) {
                                         var query = "SELECT ?Compartment " +
                                             "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }";
 
-                                        sendPostRequest(
-                                            endpoint,
+                                        ajaxUtils.sendPostRequest(
+                                            sparqlUtils.endpoint,
                                             query,
                                             function (jsonObjCompartment) {
 
                                                 var query = "SELECT ?Located_in " +
                                                     "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#located_in> ?Located_in. }";
 
-                                                sendPostRequest(
-                                                    endpoint,
+                                                ajaxUtils.sendPostRequest(
+                                                    sparqlUtils.endpoint,
                                                     query,
                                                     function (jsonObjLocation) {
 
-                                                        sendGetRequest(
-                                                            modelHtml,
+                                                        ajaxUtils.sendGetRequest(
+                                                            sparqlUtils.modelHtml,
                                                             function (modelHtmlContent) {
 
                                                                 $("#main-content").html(modelHtmlContent);
@@ -774,7 +742,7 @@ var EMP = (function (global) {
                 // search list to model list with empty model
                 if (jsonObj.length == 0) break;
 
-                if (isExistModel2DArray(modelEntityName, model2DArray))
+                if (miscellaneous.isExistModel2DArray(modelEntityName, model2DArray))
                     break;
 
                 model.push($("<label/>").html("<input id=" + modelEntityName + " + type=checkbox " +
@@ -792,7 +760,7 @@ var EMP = (function (global) {
             model2DArray.push(model.splice(0, 7)); // 6 + 1 (checkbox) header element
         }
 
-        model2DArray = uniqueifymodel2DArray(model2DArray);
+        model2DArray = miscellaneous.uniqueifymodel2DArray(model2DArray);
 
         // Table body
         var tbody = $("<tbody/>"), td = [];
@@ -955,16 +923,16 @@ var EMP = (function (global) {
     // MODEL OF SIMILARITY: load the SVG diagram through similarityModels function
     mainUtils.loadSimilarityHtml = function () {
 
-        sendGetRequest(
-            similarityHtml,
+        ajaxUtils.sendGetRequest(
+            sparqlUtils.similarityHtml,
             function (similarityHtmlContent) {
 
                 $("#main-content").html(similarityHtmlContent);
 
-                sendGetRequest(
-                    similarityHtml,
+                ajaxUtils.sendGetRequest(
+                    sparqlUtils.similarityHtml,
                     function () {
-                        similarityModels(model2DArray, modelEntityNameArray);
+                        similarityModels.similarityModels(model2DArray, modelEntityNameArray);
 
                         // Reinitialize to display only selected models on the Platform
                         templistOfModel = [];
@@ -985,11 +953,11 @@ var EMP = (function (global) {
             $("#modelList").html("Please load models from MODEL DISCOVERY");
         }
 
-        sendGetRequest(
-            epithelialHtml,
+        ajaxUtils.sendGetRequest(
+            sparqlUtils.epithelialHtml,
             function (epithelialHtmlContent) {
                 $("#main-content").html(epithelialHtmlContent);
-                sendGetRequest(epithelialHtml, mainUtils.loadEpithelial, false);
+                ajaxUtils.sendGetRequest(sparqlUtils.epithelialHtml, mainUtils.loadEpithelial, false);
             },
             false);
     };
@@ -1012,7 +980,7 @@ var EMP = (function (global) {
         // empty platform as no model is selected
         if (modelEntityFullNameArray.length == 0) {
 
-            epithelialPlatform(
+            epithelialPlatform.epithelialPlatform(
                 combinedMembrane,
                 concentration_fma,
                 source_fma2,
@@ -1024,7 +992,7 @@ var EMP = (function (global) {
             return;
         }
 
-        // remove visualized solutes in the next iteration in Load Model
+        // remove visualized solutes in the next miscellaneous.iteration in Load Model
         var rmFromModelEntityFullNameArray = function (membrane, concentration_fma) {
 
             for (var i in membrane) {
@@ -1095,30 +1063,52 @@ var EMP = (function (global) {
         // make cotransporters between fluxes
         mainUtils.makecotransporter = function (membrane1, membrane2) {
 
-            var query = makecotransporterSPARQL(membrane1.model_entity, membrane2.model_entity);
+            var query = sparqlUtils.makecotransporterSPARQL(membrane1.model_entity, membrane2.model_entity);
 
-            sendPostRequest(
-                endpoint,
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonObj) {
 
+                    // console.log("jsonObj in makecotransporter: ", jsonObj);
+
                     var tempProtein = [], tempApical = [], tempBasolateral = [];
 
-                    // iterate over med_fma and med_pr in jsonObj
-                    for (var m in jsonObj.results.bindings) {
-                        var tmpuri = jsonObj.results.bindings[m].med_entity_uri.value;
+                    // loop to iterate over med_fma and med_pr in jsonObj
+                    for (var m = 0; m < jsonObj.results.bindings.length; m++) {
+                        var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
+                        var tmpApi = jsonObj.results.bindings[m].med_entity_uri.value;
+                        var tmpBas = jsonObj.results.bindings[m].med_entity_uri.value;
 
-                        if (tmpuri.indexOf(partOfProteinUri) != -1)
+                        if (tmpPro.indexOf(sparqlUtils.partOfProteinUri) != -1) {
                             tempProtein.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
 
-                        if (tmpuri.indexOf(apicalID) != -1)
+                        if (tmpApi.indexOf(sparqlUtils.apicalID) != -1) {
                             tempApical.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
 
-                        if (tmpuri.indexOf(basolateralID) != -1)
+                        if (tmpBas.indexOf(sparqlUtils.basolateralID) != -1) {
                             tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
                     }
 
+                    // remove duplicate protein ID
+                    // TODO: probably no need to do this!
+                    tempProtein = tempProtein.filter(function (item, pos) {
+                        return tempProtein.indexOf(item) == pos;
+                    });
+
+                    tempApical = tempApical.filter(function (item, pos) {
+                        return tempApical.indexOf(item) == pos;
+                    });
+
+                    tempBasolateral = tempBasolateral.filter(function (item, pos) {
+                        return tempBasolateral.indexOf(item) == pos;
+                    });
+
                     // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
+                    // console.log("med_pr in makecotransporter : ", membrane1, membrane1.med_pr, membrane2, membrane2.med_pr);
 
                     // check med_pr, med_pr_text and med_pr_text_syn
                     var tmp_med_pr, tmp_med_pr_text, tmp_med_pr_text_syn;
@@ -1133,7 +1123,6 @@ var EMP = (function (global) {
                         tmp_med_pr_text_syn = membrane2.med_pr_text_syn;
                     }
 
-                    // co-transporter
                     var membraneOBJ = {
                         solute_chebi: membrane1.solute_chebi,
                         solute_text: membrane1.solute_text,
@@ -1154,41 +1143,56 @@ var EMP = (function (global) {
                         sink_fma2: membrane2.sink_fma
                     };
 
-                    for (var i in tempProtein) {
+                    // console.log("tempprotein: ", tempProtein);
+
+                    for (var i = 0; i < tempProtein.length; i++) {
+
+                        // console.log("tempprotein inside: ", tempProtein);
 
                         // cotransporter in apical membrane
-                        if (tempProtein.length != 0 && tempApical.length != 0)
+                        if (tempProtein.length != 0 && tempApical.length != 0) {
                             apicalMembrane.push(membraneOBJ);
+                        }
 
                         // cotransporter in basolateral membrane
-                        if (tempProtein.length != 0 && tempBasolateral.length != 0)
+                        if (tempProtein.length != 0 && tempBasolateral.length != 0) {
                             basolateralMembrane.push(membraneOBJ);
+                        }
                     }
 
-                    if (membrane1.med_pr == membrane2.med_pr && membrane1.model_entity == membrane2.model_entity) {
+                    // same solute cotransporter in apical membrane
+                    if (membrane1.med_fma == sparqlUtils.apicalID && membrane2.med_fma == sparqlUtils.apicalID &&
+                        membrane1.med_pr == membrane2.med_pr &&
+                        membrane1.model_entity == membrane2.model_entity) {
 
-                        // same solute cotransporter in apical membrane
-                        if (membrane1.med_fma == apicalID && membrane2.med_fma == apicalID)
-                            apicalMembrane.push(membraneOBJ);
+                        // console.log("tempprotein inside same solute: ", tempProtein);
 
-                        // same solute cotransporter in basolateral membrane
-                        if (membrane1.med_fma == basolateralID && membrane2.med_fma == basolateralID)
-                            basolateralMembrane.push(membraneOBJ);
+                        apicalMembrane.push(membraneOBJ);
+                    }
+
+                    // same solute cotransporter in basolateral membrane
+                    if (membrane1.med_fma == sparqlUtils.basolateralID && membrane2.med_fma == sparqlUtils.basolateralID &&
+                        membrane1.med_pr == membrane2.med_pr &&
+                        membrane1.model_entity == membrane2.model_entity) {
+                        basolateralMembrane.push(membraneOBJ);
                     }
 
                     counter++;
 
-                    if (counter == iteration(membrane.length)) {
+                    if (counter == miscellaneous.iteration(membrane.length)) {
 
-                        console.log("mainUtils.makecotransporter: membrane -> ", membrane);
-                        console.log("mainUtils.makecotransporter: model2DArr -> ", model2DArray);
-                        console.log("mainUtils.makecotransporter: modelEntityNameArray -> ", modelEntityNameArray);
-                        console.log("mainUtils.makecotransporter: modelEntityFullNameArray -> ", modelEntityFullNameArray);
-                        console.log("mainUtils.makecotransporter: templistOfModel -> ", templistOfModel);
+                        console.log("membrane in index.js: ", membrane);
+                        console.log("apicalMembrane in index.js: ", apicalMembrane);
+                        console.log("basolateralMembrane in index.js: ", basolateralMembrane);
 
                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
-                        epithelialPlatform(
+                        console.log("model2DArr: ", model2DArray);
+                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                        console.log("templistOfModel: ", templistOfModel);
+
+                        epithelialPlatform.epithelialPlatform(
                             combinedMembrane,
                             concentration_fma,
                             source_fma2,
@@ -1202,51 +1206,48 @@ var EMP = (function (global) {
                 true);
         };
 
-        // determine source, mediator and destionation of fluxes
+        // determine source, mediator and destination of fluxes
         mainUtils.srcDescMediatorOfFluxes = function () {
 
             var model, query, i;
             if (modelEntityFullNameArray[index] == undefined)
                 model = undefined;
             else {
-                model = parseModelName(modelEntityFullNameArray[index]);
+                model = miscellaneous.parseModelName(modelEntityFullNameArray[index]);
                 model = model + "#" + model.slice(0, model.indexOf("."));
             }
 
-            query = opbSPARQL(modelEntityFullNameArray[index]);
+            query = sparqlUtils.opbSPARQL(modelEntityFullNameArray[index]);
 
-            sendPostRequest(
-                endpoint,
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonObjOPB) {
+                    // flux OPB
+                    if (jsonObjOPB.results.bindings[0].opb.value == sparqlUtils.fluxOPB) {
 
-                    if (jsonObjOPB.results.bindings[0].opb.value == fluxOPB) {
+                        query = sparqlUtils.srcDescMediatorOfFluxesSPARQL(modelEntityFullNameArray[index], model);
 
-                        query = srcDescMediatorOfFluxesSPARQL(modelEntityFullNameArray[index], model);
-
-                        sendPostRequest(
-                            endpoint,
+                        ajaxUtils.sendPostRequest(
+                            sparqlUtils.endpoint,
                             query,
                             function (jsonObjFlux) {
 
-                                // console.log("srcDescMediatorOfFluxes: jsonObjFlux -> ", jsonObjFlux);
+                                // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
-                                var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value,
-                                    indexofColon = chebi_uri.indexOf("CHEBI:");
+                                var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
+                                var indexofColon = chebi_uri.indexOf("CHEBI:");
                                 chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
                                 var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
-
-                                sendGetRequest(
+                                ajaxUtils.sendGetRequest(
                                     endpointOLS,
                                     function (jsonObjOLSChebi) {
 
                                         // Name of a solute CHEBI from OLS
-                                        for (var i in jsonObjFlux.results.bindings) {
-
+                                        for (i = 0; i < jsonObjFlux.results.bindings.length; i++) {
                                             var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
                                                 solute_chebi_name;
-
                                             for (var m = 0; m < temparr.length; m++) {
                                                 if (temparr[m].slice(-1) == "+" || temparr[m].slice(-1) == "-") {
                                                     solute_chebi_name = temparr[m];
@@ -1257,27 +1258,30 @@ var EMP = (function (global) {
                                             if (jsonObjFlux.results.bindings[i].solute_chebi == undefined)
                                                 solute_chebi.push("");
                                             else
-                                                solute_chebi.push({
+                                                solute_chebi.push(
+                                                    {
                                                         name: solute_chebi_name,
-                                                        uri: jsonObjFlux.results.bindings[i].solute_chebi.value
+                                                        fma: jsonObjFlux.results.bindings[i].solute_chebi.value
                                                     }
                                                 );
 
                                             if (jsonObjFlux.results.bindings[i].source_fma == undefined)
                                                 source_fma.push("");
                                             else
-                                                source_fma.push({
+                                                source_fma.push(
+                                                    {
                                                         name: modelEntityFullNameArray[index],
-                                                        uri: jsonObjFlux.results.bindings[i].source_fma.value
+                                                        fma: jsonObjFlux.results.bindings[i].source_fma.value
                                                     }
                                                 );
 
                                             if (jsonObjFlux.results.bindings[i].sink_fma == undefined)
                                                 sink_fma.push("");
                                             else
-                                                sink_fma.push({
+                                                sink_fma.push(
+                                                    {
                                                         name: modelEntityFullNameArray[index],
-                                                        uri: jsonObjFlux.results.bindings[i].sink_fma.value
+                                                        fma: jsonObjFlux.results.bindings[i].sink_fma.value
                                                     }
                                                 );
 
@@ -1287,17 +1291,18 @@ var EMP = (function (global) {
                                             }
                                             else {
                                                 var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
-                                                if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfGOUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
+                                                if (temp.indexOf(sparqlUtils.partOfProteinUri) != -1 || temp.indexOf(sparqlUtils.partOfGOUri) != -1 || temp.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                                     med_pr.push({
                                                         // name of med_pr from OLS
                                                         name: modelEntityFullNameArray[index],
-                                                        uri: jsonObjFlux.results.bindings[i].med_entity_uri.value
+                                                        fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
                                                     });
                                                 }
                                                 else {
-                                                    med_fma.push({
+                                                    med_fma.push(
+                                                        {
                                                             name: modelEntityFullNameArray[index],
-                                                            uri: jsonObjFlux.results.bindings[i].med_entity_uri.value
+                                                            fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
                                                         }
                                                     );
                                                 }
@@ -1305,37 +1310,38 @@ var EMP = (function (global) {
                                         }
 
                                         // remove duplicate fma
-                                        solute_chebi = uniqueifyEpithelial(solute_chebi);
-                                        source_fma = uniqueifyEpithelial(source_fma);
-                                        sink_fma = uniqueifyEpithelial(sink_fma);
-                                        med_pr = uniqueifyEpithelial(med_pr);
-                                        med_fma = uniqueifyEpithelial(med_fma);
+                                        solute_chebi = miscellaneous.uniqueifyEpithelial(solute_chebi);
+                                        source_fma = miscellaneous.uniqueifyEpithelial(source_fma);
+                                        sink_fma = miscellaneous.uniqueifyEpithelial(sink_fma);
+                                        med_pr = miscellaneous.uniqueifyEpithelial(med_pr);
+                                        med_fma = miscellaneous.uniqueifyEpithelial(med_fma);
 
-                                        // console.log("srcDescMediatorOfFluxes: med_pr -> ", med_pr[0], med_pr);
+                                        // console.log("med_pr[0], med_pr in index.js: ", med_pr[0], med_pr);
+                                        // console.log("med_fma in index.js: ", med_fma);
 
                                         var medURI, endpointOLS, srctext, temp_med_pr, med_pr_text_syn, tempvar;
 
                                         if (med_pr[0] == undefined)
                                             medURI = jsonObjFlux.results.bindings[0].protein.value;
                                         else
-                                            medURI = med_pr[0].uri;
+                                            medURI = med_pr[0].fma;
 
-                                        if (medURI.indexOf(partOfCHEBIUri) != -1) {
+                                        if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                             chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(medURI.indexOf("CHEBI:") + 6);
                                             endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                         }
-                                        else if (medURI.indexOf(partOfGOUri) != -1) {
+                                        else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
                                             var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(medURI.indexOf("GO:") + 3);
                                             endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
                                         }
                                         else
                                             endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
 
-                                        sendGetRequest(
+                                        ajaxUtils.sendGetRequest(
                                             endpointOLS,
                                             function (jsonObjOLSMedPr) {
 
-                                                // console.log("srcDescMediatorOfFluxes: jsonObjOLSMedPr -> ", jsonObjOLSMedPr);
+                                                // console.log("jsonObjOLSMedPr in index.js: ", jsonObjOLSMedPr);
 
                                                 index++;
 
@@ -1343,29 +1349,34 @@ var EMP = (function (global) {
 
                                                     if (source_fma.length == 1) { // transporter (single flux)
 
-                                                        srctext = parserFmaNameText(source_fma[0]); // get this from OLS;
+                                                        srctext = miscellaneous.parserFmaNameText(source_fma[0]); // get this from OLS;
 
                                                         // No mediator protein in NHE3, SGLT models
-                                                        if (med_pr[0] == undefined) temp_med_pr = undefined;
-                                                        else temp_med_pr = med_pr[0].uri;
+                                                        if (med_pr[0] == undefined)
+                                                            temp_med_pr = undefined;
+                                                        else {
+                                                            temp_med_pr = med_pr[0].fma;
+                                                        }
 
-                                                        console.log("med_pr, temp_med_pr in index.js: ", med_pr, temp_med_pr);
+                                                        // console.log("med_pr, temp_med_pr in index.js: ", med_pr, temp_med_pr);
 
-                                                        if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined)
+                                                        if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
+                                                            // med_pr_text_syn = undefined;
                                                             med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
+                                                        }
                                                         else {
                                                             tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
                                                             med_pr_text_syn = tempvar[0].toUpperCase();
                                                         }
 
                                                         membrane.push({
-                                                            solute_chebi: solute_chebi[0].uri,
+                                                            solute_chebi: solute_chebi[0].fma,
                                                             solute_text: solute_chebi[0].name,
                                                             variable_text: srctext,
-                                                            source_fma: source_fma[0].uri,
+                                                            source_fma: source_fma[0].fma,
                                                             model_entity: source_fma[0].name,
-                                                            sink_fma: sink_fma[0].uri,
-                                                            med_fma: med_fma[0].uri,
+                                                            sink_fma: sink_fma[0].fma,
+                                                            med_fma: med_fma[0].fma,
                                                             med_pr: temp_med_pr,
                                                             med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
                                                             med_pr_text_syn: med_pr_text_syn,
@@ -1379,38 +1390,45 @@ var EMP = (function (global) {
                                                     else { // same solute co-transporter
 
                                                         // Swap if source and sink have same direction
-                                                        if (source_fma[0].uri == sink_fma[0].uri) {
+                                                        if (source_fma[0].fma == sink_fma[0].fma) {
 
-                                                            var tempFMA = sink_fma[0].uri,
+                                                            // console.log("inside same faces", source_fma[0], sink_fma[0]);
+
+                                                            var tempFMA = sink_fma[0].fma,
                                                                 tempName = sink_fma[0].name;
 
-                                                            sink_fma[0].uri = sink_fma[1].uri;
+                                                            sink_fma[0].fma = sink_fma[1].fma;
                                                             sink_fma[0].name = sink_fma[1].name;
-                                                            sink_fma[1].uri = tempFMA;
+                                                            sink_fma[1].fma = tempFMA;
                                                             sink_fma[1].name = tempName;
                                                         }
 
                                                         for (i = 0; i < source_fma.length; i++) {
-                                                            srctext = parserFmaNameText(source_fma[i]);
+                                                            srctext = miscellaneous.parserFmaNameText(source_fma[i]);
 
-                                                            if (med_pr[0] == undefined) temp_med_pr = undefined;
-                                                            else temp_med_pr = med_pr[0].uri;
+                                                            if (med_pr[0] == undefined)
+                                                                temp_med_pr = undefined;
+                                                            else {
+                                                                temp_med_pr = med_pr[0].fma;
+                                                            }
 
-                                                            if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined)
+                                                            if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
+                                                                // med_pr_text_syn = undefined;
                                                                 med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
+                                                            }
                                                             else {
                                                                 tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
                                                                 med_pr_text_syn = tempvar[0].toUpperCase();
                                                             }
 
                                                             membrane.push({
-                                                                solute_chebi: solute_chebi[0].uri,
+                                                                solute_chebi: solute_chebi[0].fma,
                                                                 solute_text: solute_chebi[0].name,
                                                                 variable_text: srctext,
-                                                                source_fma: source_fma[i].uri,
+                                                                source_fma: source_fma[i].fma,
                                                                 model_entity: source_fma[i].name,
-                                                                sink_fma: sink_fma[i].uri,
-                                                                med_fma: med_fma[0].uri,
+                                                                sink_fma: sink_fma[i].fma,
+                                                                med_fma: med_fma[0].fma,
                                                                 med_pr: temp_med_pr,
                                                                 med_pr_text: jsonObjOLSMedPr._embedded.terms[0].label,
                                                                 med_pr_text_syn: med_pr_text_syn,
@@ -1431,12 +1449,6 @@ var EMP = (function (global) {
 
                                                 if (index == modelEntityFullNameArray.length) {
 
-                                                    console.log("loadEpithelial: membrane -> ", membrane);
-                                                    console.log("loadEpithelial: model2DArr -> ", model2DArray);
-                                                    console.log("loadEpithelial: modelEntityNameArray -> ", modelEntityNameArray);
-                                                    console.log("loadEpithelial: modelEntityFullNameArray -> ", modelEntityFullNameArray);
-                                                    console.log("loadEpithelial: templistOfModel -> ", templistOfModel);
-
                                                     // special case: one flux is chosen
                                                     if (membrane.length <= 1) {
 
@@ -1444,7 +1456,13 @@ var EMP = (function (global) {
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
-                                                        epithelialPlatform(
+                                                        console.log("membrane: ", membrane);
+                                                        console.log("model2DArr: ", model2DArray);
+                                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                                        console.log("templistOfModel: ", templistOfModel);
+
+                                                        epithelialPlatform.epithelialPlatform(
                                                             combinedMembrane,
                                                             concentration_fma,
                                                             source_fma2,
@@ -1455,11 +1473,17 @@ var EMP = (function (global) {
                                                     }
                                                     else {
 
-                                                        console.log("membrane.length >= 1 membrane: ", membrane);
+                                                        // console.log("membrane.length >= 1 membrane: ", membrane);
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
-                                                        for (var i = 0; i < membrane.length; i++) {
+                                                        console.log("membrane: ", membrane);
+                                                        console.log("model2DArr: ", model2DArray);
+                                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                                        console.log("templistOfModel: ", templistOfModel);
+
+                                                        for (i = 0; i < membrane.length; i++) {
                                                             for (var j = i + 1; j < membrane.length; j++) {
                                                                 mainUtils.makecotransporter(membrane[i], membrane[j]);
                                                             }
@@ -1479,40 +1503,72 @@ var EMP = (function (global) {
                     }
 
                     // make a concentration object to semantically place solutes in the respective compartment
-                    else if (jsonObjOPB.results.bindings[0].opb.value == concentrationOPB) {
+                    else if (jsonObjOPB.results.bindings[0].opb.value == sparqlUtils.concentrationOPB) {
 
-                        query = concentrationOPBSPARQL(modelEntityFullNameArray[index], model);
+                        query = sparqlUtils.concentrationOPBSPARQL(modelEntityFullNameArray[index], model);
 
-                        sendPostRequest(
-                            endpoint,
+                        ajaxUtils.sendPostRequest(
+                            sparqlUtils.endpoint,
                             query,
                             function (jsonObjCon) {
-                                console.log("srcDescMediatorOfFluxes: jsonObjCon -> ", jsonObjCon);
+                                console.log("jsonObjCon in index.js: ", jsonObjCon);
 
-                                for (var i in jsonObjCon.results.bindings) {
+                                for (i = 0; i < jsonObjCon.results.bindings.length; i++) {
                                     if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
                                         concentration_fma.push("");
                                     else
-                                        concentration_fma.push({
-                                            name: modelEntityFullNameArray[index],
-                                            uri: jsonObjCon.results.bindings[i].concentration_fma.value
-                                        });
+                                        concentration_fma.push(
+                                            {
+                                                name: modelEntityFullNameArray[index],
+                                                fma: jsonObjCon.results.bindings[i].concentration_fma.value
+                                            }
+                                        );
                                 }
 
                                 index++;
 
                                 if (index == modelEntityFullNameArray.length) {
 
-                                    rmFromModelEntityFullNameArray(membrane, concentration_fma);
+                                    // special case: one concentration is chosen
+                                    if (membrane.length <= 1) {
 
-                                    epithelialPlatform(
-                                        combinedMembrane,
-                                        concentration_fma,
-                                        source_fma2,
-                                        sink_fma2,
-                                        apicalMembrane,
-                                        basolateralMembrane,
-                                        membrane);
+                                        console.log("concentration OPB, membrane.length <= 1: ", membrane);
+
+                                        rmFromModelEntityFullNameArray(membrane, concentration_fma);
+
+                                        console.log("model2DArr: ", model2DArray);
+                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                        console.log("templistOfModel: ", templistOfModel);
+                                        console.log("concentration_fma: ", concentration_fma);
+
+                                        epithelialPlatform.epithelialPlatform(
+                                            combinedMembrane,
+                                            concentration_fma,
+                                            source_fma2,
+                                            sink_fma2,
+                                            apicalMembrane,
+                                            basolateralMembrane,
+                                            membrane);
+                                    }
+                                    else {
+
+                                        console.log("concentration OPB, membrane.length >= 1 membrane: ", membrane);
+
+                                        rmFromModelEntityFullNameArray(membrane, concentration_fma);
+
+                                        console.log("model2DArr: ", model2DArray);
+                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                        console.log("templistOfModel: ", templistOfModel);
+                                        console.log("concentration_fma: ", concentration_fma);
+
+                                        for (i = 0; i < membrane.length; i++) {
+                                            for (var j = i + 1; j < membrane.length; j++) {
+                                                mainUtils.makecotransporter(membrane[i], membrane[j]);
+                                            }
+                                        }
+                                    }
 
                                     return;
                                 }

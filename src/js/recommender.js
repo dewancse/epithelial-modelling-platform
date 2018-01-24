@@ -1,74 +1,60 @@
 /**
  * Created by dsar941 on 1/22/2017.
  */
-var getTextWidth = require("./miscellaneous.js").getTextWidth;
-var uniqueify = require("./miscellaneous.js").uniqueify;
-var splitPRFromProtein = require("./miscellaneous.js").splitPRFromProtein;
-var d3CheckBox = require("./miscellaneous.js").d3CheckBox;
-var proteinOrMedPrID = require("./miscellaneous.js").proteinOrMedPrID;
-var findInCombinedMembrane = require("./miscellaneous.js").findInCombinedMembrane;
-var similarityMatrixEBI = require("./miscellaneous.js").similarityMatrixEBI;
-var uniqueifyjsonFlux = require("./miscellaneous.js").uniqueifyjsonFlux;
-var circleIDsplitUtils = require("./miscellaneous.js").circleIDsplitUtils;
-var sendPostRequest = require("../libs/ajax-utils.js").sendPostRequest;
-var sendEBIPostRequest = require("../libs/ajax-utils.js").sendEBIPostRequest;
-var sendGetRequest = require("../libs/ajax-utils.js").sendGetRequest;
-var showLoading = require("./miscellaneous.js").showLoading;
-var uniqueifyEpithelial = require("./miscellaneous.js").uniqueifyEpithelial;
-var isExist = require("./miscellaneous.js").isExist;
-var apicalID = require("./sparqlUtils.js").apicalID;
-var basolateralID = require("./sparqlUtils.js").basolateralID;
-var partOfProteinUri = require("./sparqlUtils.js").partOfProteinUri;
-var partOfGOUri = require("./sparqlUtils.js").partOfGOUri;
-var partOfCHEBIUri = require("./sparqlUtils.js").partOfCHEBIUri;
-var paracellularID = require("./sparqlUtils.js").paracellularID;
-var luminalID = require("./sparqlUtils.js").luminalID;
-var cytosolID = require("./sparqlUtils.js").cytosolID;
-var interstitialID = require("./sparqlUtils.js").interstitialID;
-var Nachannel = require("./sparqlUtils.js").Nachannel;
-var Clchannel = require("./sparqlUtils.js").Clchannel;
-var Kchannel = require("./sparqlUtils.js").Kchannel;
-var myWorkspaneName = require("./sparqlUtils.js").myWorkspaneName;
-var partOfFMAUri = require("./sparqlUtils.js").partOfFMAUri;
-var organ = require("./sparqlUtils.js").organ;
-var endpoint = require("./sparqlUtils.js").endpoint;
-var makecotransporterSPARQL = require("./sparqlUtils.js").makecotransporterSPARQL;
-var circleIDmyWelcomeWindowSPARQL = require("./sparqlUtils.js").circleIDmyWelcomeWindowSPARQL;
-var relatedMembraneSPARQL = require("./sparqlUtils.js").relatedMembraneSPARQL;
-var svgPlatform = require("./svgPlatform.js").svgPlatform;
-var relatedMembraneModelSPARQL = require("./sparqlUtils.js").relatedMembraneModelSPARQL;
-var epithelialHtml = require("./sparqlUtils.js").epithelialHtml;
+var miscellaneous = require("./miscellaneous.js");
+var ajaxUtils = require("../libs/ajax-utils.js");
+var sparqlUtils = require("./sparqlUtils.js");
+var svgPlatform = require("./svgPlatform.js");
 
 var combinedMembrane = [
     {
-        med_fma: "http://identifiers.org/fma/FMA:84669",
-        med_pr: "http://purl.obolibrary.org/obo/PR_P06685",
-        med_pr_text: "sodium/potassium-transporting ATPase subunit alpha-1 (rat)",
-        med_pr_text_syn: "P06685",
-        model_entity: "chang_fujita_b_1999.cellml#solute_concentrations.J_sc_Na",
+        med_fma: "http://identifiers.org/fma/FMA:84666",
+        med_pr: "http://purl.obolibrary.org/obo/PR_P55018",
+        med_pr_text: "solute carrier family 12 member 3 (rat)",
+        med_pr_text_syn: "TSC",
+        model_entity: "chang_fujita_b_1999.cellml#mc_sodium_flux.J_mc_Na",
         model_entity2: "",
         protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
-        sink_fma: "http://identifiers.org/fma/FMA:9673",
+        sink_fma: "http://identifiers.org/fma/FMA:66836",
         sink_fma2: "",
         solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
         solute_chebi2: "",
         solute_text: "Na+",
         solute_text2: "",
-        source_fma: "http://identifiers.org/fma/FMA:66836",
+        source_fma: "http://identifiers.org/fma/FMA:74550",
         source_fma2: "",
-        variable_text: "J_sc_Na",
+        variable_text: "J_mc_Na",
         variable_text2: "flux"
+    },
+    {
+        med_fma: "http://identifiers.org/fma/FMA:84666",
+        med_pr: undefined,
+        med_pr_text: "low affinity sodium-glucose cotransporter (mouse)",
+        med_pr_text_syn: "Q9ET37",
+        model_entity: "mackenzie_1996.cellml#NBC_current.J_Na",
+        model_entity2: "mackenzie_1996.cellml#NBC_current.J_Na",
+        protein_name: "http://purl.obolibrary.org/obo/PR_Q9ET37",
+        sink_fma: "http://identifiers.org/fma/FMA:74550",
+        sink_fma2: "http://identifiers.org/fma/FMA:66836",
+        solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
+        solute_chebi2: "http://identifiers.org/chebi/CHEBI:29101",
+        solute_text: "Na+",
+        solute_text2: "Na+",
+        source_fma: "http://identifiers.org/fma/FMA:66836",
+        source_fma2: "http://identifiers.org/fma/FMA:74550",
+        variable_text: "J_Na",
+        variable_text2: "J_Na"
     }
 ];
 
 var recommender = function (combinedMembrane) {
 
     $(document).ready(function () {
-        sendGetRequest(
-            epithelialHtml,
+        ajaxUtils.sendGetRequest(
+            sparqlUtils.epithelialHtml,
             function (epithelialHtmlContent) {
                 $("#main-content").html(epithelialHtmlContent);
-                sendGetRequest(epithelialHtml, epithelialplatform, false);
+                ajaxUtils.sendGetRequest(sparqlUtils.epithelialHtml, epithelialplatform, false);
             },
             false);
     });
@@ -108,14 +94,14 @@ var recommender = function (combinedMembrane) {
 
         // draw svg platform
         var markerWidth = 4, markerHeight = 4;
-        svgPlatform(svg, newg, height, width, w, h, markerWidth, markerHeight);
+        svgPlatform.svgPlatform(svg, newg, height, width, w, h, markerWidth, markerHeight);
 
         // line apical and basolateral
         var x = $("rect")[0].x.baseVal.value;
         var y = $("rect")[0].y.baseVal.value;
 
         var lineapical = newg.append("line")
-            .attr("id", apicalID)
+            .attr("id", sparqlUtils.apicalID)
             .attr("x1", function (d) {
                 return d.x;
             })
@@ -142,7 +128,7 @@ var recommender = function (combinedMembrane) {
             .attr("opacity", 0.5);
 
         var linebasolateral = newg.append("line")
-            .attr("id", basolateralID)
+            .attr("id", sparqlUtils.basolateralID)
             .attr("x1", function (d) {
                 return d.x + width;
             })
@@ -215,7 +201,7 @@ var recommender = function (combinedMembrane) {
 
         var combinedMemChk = function (index) {
             for (i = index; i < combinedMembrane.length; i++) {
-                checkBox[i] = new d3CheckBox();
+                checkBox[i] = new miscellaneous.d3CheckBox();
             }
 
             for (i = index; i < combinedMembrane.length; i++) {
@@ -266,7 +252,7 @@ var recommender = function (combinedMembrane) {
                     src_fma2 = combinedMembrane[i].source_fma2,
                     snk_fma = combinedMembrane[i].sink_fma,
                     snk_fma2 = combinedMembrane[i].sink_fma2,
-                    textWidth = getTextWidth(textvalue, 12),
+                    textWidth = miscellaneous.getTextWidth(textvalue, 12),
                     tempID;
 
                 if (msaveIDflag == true) {
@@ -277,12 +263,12 @@ var recommender = function (combinedMembrane) {
                 }
 
                 /*  Apical Membrane */
-                if (mediator_fma == apicalID) {
+                if (mediator_fma == sparqlUtils.apicalID) {
                     // case 1
-                    if ((src_fma == luminalID && snk_fma == cytosolID) &&
-                        ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == luminalID && snk_fma2 == cytosolID))) {
+                    if ((src_fma == sparqlUtils.luminalID && snk_fma == sparqlUtils.cytosolID) &&
+                        ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.luminalID && snk_fma2 == sparqlUtils.cytosolID))) {
 
-                        console.log("case 1 luminalID ==> cytosolID and channel: ", yvalue, cyvalue);
+                        console.log("case 1 sparqlUtils.luminalID ==> sparqlUtils.cytosolID and channel: ", yvalue, cyvalue);
 
                         var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                         linewithlineg[i] = lineg.append("line")
@@ -338,7 +324,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", apicalID)
+                            .attr("membrane", sparqlUtils.apicalID)
                             .attr("cx", function (d) {
                                 dx[i] = d.x;
                                 return d.x;
@@ -435,12 +421,12 @@ var recommender = function (combinedMembrane) {
                         yvalue += ydistance;
                         cyvalue += ydistance;
 
-                        console.log("case 1 2 luminalID ==> cytosolID and channel: ", yvalue, cyvalue);
+                        console.log("case 1 2 sparqlUtils.luminalID ==> sparqlUtils.cytosolID and channel: ", yvalue, cyvalue);
                     }
 
                     // case 2
-                    if ((src_fma == cytosolID && snk_fma == luminalID) &&
-                        ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == cytosolID && snk_fma2 == luminalID))) {
+                    if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.luminalID) &&
+                        ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.cytosolID && snk_fma2 == sparqlUtils.luminalID))) {
                         var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                         linewithlineg[i] = lineg.append("line")
                             .attr("id", "linewithlineg" + tempID)
@@ -496,7 +482,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", apicalID)
+                            .attr("membrane", sparqlUtils.apicalID)
                             .attr("cx", function (d) {
                                 dx[i] = d.x;
                                 return d.x;
@@ -595,7 +581,7 @@ var recommender = function (combinedMembrane) {
                     }
 
                     // case 3
-                    if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
+                    if ((src_fma == sparqlUtils.luminalID && snk_fma == sparqlUtils.cytosolID) && (src_fma2 == sparqlUtils.cytosolID && snk_fma2 == sparqlUtils.luminalID)) {
                         var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                         linewithlineg[i] = lineg.append("line")
                             .attr("id", "linewithlineg" + tempID)
@@ -651,7 +637,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", apicalID)
+                            .attr("membrane", sparqlUtils.apicalID)
                             .attr("cx", function (d) {
                                 dx[i] = d.x;
                                 return d.x;
@@ -750,7 +736,7 @@ var recommender = function (combinedMembrane) {
                     }
 
                     // case 4
-                    if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
+                    if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.luminalID) && (src_fma2 == sparqlUtils.luminalID && snk_fma2 == sparqlUtils.cytosolID)) {
                         var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                         linewithlineg[i] = lineg.append("line")
                             .attr("id", "linewithlineg" + tempID)
@@ -806,7 +792,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", apicalID)
+                            .attr("membrane", sparqlUtils.apicalID)
                             .attr("cx", function (d) {
                                 dx[i] = d.x;
                                 return d.x;
@@ -905,8 +891,8 @@ var recommender = function (combinedMembrane) {
                     }
 
                     // case 5
-                    if ((src_fma == luminalID && snk_fma == cytosolID) && (textvalue2 == "channel")) {
-                        console.log("case 5 cytosolID ==> luminalID and channel: ", yvalue, cyvalue);
+                    if ((src_fma == sparqlUtils.luminalID && snk_fma == sparqlUtils.cytosolID) && (textvalue2 == "channel")) {
+                        console.log("case 5 sparqlUtils.cytosolID ==> sparqlUtils.luminalID and channel: ", yvalue, cyvalue);
 
                         var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
                         linewithlineg[i] = polygong.append("line")
@@ -963,7 +949,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", apicalID)
+                            .attr("membrane", sparqlUtils.apicalID)
                             .attr("cx", function (d) {
                                 dx[i] = xvalue - 5;
                                 return dx[i];
@@ -1019,13 +1005,13 @@ var recommender = function (combinedMembrane) {
                         yvalue += ydistance;
                         cyvalue += ydistance;
 
-                        console.log("case 5 2 cytosolID ==> luminalID and channel: ", yvalue, cyvalue);
+                        console.log("case 5 2 sparqlUtils.cytosolID ==> sparqlUtils.luminalID and channel: ", yvalue, cyvalue);
                     }
 
                     // case 6
-                    if ((src_fma == cytosolID && snk_fma == luminalID) && (textvalue2 == "channel")) {
+                    if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.luminalID) && (textvalue2 == "channel")) {
 
-                        console.log("case 6 cytosolID ==> luminalID and channel: ", yvalue, cyvalue);
+                        console.log("case 6 sparqlUtils.cytosolID ==> sparqlUtils.luminalID and channel: ", yvalue, cyvalue);
 
                         var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
                         linewithlineg[i] = polygong.append("line")
@@ -1082,7 +1068,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", apicalID)
+                            .attr("membrane", sparqlUtils.apicalID)
                             .attr("cx", function (d) {
                                 dx[i] = xvalue - 5;
                                 return dx[i];
@@ -1133,17 +1119,17 @@ var recommender = function (combinedMembrane) {
                         yvalue += ydistance;
                         cyvalue += ydistance;
 
-                        console.log("case 6 2 cytosolID ==> luminalID and channel: ", yvalue, cyvalue);
+                        console.log("case 6 2 sparqlUtils.cytosolID ==> sparqlUtils.luminalID and channel: ", yvalue, cyvalue);
                     }
                 }
 
                 /*  Basolateral Membrane */
-                if (mediator_fma == basolateralID) {
+                if (mediator_fma == sparqlUtils.basolateralID) {
                     // case 1
-                    if ((src_fma == cytosolID && snk_fma == interstitialID) &&
-                        ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == cytosolID && snk_fma2 == interstitialID))) {
+                    if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.interstitialID) &&
+                        ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.cytosolID && snk_fma2 == sparqlUtils.interstitialID))) {
 
-                        console.log("case 1 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
+                        console.log("case 1 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
 
                         var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                         linewithlineg[i] = lineg.append("line")
@@ -1200,7 +1186,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", basolateralID)
+                            .attr("membrane", sparqlUtils.basolateralID)
                             .attr("cx", function (d) {
                                 dx[i] = d.x;
                                 return d.x;
@@ -1297,12 +1283,12 @@ var recommender = function (combinedMembrane) {
                         yvalueb += ydistance;
                         cyvalueb += ydistance;
 
-                        console.log("case 1 2 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
+                        console.log("case 1 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
                     }
 
                     // case 2
-                    if ((src_fma == interstitialID && snk_fma == cytosolID) &&
-                        ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == interstitialID && snk_fma2 == cytosolID))) {
+                    if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.cytosolID) &&
+                        ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.interstitialID && snk_fma2 == sparqlUtils.cytosolID))) {
                         var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                         linewithlineg[i] = lineg.append("line")
                             .attr("id", "linewithlineg" + tempID)
@@ -1358,7 +1344,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", basolateralID)
+                            .attr("membrane", sparqlUtils.basolateralID)
                             .attr("cx", function (d) {
                                 dx[i] = d.x;
                                 return d.x;
@@ -1457,7 +1443,7 @@ var recommender = function (combinedMembrane) {
                     }
 
                     // case 3
-                    if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
+                    if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.interstitialID) && (src_fma2 == sparqlUtils.interstitialID && snk_fma2 == sparqlUtils.cytosolID)) {
                         var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                         linewithlineg[i] = lineg.append("line")
                             .attr("id", "linewithlineg" + tempID)
@@ -1513,7 +1499,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", basolateralID)
+                            .attr("membrane", sparqlUtils.basolateralID)
                             .attr("cx", function (d) {
                                 dx[i] = d.x;
                                 return d.x;
@@ -1612,7 +1598,7 @@ var recommender = function (combinedMembrane) {
                     }
 
                     // case 4
-                    if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
+                    if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.cytosolID) && (src_fma2 == sparqlUtils.cytosolID && snk_fma2 == sparqlUtils.interstitialID)) {
                         var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                         linewithlineg[i] = lineg.append("line")
                             .attr("id", "linewithlineg" + tempID)
@@ -1668,7 +1654,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", basolateralID)
+                            .attr("membrane", sparqlUtils.basolateralID)
                             .attr("cx", function (d) {
                                 dx[i] = d.x;
                                 return d.x;
@@ -1767,9 +1753,9 @@ var recommender = function (combinedMembrane) {
                     }
 
                     // case 5
-                    if ((src_fma == cytosolID && snk_fma == interstitialID) && (textvalue2 == "channel")) {
+                    if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.interstitialID) && (textvalue2 == "channel")) {
 
-                        console.log("case 5 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
+                        console.log("case 5 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
 
                         var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
                         linewithlineg[i] = polygong.append("line")
@@ -1827,7 +1813,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", basolateralID)
+                            .attr("membrane", sparqlUtils.basolateralID)
                             .attr("cx", function (d) {
                                 dx[i] = xvalue - 5 + width;
                                 return dx[i];
@@ -1877,13 +1863,13 @@ var recommender = function (combinedMembrane) {
                         yvalueb += ydistance;
                         cyvalueb += ydistance;
 
-                        console.log("case 5 2 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
+                        console.log("case 5 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
                     }
 
                     // case 6
-                    if ((src_fma == interstitialID && snk_fma == cytosolID) && (textvalue2 == "channel")) {
+                    if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.cytosolID) && (textvalue2 == "channel")) {
 
-                        console.log("case 6 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
+                        console.log("case 6 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
 
                         var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
                         linewithlineg[i] = polygong.append("line")
@@ -1941,7 +1927,7 @@ var recommender = function (combinedMembrane) {
                                 ];
                             })
                             .attr("index", tempID)
-                            .attr("membrane", basolateralID)
+                            .attr("membrane", sparqlUtils.basolateralID)
                             .attr("cx", function (d) {
                                 dx[i] = xvalue - 5 + width;
                                 return dx[i];
@@ -1991,7 +1977,7 @@ var recommender = function (combinedMembrane) {
                         yvalueb += ydistance;
                         cyvalueb += ydistance;
 
-                        console.log("case 6 2 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
+                        console.log("case 6 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
                     }
                 }
 
@@ -2011,7 +1997,7 @@ var recommender = function (combinedMembrane) {
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", paracellularID)
+                        .attr("membrane", sparqlUtils.paracellularID)
                         .attr("x", function (d) {
                             dx[i] = d.x; // dxtext
                             return d.x;
@@ -2190,13 +2176,13 @@ var recommender = function (combinedMembrane) {
             }
 
             // paracellular
-            if ($(this).prop("tagName") == "text") { // OR if ($(this).attr("membrane") == paracellularID) {}
+            if ($(this).prop("tagName") == "text") { // OR if ($(this).attr("membrane") == sparqlUtils.paracellularID) {}
                 cx = $(this).attr("x");
                 cy = $(this).attr("y");
             }
 
             lineb_id = $($("line")[mindex]).prop("id");
-            circle_id = circleIDsplitUtils($(this), paracellularID);
+            circle_id = miscellaneous.circleIDSplitUtils($(this), sparqlUtils.paracellularID);
 
             // determine position on apical or basolateral membrane
             if ($(this).prop("tagName") == "circle") {
@@ -2234,8 +2220,8 @@ var recommender = function (combinedMembrane) {
                 "}}";
 
             // location of that cellml model
-            sendPostRequest(
-                endpoint,
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonLocatedin) {
 
@@ -2244,13 +2230,13 @@ var recommender = function (combinedMembrane) {
                     var jsonLocatedinCounter = 0;
                     // Type of model - kidney, lungs, etc
                     for (i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                        for (j = 0; j < organ.length; j++) {
-                            for (var k = 0; k < organ[j].key.length; k++) {
-                                if (jsonLocatedin.results.bindings[i].located_in.value == organ[j].key[k].key)
+                        for (j = 0; j < sparqlUtils.organ.length; j++) {
+                            for (var k = 0; k < sparqlUtils.organ[j].key.length; k++) {
+                                if (jsonLocatedin.results.bindings[i].located_in.value == sparqlUtils.organ[j].key[k].key)
                                     jsonLocatedinCounter++;
 
                                 if (jsonLocatedinCounter == jsonLocatedin.results.bindings.length) {
-                                    typeOfModel = organ[j].value;
+                                    typeOfModel = sparqlUtils.organ[j].value;
                                     organIndex = j;
                                     break;
                                 }
@@ -2266,9 +2252,9 @@ var recommender = function (combinedMembrane) {
                     jsonLocatedinCounter = 0;
                     // location of the above type of model
                     for (i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                        for (j = 0; j < organ[organIndex].key.length; j++) {
-                            if (jsonLocatedin.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
-                                locationOfModel += organ[organIndex].key[j].value;
+                        for (j = 0; j < sparqlUtils.organ[organIndex].key.length; j++) {
+                            if (jsonLocatedin.results.bindings[i].located_in.value == sparqlUtils.organ[organIndex].key[j].key) {
+                                locationOfModel += sparqlUtils.organ[organIndex].key[j].value;
 
                                 if (i == jsonLocatedin.results.bindings.length - 1)
                                     locationOfModel += ".";
@@ -2289,16 +2275,16 @@ var recommender = function (combinedMembrane) {
                         "WHERE { GRAPH ?g { ?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. " +
                         "}}";
 
-                    sendPostRequest(
-                        endpoint,
+                    ajaxUtils.sendPostRequest(
+                        sparqlUtils.endpoint,
                         query,
                         function (jsonRelatedModel) {
 
                             // console.log("jsonRelatedModel: ", jsonRelatedModel);
 
                             for (i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
-                                for (j = 0; j < organ[organIndex].key.length; j++) {
-                                    if (jsonRelatedModel.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
+                                for (j = 0; j < sparqlUtils.organ[organIndex].key.length; j++) {
+                                    if (jsonRelatedModel.results.bindings[i].located_in.value == sparqlUtils.organ[organIndex].key[j].key) {
                                         // parsing
                                         var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
                                         var indexOfHash = tempModel.search("#");
@@ -2311,7 +2297,7 @@ var recommender = function (combinedMembrane) {
                                 }
                             }
 
-                            relatedModel = uniqueify(relatedModel);
+                            relatedModel = miscellaneous.uniqueify(relatedModel);
 
                             // kidney, lungs, heart, etc
                             // console.log("relatedModel: ", relatedModel);
@@ -2426,9 +2412,9 @@ var recommender = function (combinedMembrane) {
                                 m.getBody().html("<div id=modalBody></div>");
                                 m.show();
 
-                                showLoading("#modalBody");
+                                miscellaneous.showLoading("#modalBody");
 
-                                var circleID = circleIDsplitUtils($(cthis), paracellularID);
+                                var circleID = miscellaneous.circleIDSplitUtils($(cthis), sparqlUtils.paracellularID);
                                 console.log("circleID in myWelcomeModal: ", circleID);
 
                                 // parsing
@@ -2439,17 +2425,17 @@ var recommender = function (combinedMembrane) {
                                 cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf("."));
 
                                 // console.log("cellmlModel: ", cellmlModel);
-                                query = circleIDmyWelcomeWindowSPARQL(circleID, cellmlModel);
+                                query = sparqlUtils.circleIDmyWelcomeWindowSPARQL(circleID, cellmlModel);
 
                                 // console.log("query: ", query);
 
                                 // protein name
-                                sendPostRequest(
-                                    endpoint,
+                                ajaxUtils.sendPostRequest(
+                                    sparqlUtils.endpoint,
                                     query,
                                     function (jsonModel) {
 
-                                        // console.log("jsonModel: ", jsonModel);
+                                        console.log("jsonModel: ", jsonModel);
 
                                         if (jsonModel.results.bindings.length == 0)
                                             proteinName = undefined;
@@ -2462,9 +2448,11 @@ var recommender = function (combinedMembrane) {
                                         else
                                             endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
 
-                                        sendGetRequest(
+                                        ajaxUtils.sendGetRequest(
                                             endpointprOLS,
                                             function (jsonPr) {
+
+                                                console.log("jsonPr: ", jsonPr);
 
                                                 var endpointgeneOLS;
                                                 if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.has_gene_template == undefined)
@@ -2472,9 +2460,11 @@ var recommender = function (combinedMembrane) {
                                                 else
                                                     endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
 
-                                                sendGetRequest(
+                                                ajaxUtils.sendGetRequest(
                                                     endpointgeneOLS,
                                                     function (jsonGene) {
+
+                                                        console.log("jsonGene: ", jsonGene);
 
                                                         var endpointspeciesOLS;
                                                         if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.only_in_taxon == undefined)
@@ -2482,9 +2472,11 @@ var recommender = function (combinedMembrane) {
                                                         else
                                                             endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
 
-                                                        sendGetRequest(
+                                                        ajaxUtils.sendGetRequest(
                                                             endpointspeciesOLS,
                                                             function (jsonSpecies) {
+
+                                                                console.log("jsonSpecies: ", jsonSpecies);
 
                                                                 if (jsonPr._embedded == undefined)
                                                                     proteinText = "undefined";
@@ -2586,14 +2578,14 @@ var recommender = function (combinedMembrane) {
                 indexOfcellml = relatedModel[idProtein].search(".cellml");
                 modelname = relatedModel[idProtein] + "#" + relatedModel[idProtein].slice(0, indexOfcellml);
             }
-            // console.log("modelname in relatedCellmlModel: ", modelname);
+            console.log("modelname in relatedCellmlModel: ", modelname);
 
             query = "SELECT ?Protein ?workspaceName " +
                 "WHERE { GRAPH ?workspaceName { <" + modelname + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
                 "}}";
 
-            sendPostRequest(
-                endpoint,
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonProtein) {
 
@@ -2605,7 +2597,7 @@ var recommender = function (combinedMembrane) {
                             jsonProtein.results.bindings[0].Protein.value;
                     }
 
-                    sendGetRequest(
+                    ajaxUtils.sendGetRequest(
                         endpointprOLS,
                         function (jsonPr) {
 
@@ -2639,7 +2631,7 @@ var recommender = function (combinedMembrane) {
         // alternative model of a dragged transporter, e.g. rat NHE3, mouse NHE3
         var alternativeCellmlModel = function (alternativeCellmlArray, membrane) {
 
-            // console.log("alternativeCellmlArray: ", alternativeCellmlArray[idAltProtein], membrane, alternativeCellmlArray);
+            console.log("alternativeCellmlArray: ", alternativeCellmlArray[idAltProtein], membrane, alternativeCellmlArray);
             var modelname, indexOfcellml, query, endpointOLS;
             if (alternativeCellmlArray[idAltProtein] == undefined) {
                 modelname = undefined;
@@ -2649,14 +2641,14 @@ var recommender = function (combinedMembrane) {
                 modelname = alternativeCellmlArray[idAltProtein] + "#" +
                     alternativeCellmlArray[idAltProtein].slice(0, indexOfcellml);
             }
-            // console.log("modelname in alternativeCellmlModel: ", modelname);
+            console.log("modelname in alternativeCellmlModel: ", modelname);
 
             query = "SELECT ?Protein ?workspaceName " +
                 "WHERE { GRAPH ?workspaceName { <" + modelname + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
                 "}}";
 
-            sendPostRequest(
-                endpoint,
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonAltProtein) {
 
@@ -2669,7 +2661,7 @@ var recommender = function (combinedMembrane) {
                             jsonAltProtein.results.bindings[0].Protein.value;
                     }
 
-                    sendGetRequest(
+                    ajaxUtils.sendGetRequest(
                         endpointOLS,
                         function (jsonOLSObj) {
 
@@ -2695,14 +2687,14 @@ var recommender = function (combinedMembrane) {
 
                                 // If apical Then basolateral and vice versa
                                 var membraneName;
-                                if (membrane == apicalID) {
-                                    membrane = basolateralID;
+                                if (membrane == sparqlUtils.apicalID) {
+                                    membrane = sparqlUtils.basolateralID;
                                     membraneName = "Basolateral membrane";
 
                                     console.log("membrane TESTING: ", membrane);
                                 }
-                                else if (membrane == basolateralID) {
-                                    membrane = apicalID;
+                                else if (membrane == sparqlUtils.basolateralID) {
+                                    membrane = sparqlUtils.apicalID;
                                     membraneName = "Apical membrane";
 
                                     console.log("membrane TESTING: ", membrane);
@@ -2717,26 +2709,16 @@ var recommender = function (combinedMembrane) {
                         true);
                 }, true);
         };
-
-        // Utility to calculate number of iterations
-        var iteration = function (length) {
-            var sum = 0;
-            for (i = 0; i < length; i++) {
-                sum = sum + (length - i - 1);
-            }
-
-            return sum;
-        };
-
+        
         var makecotransporter = function (membrane1, membrane2, fluxList, membraneName, flag) {
 
-            var query = makecotransporterSPARQL(membrane1, membrane2);
-            sendPostRequest(
-                endpoint,
+            var query = sparqlUtils.makecotransporterSPARQL(membrane1, membrane2);
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonObj) {
 
-                    // console.log("jsonObj in makecotransporter: ", jsonObj);
+                    console.log("jsonObj in makecotransporter: ", jsonObj);
                     var tempProtein = [], tempFMA = [];
                     for (var m in jsonObj.results.bindings) {
                         var tmpuri = jsonObj.results.bindings[m].med_entity_uri.value;
@@ -2764,7 +2746,7 @@ var recommender = function (combinedMembrane) {
 
                     counter++;
 
-                    if (counter == iteration(fluxList.length)) {
+                    if (counter == miscellaneous.iteration(fluxList.length)) {
 
                         // delete cotransporter indices from fluxList
                         for (var i in cotransporterList) {
@@ -2808,7 +2790,7 @@ var recommender = function (combinedMembrane) {
 
             console.log("relatedMembrane: ", membrane, membraneName);
 
-            var circleID = circleIDsplitUtils($(cthis), paracellularID);
+            var circleID = miscellaneous.circleIDSplitUtils($(cthis), sparqlUtils.paracellularID);
             console.log("relatedMembrane circleID: ", circleID);
 
             // A flux may look for a cotransporter and vice-versa
@@ -2818,10 +2800,10 @@ var recommender = function (combinedMembrane) {
                 sndCHEBI = fstCHEBI;
             else sndCHEBI = circleID[11];
 
-            var query = relatedMembraneSPARQL(fstCHEBI, sndCHEBI, membrane);
+            var query = sparqlUtils.relatedMembraneSPARQL(fstCHEBI, sndCHEBI, membrane);
 
-            sendPostRequest(
-                endpoint,
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonRelatedMembrane) {
 
@@ -2831,7 +2813,7 @@ var recommender = function (combinedMembrane) {
                     for (i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
 
                         // allow only related apical or basolateral membrane from my workspace
-                        if (jsonRelatedMembrane.results.bindings[i].g.value != myWorkspaneName)
+                        if (jsonRelatedMembrane.results.bindings[i].g.value != sparqlUtils.myWorkspaneName)
                             continue;
 
                         fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
@@ -2843,7 +2825,7 @@ var recommender = function (combinedMembrane) {
 
                     var tempfluxList = [];
                     for (i = 0; i < fluxList.length; i++) {
-                        if (!isExist(fluxList[i], tempfluxList)) {
+                        if (!miscellaneous.isExist(fluxList[i], tempfluxList)) {
                             tempfluxList.push(fluxList[i]);
                         }
                     }
@@ -2878,7 +2860,7 @@ var recommender = function (combinedMembrane) {
 
         var relatedMembraneModel = function (membraneName, cotransporterList, flag) {
 
-            // console.log("flag in relatedMembraneModel: ", flag);
+            console.log("flag in relatedMembraneModel: ", flag);
 
             var tempmembraneModel, indexOfHash, indexOfcellml, modelname, query;
             if (modelEntityObj.length == 0 || modelEntityObj[idMembrane].model_entity == undefined)
@@ -2901,8 +2883,8 @@ var recommender = function (combinedMembrane) {
                 "SELECT ?Protein WHERE { <" + tempmembraneModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
                 "}";
 
-            sendPostRequest(
-                endpoint,
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
                 query,
                 function (jsonRelatedMembraneModel) {
 
@@ -2917,14 +2899,14 @@ var recommender = function (combinedMembrane) {
                             jsonRelatedMembraneModel.results.bindings[0].Protein.value;
                     }
 
-                    sendGetRequest(
+                    ajaxUtils.sendGetRequest(
                         endpointprOLS,
                         function (jsonPr) {
 
-                            var query = relatedMembraneModelSPARQL(modelEntityObj[idMembrane].model_entity, modelEntityObj[idMembrane].model_entity2);
+                            var query = sparqlUtils.relatedMembraneModelSPARQL(modelEntityObj[idMembrane].model_entity, modelEntityObj[idMembrane].model_entity2);
 
-                            sendPostRequest(
-                                endpoint,
+                            ajaxUtils.sendPostRequest(
+                                sparqlUtils.endpoint,
                                 query,
                                 function (jsonObjFlux) {
                                     console.log("relatedMembraneModel: jsonObjFlux -> ", jsonObjFlux);
@@ -2940,7 +2922,7 @@ var recommender = function (combinedMembrane) {
                                         endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                     }
 
-                                    sendGetRequest(
+                                    ajaxUtils.sendGetRequest(
                                         endpointOLS,
                                         function (jsonObjOLSChebi) {
 
@@ -2956,7 +2938,7 @@ var recommender = function (combinedMembrane) {
                                                 endpointOLS2 = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri2;
                                             }
 
-                                            sendGetRequest(
+                                            ajaxUtils.sendGetRequest(
                                                 endpointOLS2,
                                                 function (jsonObjOLSChebi2) {
 
@@ -3028,7 +3010,7 @@ var recommender = function (combinedMembrane) {
                                                         }
                                                         else {
                                                             var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
-                                                            if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfGOUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
+                                                            if (temp.indexOf(sparqlUtils.partOfProteinUri) != -1 || temp.indexOf(sparqlUtils.partOfGOUri) != -1 || temp.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                                                 med_pr.push({
                                                                     // name of med_pr from OLS
                                                                     // TODO: J_sc_K two PR and one FMA URI!!
@@ -3036,7 +3018,7 @@ var recommender = function (combinedMembrane) {
                                                                 });
                                                             }
                                                             else {
-                                                                if (temp.indexOf(partOfFMAUri) != -1) {
+                                                                if (temp.indexOf(sparqlUtils.partOfFMAUri) != -1) {
                                                                     med_fma.push({med_fma: jsonObjFlux.results.bindings[i].med_entity_uri.value});
                                                                 }
                                                             }
@@ -3044,14 +3026,14 @@ var recommender = function (combinedMembrane) {
                                                     }
 
                                                     // remove duplicate fma
-                                                    solute_chebi = uniqueifyEpithelial(solute_chebi);
-                                                    solute_chebi2 = uniqueifyEpithelial(solute_chebi2);
-                                                    source_fma = uniqueifyEpithelial(source_fma);
-                                                    sink_fma = uniqueifyEpithelial(sink_fma);
-                                                    source_fma2 = uniqueifyEpithelial(source_fma2);
-                                                    sink_fma2 = uniqueifyEpithelial(sink_fma2);
-                                                    med_pr = uniqueifyEpithelial(med_pr);
-                                                    med_fma = uniqueifyEpithelial(med_fma);
+                                                    solute_chebi = miscellaneous.uniqueifyEpithelial(solute_chebi);
+                                                    solute_chebi2 = miscellaneous.uniqueifyEpithelial(solute_chebi2);
+                                                    source_fma = miscellaneous.uniqueifyEpithelial(source_fma);
+                                                    sink_fma = miscellaneous.uniqueifyEpithelial(sink_fma);
+                                                    source_fma2 = miscellaneous.uniqueifyEpithelial(source_fma2);
+                                                    sink_fma2 = miscellaneous.uniqueifyEpithelial(sink_fma2);
+                                                    med_pr = miscellaneous.uniqueifyEpithelial(med_pr);
+                                                    med_fma = miscellaneous.uniqueifyEpithelial(med_fma);
 
                                                     if (jsonRelatedMembraneModel.results.bindings.length != 0) {
 
@@ -3093,7 +3075,7 @@ var recommender = function (combinedMembrane) {
 
                                                             variabletext = variabletext.slice(indexOfdot + 1);
 
-                                                            var tempjsonObjFlux = uniqueifyjsonFlux(jsonObjFlux.results.bindings);
+                                                            var tempjsonObjFlux = miscellaneous.uniqueifyjsonFlux(jsonObjFlux.results.bindings);
 
                                                             // console.log("tempjsonObjFlux: ", tempjsonObjFlux);
                                                             // console.log("circleID: ", circleID);
@@ -3101,12 +3083,12 @@ var recommender = function (combinedMembrane) {
                                                             if (tempjsonObjFlux.length == 1) {
                                                                 var vartext2;
                                                                 if (med_pr.length != 0) {
-                                                                    if (med_pr[0].med_pr == Nachannel || med_pr[0].med_pr == Kchannel ||
-                                                                        med_pr[0].med_pr == Clchannel) {
+                                                                    if (med_pr[0].med_pr == sparqlUtils.Nachannel || med_pr[0].med_pr == sparqlUtils.Kchannel ||
+                                                                        med_pr[0].med_pr == sparqlUtils.Clchannel) {
                                                                         vartext2 = "channel";
                                                                     }
-                                                                    else if (tempjsonObjFlux[0].source_fma.value == luminalID &&
-                                                                        tempjsonObjFlux[0].sink_fma.value == interstitialID) {
+                                                                    else if (tempjsonObjFlux[0].source_fma.value == sparqlUtils.luminalID &&
+                                                                        tempjsonObjFlux[0].sink_fma.value == sparqlUtils.interstitialID) {
                                                                         vartext2 = "diffusiveflux";
                                                                     }
                                                                     else {
@@ -3211,12 +3193,12 @@ var recommender = function (combinedMembrane) {
 
                                                     // console.log("medURI: ", medURI);
 
-                                                    if (medURI.indexOf(partOfCHEBIUri) != -1) {
+                                                    if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                                         var indexofColon = medURI.indexOf("CHEBI:");
                                                         chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
                                                         endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
                                                     }
-                                                    else if (medURI.indexOf(partOfGOUri) != -1) {
+                                                    else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
                                                         var indexofColon = medURI.indexOf("GO:");
                                                         var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
                                                         endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
@@ -3224,7 +3206,7 @@ var recommender = function (combinedMembrane) {
                                                     else
                                                         endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
 
-                                                    sendGetRequest(
+                                                    ajaxUtils.sendGetRequest(
                                                         endpointOLS,
                                                         function (jsonObjOLSMedPr) {
 
@@ -3294,7 +3276,7 @@ var recommender = function (combinedMembrane) {
 
             // add models without dragging
             if (flag == 2) {
-                var relatedOrganModels2 = "<p id=addModelsID>";
+                var relatedorganModels2 = "<p id=addModelsID>";
                 for (var i = 0; i < membraneModelID.length; i++) {
 
                     // console.log("flag in showModalWindow: ", flag);
@@ -3302,10 +3284,10 @@ var recommender = function (combinedMembrane) {
                     // console.log("membraneModelID: ", membraneModelID);
 
                     // Do not display already visualized models on the apical or basolateral membrane
-                    if (findInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], combinedMembrane))
+                    if (miscellaneous.searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], combinedMembrane))
                         continue;
 
-                    var workspaceuri = myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
+                    var workspaceuri = sparqlUtils.myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
 
                     var variableName;
                     if (membraneModelID[i][1] != "") {
@@ -3330,11 +3312,11 @@ var recommender = function (combinedMembrane) {
                         'Model entity2: ' + membraneModelID[i][1] + '"' +
                         '>' + membraneModelID[i][0] + " " + variableName + '</a></label>'; // membraneModelID[i][0]
 
-                    relatedOrganModels2 += label.innerHTML + "<br>";
+                    relatedorganModels2 += label.innerHTML + "<br>";
                 }
 
-                if (relatedOrganModels2 == "<p id=addModelsID>") {
-                    relatedOrganModels2 += "Not Exist" + "<br>";
+                if (relatedorganModels2 == "<p id=addModelsID>") {
+                    relatedorganModels2 += "Not Exist" + "<br>";
                 }
 
                 $("#modalBody").empty();
@@ -3343,7 +3325,7 @@ var recommender = function (combinedMembrane) {
 
                 $("#modalBody")
                     .append(msg)
-                    .append(relatedOrganModels2);
+                    .append(relatedorganModels2);
 
                 console.log("outside modelbody2!");
 
@@ -3352,12 +3334,12 @@ var recommender = function (combinedMembrane) {
             else if (flag == 1) {
                 idMembrane = 0;
 
-                var circleID = circleIDsplitUtils($(cthis), paracellularID);
+                var circleID = miscellaneous.circleIDSplitUtils($(cthis), sparqlUtils.paracellularID);
 
                 var msg2 = "<p><b>" + proteinText + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
                     "<b>" + locationOfModel + "</b><\p>";
 
-                var workspaceuri = myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + circleID[0];
+                var workspaceuri = sparqlUtils.myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + circleID[0];
 
                 var model = "<b>Model: </b><a href=" + workspaceuri + " + target=_blank " +
                     "data-toggle=tooltip data-placement=right " +
@@ -3377,10 +3359,10 @@ var recommender = function (combinedMembrane) {
                 var index = 0, ProteinSeq = "", requestData, PID = [],
                     baseUrl = "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
 
-                proteinOrMedPrID(membraneModelID, PID);
+                miscellaneous.proteinOrMedPrID(membraneModelID, PID);
                 console.log("PID BEFORE: ", PID);
 
-                var draggedMedPrID = splitPRFromProtein(circleID);
+                var draggedMedPrID = miscellaneous.splitPRFromProtein(circleID);
                 PID.push(draggedMedPrID);
 
                 console.log("PID BEFORE Filter: ", PID);
@@ -3413,13 +3395,13 @@ var recommender = function (combinedMembrane) {
                         // dbfectendpoint = cors_api_url + "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
                         dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
 
-                    sendGetRequest(
+                    ajaxUtils.sendGetRequest(
                         dbfectendpoint,
                         function (psequence) {
                             ProteinSeq += psequence;
 
                             // PID is empty
-                            if (PID.length == 1) { // in fact, PID.length == 0, to enable the above dbfectendpoint query
+                            if (PID.length == 1) { // in fact, PID.length == 0, to enable the above dbfectsparqlUtils.endpoint query
 
                                 var indexOfBar = psequence.search(/\|/gi),
                                     indexOfBar2 = psequence.slice(indexOfBar + 1, psequence.length).search(/\|/gi),
@@ -3443,7 +3425,7 @@ var recommender = function (combinedMembrane) {
 
                                 var requestUrl = baseUrl + "/run/";
 
-                                sendEBIPostRequest(
+                                ajaxUtils.sendEBIPostRequest(
                                     requestUrl,
                                     requestData,
                                     function (jobId) {
@@ -3451,7 +3433,7 @@ var recommender = function (combinedMembrane) {
 
                                         var chkJobStatus = function (jobId) {
                                             var jobIdUrl = baseUrl + "/status/" + jobId;
-                                            sendGetRequest(
+                                            ajaxUtils.sendGetRequest(
                                                 jobIdUrl,
                                                 function (resultObj) {
                                                     console.log("result: ", resultObj); // jobId status
@@ -3463,18 +3445,18 @@ var recommender = function (combinedMembrane) {
                                                     }
 
                                                     var pimUrl = baseUrl + "/result/" + jobId + "/pim";
-                                                    sendGetRequest(
+                                                    ajaxUtils.sendGetRequest(
                                                         pimUrl,
                                                         function (identityMatrix) {
 
-                                                            var similarityOBJ = similarityMatrixEBI(
+                                                            var similarityOBJ = miscellaneous.similarityMatrixEBI(
                                                                 identityMatrix, PID, draggedMedPrID, membraneModelObj);
 
                                                             var tempList = [];
                                                             for (var i = 0; i < membraneModelObj.length; i++) {
                                                                 for (var j = 0; j < membraneModelID.length; j++) {
 
-                                                                    var tempID = splitPRFromProtein(membraneModelID[j]);
+                                                                    var tempID = miscellaneous.splitPRFromProtein(membraneModelID[j]);
                                                                     if (tempID.charAt(0) != "P") {
                                                                         if (tempID.charAt(0) != "Q") {
                                                                             tempID = "P" + tempID.replace(/^0+/, "");
@@ -3501,10 +3483,10 @@ var recommender = function (combinedMembrane) {
                                                             for (var i = 0; i < membraneModelObj.length; i++) {
 
                                                                 // Do not display visualized models
-                                                                if (findInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], combinedMembrane))
+                                                                if (miscellaneous.searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], combinedMembrane))
                                                                     continue;
 
-                                                                var workspaceuri = myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
+                                                                var workspaceuri = sparqlUtils.myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
 
                                                                 var label = document.createElement("label");
                                                                 label.innerHTML = '<br><input id="' + membraneModelID[i] + '" ' +
@@ -3558,10 +3540,10 @@ var recommender = function (combinedMembrane) {
                                                             // alternativeModel += "</p>";
                                                             // console.log("relatedModelObj: ", relatedModelObj);
 
-                                                            // related organ models (kidney, lungs, etc) in PMR
-                                                            var relatedOrganModel = "<p id=relatedOrganModelID><b>" + typeOfModel + " model in PMR</b>";
+                                                            // related sparqlUtils.organ models (kidney, lungs, etc) in PMR
+                                                            var relatedorganModel = "<p id=relatedorganModelID><b>" + typeOfModel + " model in PMR</b>";
                                                             if (relatedModelObj.length == 1) { // includes own protein name
-                                                                relatedOrganModel += "<br>Not Exist" + "<br>";
+                                                                relatedorganModel += "<br>Not Exist" + "<br>";
                                                             }
                                                             else {
                                                                 for (var i = 0; i < relatedModelObj.length; i++) {
@@ -3580,7 +3562,7 @@ var recommender = function (combinedMembrane) {
                                                                         'Model entity: ' + relatedModelObj[i].modelEntity + '"' +
                                                                         '>' + relatedModelObj[i].prname + '</a></label>';
 
-                                                                    relatedOrganModel += label.innerHTML;
+                                                                    relatedorganModel += label.innerHTML;
                                                                 }
                                                             }
 
@@ -3602,7 +3584,7 @@ var recommender = function (combinedMembrane) {
                                                                 .append(msg3)
                                                                 .append(membraneModel)
                                                                 .append(alternativeModel)
-                                                                .append(relatedOrganModel);
+                                                                .append(relatedorganModel);
 
                                                             console.log("outside modelbody!");
 
@@ -3614,7 +3596,7 @@ var recommender = function (combinedMembrane) {
                                         }
 
                                         chkJobStatus(jobId);
-                                        // console.log("AFTER chkJobStatus(jobId)!");
+                                        console.log("AFTER chkJobStatus(jobId)!");
 
                                         return;
                                     },
@@ -3625,13 +3607,13 @@ var recommender = function (combinedMembrane) {
 
                             // callback
                             WSDbfetchREST();
-                            // console.log("AFTER WSDbfetchREST!");
+                            console.log("AFTER WSDbfetchREST! CALLBACK!");
                         },
                         false);
                 };
 
                 WSDbfetchREST();
-                // console.log("AFTER WSDbfetchREST!");
+                console.log("AFTER WSDbfetchREST!");
 
                 return;
             }
@@ -3748,7 +3730,7 @@ var recommender = function (combinedMembrane) {
                 dytextinitial = 198.3333282470703,
                 dytextinitial2 = 237.3333282470703;
             for (i = 0; i < circlewithlineg.length; i++) {
-                if (circlewithlineg[i].attr("membrane") == apicalID) {
+                if (circlewithlineg[i].attr("membrane") == sparqlUtils.apicalID) {
                     console.log("apical !");
 
                     // line 1
@@ -3843,7 +3825,7 @@ var recommender = function (combinedMembrane) {
                 dytextinitialb = 198.3333282470703,
                 dytextinitialb2 = 237.3333282470703;
             for (i = 0; i < circlewithlineg.length; i++) {
-                if (circlewithlineg[i].attr("membrane") == basolateralID) {
+                if (circlewithlineg[i].attr("membrane") == sparqlUtils.basolateralID) {
                     console.log("baso !");
 
                     // line 1
@@ -4061,7 +4043,7 @@ var recommender = function (combinedMembrane) {
                                 solute_chebi2: circleID[11], // solute CHEBI uri
                                 solute_text2: circleID[13] // solute text using the CHEBI uri from OLS
                             });
-                            // combinedMembrane = uniqueifyCombinedMembrane(combinedMembrane);
+                            // combinedMembrane = miscellaneous.uniqueifyCombinedMembrane(combinedMembrane);
 
                             console.log("combinedMembrane in addModelsID input: ", combinedMembrane);
 
@@ -4080,7 +4062,7 @@ var recommender = function (combinedMembrane) {
                             console.log("Apical or Basolateral membrane!!");
 
                             // paracellular
-                            if ($(cthis).attr("membrane") == paracellularID) {
+                            if ($(cthis).attr("membrane") == sparqlUtils.paracellularID) {
                                 $(cthis).attr("idParacellular", $("#membraneModelsID input")[i].id);
                             }
                             else {
@@ -4103,20 +4085,20 @@ var recommender = function (combinedMembrane) {
                         }
                     }
 
-                    // related organ models in PMR
-                    for (i = 0; i < $("#relatedOrganModelID input").length; i++) {
-                        if ($("#relatedOrganModelID input")[i].checked) {
+                    // related sparqlUtils.organ models in PMR
+                    for (i = 0; i < $("#relatedorganModelID input").length; i++) {
+                        if ($("#relatedorganModelID input")[i].checked) {
 
-                            console.log("Related organ model!!");
+                            console.log("Related sparqlUtils.organ model!!");
 
-                            $(cthis).attr("id", $("#relatedOrganModelID input")[i].id);
+                            $(cthis).attr("id", $("#relatedorganModelID input")[i].id);
                             console.log("cthis AFTER: ", cthis);
                         }
                     }
 
                     membraneColorBack();
 
-                    var circleID = circleIDsplitUtils($(cthis), paracellularID);
+                    var circleID = miscellaneous.circleIDSplitUtils($(cthis), sparqlUtils.paracellularID);
                     console.log("circleID at the end: ", circleID);
 
                     var totalCheckboxes = $("input:checkbox").length,
@@ -4133,75 +4115,75 @@ var recommender = function (combinedMembrane) {
                         console.log("icircleGlobal: ", icircleGlobal);
 
                         // mediator FMA uri
-                        if (combinedMembrane[icircleGlobal].med_fma == apicalID) {
-                            circleID[8] = basolateralID;
-                            combinedMembrane[icircleGlobal].med_fma = basolateralID;
+                        if (combinedMembrane[icircleGlobal].med_fma == sparqlUtils.apicalID) {
+                            circleID[8] = sparqlUtils.basolateralID;
+                            combinedMembrane[icircleGlobal].med_fma = sparqlUtils.basolateralID;
 
                             // source and sink FMA uri
-                            if (combinedMembrane[icircleGlobal].source_fma == luminalID && combinedMembrane[icircleGlobal].sink_fma == cytosolID) {
-                                circleID[4] = cytosolID;
-                                combinedMembrane[icircleGlobal].source_fma = cytosolID;
-                                circleID[5] = interstitialID;
-                                combinedMembrane[icircleGlobal].sink_fma = interstitialID;
+                            if (combinedMembrane[icircleGlobal].source_fma == sparqlUtils.luminalID && combinedMembrane[icircleGlobal].sink_fma == sparqlUtils.cytosolID) {
+                                circleID[4] = sparqlUtils.cytosolID;
+                                combinedMembrane[icircleGlobal].source_fma = sparqlUtils.cytosolID;
+                                circleID[5] = sparqlUtils.interstitialID;
+                                combinedMembrane[icircleGlobal].sink_fma = sparqlUtils.interstitialID;
                             }
 
-                            if (combinedMembrane[icircleGlobal].source_fma == cytosolID && combinedMembrane[icircleGlobal].sink_fma == luminalID) {
-                                circleID[4] = interstitialID;
-                                combinedMembrane[icircleGlobal].source_fma = interstitialID;
-                                circleID[5] = cytosolID;
-                                combinedMembrane[icircleGlobal].sink_fma = cytosolID;
+                            if (combinedMembrane[icircleGlobal].source_fma == sparqlUtils.cytosolID && combinedMembrane[icircleGlobal].sink_fma == sparqlUtils.luminalID) {
+                                circleID[4] = sparqlUtils.interstitialID;
+                                combinedMembrane[icircleGlobal].source_fma = sparqlUtils.interstitialID;
+                                circleID[5] = sparqlUtils.cytosolID;
+                                combinedMembrane[icircleGlobal].sink_fma = sparqlUtils.cytosolID;
                             }
 
                             // source2 and sink2 FMA uri
                             if (combinedMembrane[icircleGlobal].source_fma2 != "" && combinedMembrane[icircleGlobal].sink_fma2 != "") {
-                                if (combinedMembrane[icircleGlobal].source_fma2 == luminalID && combinedMembrane[icircleGlobal].sink_fma2 == cytosolID) {
-                                    circleID[6] = cytosolID;
-                                    combinedMembrane[icircleGlobal].source_fma2 = cytosolID;
-                                    circleID[7] = interstitialID;
-                                    combinedMembrane[icircleGlobal].sink_fma2 = interstitialID;
+                                if (combinedMembrane[icircleGlobal].source_fma2 == sparqlUtils.luminalID && combinedMembrane[icircleGlobal].sink_fma2 == sparqlUtils.cytosolID) {
+                                    circleID[6] = sparqlUtils.cytosolID;
+                                    combinedMembrane[icircleGlobal].source_fma2 = sparqlUtils.cytosolID;
+                                    circleID[7] = sparqlUtils.interstitialID;
+                                    combinedMembrane[icircleGlobal].sink_fma2 = sparqlUtils.interstitialID;
                                 }
 
-                                if (combinedMembrane[icircleGlobal].source_fma2 == cytosolID && combinedMembrane[icircleGlobal].sink_fma2 == luminalID) {
-                                    circleID[6] = interstitialID;
-                                    combinedMembrane[icircleGlobal].source_fma2 = interstitialID;
-                                    circleID[7] = cytosolID;
-                                    combinedMembrane[icircleGlobal].sink_fma2 = cytosolID;
+                                if (combinedMembrane[icircleGlobal].source_fma2 == sparqlUtils.cytosolID && combinedMembrane[icircleGlobal].sink_fma2 == sparqlUtils.luminalID) {
+                                    circleID[6] = sparqlUtils.interstitialID;
+                                    combinedMembrane[icircleGlobal].source_fma2 = sparqlUtils.interstitialID;
+                                    circleID[7] = sparqlUtils.cytosolID;
+                                    combinedMembrane[icircleGlobal].sink_fma2 = sparqlUtils.cytosolID;
                                 }
                             }
                         }
                         else {
-                            circleID[8] = apicalID;
-                            combinedMembrane[icircleGlobal].med_fma = apicalID;
+                            circleID[8] = sparqlUtils.apicalID;
+                            combinedMembrane[icircleGlobal].med_fma = sparqlUtils.apicalID;
 
                             // source and sink FMA uri
-                            if (combinedMembrane[icircleGlobal].source_fma == cytosolID && combinedMembrane[icircleGlobal].sink_fma == interstitialID) {
-                                circleID[4] = luminalID;
-                                combinedMembrane[icircleGlobal].source_fma = luminalID;
-                                circleID[5] = cytosolID;
-                                combinedMembrane[icircleGlobal].sink_fma = cytosolID;
+                            if (combinedMembrane[icircleGlobal].source_fma == sparqlUtils.cytosolID && combinedMembrane[icircleGlobal].sink_fma == sparqlUtils.interstitialID) {
+                                circleID[4] = sparqlUtils.luminalID;
+                                combinedMembrane[icircleGlobal].source_fma = sparqlUtils.luminalID;
+                                circleID[5] = sparqlUtils.cytosolID;
+                                combinedMembrane[icircleGlobal].sink_fma = sparqlUtils.cytosolID;
                             }
 
-                            if (combinedMembrane[icircleGlobal].source_fma == interstitialID && combinedMembrane[icircleGlobal].sink_fma == cytosolID) {
-                                circleID[4] = cytosolID;
-                                combinedMembrane[icircleGlobal].source_fma = cytosolID;
-                                circleID[5] = luminalID;
-                                combinedMembrane[icircleGlobal].sink_fma = luminalID;
+                            if (combinedMembrane[icircleGlobal].source_fma == sparqlUtils.interstitialID && combinedMembrane[icircleGlobal].sink_fma == sparqlUtils.cytosolID) {
+                                circleID[4] = sparqlUtils.cytosolID;
+                                combinedMembrane[icircleGlobal].source_fma = sparqlUtils.cytosolID;
+                                circleID[5] = sparqlUtils.luminalID;
+                                combinedMembrane[icircleGlobal].sink_fma = sparqlUtils.luminalID;
                             }
 
                             // source2 and sink2 FMA uri
                             if (circleID[6] != "" && circleID[7] != "") {
-                                if (combinedMembrane[icircleGlobal].source_fma2 == cytosolID && combinedMembrane[icircleGlobal].sink_fma2 == interstitialID) {
-                                    circleID[6] = luminalID;
-                                    combinedMembrane[icircleGlobal].source_fma2 = luminalID;
-                                    circleID[7] = cytosolID;
-                                    combinedMembrane[icircleGlobal].sink_fma2 = cytosolID;
+                                if (combinedMembrane[icircleGlobal].source_fma2 == sparqlUtils.cytosolID && combinedMembrane[icircleGlobal].sink_fma2 == sparqlUtils.interstitialID) {
+                                    circleID[6] = sparqlUtils.luminalID;
+                                    combinedMembrane[icircleGlobal].source_fma2 = sparqlUtils.luminalID;
+                                    circleID[7] = sparqlUtils.cytosolID;
+                                    combinedMembrane[icircleGlobal].sink_fma2 = sparqlUtils.cytosolID;
                                 }
 
-                                if (combinedMembrane[icircleGlobal].source_fma2 == interstitialID && combinedMembrane[icircleGlobal].sink_fma2 == cytosolID) {
-                                    circleID[6] = cytosolID;
-                                    combinedMembrane[icircleGlobal].source_fma2 = cytosolID;
-                                    circleID[7] = luminalID;
-                                    combinedMembrane[icircleGlobal].sink_fma2 = luminalID;
+                                if (combinedMembrane[icircleGlobal].source_fma2 == sparqlUtils.interstitialID && combinedMembrane[icircleGlobal].sink_fma2 == sparqlUtils.cytosolID) {
+                                    circleID[6] = sparqlUtils.cytosolID;
+                                    combinedMembrane[icircleGlobal].source_fma2 = sparqlUtils.cytosolID;
+                                    circleID[7] = sparqlUtils.luminalID;
+                                    combinedMembrane[icircleGlobal].sink_fma2 = sparqlUtils.luminalID;
                                 }
                             }
                         }
@@ -4247,7 +4229,7 @@ var recommender = function (combinedMembrane) {
                     }
 
                     // circle placement and rearrangement
-                    if ($(cthis).attr("membrane") == apicalID) {
+                    if ($(cthis).attr("membrane") == sparqlUtils.apicalID) {
                         linebasolateral
                             .transition()
                             .delay(1000)

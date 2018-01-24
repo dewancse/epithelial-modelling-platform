@@ -215,16 +215,14 @@ var isExistModel2DArray = function (element, model2DArray) {
     return false;
 };
 
-var circleIDsplitUtils = function (cthis, paracellularID) {
+var circleIDSplitUtils = function (cthis, paracellularID) {
     var circleID;
-    if (cthis.attr("membrane") == paracellularID) {
+    if (cthis.attr("membrane") == paracellularID)
         circleID = cthis.attr("idParacellular").split(",");
-    }
-    else {
+    else
         circleID = cthis.prop("id").split(",");
-    }
     return circleID;
-}
+};
 
 // split PR_ from protein identifier
 var splitPRFromProtein = function (tempMemModelID) {
@@ -257,7 +255,7 @@ var proteinOrMedPrID = function (membraneModelID, PID) {
     }
 };
 
-var findInCombinedMembrane = function (model1, model2, combinedMembrane) {
+var searchInCombinedMembrane = function (model1, model2, combinedMembrane) {
     for (var i = 0; i < combinedMembrane.length; i++) {
         if ((combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == model2) ||
             (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == model1) ||
@@ -507,9 +505,9 @@ exports.uniqueifyjsonModel = uniqueifyjsonModel;
 exports.isExist = isExist;
 exports.isExistModel2DArray = isExistModel2DArray;
 exports.uniqueifyCombinedMembrane = uniqueifyCombinedMembrane;
-exports.circleIDsplitUtils = circleIDsplitUtils;
+exports.circleIDSplitUtils = circleIDSplitUtils;
 exports.splitPRFromProtein = splitPRFromProtein;
 exports.proteinOrMedPrID = proteinOrMedPrID;
-exports.findInCombinedMembrane = findInCombinedMembrane;
+exports.searchInCombinedMembrane = searchInCombinedMembrane;
 exports.similarityMatrixEBI = similarityMatrixEBI;
 exports.d3CheckBox = d3CheckBox;
