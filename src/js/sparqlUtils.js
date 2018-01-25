@@ -466,26 +466,25 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
             else if (membrane[i].med_fma == basolateralID)
                 apicalbasoMembraneObj = basolateralMembrane;
 
-            apicalbasoMembraneObj.push(
-                {
-                    solute_chebi: membrane[i].solute_chebi,
-                    solute_text: membrane[i].solute_text,
-                    variable_text: membrane[i].variable_text,
-                    source_fma: membrane[i].source_fma,
-                    sink_fma: membrane[i].sink_fma,
-                    solute_chebi2: "",
-                    solute_text2: "",
-                    variable_text2: "flux",
-                    source_fma2: "",
-                    sink_fma2: "",
-                    model_entity: membrane[i].model_entity,
-                    model_entity2: "",
-                    med_fma: membrane[i].med_fma,
-                    med_pr: membrane[i].med_pr,
-                    med_pr_text: membrane[i].med_pr_text,
-                    med_pr_text_syn: membrane[i].med_pr_text_syn,
-                    protein_name: membrane[i].protein_name
-                });
+            apicalbasoMembraneObj.push({
+                solute_chebi: membrane[i].solute_chebi,
+                solute_text: membrane[i].solute_text,
+                variable_text: membrane[i].variable_text,
+                source_fma: membrane[i].source_fma,
+                sink_fma: membrane[i].sink_fma,
+                solute_chebi2: "",
+                solute_text2: "",
+                variable_text2: "flux",
+                source_fma2: "",
+                sink_fma2: "",
+                model_entity: membrane[i].model_entity,
+                model_entity2: "",
+                med_fma: membrane[i].med_fma,
+                med_pr: membrane[i].med_pr,
+                med_pr_text: membrane[i].med_pr_text,
+                med_pr_text_syn: membrane[i].med_pr_text_syn,
+                protein_name: membrane[i].protein_name
+            });
         }
     }
 

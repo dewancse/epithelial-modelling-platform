@@ -8,43 +8,102 @@ var svgPlatform = require("./svgPlatform.js");
 
 var combinedMembrane = [
     {
-        med_fma: "http://identifiers.org/fma/FMA:84666",
-        med_pr: "http://purl.obolibrary.org/obo/PR_P55018",
-        med_pr_text: "solute carrier family 12 member 3 (rat)",
-        med_pr_text_syn: "TSC",
-        model_entity: "chang_fujita_b_1999.cellml#mc_sodium_flux.J_mc_Na",
+        med_fma: "http://identifiers.org/fma/FMA:84669",
+        med_pr: "http://purl.obolibrary.org/obo/PR_P06685",
+        med_pr_text: "sodium/potassium-transporting ATPase subunit alpha-1 (rat)",
+        med_pr_text_syn: "P06685",
+        model_entity: "chang_fujita_b_1999.cellml#solute_concentrations.J_sc_Na",
         model_entity2: "",
         protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
-        sink_fma: "http://identifiers.org/fma/FMA:66836",
+        sink_fma: "http://identifiers.org/fma/FMA:9673",
         sink_fma2: "",
         solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
         solute_chebi2: "",
         solute_text: "Na+",
         solute_text2: "",
-        source_fma: "http://identifiers.org/fma/FMA:74550",
-        source_fma2: "",
-        variable_text: "J_mc_Na",
-        variable_text2: "flux"
-    },
-    {
-        med_fma: "http://identifiers.org/fma/FMA:84666",
-        med_pr: undefined,
-        med_pr_text: "low affinity sodium-glucose cotransporter (mouse)",
-        med_pr_text_syn: "Q9ET37",
-        model_entity: "mackenzie_1996.cellml#NBC_current.J_Na",
-        model_entity2: "mackenzie_1996.cellml#NBC_current.J_Na",
-        protein_name: "http://purl.obolibrary.org/obo/PR_Q9ET37",
-        sink_fma: "http://identifiers.org/fma/FMA:74550",
-        sink_fma2: "http://identifiers.org/fma/FMA:66836",
-        solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
-        solute_chebi2: "http://identifiers.org/chebi/CHEBI:29101",
-        solute_text: "Na+",
-        solute_text2: "Na+",
         source_fma: "http://identifiers.org/fma/FMA:66836",
-        source_fma2: "http://identifiers.org/fma/FMA:74550",
-        variable_text: "J_Na",
-        variable_text2: "J_Na"
+        source_fma2: "",
+        variable_text: "J_sc_Na",
+        variable_text2: "flux"
     }
+    // ,
+    // {
+    //     med_fma: "http://identifiers.org/fma/FMA:84666",
+    //     med_pr: "http://purl.obolibrary.org/obo/PR_P55018",
+    //     med_pr_text: "solute carrier family 12 member 3 (rat)",
+    //     med_pr_text_syn: "TSC",
+    //     model_entity: "chang_fujita_b_1999.cellml#mc_sodium_flux.J_mc_Na",
+    //     model_entity2: "",
+    //     protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
+    //     sink_fma: "http://identifiers.org/fma/FMA:66836",
+    //     sink_fma2: "",
+    //     solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
+    //     solute_chebi2: "",
+    //     solute_text: "Na+",
+    //     solute_text2: "",
+    //     source_fma: "http://identifiers.org/fma/FMA:74550",
+    //     source_fma2: "",
+    //     variable_text: "J_mc_Na",
+    //     variable_text2: "flux"
+    // }
+    // ,
+    // {
+    //     med_fma: "http://identifiers.org/fma/FMA:84666",
+    //     med_pr: undefined,
+    //     med_pr_text: "low affinity sodium-glucose cotransporter (mouse)",
+    //     med_pr_text_syn: "Q9ET37",
+    //     model_entity: "mackenzie_1996.cellml#NBC_current.J_Na",
+    //     model_entity2: "mackenzie_1996.cellml#NBC_current.J_Na",
+    //     protein_name: "http://purl.obolibrary.org/obo/PR_Q9ET37",
+    //     sink_fma: "http://identifiers.org/fma/FMA:74550",
+    //     sink_fma2: "http://identifiers.org/fma/FMA:66836",
+    //     solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
+    //     solute_chebi2: "http://identifiers.org/chebi/CHEBI:29101",
+    //     solute_text: "Na+",
+    //     solute_text2: "Na+",
+    //     source_fma: "http://identifiers.org/fma/FMA:66836",
+    //     source_fma2: "http://identifiers.org/fma/FMA:74550",
+    //     variable_text: "J_Na",
+    //     variable_text2: "J_Na"
+    // },
+    // {
+    //     med_fma: "http://identifiers.org/fma/FMA:84666",
+    //     med_pr: "http://purl.obolibrary.org/obo/PR_000014527",
+    //     med_pr_text: "amiloride-sensitive sodium channel subunit alpha",
+    //     med_pr_text_syn: "SCNN1",
+    //     model_entity: "chang_fujita_b_1999.cellml#mc_sodium_flux.G_mc_Na",
+    //     model_entity2: "",
+    //     protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
+    //     sink_fma: "http://identifiers.org/fma/FMA:66836",
+    //     sink_fma2: "channel",
+    //     solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
+    //     solute_chebi2: "channel",
+    //     solute_text: "Na+",
+    //     solute_text2: "channel",
+    //     source_fma: "http://identifiers.org/fma/FMA:74550",
+    //     source_fma2: "channel",
+    //     variable_text: "G_mc_Na",
+    //     variable_text2: "channel"
+    // },
+    // {
+    //     med_fma: "http://identifiers.org/fma/FMA:84669",
+    //     med_pr: "http://purl.obolibrary.org/obo/PR_Q06393",
+    //     med_pr_text: "chloride channel protein ClC-Ka (rat)",
+    //     med_pr_text_syn: "CLCNK1",
+    //     model_entity: "chang_fujita_b_1999.cellml#sc_chloride_flux.G_sc_Cl",
+    //     model_entity2: "",
+    //     protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
+    //     sink_fma: "http://identifiers.org/fma/FMA:66836",
+    //     sink_fma2: "channel",
+    //     solute_chebi: "http://identifiers.org/chebi/CHEBI:17996",
+    //     solute_chebi2: "channel",
+    //     solute_text: "Cl-",
+    //     solute_text2: "channel",
+    //     source_fma: "http://identifiers.org/fma/FMA:9673",
+    //     source_fma2: "channel",
+    //     variable_text: "G_sc_Cl",
+    //     variable_text2: "channel"
+    // }
 ];
 
 var recommender = function (combinedMembrane) {
@@ -222,6 +281,28 @@ var recommender = function (combinedMembrane) {
 
         // INITIAL call
         combinedMemChk(0);
+
+        $(document).on("click", function () {
+            var totalCheckboxes = $("input:checkbox").length,
+                numberOfChecked = $("input:checkbox:checked").length,
+                numberOfNotChecked = totalCheckboxes - numberOfChecked;
+
+            console.log("click event -> totalCheckboxes, numberOfChecked, numberNotChecked: ",
+                totalCheckboxes, numberOfChecked, numberOfNotChecked);
+
+            $("input[type='checkbox']").prop("checked", function (i, val) {
+                if (val == false) {
+                    $(this).prop({disabled: true});
+                }
+                return val;
+            });
+
+            if (totalCheckboxes == numberOfNotChecked) {
+                $("input[type='checkbox']").prop({
+                    disabled: false
+                });
+            }
+        });
 
         // apical, basolateral and paracellular membrane
         var combinedMemFunc = function (index, msaveIDflag) {
@@ -2190,21 +2271,16 @@ var recommender = function (combinedMembrane) {
                 gt = lineb_x + radius / 2;
             }
             else if ($(this).prop("tagName") == "polygon") {
-                lt = lineb_x + polygonlineLen + 40;
-                gt = lineb_x + polygonlineLen * 2;
+                lt = lineb_x + polygonlineLen + 40; // + 60
+                gt = lineb_x + polygonlineLen * 2; // + 60
             }
 
             if ((cx >= lt && cx <= gt) && (lineb_id != circle_id)) {
-                $($("line")[mindex]).css("stroke", "red");
-
-                if ((cx >= lt && cx <= gt) && (lineb_id != circle_id)) {
-                    $($("line")[mindex]).css("stroke", "yellow");
-                }
+                $($("line")[mindex]).css("stroke", "yellow");
             }
             else {
                 if (mindex == 1)
                     $($("line")[mindex]).css("stroke", "orange");
-
                 else
                     $($("line")[mindex]).css("stroke", "green");
             }
@@ -2709,7 +2785,7 @@ var recommender = function (combinedMembrane) {
                         true);
                 }, true);
         };
-        
+
         var makecotransporter = function (membrane1, membrane2, fluxList, membraneName, flag) {
 
             var query = sparqlUtils.makecotransporterSPARQL(membrane1, membrane2);
@@ -2796,7 +2872,7 @@ var recommender = function (combinedMembrane) {
             // A flux may look for a cotransporter and vice-versa
             var fstCHEBI, sndCHEBI;
             fstCHEBI = circleID[10];
-            if (circleID[11] == "")
+            if (circleID[11] == "" || circleID[11] == "channel" || circleID[11] == "diffusiveflux")
                 sndCHEBI = fstCHEBI;
             else sndCHEBI = circleID[11];
 
@@ -2818,7 +2894,7 @@ var recommender = function (combinedMembrane) {
 
                         fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
 
-                        if (circleID[11] != "") {
+                        if (circleID[11] != "" || circleID[11] != "channel" || circleID[11] != "diffusiveflux") {
                             fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity2.value);
                         }
                     }

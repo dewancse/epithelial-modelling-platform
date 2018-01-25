@@ -256,6 +256,9 @@ var proteinOrMedPrID = function (membraneModelID, PID) {
 };
 
 var searchInCombinedMembrane = function (model1, model2, combinedMembrane) {
+
+    console.log("searchInCombinedMembrane combinedMembrane: ", combinedMembrane);
+
     for (var i = 0; i < combinedMembrane.length; i++) {
         if ((combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == model2) ||
             (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == model1) ||

@@ -16,7 +16,7 @@ var EMP = (function (global) {
         templistOfModel = [], // delete operation
         model = [], // selected models in Load Models
         model2DArray = [],
-        combinedMembrane = []; // combine all membranes in epithelialPlatform.epithelialPlatform.js
+        combinedMembrane = []; // combine all membranes in epithelialPlatform.js
 
     var modelEntityName, // search action
         modelEntityNameArray = [], // model action
@@ -378,7 +378,7 @@ var EMP = (function (global) {
 
         if (!sessionStorage.getItem("searchListContent")) {
 
-            console.log("loadSearchHtml IF");
+            // console.log("loadSearchHtml IF");
 
             ajaxUtils.sendGetRequest(
                 sparqlUtils.searchHtml,
@@ -388,7 +388,7 @@ var EMP = (function (global) {
                 false);
         }
         else {
-            console.log("loadSearchHtml ELSE");
+            // console.log("loadSearchHtml ELSE");
 
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
@@ -821,16 +821,16 @@ var EMP = (function (global) {
 
     // FILTER BY PROTEIN: filter search results in MODEL DISCOVERY
     mainUtils.filterSearchHtml = function () {
-        console.log("mainUtils.filterSearchHtml!");
+        // console.log("mainUtils.filterSearchHtml!");
 
         if ($("#membraneId").val() == "all") {
             $("table tr").show();
-            console.log("IF: ", $("#membraneId").val());
+            // console.log("IF: ", $("#membraneId").val());
         }
         else {
             var selectedprotein = $("#membraneId option:selected").val();
 
-            console.log("selectedprotein: ", selectedprotein);
+            // console.log("selectedprotein: ", selectedprotein);
 
             for (var i = 1; i < $("table tr").length; i++) {
 
@@ -847,7 +847,7 @@ var EMP = (function (global) {
 
     // FILTER BY PROTEIN: filter dropdown list in MODEL DISCOVERY
     var filterByProtein = function () {
-        console.log("filterByProtein!");
+        // console.log("filterByProtein!");
 
         // Initialize dropdown list
         $("#membraneId").empty();
@@ -1199,8 +1199,7 @@ var EMP = (function (global) {
                             sink_fma2,
                             apicalMembrane,
                             basolateralMembrane,
-                            membrane
-                        );
+                            membrane);
                     }
                 },
                 true);
@@ -1473,7 +1472,7 @@ var EMP = (function (global) {
                                                     }
                                                     else {
 
-                                                        // console.log("membrane.length >= 1 membrane: ", membrane);
+                                                        console.log("membrane.length >= 1 membrane: ", membrane);
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
@@ -1517,12 +1516,10 @@ var EMP = (function (global) {
                                     if (jsonObjCon.results.bindings[i].concentration_fma == undefined)
                                         concentration_fma.push("");
                                     else
-                                        concentration_fma.push(
-                                            {
-                                                name: modelEntityFullNameArray[index],
-                                                fma: jsonObjCon.results.bindings[i].concentration_fma.value
-                                            }
-                                        );
+                                        concentration_fma.push({
+                                            name: modelEntityFullNameArray[index],
+                                            fma: jsonObjCon.results.bindings[i].concentration_fma.value
+                                        });
                                 }
 
                                 index++;
