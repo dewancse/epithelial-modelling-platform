@@ -3773,7 +3773,9 @@ var recommender = function (combinedMembrane) {
 
         // retain color of membranes
         var membraneColorBack = function () {
+            console.log("membraneColorBack line: ", $("line"));
             for (var i = 0; i < $("line").length; i++) {
+                console.log("membraneColorBack: ", $("line")[i].id, $(cthis).attr("membrane"), i);
                 if ($("line")[i].id == $(cthis).attr("membrane") && i == 0) {
                     linebasolateral
                         .transition()
@@ -3784,7 +3786,7 @@ var recommender = function (combinedMembrane) {
                     yvalueb += ydistance;
                     break;
                 }
-                if ($("line")[i].id == $(this).attr("membrane") && i == 1) {
+                if ($("line")[i].id == $(cthis).attr("membrane") && i == 1) {
                     lineapical
                         .transition()
                         .delay(1000)
