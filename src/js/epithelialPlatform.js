@@ -266,9 +266,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // add models without dragging
     $(document).on("click", function () {
 
-        console.log("click FUNCTION event: ", event);
+        console.log("click FUNCTION!");
 
-        // checkbox disabled when one is active on the recommender system
         var totalCheckboxes = $("#myModal input:checkbox").length,
             numberOfChecked = $("#myModal input:checkbox:checked").length,
             numberOfNotChecked = totalCheckboxes - numberOfChecked;
@@ -290,12 +289,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         console.log("click function -> combinedMembrane: ", combinedMembrane);
+
         console.log("click function -> linewithlineg, circlewithlineg: ", linewithlineg, circlewithlineg);
         console.log("click function -> dx, dy: ", dx, dy);
 
-        // add models without dragging, i.e., clicking on apical or basolateral membrane
+        // Change marker direction and text position
         if (event.target.localName == "line" && event.target.nodeName == "line") {
-            // console.log("event.srcElement.id: ", event.srcElement.id);
+            console.log("event.srcElement.id: ", event.srcElement.id);
             if (event.srcElement.id == sparqlUtils.apicalID || event.srcElement.id == sparqlUtils.basolateralID)
                 modalWindowToAddModels(event.srcElement.id);
         }
@@ -3180,6 +3180,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                     console.log("makecotransporter: combinedMembrane -> ", combinedMembrane);
 
+
                     relatedMembraneModel(membraneName, cotransporterList, flag);
                 }
             },
@@ -4031,6 +4032,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     };
 
     // circles, polygons and arrows move back if close clicked
+    // circles, polygons and arrows move back if close clicked
     var moveBack = function () {
         if (linewithlineg[icircleGlobal] != undefined) {
             linewithlineg[icircleGlobal]
@@ -4119,7 +4121,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 yvalueb += ydistance;
                 break;
             }
-            if ($("line")[i].id == $(cthis).attr("membrane") && i == 1) {
+            if ($("line")[i].id == $(this).attr("membrane") && i == 1) {
                 lineapical
                     .transition()
                     .delay(1000)
@@ -4780,10 +4782,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         $this.setHeader($this.options.header);
     };
 
-    // add models without dragging, i.e., clicking on apical or basolateral membrane
+    // display modal window after clicking either apical or basolateral membrane
     function modalWindowToAddModels(located_in) {
 
-        console.log("AddModels located_in: ", located_in);
+        console.log("modalWindowToAddModels located_in: ", located_in);
 
         var membraneName;
         if (located_in == sparqlUtils.apicalID)
@@ -4812,25 +4814,28 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             query,
             function (jsonRelatedModelEntity) {
 
+                console.log("modalWindowToAddModels jsonRelatedModelEntity: ", jsonRelatedModelEntity, combinedMembrane);
                 for (var i = 0; i < jsonRelatedModelEntity.results.bindings.length; i++) {
                     if (!miscellaneous.isExist(jsonRelatedModelEntity.results.bindings[i].modelEntity.value, relatedModelEntity)) {
                         relatedModelEntity.push(jsonRelatedModelEntity.results.bindings[i].modelEntity.value);
                     }
                 }
 
-                console.log("AddModels relatedModelEntity: ", relatedModelEntity); // fluxList
-                console.log("AddModels membrane and membraneName: ", membrane, membraneName);
+                console.log("modalWindowToAddModels relatedModelEntity: ", relatedModelEntity); // fluxList
 
                 if (relatedModelEntity.length <= 1) {
+                    // console.log("fluxList.length <= 1");
+                    // make flux in modelEntityObj
                     modelEntityObj.push({
                         "model_entity": relatedModelEntity[0],
                         "model_entity2": ""
                     });
 
-                    console.log("AddModels cotransporterList: ", cotransporterList);
-                    console.log("AddModels modelEntityObj: ", modelEntityObj);
+                    console.log("addModels fluxList: ", relatedModelEntity);
+                    console.log("addModels cotransporterList: ", cotransporterList);
+                    console.log("addModels modelEntityObj: ", modelEntityObj);
 
-                    // flag 2 for add models without dragging
+                    // 2 for addModels, i.e., add models window without dragging
                     relatedMembraneModel(membraneName, cotransporterList, 2);
                 }
                 else {
@@ -4840,7 +4845,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         }
                     }
                 }
-
             }, true);
 
         jQuery(window).trigger("resize");
