@@ -282,12 +282,12 @@ var EMP = (function (global) {
                 // pig SGLT2 (PR_P31636) does not exist in PR ontology, assign mouse species instead
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
-                    pr_uri = undefined;
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                    // pr_uri = undefined;
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 }
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
 
                     // dropdown list
                     listOfProteinURIs.push(pr_uri);
@@ -301,7 +301,7 @@ var EMP = (function (global) {
                         if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
                             endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
                         else
-                            endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                            endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                         ajaxUtils.sendGetRequest(
                             endpointgeneOLS,
@@ -311,7 +311,7 @@ var EMP = (function (global) {
                                 if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
                                     endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
                                 else
-                                    endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                    endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                                 ajaxUtils.sendGetRequest(
                                     endpointspeciesOLS,
@@ -507,7 +507,7 @@ var EMP = (function (global) {
             var fma_uri = compartment[i].Compartment.value;
             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
 
-            var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+            var endpointOLS = sparqlUtils.abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
             ajaxUtils.sendGetRequest(
                 endpointOLS,
@@ -527,7 +527,7 @@ var EMP = (function (global) {
                             var fma_uri = location[i].Located_in.value;
                             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
 
-                            var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+                            var endpointOLS = sparqlUtils.abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
                             ajaxUtils.sendGetRequest(
                                 endpointOLS,
@@ -578,11 +578,11 @@ var EMP = (function (global) {
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
                     pr_uri = undefined;
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 }
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(
@@ -591,7 +591,7 @@ var EMP = (function (global) {
 
                         var endpointgeneOLS;
                         if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.has_gene_template == undefined)
-                            endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                            endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                         else
                             endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
 
@@ -601,7 +601,7 @@ var EMP = (function (global) {
 
                                 var endpointspeciesOLS;
                                 if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.only_in_taxon == undefined)
-                                    endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                    endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                 else
                                     endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
 
@@ -1238,7 +1238,7 @@ var EMP = (function (global) {
                                 var indexofColon = chebi_uri.indexOf("CHEBI:");
                                 chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
-                                var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                var endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                 ajaxUtils.sendGetRequest(
                                     endpointOLS,
                                     function (jsonObjOLSChebi) {
@@ -1327,14 +1327,14 @@ var EMP = (function (global) {
 
                                         if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                             chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(medURI.indexOf("CHEBI:") + 6);
-                                            endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                         }
                                         else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
                                             var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(medURI.indexOf("GO:") + 3);
-                                            endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
                                         }
                                         else
-                                            endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;
 
                                         ajaxUtils.sendGetRequest(
                                             endpointOLS,

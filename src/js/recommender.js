@@ -14,7 +14,7 @@ var combinedMembrane = [
         med_pr_text_syn: "P06685",
         model_entity: "chang_fujita_b_1999.cellml#solute_concentrations.J_sc_Na",
         model_entity2: "",
-        protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
+        protein_name: "http://purl.obolibrary.org/obo/CL_0000066",
         sink_fma: "http://identifiers.org/fma/FMA:9673",
         sink_fma2: "",
         solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
@@ -34,7 +34,7 @@ var combinedMembrane = [
     //     med_pr_text_syn: "TSC",
     //     model_entity: "chang_fujita_b_1999.cellml#mc_sodium_flux.J_mc_Na",
     //     model_entity2: "",
-    //     protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
+    //     protein_name: "http://purl.obolibrary.org/obo/CL_0000066",
     //     sink_fma: "http://identifiers.org/fma/FMA:66836",
     //     sink_fma2: "",
     //     solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
@@ -73,7 +73,7 @@ var combinedMembrane = [
     //     med_pr_text_syn: "SCNN1",
     //     model_entity: "chang_fujita_b_1999.cellml#mc_sodium_flux.G_mc_Na",
     //     model_entity2: "",
-    //     protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
+    //     protein_name: "http://purl.obolibrary.org/obo/CL_0000066",
     //     sink_fma: "http://identifiers.org/fma/FMA:66836",
     //     sink_fma2: "channel",
     //     solute_chebi: "http://identifiers.org/chebi/CHEBI:29101",
@@ -92,7 +92,7 @@ var combinedMembrane = [
     //     med_pr_text_syn: "CLCNK1",
     //     model_entity: "chang_fujita_b_1999.cellml#sc_chloride_flux.G_sc_Cl",
     //     model_entity2: "",
-    //     protein_name: "http://purl.obolibrary.org/obo/PR_P13866",
+    //     protein_name: "http://purl.obolibrary.org/obo/CL_0000066",
     //     sink_fma: "http://identifiers.org/fma/FMA:66836",
     //     sink_fma2: "channel",
     //     solute_chebi: "http://identifiers.org/chebi/CHEBI:17996",
@@ -2520,9 +2520,9 @@ var recommender = function (combinedMembrane) {
 
                                         var endpointprOLS;
                                         if (proteinName != undefined)
-                                            endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + proteinName;
+                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + proteinName;
                                         else
-                                            endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                                         ajaxUtils.sendGetRequest(
                                             endpointprOLS,
@@ -2532,7 +2532,7 @@ var recommender = function (combinedMembrane) {
 
                                                 var endpointgeneOLS;
                                                 if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.has_gene_template == undefined)
-                                                    endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                                    endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                                 else
                                                     endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
 
@@ -2544,7 +2544,7 @@ var recommender = function (combinedMembrane) {
 
                                                         var endpointspeciesOLS;
                                                         if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.only_in_taxon == undefined)
-                                                            endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                                            endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                                         else
                                                             endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
 
@@ -2667,9 +2667,9 @@ var recommender = function (combinedMembrane) {
 
                     var endpointprOLS;
                     if (jsonProtein.results.bindings.length == 0)
-                        endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                     else {
-                        endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
                             jsonProtein.results.bindings[0].Protein.value;
                     }
 
@@ -2731,9 +2731,9 @@ var recommender = function (combinedMembrane) {
                     // console.log("jsonAltProtein in alternativeCellmlModel: ", jsonAltProtein);
 
                     if (jsonAltProtein.results.bindings.length == 0)
-                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                     else {
-                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
+                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
                             jsonAltProtein.results.bindings[0].Protein.value;
                     }
 
@@ -2971,7 +2971,7 @@ var recommender = function (combinedMembrane) {
                         showModalWindow(membraneName, flag);
                         return;
                     } else {
-                        endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
                             jsonRelatedMembraneModel.results.bindings[0].Protein.value;
                     }
 
@@ -2995,7 +2995,7 @@ var recommender = function (combinedMembrane) {
                                         var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value,
                                             indexofColon = chebi_uri.indexOf("CHEBI:");
                                         chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
-                                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                     }
 
                                     ajaxUtils.sendGetRequest(
@@ -3011,7 +3011,7 @@ var recommender = function (combinedMembrane) {
                                                     indexofColon2 = chebi_uri2.indexOf("CHEBI:");
                                                 chebi_uri2 = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri2.slice(indexofColon2 + 6);
 
-                                                endpointOLS2 = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri2;
+                                                endpointOLS2 = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri2;
                                             }
 
                                             ajaxUtils.sendGetRequest(
@@ -3272,15 +3272,15 @@ var recommender = function (combinedMembrane) {
                                                     if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                                         var indexofColon = medURI.indexOf("CHEBI:");
                                                         chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
-                                                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                                     }
                                                     else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
                                                         var indexofColon = medURI.indexOf("GO:");
                                                         var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
-                                                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
+                                                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
                                                     }
                                                     else
-                                                        endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
+                                                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;
 
                                                     ajaxUtils.sendGetRequest(
                                                         endpointOLS,

@@ -16,6 +16,7 @@ function getRequestObject() {
 // Makes an Ajax GET request to 'requestUrl'
 var sendGetRequest = function (requestUrl, responseHandler, isJsonResponse) {
     var request = getRequestObject();
+
     request.onreadystatechange = function () {
         handleResponse(request, responseHandler, isJsonResponse);
     };
@@ -67,6 +68,7 @@ var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonRes
 // function if response is ready
 // and not an error
 function handleResponse(request, responseHandler, isJsonResponse) {
+
     if ((request.readyState == 4) && (request.status == 200)) {
 
         // Default to isJsonResponse = true

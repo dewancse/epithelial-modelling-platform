@@ -7,6 +7,9 @@ var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
     // endpoint = cors_api_url + pmrEndpoint;
     endpoint = pmrEndpoint;
 
+var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/ontologies";
+var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
+
 var organ = [
     {
         "key": [
@@ -617,3 +620,5 @@ exports.processCombinedMembrane = processCombinedMembrane;
 exports.relatedMembraneModelSPARQL = relatedMembraneModelSPARQL;
 exports.modalWindowToAddModelsSPARQL = modalWindowToAddModelsSPARQL;
 exports.concentrationOPBSPARQL = concentrationOPBSPARQL;
+exports.ebiOntoEndpoint = ebiOntoEndpoint;
+exports.abiOntoEndpoint = abiOntoEndpoint;

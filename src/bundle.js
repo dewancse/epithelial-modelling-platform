@@ -597,6 +597,9 @@ var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
     // endpoint = cors_api_url + pmrEndpoint;
     endpoint = pmrEndpoint;
 
+var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/ontologies";
+var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
+
 var organ = [
     {
         "key": [
@@ -1207,6 +1210,8 @@ exports.processCombinedMembrane = processCombinedMembrane;
 exports.relatedMembraneModelSPARQL = relatedMembraneModelSPARQL;
 exports.modalWindowToAddModelsSPARQL = modalWindowToAddModelsSPARQL;
 exports.concentrationOPBSPARQL = concentrationOPBSPARQL;
+exports.ebiOntoEndpoint = ebiOntoEndpoint;
+exports.abiOntoEndpoint = abiOntoEndpoint;
 
 /***/ }),
 /* 2 */
@@ -1230,6 +1235,7 @@ function getRequestObject() {
 // Makes an Ajax GET request to 'requestUrl'
 var sendGetRequest = function (requestUrl, responseHandler, isJsonResponse) {
     var request = getRequestObject();
+
     request.onreadystatechange = function () {
         handleResponse(request, responseHandler, isJsonResponse);
     };
@@ -1281,6 +1287,7 @@ var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonRes
 // function if response is ready
 // and not an error
 function handleResponse(request, responseHandler, isJsonResponse) {
+
     if ((request.readyState == 4) && (request.status == 200)) {
 
         // Default to isJsonResponse = true
@@ -1596,12 +1603,12 @@ var EMP = (function (global) {
                 // pig SGLT2 (PR_P31636) does not exist in PR ontology, assign mouse species instead
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
-                    pr_uri = undefined;
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                    // pr_uri = undefined;
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 }
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
 
                     // dropdown list
                     listOfProteinURIs.push(pr_uri);
@@ -1615,7 +1622,7 @@ var EMP = (function (global) {
                         if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
                             endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
                         else
-                            endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                            endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                         ajaxUtils.sendGetRequest(
                             endpointgeneOLS,
@@ -1625,7 +1632,7 @@ var EMP = (function (global) {
                                 if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
                                     endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
                                 else
-                                    endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                    endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                                 ajaxUtils.sendGetRequest(
                                     endpointspeciesOLS,
@@ -1821,7 +1828,7 @@ var EMP = (function (global) {
             var fma_uri = compartment[i].Compartment.value;
             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
 
-            var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+            var endpointOLS = sparqlUtils.abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
             ajaxUtils.sendGetRequest(
                 endpointOLS,
@@ -1841,7 +1848,7 @@ var EMP = (function (global) {
                             var fma_uri = location[i].Located_in.value;
                             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
 
-                            var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/fma/terms?iri=" + fma_uri;
+                            var endpointOLS = sparqlUtils.abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
                             ajaxUtils.sendGetRequest(
                                 endpointOLS,
@@ -1892,11 +1899,11 @@ var EMP = (function (global) {
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
                     pr_uri = undefined;
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 }
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                    endpointproteinOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + pr_uri;
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(
@@ -1905,7 +1912,7 @@ var EMP = (function (global) {
 
                         var endpointgeneOLS;
                         if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.has_gene_template == undefined)
-                            endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                            endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                         else
                             endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
 
@@ -1915,7 +1922,7 @@ var EMP = (function (global) {
 
                                 var endpointspeciesOLS;
                                 if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.only_in_taxon == undefined)
-                                    endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                    endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                 else
                                     endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
 
@@ -2552,7 +2559,7 @@ var EMP = (function (global) {
                                 var indexofColon = chebi_uri.indexOf("CHEBI:");
                                 chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
-                                var endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                var endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                 ajaxUtils.sendGetRequest(
                                     endpointOLS,
                                     function (jsonObjOLSChebi) {
@@ -2641,14 +2648,14 @@ var EMP = (function (global) {
 
                                         if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                             chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(medURI.indexOf("CHEBI:") + 6);
-                                            endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                         }
                                         else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
                                             var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(medURI.indexOf("GO:") + 3);
-                                            endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
                                         }
                                         else
-                                            endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;
 
                                         ajaxUtils.sendGetRequest(
                                             endpointOLS,
@@ -3464,9 +3471,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // add models without dragging
     $(document).on("click", function () {
 
-        console.log("click FUNCTION event: ", event);
+        console.log("click FUNCTION!");
 
-        // checkbox disabled when one is active on the recommender system
         var totalCheckboxes = $("#myModal input:checkbox").length,
             numberOfChecked = $("#myModal input:checkbox:checked").length,
             numberOfNotChecked = totalCheckboxes - numberOfChecked;
@@ -3488,12 +3494,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         console.log("click function -> combinedMembrane: ", combinedMembrane);
+
         console.log("click function -> linewithlineg, circlewithlineg: ", linewithlineg, circlewithlineg);
         console.log("click function -> dx, dy: ", dx, dy);
 
-        // add models without dragging, i.e., clicking on apical or basolateral membrane
+        // Change marker direction and text position
         if (event.target.localName == "line" && event.target.nodeName == "line") {
-            // console.log("event.srcElement.id: ", event.srcElement.id);
+            console.log("event.srcElement.id: ", event.srcElement.id);
             if (event.srcElement.id == sparqlUtils.apicalID || event.srcElement.id == sparqlUtils.basolateralID)
                 modalWindowToAddModels(event.srcElement.id);
         }
@@ -5909,7 +5916,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var dropcircle = function () {
 
-        console.log("dropcircle!!!!!!");
+        console.log("dropcircle!");
 
         // div.style("display", "none");
 
@@ -5929,6 +5936,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 $("#myWelcomeModal").modal({backdrop: "static", keyboard: false});
                 m.show();
+
+                console.log("BEFORE function welcomeModal (options): ", combinedMembrane);
 
                 function welcomeModal(options) {
                     var $this = this;
@@ -5989,6 +5998,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         // Yes button clicked!!
                         $("#saveID").click(function (event) {
 
+                            console.log("BEFORE Yes clicked: ", combinedMembrane);
+
                             console.log("Yes clicked!");
                             console.log("first save button clicked!");
 
@@ -6036,9 +6047,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                     var endpointprOLS;
                                     if (proteinName != undefined)
-                                        endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + proteinName;
+                                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + proteinName;
                                     else
-                                        endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                                     ajaxUtils.sendGetRequest(
                                         endpointprOLS,
@@ -6046,7 +6057,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                             var endpointgeneOLS;
                                             if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.has_gene_template == undefined)
-                                                endpointgeneOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                                endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                             else
                                                 endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
 
@@ -6056,7 +6067,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                     var endpointspeciesOLS;
                                                     if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.only_in_taxon == undefined)
-                                                        endpointspeciesOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                                                        endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                                     else
                                                         endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
 
@@ -6104,7 +6115,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                             jQuery(window).trigger("resize");
 
-                            console.log("END OF WELCOMESAVE!!!");
+                            console.log("END OF WELCOME SAVE -> combinedMembrane: ", combinedMembrane);
                             // reinitialization
                             // reinitVariable();
                             // return;
@@ -6150,6 +6161,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             else
                 $($("line")[mindex]).css("stroke", "green");
         }
+
+        console.log("END of dropcircle combinedMembrane: ", combinedMembrane);
     };
 
     var dragcircleunchecked = function () {
@@ -6181,9 +6194,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 var endpointprOLS;
                 if (jsonProtein.results.bindings.length == 0)
-                    endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                    endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 else {
-                    endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
+                    endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
                         jsonProtein.results.bindings[0].Protein.value;
                 }
 
@@ -6243,9 +6256,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             function (jsonAltProtein) {
 
                 if (jsonAltProtein.results.bindings.length == 0)
-                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr";
+                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 else {
-                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
+                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
                         jsonAltProtein.results.bindings[0].Protein.value;
                 }
 
@@ -6378,6 +6391,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                     console.log("makecotransporter: combinedMembrane -> ", combinedMembrane);
 
+
                     relatedMembraneModel(membraneName, cotransporterList, flag);
                 }
             },
@@ -6498,7 +6512,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     showModalWindow(membraneName, flag);
                     return;
                 } else {
-                    endpointprOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" +
+                    endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
                         jsonRelatedMembraneModel.results.bindings[0].Protein.value;
                 }
 
@@ -6524,7 +6538,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value,
                                         indexofColon = chebi_uri.indexOf("CHEBI:");
                                     chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
-                                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                 }
 
                                 ajaxUtils.sendGetRequest(
@@ -6540,7 +6554,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 indexofColon2 = chebi_uri2.indexOf("CHEBI:");
                                             chebi_uri2 = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri2.slice(indexofColon2 + 6);
 
-                                            endpointOLS2 = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri2;
+                                            endpointOLS2 = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri2;
                                         }
 
                                         ajaxUtils.sendGetRequest(
@@ -6800,15 +6814,15 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                                     var indexofColon = medURI.indexOf("CHEBI:");
                                                     chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
-                                                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/chebi/terms?iri=" + chebi_uri;
+                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                                 }
                                                 else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
                                                     var indexofColon = medURI.indexOf("GO:");
                                                     var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
-                                                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/go/terms?iri=" + go_uri;
+                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
                                                 }
                                                 else
-                                                    endpointOLS = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies/pr/terms?iri=" + medURI;
+                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;
 
                                                 ajaxUtils.sendGetRequest(
                                                     endpointOLS,
@@ -7229,6 +7243,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     };
 
     // circles, polygons and arrows move back if close clicked
+    // circles, polygons and arrows move back if close clicked
     var moveBack = function () {
         if (linewithlineg[icircleGlobal] != undefined) {
             linewithlineg[icircleGlobal]
@@ -7317,7 +7332,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 yvalueb += ydistance;
                 break;
             }
-            if ($("line")[i].id == $(cthis).attr("membrane") && i == 1) {
+            if ($("line")[i].id == $(this).attr("membrane") && i == 1) {
                 lineapical
                     .transition()
                     .delay(1000)
@@ -7546,7 +7561,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var Modal = function (options) {
 
-        console.log("Modal!!!");
+        console.log("Modal function");
 
         var $this = this;
 
@@ -7621,6 +7636,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             // save button clicked!!
             $("#msaveID").click(function (event) {
 
+                console.log("#msaveID: ", combinedMembrane);
                 console.log("second save button clicked!");
 
                 // add models without dragging
@@ -7682,6 +7698,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                         $(cthis).attr("id", $("#membraneModelsID input")[i].id);
                         console.log("cthis AFTER: ", cthis);
+
+                        console.log("$(#membraneModelsID input): ", combinedMembrane);
                     }
                 }
 
@@ -7978,10 +7996,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         $this.setHeader($this.options.header);
     };
 
-    // add models without dragging, i.e., clicking on apical or basolateral membrane
+    // display modal window after clicking either apical or basolateral membrane
     function modalWindowToAddModels(located_in) {
 
-        console.log("AddModels located_in: ", located_in);
+        console.log("modalWindowToAddModels located_in: ", located_in);
 
         var membraneName;
         if (located_in == sparqlUtils.apicalID)
@@ -8010,25 +8028,28 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             query,
             function (jsonRelatedModelEntity) {
 
+                console.log("modalWindowToAddModels jsonRelatedModelEntity: ", jsonRelatedModelEntity, combinedMembrane);
                 for (var i = 0; i < jsonRelatedModelEntity.results.bindings.length; i++) {
                     if (!miscellaneous.isExist(jsonRelatedModelEntity.results.bindings[i].modelEntity.value, relatedModelEntity)) {
                         relatedModelEntity.push(jsonRelatedModelEntity.results.bindings[i].modelEntity.value);
                     }
                 }
 
-                console.log("AddModels relatedModelEntity: ", relatedModelEntity); // fluxList
-                console.log("AddModels membrane and membraneName: ", membrane, membraneName);
+                console.log("modalWindowToAddModels relatedModelEntity: ", relatedModelEntity); // fluxList
 
                 if (relatedModelEntity.length <= 1) {
+                    // console.log("fluxList.length <= 1");
+                    // make flux in modelEntityObj
                     modelEntityObj.push({
                         "model_entity": relatedModelEntity[0],
                         "model_entity2": ""
                     });
 
-                    console.log("AddModels cotransporterList: ", cotransporterList);
-                    console.log("AddModels modelEntityObj: ", modelEntityObj);
+                    console.log("addModels fluxList: ", relatedModelEntity);
+                    console.log("addModels cotransporterList: ", cotransporterList);
+                    console.log("addModels modelEntityObj: ", modelEntityObj);
 
-                    // flag 2 for add models without dragging
+                    // 2 for addModels, i.e., add models window without dragging
                     relatedMembraneModel(membraneName, cotransporterList, 2);
                 }
                 else {
@@ -8038,7 +8059,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         }
                     }
                 }
-
             }, true);
 
         jQuery(window).trigger("resize");
