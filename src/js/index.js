@@ -280,6 +280,7 @@ var EMP = (function (global) {
                 }
 
                 // pig SGLT2 (PR_P31636) does not exist in PR ontology, assign mouse species instead
+                // PR_P31636 is added in PR ontology
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
                     // pr_uri = undefined;
@@ -287,7 +288,11 @@ var EMP = (function (global) {
                 }
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+
+                    if (pr_uri == sparqlUtils.epithelialcellID)
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
 
                     // dropdown list
                     listOfProteinURIs.push(pr_uri);
@@ -577,12 +582,16 @@ var EMP = (function (global) {
 
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
-                    pr_uri = undefined;
+                    // pr_uri = undefined;
                     endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 }
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
-                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+
+                    if (pr_uri == sparqlUtils.epithelialcellID)
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(

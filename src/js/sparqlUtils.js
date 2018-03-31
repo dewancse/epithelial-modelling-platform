@@ -155,9 +155,11 @@ var searchHtml = "./snippets/search-snippet.html";
 var similarityHtml = "./snippets/similarity-snippet.html";
 var epithelialHtml = "./snippets/epithelial-snippet.html";
 
+var epithelialcellID = "http://purl.obolibrary.org/obo/CL_0000066";
 var apicalID = "http://identifiers.org/fma/FMA:84666";
 var basolateralID = "http://identifiers.org/fma/FMA:84669";
 var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
+var partOfCellUri = "http://purl.obolibrary.org/obo/CL";
 var partOfGOUri = "http://identifiers.org/go/GO";
 var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
 var fluxOPB = "http://identifiers.org/opb/OPB_00593";
@@ -622,3 +624,4 @@ exports.modalWindowToAddModelsSPARQL = modalWindowToAddModelsSPARQL;
 exports.concentrationOPBSPARQL = concentrationOPBSPARQL;
 exports.ebiOntoEndpoint = ebiOntoEndpoint;
 exports.abiOntoEndpoint = abiOntoEndpoint;
+exports.epithelialcellID = epithelialcellID;

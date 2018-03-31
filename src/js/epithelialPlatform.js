@@ -2841,8 +2841,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                         proteinName = jsonModel.results.bindings[0].Protein.value;
 
                                     var endpointprOLS;
-                                    if (proteinName != undefined)
-                                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + proteinName;
+                                    if (proteinName != undefined) {
+                                        if (proteinName == sparqlUtils.epithelialcellID)
+                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + proteinName;
+                                        else
+                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + proteinName;
+                                    }
                                     else
                                         endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
@@ -2991,8 +2995,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 if (jsonProtein.results.bindings.length == 0)
                     endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 else {
-                    endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
-                        jsonProtein.results.bindings[0].Protein.value;
+                    var pr_uri = jsonProtein.results.bindings[0].Protein.value;
+                    if (pr_uri == sparqlUtils.epithelialcellID)
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(
@@ -3053,8 +3060,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 if (jsonAltProtein.results.bindings.length == 0)
                     endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 else {
-                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
-                        jsonAltProtein.results.bindings[0].Protein.value;
+                    var pr_uri = jsonAltProtein.results.bindings[0].Protein.value;
+                    if (pr_uri == sparqlUtils.epithelialcellID)
+                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else
+                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(
@@ -3307,8 +3317,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     showModalWindow(membraneName, flag);
                     return;
                 } else {
-                    endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" +
-                        jsonRelatedMembraneModel.results.bindings[0].Protein.value;
+                    var pr_uri = jsonRelatedMembraneModel.results.bindings[0].Protein.value;
+                    if (pr_uri == sparqlUtils.epithelialcellID)
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(
