@@ -1652,22 +1652,22 @@ var EMP = (function (global) {
 
                                         // species
                                         if (jsonSpecies._embedded == undefined)
-                                            speciesList.push("Undefined");
+                                            speciesList.push("Numerical model"); // Or undefined
                                         else
                                             speciesList.push(jsonSpecies._embedded.terms[0].label);
 
                                         // gene
                                         if (jsonGene._embedded == undefined)
-                                            geneList.push("Undefined");
+                                            geneList.push("Numerical model"); // Or undefined
                                         else {
                                             var geneName = jsonGene._embedded.terms[0].label;
                                             geneName = geneName.slice(0, geneName.indexOf("(") - 1);
-                                            geneList.push(geneName);
+                                            geneList.push(geneName); // Or undefined
                                         }
 
                                         // protein
                                         if (jsonProtein._embedded == undefined)
-                                            proteinList.push("Undefined");
+                                            proteinList.push("Numerical model"); // Or undefined
                                         else {
                                             var proteinName = jsonProtein._embedded.terms[0].label;
                                             proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
@@ -1707,7 +1707,7 @@ var EMP = (function (global) {
 
         if (!sessionStorage.getItem("searchListContent")) {
 
-            // console.log("loadSearchHtml IF");
+            console.log("loadSearchHtml IF");
 
             ajaxUtils.sendGetRequest(
                 sparqlUtils.searchHtml,
@@ -1717,11 +1717,12 @@ var EMP = (function (global) {
                 false);
         }
         else {
-            // console.log("loadSearchHtml ELSE");
+            console.log("loadSearchHtml ELSE");
 
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
             filterByProtein(); // reload protein in the dropdown list
+
             mainUtils.showDiscoverModels(
                 head,
                 modelEntity,
@@ -1739,6 +1740,7 @@ var EMP = (function (global) {
         // Empty search result
         if (head.length == 0) {
             $("#searchList").html("<section class=container-fluid><label><br>No Search Results!</label></section>");
+            $("#searchTxt").attr("value", "");
             return;
         }
 
@@ -1974,12 +1976,12 @@ var EMP = (function (global) {
 
                                                                 var species, gene, protein;
                                                                 if (jsonSpecies._embedded == undefined)
-                                                                    species = "Undefined";
+                                                                    species = "Numerical model"; // Or undefined
                                                                 else
                                                                     species = jsonSpecies._embedded.terms[0].label;
 
                                                                 if (jsonGene._embedded == undefined)
-                                                                    gene = "Undefined";
+                                                                    gene = "Numerical model"; // Or undefined
                                                                 else {
                                                                     var geneName = jsonGene._embedded.terms[0].label;
                                                                     geneName = geneName.slice(0, geneName.indexOf("(") - 1);
@@ -1987,7 +1989,7 @@ var EMP = (function (global) {
                                                                 }
 
                                                                 if (jsonProtein._embedded == undefined)
-                                                                    protein = "Undefined";
+                                                                    protein = "Numerical model"; // Or undefined
                                                                 else {
                                                                     var proteinName = jsonProtein._embedded.terms[0].label;
                                                                     proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
@@ -2154,21 +2156,23 @@ var EMP = (function (global) {
 
     // FILTER BY PROTEIN: filter search results in MODEL DISCOVERY
     mainUtils.filterSearchHtml = function () {
-        // console.log("mainUtils.filterSearchHtml!");
 
         if ($("#membraneId").val() == "all") {
             $("table tr").show();
-            // console.log("IF: ", $("#membraneId").val());
+            console.log("IF: ", $("#membraneId").val());
         }
         else {
             var selectedprotein = $("#membraneId option:selected").val();
 
-            // console.log("selectedprotein: ", selectedprotein);
+            console.log("ELSE selectedprotein: ", selectedprotein);
+            console.log("ELSE (table tr): ", $("table tr"));
 
             for (var i = 1; i < $("table tr").length; i++) {
 
                 var tempstr = $("table tr")[i];
                 tempstr = $($(tempstr).find("input")).attr("uri");
+
+                console.log("ELSE tempstr: ", tempstr);
 
                 if (selectedprotein == tempstr)
                     $("table tr")[i].hidden = false;
@@ -2180,7 +2184,6 @@ var EMP = (function (global) {
 
     // FILTER BY PROTEIN: filter dropdown list in MODEL DISCOVERY
     var filterByProtein = function () {
-        // console.log("filterByProtein!");
 
         // Initialize dropdown list
         $("#membraneId").empty();
@@ -2194,6 +2197,9 @@ var EMP = (function (global) {
         tmpProteinList = tmpProteinList.filter(function (item, pos) {
             return tmpProteinList.indexOf(item) == pos;
         });
+
+        console.log("tmpProteinList: ", tmpProteinList);
+        console.log("listOfProteinURIs: ", listOfProteinURIs);
 
         for (var i in tmpProteinList) {
             $("#membraneId").append("<option value=" + listOfProteinURIs[i] + ">" + tmpProteinList[i] + "</option>");
@@ -6092,7 +6098,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         function (jsonSpecies) {
 
                                                             if (jsonPr._embedded == undefined)
-                                                                proteinText = "undefined";
+                                                                proteinText = "Numerical model"; // Or undefined
                                                             else {
                                                                 proteinText = jsonPr._embedded.terms[0].label;
                                                                 proteinText = proteinText.slice(0, proteinText.indexOf("(") - 1);
@@ -6110,12 +6116,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             }
 
                                                             if (jsonSpecies._embedded == undefined)
-                                                                speciesName = "undefined";
+                                                                speciesName = "Numerical model"; // Or undefined
                                                             else
                                                                 speciesName = jsonSpecies._embedded.terms[0].label;
 
                                                             if (jsonGene._embedded == undefined)
-                                                                geneName = "undefined";
+                                                                geneName = "Numerical model"; // Or undefined
                                                             else {
                                                                 geneName = jsonGene._embedded.terms[0].label;
                                                                 geneName = geneName.slice(0, geneName.indexOf("(") - 1);

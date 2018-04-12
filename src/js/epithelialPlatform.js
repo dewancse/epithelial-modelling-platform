@@ -2875,7 +2875,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         function (jsonSpecies) {
 
                                                             if (jsonPr._embedded == undefined)
-                                                                proteinText = "undefined";
+                                                                proteinText = "Numerical model"; // Or undefined
                                                             else {
                                                                 proteinText = jsonPr._embedded.terms[0].label;
                                                                 proteinText = proteinText.slice(0, proteinText.indexOf("(") - 1);
@@ -2893,12 +2893,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             }
 
                                                             if (jsonSpecies._embedded == undefined)
-                                                                speciesName = "undefined";
+                                                                speciesName = "Numerical model"; // Or undefined
                                                             else
                                                                 speciesName = jsonSpecies._embedded.terms[0].label;
 
                                                             if (jsonGene._embedded == undefined)
-                                                                geneName = "undefined";
+                                                                geneName = "Numerical model"; // Or undefined
                                                             else {
                                                                 geneName = jsonGene._embedded.terms[0].label;
                                                                 geneName = geneName.slice(0, geneName.indexOf("(") - 1);

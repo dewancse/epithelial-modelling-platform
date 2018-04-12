@@ -1,6 +1,15 @@
 ### Epithelial Modelling Platform (EPM)
 Epithelial modelling platform is a web-based epithelial transport discovery, exploration and assembly tool. It allows users to discover, explore and assemble computational models for investigating their experimental or clinical hypotheses. In particular, this platform will aid biologists and clinicians to test their clinical or experimental hypotheses for a given collection of disparate mechanisms and/or observations such as diseases, drug actions and clinical observations.
 
+### Installing EPM
+Please do the following steps to clone the EPM in your workspace:
+
+- git clone https://github.com/dewancse/epithelial-modelling-platform.git
+- run the "server.js" with this command: "node ./src/js/server.js"
+- open "index.html" in the browser
+- install "CORS Toggle" to deal with cross browser origin issue.
+- if you change something in any js files of the project, you need to execute webpack with this command: "webpack --progress --profile" 
+
 ### EPM workflow
 
 #### Discover CellML Models
