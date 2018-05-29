@@ -152,6 +152,7 @@ var homeHtml = "./snippets/home-snippet.html";
 var viewHtml = "./snippets/view-snippet.html";
 var modelHtml = "./snippets/model-snippet.html";
 var searchHtml = "./snippets/search-snippet.html";
+var usecaseHtml = "./snippets/usecase-snippet.html";
 var similarityHtml = "./snippets/similarity-snippet.html";
 var epithelialHtml = "./snippets/epithelial-snippet.html";
 
@@ -197,6 +198,20 @@ var makecotransporterSPARQL = function (membrane1, membrane2) {
 
     return query;
 };
+
+var mediatorSPARQL = function (modelEntity) {
+    var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+        "SELECT ?mediator " +
+        "WHERE { " +
+        "<" + modelEntity + "> semsim:isComputationalComponentFor ?model_prop. " +
+        "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+        "?model_proc semsim:hasMediatorParticipant ?model_medparticipant. " +
+        "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. " +
+        "?med_entity semsim:hasPhysicalDefinition ?mediator. " +
+        "}";
+
+    return query;
+}
 
 var srcDescMediatorOfFluxesSPARQL = function (cellmlModelEntity, model) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -598,11 +613,13 @@ exports.homeHtml = homeHtml;
 exports.viewHtml = viewHtml;
 exports.modelHtml = modelHtml;
 exports.searchHtml = searchHtml;
+exports.usecaseHtml = usecaseHtml;
 exports.similarityHtml = similarityHtml;
 exports.epithelialHtml = epithelialHtml;
 exports.apicalID = apicalID;
 exports.basolateralID = basolateralID;
 exports.partOfProteinUri = partOfProteinUri;
+exports.partOfCellUri = partOfCellUri;
 exports.partOfGOUri = partOfGOUri;
 exports.partOfCHEBIUri = partOfCHEBIUri;
 exports.fluxOPB = fluxOPB;
@@ -625,3 +642,4 @@ exports.concentrationOPBSPARQL = concentrationOPBSPARQL;
 exports.ebiOntoEndpoint = ebiOntoEndpoint;
 exports.abiOntoEndpoint = abiOntoEndpoint;
 exports.epithelialcellID = epithelialcellID;
+exports.mediatorSPARQL = mediatorSPARQL;

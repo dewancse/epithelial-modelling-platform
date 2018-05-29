@@ -298,76 +298,98 @@ var EMP = (function (global) {
                     listOfProteinURIs.push(pr_uri);
                 }
 
-                ajaxUtils.sendGetRequest(
-                    endpointproteinOLS,
-                    function (jsonProtein) {
+                var query = sparqlUtils.mediatorSPARQL(jsonModel.results.bindings[discoverIndex].Model_entity.value);
 
-                        var endpointgeneOLS;
-                        if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
-                            endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
-                        else
-                            endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
+                ajaxUtils.sendPostRequest(
+                    sparqlUtils.endpoint,
+                    query,
+                    function (jsonepithelialobj) {
+
+                        // epithelial cell
+                        if (pr_uri == sparqlUtils.epithelialcellID) {
+                            for (var i = 0; i < jsonepithelialobj.results.bindings.length; i++) {
+                                var temp = jsonepithelialobj.results.bindings[i].mediator.value;
+
+                                if (temp.indexOf(sparqlUtils.partOfProteinUri) != -1) {
+                                    var mediatorURI = jsonepithelialobj.results.bindings[i].mediator.value;
+                                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + mediatorURI;
+                                    break;
+                                }
+                            }
+                        }
 
                         ajaxUtils.sendGetRequest(
-                            endpointgeneOLS,
-                            function (jsonGene) {
+                            endpointproteinOLS,
+                            function (jsonProtein) {
 
-                                var endpointspeciesOLS;
-                                if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
-                                    endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
+                                var endpointgeneOLS;
+                                if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
+                                    endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
                                 else
-                                    endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
+                                    endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                                 ajaxUtils.sendGetRequest(
-                                    endpointspeciesOLS,
-                                    function (jsonSpecies) {
+                                    endpointgeneOLS,
+                                    function (jsonGene) {
 
-                                        // model and biological meaning
-                                        modelEntity.push(jsonModel.results.bindings[discoverIndex].Model_entity.value);
-                                        biologicalMeaning.push(jsonModel.results.bindings[discoverIndex].Biological_meaning.value);
-
-                                        // species
-                                        if (jsonSpecies._embedded == undefined)
-                                            speciesList.push("Numerical model"); // Or undefined
+                                        var endpointspeciesOLS;
+                                        if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
+                                            endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
                                         else
-                                            speciesList.push(jsonSpecies._embedded.terms[0].label);
+                                            endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
-                                        // gene
-                                        if (jsonGene._embedded == undefined)
-                                            geneList.push("Numerical model"); // Or undefined
-                                        else {
-                                            var geneName = jsonGene._embedded.terms[0].label;
-                                            geneName = geneName.slice(0, geneName.indexOf("(") - 1);
-                                            geneList.push(geneName); // Or undefined
-                                        }
+                                        ajaxUtils.sendGetRequest(
+                                            endpointspeciesOLS,
+                                            function (jsonSpecies) {
 
-                                        // protein
-                                        if (jsonProtein._embedded == undefined)
-                                            proteinList.push("Numerical model"); // Or undefined
-                                        else {
-                                            var proteinName = jsonProtein._embedded.terms[0].label;
-                                            proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
-                                            proteinList.push(proteinName);
-                                        }
+                                                // model and biological meaning
+                                                modelEntity.push(jsonModel.results.bindings[discoverIndex].Model_entity.value);
+                                                biologicalMeaning.push(jsonModel.results.bindings[discoverIndex].Biological_meaning.value);
 
-                                        head = ["Model_entity", "Biological_meaning", "Species", "Gene", "Protein"];
+                                                // species
+                                                if (jsonSpecies._embedded == undefined)
+                                                    speciesList.push("Numerical model"); // Or undefined
+                                                else
+                                                    speciesList.push(jsonSpecies._embedded.terms[0].label);
 
-                                        mainUtils.showDiscoverModels();
+                                                // gene
+                                                if (jsonGene._embedded == undefined)
+                                                    geneList.push("Numerical model"); // Or undefined
+                                                else {
+                                                    var geneName = jsonGene._embedded.terms[0].label;
+                                                    geneName = geneName.slice(0, geneName.indexOf("(") - 1);
+                                                    geneList.push(geneName); // Or undefined
+                                                }
 
-                                        discoverIndex++; // increment index of modelEntity
+                                                // protein
+                                                if (jsonProtein._embedded == undefined)
+                                                    proteinList.push("Numerical model"); // Or undefined
+                                                else {
+                                                    var proteinName = jsonProtein._embedded.terms[0].label;
+                                                    proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
+                                                    proteinList.push(proteinName);
+                                                }
 
-                                        if (discoverIndex == jsonModel.results.bindings.length) {
+                                                head = ["Model_entity", "Biological_meaning", "Species", "Gene", "Protein"];
 
-                                            listOfProteinURIs = listOfProteinURIs.filter(function (item, pos) {
-                                                return listOfProteinURIs.indexOf(item) == pos;
-                                            });
+                                                mainUtils.showDiscoverModels();
 
-                                            // dropdown list
-                                            filterByProtein();
-                                            return;
-                                        }
+                                                discoverIndex++; // increment index of modelEntity
 
-                                        mainUtils.discoverModels(jsonModel); // callback
+                                                if (discoverIndex == jsonModel.results.bindings.length) {
+
+                                                    listOfProteinURIs = listOfProteinURIs.filter(function (item, pos) {
+                                                        return listOfProteinURIs.indexOf(item) == pos;
+                                                    });
+
+                                                    // dropdown list
+                                                    filterByProtein();
+                                                    return;
+                                                }
+
+                                                mainUtils.discoverModels(jsonModel); // callback
+                                            },
+                                            true);
                                     },
                                     true);
                             },

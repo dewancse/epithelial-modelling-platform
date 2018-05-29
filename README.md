@@ -86,4 +86,4 @@ Need to solve the TODOs under the `Quality control` section.
 MIT license!
 
 ### Acknowledgements
-This project is supported by the MedTech Centre of Research Excellence (MedTech CoRE) and the Auckland Bioengineering Institute.
+This project is supported by the MedTech Centre of Research Excellence (MedTech CoRE), the Aotearoa Foundation, and the Auckland Bioengineering Institute.
