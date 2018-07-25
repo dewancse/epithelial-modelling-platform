@@ -45,7 +45,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
                 .style("font", "16px sans-serif")
                 .attr("stroke", "purple")
                 .attr("opacity", 0.5)
-                .attr("x", 850)
+                .attr("x", 960)
                 .attr("y", 70)
                 .text("Luminal Compartment");
 
@@ -66,7 +66,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
                 .style("font", "16px sans-serif")
                 .attr("stroke", "blue")
                 .attr("opacity", 0.5)
-                .attr("x", 850)
+                .attr("x", 960)
                 .attr("y", 95)
                 .text("Cytosol Compartment");
 
@@ -87,7 +87,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
                 .style("font", "16px sans-serif")
                 .attr("stroke", "teal")
                 .attr("opacity", 0.5)
-                .attr("x", 850)
+                .attr("x", 960)
                 .attr("y", 120)
                 .text("Interstitial Fluid");
 
@@ -95,6 +95,28 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
         })
         .attr("stroke-width", 1)
         .attr("fill", "white");
+
+    // Blood capillary rectangle
+    var bloodcapillary = newg.append("rect")
+        .attr("id", sparqlUtils.bloodCapillary)
+        .attr("x", w + 20 + 40)
+        .attr("y", 0)
+        .attr("width", 70)
+        .attr("height", h)
+        .attr("stroke", function (d) {
+            svg.append("text")
+                .style("font", "16px sans-serif")
+                .attr("stroke", "darkred")
+                // .attr("opacity", 0.5)
+                .attr("x", 960)
+                .attr("y", 145)
+                .text("Blood Capillary");
+
+            return "red";
+        })
+        .attr("stroke-width", 1)
+        .attr("fill", "darkred");
+        // .attr("opacity", 0.5);
 
     // Paracellular rectangle
     var paracellular = newg.append("rect")
@@ -108,8 +130,8 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
                 .style("font", "16px sans-serif")
                 .attr("stroke", "violet")
                 .attr("opacity", 0.5)
-                .attr("x", 850)
-                .attr("y", 145)
+                .attr("x", 960)
+                .attr("y", 170)
                 .text("Paracellular Pathway");
 
             return "violet";

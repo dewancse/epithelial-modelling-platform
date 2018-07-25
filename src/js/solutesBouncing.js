@@ -3,16 +3,25 @@
  */
 var solutesBouncing = function (newg, solutes) {
 
+    console.log("solutes: ", solutes);
+    console.log("solutes.compartment: ", solutes.compartment);
+
     var nodes = [],
         m = 10,
         maxSpeed = 1,
         color = d3.scaleOrdinal(d3.schemeCategory20).domain(d3.range(m));
 
     for (var i = 0; i < solutes.length; i++) {
+
+        var colour;
+        if (solutes[i].compartment == "http://identifiers.org/fma/FMA:263901")
+            colour = "white";
+        else colour = color(Math.floor(Math.random() * m)); // assuming initial text length is 100
+
         nodes.push({
             text: solutes[i].value,
             // fma: solutes[i].fma,
-            color: color(Math.floor(Math.random() * m)), // assuming initial text length is 100
+            color: colour,
             x: Math.random() * ((solutes[i].xrect + solutes[i].width) - (solutes[i].xrect + 100)) + (solutes[i].xrect),
             y: Math.random() * ((solutes[i].yrect + solutes[i].height) - solutes[i].yrect) + solutes[i].yrect,
             speedX: Math.random() * maxSpeed,

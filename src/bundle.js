@@ -708,6 +708,16 @@ var dictionary = [
         "chebi": "<http://identifiers.org/chebi/CHEBI:29103>"
     },
     {
+        "key1": "flux", "key2": "bicarbonate",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://identifiers.org/chebi/CHEBI:17544>"
+    },
+    {
+        "key1": "flux", "key2": "glucose",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+    },
+    {
         "key1": "concentration", "key2": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
     },
@@ -735,6 +745,16 @@ var dictionary = [
         "key1": "concentration", "key2": "potassium",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
         "chebi": "<http://identifiers.org/chebi/CHEBI:29103>"
+    },
+    {
+        "key1": "concentration", "key2": "bicarbonate",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://identifiers.org/chebi/CHEBI:17544>"
+    },
+    {
+        "key1": "concentration", "key2": "glucose",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
     }
 ];
 
@@ -764,6 +784,12 @@ var Nachannel = "http://purl.obolibrary.org/obo/PR_000014527";
 var Clchannel = "http://purl.obolibrary.org/obo/PR_Q06393";
 var Kchannel = "http://purl.obolibrary.org/obo/PR_P15387";
 var partOfFMAUri = "http://identifiers.org/fma/FMA";
+
+var naENaC = "http://purl.obolibrary.org/obo/PR_P37089";
+var clChannel = "http://purl.obolibrary.org/obo/PR_P35524";
+var kChannel = "http://purl.obolibrary.org/obo/PR_000001916";
+var bloodCapillary = "http://identifiers.org/fma/FMA:263901";
+var capillaryID = "http://identifiers.org/fma/FMA:63194";
 
 var myWorkspaneName = "https://models.physiomeproject.org/workspace/267";
 var uriSEDML = "https://sed-ml.github.io/index.html";
@@ -959,10 +985,11 @@ var relatedMembraneSPARQL = function (fstCHEBI, sndCHEBI, membrane) {
     return query;
 };
 
-var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, membrane, combinedMembrane) {
+var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, capillaryMembrane, membrane, combinedMembrane) {
 
     var tempapical = [],
         tempBasolateral = [],
+        tempCapillary = [],
         paracellularMembrane = [];
 
     // Extract apical fluxes
@@ -995,6 +1022,21 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
         });
     }
 
+    // Extract capillary fluxes
+    for (var i in capillaryMembrane) {
+        tempCapillary.push({
+            srctext: capillaryMembrane[i].variable_text,
+            srcfma: capillaryMembrane[i].source_fma,
+            snkfma: capillaryMembrane[i].sink_fma
+        });
+
+        tempCapillary.push({
+            srctext: capillaryMembrane[i].variable_text2,
+            srcfma: capillaryMembrane[i].source_fma2,
+            snkfma: capillaryMembrane[i].sink_fma2
+        });
+    }
+
     // remove apical fluxes from membrane array
     for (var i in tempapical) {
         for (var j in membrane) {
@@ -1013,6 +1055,18 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
             if (tempBasolateral[i].srctext == membrane[j].variable_text &&
                 tempBasolateral[i].srcfma == membrane[j].source_fma &&
                 tempBasolateral[i].snkfma == membrane[j].sink_fma) {
+
+                membrane.splice(j, 1);
+            }
+        }
+    }
+
+    // remove capillary fluxes from membrane array
+    for (var i in tempCapillary) {
+        for (var j in membrane) {
+            if (tempCapillary[i].srctext == membrane[j].variable_text &&
+                tempCapillary[i].srcfma == membrane[j].source_fma &&
+                tempCapillary[i].snkfma == membrane[j].sink_fma) {
 
                 membrane.splice(j, 1);
             }
@@ -1052,13 +1106,21 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
     // Nachannel, Clchannel, Kchannel
     for (var i in membrane) {
         if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == Nachannel ||
-            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
+            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel ||
+            membrane[i].med_pr == naENaC || membrane[i].med_pr == clChannel || membrane[i].med_pr == kChannel)) {
             abpmembraneObject(apicalMembrane, "channel", membrane[i]);
         }
 
         if (membrane[i].med_fma == basolateralID && (membrane[i].med_pr == Nachannel ||
-            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
+            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel ||
+            membrane[i].med_pr == naENaC || membrane[i].med_pr == clChannel || membrane[i].med_pr == kChannel)) {
             abpmembraneObject(basolateralMembrane, "channel", membrane[i]);
+        }
+
+        if (membrane[i].med_fma == capillaryID && (membrane[i].med_pr == Nachannel ||
+            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel ||
+            membrane[i].med_pr == naENaC || membrane[i].med_pr == clChannel || membrane[i].med_pr == kChannel)) {
+            abpmembraneObject(capillaryMembrane, "channel", membrane[i]);
         }
 
         if (membrane[i].source_fma == luminalID && membrane[i].sink_fma == interstitialID) {
@@ -1075,6 +1137,8 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
                 apicalbasoMembraneObj = apicalMembrane;
             else if (membrane[i].med_fma == basolateralID)
                 apicalbasoMembraneObj = basolateralMembrane;
+            else if (membrane[i].med_fma == capillaryID)
+                apicalbasoMembraneObj = capillaryMembrane;
 
             apicalbasoMembraneObj.push({
                 solute_chebi: membrane[i].solute_chebi,
@@ -1102,6 +1166,8 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
         combinedMembrane.push(apicalMembrane[i]);
     for (var i in basolateralMembrane)
         combinedMembrane.push(basolateralMembrane[i]);
+    for (var i in capillaryMembrane)
+        combinedMembrane.push(capillaryMembrane[i]);
     for (var i in paracellularMembrane)
         combinedMembrane.push(paracellularMembrane[i]);
 
@@ -1221,6 +1287,9 @@ exports.interstitialID = interstitialID;
 exports.Nachannel = Nachannel;
 exports.Clchannel = Clchannel;
 exports.Kchannel = Kchannel;
+exports.naENaC = naENaC;
+exports.clChannel = clChannel;
+exports.kChannel = kChannel;
 exports.partOfFMAUri = partOfFMAUri;
 exports.myWorkspaneName = myWorkspaneName;
 exports.uriSEDML = uriSEDML;
@@ -1233,6 +1302,8 @@ exports.ebiOntoEndpoint = ebiOntoEndpoint;
 exports.abiOntoEndpoint = abiOntoEndpoint;
 exports.epithelialcellID = epithelialcellID;
 exports.mediatorSPARQL = mediatorSPARQL;
+exports.bloodCapillary = bloodCapillary;
+exports.capillaryID = capillaryID;
 
 /***/ }),
 /* 2 */
@@ -1587,8 +1658,10 @@ var EMP = (function (global) {
                 sparqlUtils.endpoint,
                 query,
                 function (jsonModel) {
+                    console.log("jsonModel: ", jsonModel);
                     // REMOVE duplicate cellml model and variable name (NOT component name)
                     jsonModel.results.bindings = miscellaneous.uniqueifyjsonModel(jsonModel.results.bindings);
+                    console.log("After jsonModel: ", jsonModel);
                     mainUtils.discoverModels(jsonModel);
                 },
                 true);
@@ -1613,6 +1686,8 @@ var EMP = (function (global) {
             query,
             function (jsonProteinUri) {
 
+                console.log("jsonProteinUri: ", jsonProteinUri);
+
                 if (jsonProteinUri.results.bindings.length == 0) {
                     discoverIndex++;
 
@@ -1633,6 +1708,10 @@ var EMP = (function (global) {
 
                     if (pr_uri == sparqlUtils.epithelialcellID)
                         endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
+                        var go_uri = "http://purl.obolibrary.org/obo/GO_" + pr_uri.slice(pr_uri.indexOf("GO:") + 3);
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                    }
                     else
                         endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
 
@@ -1640,12 +1719,17 @@ var EMP = (function (global) {
                     listOfProteinURIs.push(pr_uri);
                 }
 
+                console.log("pr_uri: ", pr_uri);
+                console.log("endpointproteinOLS: ", endpointproteinOLS);
+
                 var query = sparqlUtils.mediatorSPARQL(jsonModel.results.bindings[discoverIndex].Model_entity.value);
 
                 ajaxUtils.sendPostRequest(
                     sparqlUtils.endpoint,
                     query,
                     function (jsonepithelialobj) {
+
+                        console.log("jsonepithelialobj: ", jsonepithelialobj);
 
                         // epithelial cell
                         if (pr_uri == sparqlUtils.epithelialcellID) {
@@ -1660,9 +1744,13 @@ var EMP = (function (global) {
                             }
                         }
 
+                        console.log("After endpointproteinOLS: ", endpointproteinOLS);
+
                         ajaxUtils.sendGetRequest(
                             endpointproteinOLS,
                             function (jsonProtein) {
+
+                                console.log("jsonProtein: ", jsonProtein);
 
                                 var endpointgeneOLS;
                                 if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
@@ -1674,6 +1762,8 @@ var EMP = (function (global) {
                                     endpointgeneOLS,
                                     function (jsonGene) {
 
+                                        console.log("jsonGene: ", jsonGene);
+
                                         var endpointspeciesOLS;
                                         if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
                                             endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
@@ -1683,6 +1773,8 @@ var EMP = (function (global) {
                                         ajaxUtils.sendGetRequest(
                                             endpointspeciesOLS,
                                             function (jsonSpecies) {
+
+                                                console.log("jsonSpecies: ", jsonSpecies);
 
                                                 // model and biological meaning
                                                 modelEntity.push(jsonModel.results.bindings[discoverIndex].Model_entity.value);
@@ -1946,6 +2038,8 @@ var EMP = (function (global) {
             query,
             function (jsonProteinUri) {
 
+                console.log("loadMOdel jsonProteinUri: ", jsonProteinUri);
+
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
                     // pr_uri = undefined;
@@ -1956,13 +2050,22 @@ var EMP = (function (global) {
 
                     if (pr_uri == sparqlUtils.epithelialcellID)
                         endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
+                        var go_uri = "http://purl.obolibrary.org/obo/GO_" + pr_uri.slice(pr_uri.indexOf("GO:") + 3);
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                    }
                     else
                         endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
+                console.log("loadMOdel pr_uri: ", pr_uri);
+                console.log("loadMOdel endpointproteinOLS: ", endpointproteinOLS);
+
                 ajaxUtils.sendGetRequest(
                     endpointproteinOLS,
                     function (jsonProtein) {
+
+                        console.log("loadMOdel jsonProtein: ", jsonProtein);
 
                         var endpointgeneOLS;
                         if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.has_gene_template == undefined)
@@ -2354,7 +2457,7 @@ var EMP = (function (global) {
 
         var source_fma = [], sink_fma = [], med_fma = [], med_pr = [], source_fma2 = [],
             sink_fma2 = [], solute_chebi = [], index = 0, counter = 0,
-            membrane = [], apicalMembrane = [], basolateralMembrane = [];
+            membrane = [], apicalMembrane = [], basolateralMembrane = [], capillaryMembrane = [];
 
         // empty platform as no model is selected
         if (modelEntityFullNameArray.length == 0) {
@@ -2366,6 +2469,7 @@ var EMP = (function (global) {
                 sink_fma2,
                 apicalMembrane,
                 basolateralMembrane,
+                capillaryMembrane,
                 membrane);
 
             return;
@@ -2451,13 +2555,14 @@ var EMP = (function (global) {
 
                     // console.log("jsonObj in makecotransporter: ", jsonObj);
 
-                    var tempProtein = [], tempApical = [], tempBasolateral = [];
+                    var tempProtein = [], tempApical = [], tempBasolateral = [], tempCapillary = [];
 
                     // loop to iterate over med_fma and med_pr in jsonObj
                     for (var m = 0; m < jsonObj.results.bindings.length; m++) {
                         var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
                         var tmpApi = jsonObj.results.bindings[m].med_entity_uri.value;
                         var tmpBas = jsonObj.results.bindings[m].med_entity_uri.value;
+                        var tmpCap = jsonObj.results.bindings[m].med_entity_uri.value;
 
                         if (tmpPro.indexOf(sparqlUtils.partOfProteinUri) != -1) {
                             tempProtein.push(jsonObj.results.bindings[m].med_entity_uri.value);
@@ -2469,6 +2574,10 @@ var EMP = (function (global) {
 
                         if (tmpBas.indexOf(sparqlUtils.basolateralID) != -1) {
                             tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
+
+                        if (tmpCap.indexOf(sparqlUtils.capillaryID) != -1) {
+                            tempCapillary.push(jsonObj.results.bindings[m].med_entity_uri.value);
                         }
                     }
 
@@ -2484,6 +2593,10 @@ var EMP = (function (global) {
 
                     tempBasolateral = tempBasolateral.filter(function (item, pos) {
                         return tempBasolateral.indexOf(item) == pos;
+                    });
+
+                    tempCapillary = tempCapillary.filter(function (item, pos) {
+                        return tempCapillary.indexOf(item) == pos;
                     });
 
                     // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
@@ -2537,6 +2650,11 @@ var EMP = (function (global) {
                         if (tempProtein.length != 0 && tempBasolateral.length != 0) {
                             basolateralMembrane.push(membraneOBJ);
                         }
+
+                        // cotransporter in basolateral membrane
+                        if (tempProtein.length != 0 && tempCapillary.length != 0) {
+                            capillaryMembrane.push(membraneOBJ);
+                        }
                     }
 
                     // same solute cotransporter in apical membrane
@@ -2556,6 +2674,13 @@ var EMP = (function (global) {
                         basolateralMembrane.push(membraneOBJ);
                     }
 
+                    // same solute cotransporter in capillary membrane
+                    if (membrane1.med_fma == sparqlUtils.capillaryID && membrane2.med_fma == sparqlUtils.capillaryID &&
+                        membrane1.med_pr == membrane2.med_pr &&
+                        membrane1.model_entity == membrane2.model_entity) {
+                        capillaryMembrane.push(membraneOBJ);
+                    }
+
                     counter++;
 
                     if (counter == miscellaneous.iteration(membrane.length)) {
@@ -2563,6 +2688,7 @@ var EMP = (function (global) {
                         console.log("membrane in index.js: ", membrane);
                         console.log("apicalMembrane in index.js: ", apicalMembrane);
                         console.log("basolateralMembrane in index.js: ", basolateralMembrane);
+                        console.log("capillaryMembrane in index.js: ", capillaryMembrane);
 
                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
@@ -2578,6 +2704,7 @@ var EMP = (function (global) {
                             sink_fma2,
                             apicalMembrane,
                             basolateralMembrane,
+                            capillaryMembrane,
                             membrane);
                     }
                 },
@@ -2611,23 +2738,28 @@ var EMP = (function (global) {
                             query,
                             function (jsonObjFlux) {
 
-                                // console.log("jsonObjFlux in index.js: ", jsonObjFlux);
+                                console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                                 var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
                                 var indexofColon = chebi_uri.indexOf("CHEBI:");
                                 chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
                                 var endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
+
+                                console.log("endpointOLS in index.js: ", endpointOLS);
+
                                 ajaxUtils.sendGetRequest(
                                     endpointOLS,
                                     function (jsonObjOLSChebi) {
+
+                                        console.log("jsonObjOLSChebi in index.js: ", jsonObjOLSChebi);
 
                                         // Name of a solute CHEBI from OLS
                                         for (i = 0; i < jsonObjFlux.results.bindings.length; i++) {
                                             var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
                                                 solute_chebi_name;
                                             for (var m = 0; m < temparr.length; m++) {
-                                                if (temparr[m].slice(-1) == "+" || temparr[m].slice(-1) == "-") {
+                                                if (temparr[m].slice(-1) == "+" || temparr[m].slice(-1) == "-" || temparr[m] == "Glc") {
                                                     solute_chebi_name = temparr[m];
                                                     break;
                                                 }
@@ -2763,7 +2895,6 @@ var EMP = (function (global) {
 
                                                         source_fma2.push(source_fma[0]);
                                                         sink_fma2.push(sink_fma[0]);
-
                                                     }
                                                     else { // same solute co-transporter
 
@@ -2847,6 +2978,7 @@ var EMP = (function (global) {
                                                             sink_fma2,
                                                             apicalMembrane,
                                                             basolateralMembrane,
+                                                            capillaryMembrane,
                                                             membrane);
                                                     }
                                                     else {
@@ -2925,6 +3057,7 @@ var EMP = (function (global) {
                                             sink_fma2,
                                             apicalMembrane,
                                             basolateralMembrane,
+                                            capillaryMembrane,
                                             membrane);
                                     }
                                     else {
@@ -3271,7 +3404,7 @@ var sparqlUtils = __webpack_require__(1);
 var svgPlatform = __webpack_require__(8);
 
 var epithelialPlatform = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
-                                   apicalMembrane, basolateralMembrane, membrane) {
+                                   apicalMembrane, basolateralMembrane, capillaryMembrane, membrane) {
 
     var relatedModel = [], membraneModelObj = [], alternativeModelObj = [], relatedModelObj = [],
         modelEntityObj = [], membraneModelID = [], proteinName, proteinText, cellmlModel, biological_meaning,
@@ -3285,13 +3418,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var i, j, msaveIDflag = false;
 
-    combinedMembrane = sparqlUtils.processCombinedMembrane(apicalMembrane, basolateralMembrane, membrane, combinedMembrane);
+    combinedMembrane = sparqlUtils.processCombinedMembrane(apicalMembrane, basolateralMembrane, capillaryMembrane, membrane, combinedMembrane);
     combinedMembrane = miscellaneous.uniqueifyCombinedMembrane(combinedMembrane);
 
     console.log("epithelialPlatform membrane: ", membrane);
     console.log("epithelialPlatform concentration_fma: ", concentration_fma);
     console.log("epithelialPlatform apicalMembrane: ", apicalMembrane);
     console.log("epithelialPlatform basolateralMembrane: ", basolateralMembrane);
+    console.log("epithelialPlatform capillaryMembrane: ", capillaryMembrane);
 
     console.log("epithelialPlatform combinedMembrane: ", combinedMembrane);
 
@@ -3345,8 +3479,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     for (i = 0; i < concentration_fma.length; i++) {
 
-        // luminal(1), cytosol(2), interstitial(3), paracellular(4), paracellular2(5)
-        for (var j = 1; j <= 5; j++) {
+        // luminal(1), cytosol(2), interstitial(3), blood capillary(4), paracellular(5), paracellular2(6)
+        console.log("rect: ", $("rect"));
+        for (var j = 1; j <= 6; j++) {
             if (concentration_fma[i].fma == $("rect")[j].id) {
                 break;
             }
@@ -3401,7 +3536,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             svg.append("text")
                 .style("font", "16px sans-serif")
                 .attr("stroke", "green")
-                .attr("x", 850)
+                .attr("x", 960)
                 .attr("y", 20)
                 .text("Apical Membrane");
 
@@ -3428,11 +3563,35 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             svg.append("text")
                 .style("font", "16px sans-serif")
                 .attr("stroke", "orange")
-                .attr("x", 850)
+                .attr("x", 960)
                 .attr("y", 45)
                 .text("Basolateral Membrane");
 
             return "orange";
+        })
+        .attr("stroke-width", 25)
+        .attr("opacity", 0.5);
+
+    var linecapillary = newg.append("line")
+        .attr("id", sparqlUtils.capillaryID)
+        .attr("x1", w + 10 + 20)
+        .attr("y1", function (d) {
+            return d.y + 10;
+        })
+        .attr("x2", w + 10 + 20)
+        .attr("y2", function (d) {
+            return d.y + height - 10;
+        })
+        .attr("stroke", function (d) {
+            svg.append("text")
+                .style("font", "16px sans-serif")
+                .attr("stroke", "red")
+                .attr("x", 960)
+                .attr("y", 195)
+                .text("Capillary Membrane")
+                .attr("opacity", 0.5);
+
+            return "red";
         })
         .attr("stroke-width", 25)
         .attr("opacity", 0.5);
@@ -3442,8 +3601,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         yrect = $("rect")[0].y.baseVal.value;
 
     // Paracellular membrane
-    var xprect = $("rect")[4].x.baseVal.value,
-        yprect = $("rect")[4].y.baseVal.value,
+    var xprect = $("rect")[5].x.baseVal.value,
+        yprect = $("rect")[5].y.baseVal.value,
         xpvalue = xprect + 10,
         ypvalue = yprect + 25,
         ypdistance = 35;
@@ -3456,8 +3615,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         cxvalue = xrect, cyvalue = yrect + 10 + 50, // initial distance 50
         ydistance = 70,
 
-        yvalueb = yrect + 10 + 50, // initial distance 50
+        yvalueb = yrect + 10 + 50, // initial distance 50 for basoalteral
         cyvalueb = yrect + 10 + 50, // initial distance 50
+
+        yvaluec = yrect + 10 + 50, // initial distance 50 for capillary
+        cyvaluec = yrect + 10 + 50, // initial distance 50
 
         circlewithlineg = [], circlewithtext = [],
         linewithlineg = [], linewithlineg2 = [],
@@ -3468,7 +3630,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var checkboxsvg = newg.append("g");
 
     var checkBox = [], checkedchk = [],
-        ydistancechk = 50, yinitialchk = 185, ytextinitialchk = 200;
+        ydistancechk = 50, yinitialchk = 215, ytextinitialchk = 230;
 
     var update = function () {
 
@@ -3499,8 +3661,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 indexOfParen = textvaluechk.indexOf("(");
             textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + " (" + combinedMembrane[i].med_pr_text_syn + ")";
 
-            checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
-            checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
+            checkBox[i].x(960).y(yinitialchk).checked(false).clickEvent(update);
+            checkBox[i].xtext(1000).ytext(ytextinitialchk).text("" + textvaluechk + "");
 
             checkboxsvg.call(checkBox[i]);
 
@@ -5608,6 +5770,1082 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     cyvalueb += ydistance;
 
                     console.log("case 6 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
+                }
+            }
+
+            /*  Capillary Membrane */
+            if (mediator_fma == sparqlUtils.capillaryID) {
+                // case 1
+                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.bloodCapillary) &&
+                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.interstitialID && snk_fma2 == sparqlUtils.bloodCapillary))) {
+
+                    console.log("case 1 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID: ", yvalueb, cyvalueb);
+
+                    var lineg = newg.append("g").data([{
+                        x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec
+                    }]);
+                    linewithlineg[i] = lineg.append("line")
+                        .attr("id", "linewithlineg" + tempID)
+                        .attr("x1", function (d) {
+                            dx1line[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            dy1line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            dx2line[i] = d.x + lineLen;
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            dy2line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#end)")
+                        .attr("cursor", "pointer");
+
+                    var linegtext = lineg.append("g").data([{
+                        x: xvalue + lineLen + 10 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec + 5
+                    }]);
+                    linewithtextg[i] = linegtext.append("text")
+                        .attr("id", "linewithtextg" + tempID)
+                        .attr("x", function (d) {
+                            dxtext[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            dytext[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "white")
+                        .attr("cursor", "pointer")
+                        .text(solute_text);
+
+                    var linegcircle = lineg.append("g").data([{
+                        x: cxvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: cyvaluec
+                    }]);
+                    circlewithlineg[i] = linegcircle.append("circle")
+                        .attr("id", function (d) {
+                            return [
+                                model_entity, model_entity2,
+                                textvalue, textvalue2,
+                                src_fma, snk_fma, src_fma2, snk_fma2,
+                                mediator_fma, mediator_pr,
+                                solute_chebi, solute_chebi2, solute_text, solute_text2,
+                                mediator_pr_text, mediator_pr_text_syn, protein_name
+                            ];
+                        })
+                        .attr("index", tempID)
+                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("cx", function (d) {
+                            dx[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("cy", function (d) {
+                            dy[i] = d.y + radius;
+                            return d.y + radius;
+                        })
+                        .attr("r", radius)
+                        .attr("fill", "red")
+                        .attr("opacity", 0.6)
+                        .attr("stroke-width", 20)
+                        .attr("cursor", "move")
+                        .on("mouseover", function () {
+                            div.style("display", "inline");
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", 1);
+
+                            var id = d3.select(this)._groups[0][0].id,
+                                indexOfComma = id.indexOf(","),
+                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                            div.html(
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
+                                .style("left", d3.mouse(this)[0] + 540 + "px")
+                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                        });
+
+                    // protein name inside this circle
+                    circlewithtext[i] = linegcircle.append("text")
+                        .attr("id", "circlewithtext" + tempID)
+                        .attr("x", function (d) {
+                            dxcircletext[i] = d.x - 15;
+                            return d.x - 15;
+                        })
+                        .attr("y", function (d) {
+                            dycircletext[i] = d.y + 23;
+                            return d.y + 23;
+                        })
+                        .attr("font-size", "10px")
+                        .attr("fill", "white")
+                        .attr("fontWeight", "bold")
+                        .attr("cursor", "move")
+                        .text(mediator_pr_text_syn);
+
+                    if (textvalue2 == "flux") {
+                        linewithlineg2[i] = "";
+                        linewithtextg2[i] = "";
+                        dx1line2[i] = "";
+                        dy1line2[i] = "";
+                        dx2line2[i] = "";
+                        dy2line2[i] = "";
+                        dxtext2[i] = "";
+                        dytext2[i] = "";
+                    }
+
+                    if (textvalue2 != "flux") {
+                        var lineg2 = lineg.append("g").data([{
+                            x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                            y: yvaluec + radius * 2
+                        }]);
+                        linewithlineg2[i] = lineg2.append("line")
+                            .attr("id", "linewithlineg2" + tempID)
+                            .attr("x1", function (d) {
+                                dx1line2[i] = d.x;
+                                return d.x;
+                            })
+                            .attr("y1", function (d) {
+                                dy1line2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("x2", function (d) {
+                                dx2line2[i] = d.x + lineLen;
+                                return d.x + lineLen;
+                            })
+                            .attr("y2", function (d) {
+                                dy2line2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2)
+                            .attr("marker-end", "url(#end)")
+                            .attr("cursor", "pointer");
+
+                        var linegtext2 = lineg2.append("g").data([{
+                            x: xvalue + lineLen + 10 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                            y: yvaluec + radius * 2 + markerHeight
+                        }]);
+                        linewithtextg2[i] = linegtext2.append("text")
+                            .attr("id", "linewithtextg2" + tempID)
+                            .attr("x", function (d) {
+                                dxtext2[i] = d.x;
+                                return d.x;
+                            })
+                            .attr("y", function (d) {
+                                dytext2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("font-family", "Times New Roman")
+                            .attr("font-size", "12px")
+                            .attr("font-weight", "bold")
+                            .attr("fill", "white")
+                            .attr("cursor", "pointer")
+                            .text(solute_text2);
+                    }
+
+                    if (msaveIDflag == true) {
+                        msaveIDflag = false;
+                        break;
+                    }
+
+                    // increment y-axis of line and circle
+                    yvaluec += ydistance;
+                    cyvaluec += ydistance;
+
+                    console.log("case 1 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID: ", yvaluec, cyvaluec);
+                }
+
+                // case 2
+                if ((src_fma == sparqlUtils.bloodCapillary && snk_fma == sparqlUtils.interstitialID) &&
+                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.bloodCapillary && snk_fma2 == sparqlUtils.interstitialID))) {
+                    var lineg = newg.append("g").data([{
+                        x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec
+                    }]);
+                    linewithlineg[i] = lineg.append("line")
+                        .attr("id", "linewithlineg" + tempID)
+                        .attr("x1", function (d) {
+                            dx1line[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            dy1line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            dx2line[i] = d.x + lineLen;
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            dy2line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-start", "url(#start)")
+                        .attr("cursor", "pointer");
+
+                    var linegtext = lineg.append("g").data([{
+                        x: xvalue - 30 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec + 5
+                    }]);
+                    linewithtextg[i] = linegtext.append("text")
+                        .attr("id", "linewithtextg" + tempID)
+                        .attr("x", function (d) {
+                            dxtext[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            dytext[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "white")
+                        .attr("cursor", "pointer")
+                        .text(solute_text);
+
+                    var linegcircle = lineg.append("g").data([{
+                        x: cxvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: cyvaluec
+                    }]);
+                    circlewithlineg[i] = linegcircle.append("circle")
+                        .attr("id", function (d) {
+                            return [
+                                model_entity, model_entity2,
+                                textvalue, textvalue2,
+                                src_fma, snk_fma, src_fma2, snk_fma2,
+                                mediator_fma, mediator_pr,
+                                solute_chebi, solute_chebi2, solute_text, solute_text2,
+                                mediator_pr_text, mediator_pr_text_syn, protein_name
+                            ];
+                        })
+                        .attr("index", tempID)
+                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("cx", function (d) {
+                            dx[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("cy", function (d) {
+                            dy[i] = d.y + radius;
+                            return d.y + radius;
+                        })
+                        .attr("r", radius)
+                        .attr("fill", "red")
+                        .attr("opacity", 0.6)
+                        .attr("stroke-width", 20)
+                        .attr("cursor", "move")
+                        .on("mouseover", function () {
+                            div.style("display", "inline");
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", 1);
+
+                            var id = d3.select(this)._groups[0][0].id,
+                                indexOfComma = id.indexOf(","),
+                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                            div.html(
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
+                                .style("left", d3.mouse(this)[0] + 540 + "px")
+                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                        });
+
+                    // protein name inside this circle
+                    circlewithtext[i] = linegcircle.append("text")
+                        .attr("id", "circlewithtext" + tempID)
+                        .attr("x", function (d) {
+                            dxcircletext[i] = d.x - 15;
+                            return d.x - 15;
+                        })
+                        .attr("y", function (d) {
+                            dycircletext[i] = d.y + 23;
+                            return d.y + 23;
+                        })
+                        .attr("font-size", "10px")
+                        .attr("fill", "white")
+                        .attr("fontWeight", "bold")
+                        .attr("cursor", "move")
+                        .text(mediator_pr_text_syn);
+
+                    if (textvalue2 == "flux") {
+                        linewithlineg2[i] = "";
+                        linewithtextg2[i] = "";
+                        dx1line2[i] = "";
+                        dy1line2[i] = "";
+                        dx2line2[i] = "";
+                        dy2line2[i] = "";
+                        dxtext2[i] = "";
+                        dytext2[i] = "";
+                    }
+
+                    if (textvalue2 != "flux") {
+                        var lineg2 = lineg.append("g").data([{
+                            x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                            y: yvaluec + radius * 2
+                        }]);
+                        linewithlineg2[i] = lineg2.append("line")
+                            .attr("id", "linewithlineg2" + tempID)
+                            .attr("x1", function (d) {
+                                dx1line2[i] = d.x;
+                                return d.x;
+                            })
+                            .attr("y1", function (d) {
+                                dy1line2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("x2", function (d) {
+                                dx2line2[i] = d.x + lineLen;
+                                return d.x + lineLen;
+                            })
+                            .attr("y2", function (d) {
+                                dy2line2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2)
+                            .attr("marker-start", "url(#start)")
+                            .attr("cursor", "pointer");
+
+                        var linegtext2 = lineg2.append("g").data([{
+                            x: xvalue - textWidth - 10 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                            y: yvaluec + radius * 2 + markerHeight
+                        }]);
+                        linewithtextg2[i] = linegtext2.append("text")
+                            .attr("id", "linewithtextg2" + tempID)
+                            .attr("x", function (d) {
+                                dxtext2[i] = d.x;
+                                return d.x;
+                            })
+                            .attr("y", function (d) {
+                                dytext2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("font-family", "Times New Roman")
+                            .attr("font-size", "12px")
+                            .attr("font-weight", "bold")
+                            .attr("fill", "white")
+                            .attr("cursor", "pointer")
+                            .text(solute_text2);
+                    }
+
+                    if (msaveIDflag == true) {
+                        msaveIDflag = false;
+                        break;
+                    }
+
+                    // increment y-axis of line and circle
+                    yvaluec += ydistance;
+                    cyvaluec += ydistance;
+                }
+
+                // case 3
+                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.bloodCapillary) && (src_fma2 == sparqlUtils.bloodCapillary && snk_fma2 == sparqlUtils.interstitialID)) {
+                    var lineg = newg.append("g").data([{
+                        x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec
+                    }]);
+                    linewithlineg[i] = lineg.append("line")
+                        .attr("id", "linewithlineg" + tempID)
+                        .attr("x1", function (d) {
+                            dx1line[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            dy1line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            dx2line[i] = d.x + lineLen;
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            dy2line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#end)")
+                        .attr("cursor", "pointer");
+
+                    var linegtext = lineg.append("g").data([{
+                        x: xvalue + lineLen + 10 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec + 5
+                    }]);
+                    linewithtextg[i] = linegtext.append("text")
+                        .attr("id", "linewithtextg" + tempID)
+                        .attr("x", function (d) {
+                            dxtext[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            dytext[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "white")
+                        .attr("cursor", "pointer")
+                        .text(solute_text);
+
+                    var linegcircle = lineg.append("g").data([{
+                        x: cxvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: cyvaluec
+                    }]);
+                    circlewithlineg[i] = linegcircle.append("circle")
+                        .attr("id", function (d) {
+                            return [
+                                model_entity, model_entity2,
+                                textvalue, textvalue2,
+                                src_fma, snk_fma, src_fma2, snk_fma2,
+                                mediator_fma, mediator_pr,
+                                solute_chebi, solute_chebi2, solute_text, solute_text2,
+                                mediator_pr_text, mediator_pr_text_syn, protein_name
+                            ];
+                        })
+                        .attr("index", tempID)
+                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("cx", function (d) {
+                            dx[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("cy", function (d) {
+                            dy[i] = d.y + radius;
+                            return d.y + radius;
+                        })
+                        .attr("r", radius)
+                        .attr("fill", "red")
+                        .attr("opacity", 0.6)
+                        .attr("stroke-width", 20)
+                        .attr("cursor", "move")
+                        .on("mouseover", function () {
+                            div.style("display", "inline");
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", 1);
+
+                            var id = d3.select(this)._groups[0][0].id,
+                                indexOfComma = id.indexOf(","),
+                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                            div.html(
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
+                                .style("left", d3.mouse(this)[0] + 540 + "px")
+                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                        });
+
+                    // protein name inside this circle
+                    circlewithtext[i] = linegcircle.append("text")
+                        .attr("id", "circlewithtext" + tempID)
+                        .attr("x", function (d) {
+                            dxcircletext[i] = d.x - 15;
+                            return d.x - 15;
+                        })
+                        .attr("y", function (d) {
+                            dycircletext[i] = d.y + 23;
+                            return d.y + 23;
+                        })
+                        .attr("font-size", "10px")
+                        .attr("fill", "white")
+                        .attr("fontWeight", "bold")
+                        .attr("cursor", "move")
+                        .text(mediator_pr_text_syn);
+
+                    if (textvalue2 == "flux") {
+                        linewithlineg2[i] = "";
+                        linewithtextg2[i] = "";
+                        dx1line2[i] = "";
+                        dy1line2[i] = "";
+                        dx2line2[i] = "";
+                        dy2line2[i] = "";
+                        dxtext2[i] = "";
+                        dytext2[i] = "";
+                    }
+
+                    if (textvalue2 != "flux") {
+                        var lineg2 = lineg.append("g").data([{
+                            x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                            y: yvaluec + radius * 2
+                        }]);
+                        linewithlineg2[i] = lineg2.append("line")
+                            .attr("id", "linewithlineg2" + tempID)
+                            .attr("x1", function (d) {
+                                dx1line2[i] = d.x;
+                                return d.x;
+                            })
+                            .attr("y1", function (d) {
+                                dy1line2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("x2", function (d) {
+                                dx2line2[i] = d.x + lineLen;
+                                return d.x + lineLen;
+                            })
+                            .attr("y2", function (d) {
+                                dy2line2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2)
+                            .attr("marker-start", "url(#start)")
+                            .attr("cursor", "pointer");
+
+                        var linegtext2 = lineg2.append("g").data([{
+                            x: xvalue - 30 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                            y: yvaluec + radius * 2 + markerHeight
+                        }]);
+                        linewithtextg2[i] = linegtext2.append("text")
+                            .attr("id", "linewithtextg2" + tempID)
+                            .attr("x", function (d) {
+                                dxtext2[i] = d.x;
+                                return d.x;
+                            })
+                            .attr("y", function (d) {
+                                dytext2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("font-family", "Times New Roman")
+                            .attr("font-size", "12px")
+                            .attr("font-weight", "bold")
+                            .attr("fill", "white")
+                            .attr("cursor", "pointer")
+                            .text(solute_text2);
+                    }
+
+                    if (msaveIDflag == true) {
+                        msaveIDflag = false;
+                        break;
+                    }
+
+                    // increment y-axis of line and circle
+                    yvaluec += ydistance;
+                    cyvaluec += ydistance;
+                }
+
+                // case 4
+                if ((src_fma == sparqlUtils.bloodCapillary && snk_fma == sparqlUtils.interstitialID) && (src_fma2 == sparqlUtils.interstitialID && snk_fma2 == sparqlUtils.bloodCapillary)) {
+                    var lineg = newg.append("g").data([{
+                        x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec
+                    }]);
+                    linewithlineg[i] = lineg.append("line")
+                        .attr("id", "linewithlineg" + tempID)
+                        .attr("x1", function (d) {
+                            dx1line[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            dy1line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            dx2line[i] = d.x + lineLen;
+                            return d.x + lineLen;
+                        })
+                        .attr("y2", function (d) {
+                            dy2line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-start", "url(#start)")
+                        .attr("cursor", "pointer");
+
+                    var linegtext = lineg.append("g").data([{
+                        x: xvalue - 30 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec + 5
+                    }]);
+                    linewithtextg[i] = linegtext.append("text")
+                        .attr("id", "linewithtextg" + tempID)
+                        .attr("x", function (d) {
+                            dxtext[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            dytext[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "white")
+                        .attr("cursor", "pointer")
+                        .text(solute_text);
+
+                    var linegcircle = lineg.append("g").data([{
+                        x: cxvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: cyvaluec
+                    }]);
+                    circlewithlineg[i] = linegcircle.append("circle")
+                        .attr("id", function (d) {
+                            return [
+                                model_entity, model_entity2,
+                                textvalue, textvalue2,
+                                src_fma, snk_fma, src_fma2, snk_fma2,
+                                mediator_fma, mediator_pr,
+                                solute_chebi, solute_chebi2, solute_text, solute_text2,
+                                mediator_pr_text, mediator_pr_text_syn, protein_name
+                            ];
+                        })
+                        .attr("index", tempID)
+                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("cx", function (d) {
+                            dx[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("cy", function (d) {
+                            dy[i] = d.y + radius;
+                            return d.y + radius;
+                        })
+                        .attr("r", radius)
+                        .attr("fill", "red")
+                        .attr("opacity", 0.6)
+                        .attr("stroke-width", 20)
+                        .attr("cursor", "move")
+                        .on("mouseover", function () {
+                            div.style("display", "inline");
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", 1);
+
+                            var id = d3.select(this)._groups[0][0].id,
+                                indexOfComma = id.indexOf(","),
+                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                            div.html(
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
+                                .style("left", d3.mouse(this)[0] + 540 + "px")
+                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                        });
+
+                    // protein name inside this circle
+                    circlewithtext[i] = linegcircle.append("text")
+                        .attr("id", "circlewithtext" + tempID)
+                        .attr("x", function (d) {
+                            dxcircletext[i] = d.x - 15;
+                            return d.x - 15;
+                        })
+                        .attr("y", function (d) {
+                            dycircletext[i] = d.y + 23;
+                            return d.y + 23;
+                        })
+                        .attr("font-size", "10px")
+                        .attr("fill", "white")
+                        .attr("fontWeight", "bold")
+                        .attr("cursor", "move")
+                        .text(mediator_pr_text_syn);
+
+                    if (textvalue2 == "flux") {
+                        linewithlineg2[i] = "";
+                        linewithtextg2[i] = "";
+                        dx1line2[i] = "";
+                        dy1line2[i] = "";
+                        dx2line2[i] = "";
+                        dy2line2[i] = "";
+                        dxtext2[i] = "";
+                        dytext2[i] = "";
+                    }
+
+                    if (textvalue2 != "flux") {
+                        var lineg2 = lineg.append("g").data([{
+                            x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                            y: yvaluec + radius * 2
+                        }]);
+                        linewithlineg2[i] = lineg2.append("line")
+                            .attr("id", "linewithlineg2" + tempID)
+                            .attr("x1", function (d) {
+                                dx1line2[i] = d.x;
+                                return d.x;
+                            })
+                            .attr("y1", function (d) {
+                                dy1line2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("x2", function (d) {
+                                dx2line2[i] = d.x + lineLen;
+                                return d.x + lineLen;
+                            })
+                            .attr("y2", function (d) {
+                                dy2line2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2)
+                            .attr("marker-end", "url(#end)")
+                            .attr("cursor", "pointer");
+
+                        var linegtext2 = lineg2.append("g").data([{
+                            x: xvalue + lineLen + 10 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                            y: yvaluec + radius * 2 + markerHeight
+                        }]);
+                        linewithtextg2[i] = linegtext2.append("text")
+                            .attr("id", "linewithtextg2" + tempID)
+                            .attr("x", function (d) {
+                                dxtext2[i] = d.x;
+                                return d.x;
+                            })
+                            .attr("y", function (d) {
+                                dytext2[i] = d.y;
+                                return d.y;
+                            })
+                            .attr("font-family", "Times New Roman")
+                            .attr("font-size", "12px")
+                            .attr("font-weight", "bold")
+                            .attr("fill", "white")
+                            .attr("cursor", "pointer")
+                            .text(solute_text2);
+                    }
+
+                    if (msaveIDflag == true) {
+                        msaveIDflag = false;
+                        break;
+                    }
+
+                    // increment y-axis of line and circle
+                    yvaluec += ydistance;
+                    cyvaluec += ydistance;
+                }
+
+                // case 5
+                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.bloodCapillary) && (textvalue2 == "channel")) {
+
+                    console.log("case 5 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvaluec, cyvaluec);
+
+                    var polygong = newg.append("g").data([{
+                        x: xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec
+                    }]);
+                    linewithlineg[i] = polygong.append("line")
+                        .attr("id", "linewithlineg" + tempID)
+                        .attr("x1", function (d) {
+                            dx1line[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            dy1line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            dx2line[i] = d.x + polygonlineLen;
+                            return d.x + polygonlineLen;
+                        })
+                        .attr("y2", function (d) {
+                            dy2line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#end)")
+                        .attr("cursor", "pointer");
+
+                    var linegtext = polygong.append("g").data([{
+                        x: xvalue + lineLen + 10 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec + 5
+                    }]);
+                    linewithtextg[i] = linegtext.append("text")
+                        .attr("id", "linewithtextg" + tempID)
+                        .attr("x", function (d) {
+                            dxtext[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            dytext[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "white")
+                        .attr("cursor", "pointer")
+                        .text(solute_text);
+
+                    // Polygon
+                    circlewithlineg[i] = polygong.append("g").append("polygon")
+                        .attr("transform", "translate(" + (xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20) + "," + (yvaluec - 30) + ")")
+                        .attr("id", function (d) {
+                            return [
+                                model_entity, model_entity2,
+                                textvalue, textvalue2,
+                                src_fma, snk_fma, src_fma2, snk_fma2,
+                                mediator_fma, mediator_pr,
+                                solute_chebi, solute_chebi2, solute_text, solute_text2,
+                                mediator_pr_text, mediator_pr_text_syn, protein_name
+                            ];
+                        })
+                        .attr("index", tempID)
+                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("cx", function (d) {
+                            dx[i] = xvalue - 5 + width;
+                            return dx[i];
+                        })
+                        .attr("cy", function (d) {
+                            dy[i] = yvaluec - 30;
+                            return dy[i];
+                        })
+                        .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                        .attr("fill", "yellow")
+                        .attr("stroke", "black")
+                        .attr("stroke-linecap", "round")
+                        .attr("stroke-linejoin", "round")
+                        .attr("cursor", "move")
+                        .on("mouseover", function () {
+                            div.style("display", "inline");
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", 1);
+
+                            var id = d3.select(this)._groups[0][0].id,
+                                indexOfComma = id.indexOf(","),
+                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                            div.html(
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
+                                .style("left", d3.mouse(this)[0] + 540 + "px")
+                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                        });
+
+                    var polygontext = polygong.append("g").data([{
+                        x: xvalue + 12 + width + (w - (w / 3 + width + 30)) + 40 + 15,
+                        y: yvaluec + 4
+                    }]);
+                    circlewithtext[i] = polygontext.append("text")
+                        .attr("id", "circlewithtext" + tempID)
+                        .attr("x", function (d) {
+                            dxcircletext[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            dycircletext[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("font-size", "10px")
+                        .attr("fill", "red")
+                        .attr("cursor", "move")
+                        .text(mediator_pr_text_syn);
+
+                    linewithlineg2[i] = "";
+                    linewithtextg2[i] = "";
+                    dx1line2[i] = "";
+                    dy1line2[i] = "";
+                    dx2line2[i] = "";
+                    dy2line2[i] = "";
+                    dxtext2[i] = "";
+                    dytext2[i] = "";
+
+                    if (msaveIDflag == true) {
+                        msaveIDflag = false;
+                        break;
+                    }
+
+                    // increment y-axis of line and circle
+                    yvaluec += ydistance;
+                    cyvaluec += ydistance;
+
+                    console.log("case 5 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvaluec, cyvaluec);
+                }
+
+                // case 6
+                if ((src_fma == sparqlUtils.bloodCapillary && snk_fma == sparqlUtils.interstitialID) && (textvalue2 == "channel")) {
+
+                    console.log("case 6 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvaluec, cyvaluec);
+
+                    var polygong = newg.append("g").data([{
+                        x: xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec
+                    }]);
+                    linewithlineg[i] = polygong.append("line")
+                        .attr("id", "linewithlineg" + tempID)
+                        .attr("x1", function (d) {
+                            dx1line[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y1", function (d) {
+                            dy1line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("x2", function (d) {
+                            dx2line[i] = d.x + polygonlineLen;
+                            return d.x + polygonlineLen;
+                        })
+                        .attr("y2", function (d) {
+                            dy2line[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-start", "url(#start)")
+                        .attr("cursor", "pointer");
+
+                    var linegtext = polygong.append("g").data([{
+                        x: xvalue - 30 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec + 5
+                    }]);
+                    linewithtextg[i] = linegtext.append("text")
+                        .attr("id", "linewithtextg" + tempID)
+                        .attr("x", function (d) {
+                            dxtext[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            dytext[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("font-family", "Times New Roman")
+                        .attr("font-size", "12px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "white")
+                        .attr("cursor", "pointer")
+                        .text(solute_text);
+
+                    // Polygon
+                    circlewithlineg[i] = polygong.append("g").append("polygon")
+                        .attr("transform", "translate(" + (xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20) + "," + (yvaluec - 30) + ")")
+                        .attr("id", function (d) {
+                            return [
+                                model_entity, model_entity2,
+                                textvalue, textvalue2,
+                                src_fma, snk_fma, src_fma2, snk_fma2,
+                                mediator_fma, mediator_pr,
+                                solute_chebi, solute_chebi2, solute_text, solute_text2,
+                                mediator_pr_text, mediator_pr_text_syn, protein_name
+                            ];
+                        })
+                        .attr("index", tempID)
+                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("cx", function (d) {
+                            dx[i] = xvalue - 5 + width;
+                            return dx[i];
+                        })
+                        .attr("cy", function (d) {
+                            dy[i] = yvaluec - 30;
+                            return dy[i];
+                        })
+                        .attr("points", "10,20 50,20 45,30 50,40 10,40 15,30")
+                        .attr("fill", "yellow")
+                        .attr("stroke", "black")
+                        .attr("stroke-linecap", "round")
+                        .attr("stroke-linejoin", "round")
+                        .attr("cursor", "move")
+                        .on("mouseover", function () {
+                            div.style("display", "inline");
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", 1);
+
+                            var id = d3.select(this)._groups[0][0].id,
+                                indexOfComma = id.indexOf(","),
+                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+                            div.html(
+                                "<b>CellML </b> " +
+                                "<a href=" + tempworkspace + " + target=_blank>" +
+                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>SEDML </b> " +
+                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
+                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+                                "<br/>" +
+                                "<b>Click middle mouse to close</b>")
+                                .style("left", d3.mouse(this)[0] + 540 + "px")
+                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                        });
+
+                    var polygontext = polygong.append("g").data([{
+                        x: xvalue + 12 + width + (w - (w / 3 + width + 30)) + 40 + 20,
+                        y: yvaluec + 4
+                    }]);
+                    circlewithtext[i] = polygontext.append("text")
+                        .attr("id", "circlewithtext" + tempID)
+                        .attr("x", function (d) {
+                            dxcircletext[i] = d.x;
+                            return d.x;
+                        })
+                        .attr("y", function (d) {
+                            dycircletext[i] = d.y;
+                            return d.y;
+                        })
+                        .attr("font-size", "10px")
+                        .attr("fill", "red")
+                        .attr("cursor", "move")
+                        .text(mediator_pr_text_syn);
+
+                    linewithlineg2[i] = "";
+                    linewithtextg2[i] = "";
+                    dx1line2[i] = "";
+                    dy1line2[i] = "";
+                    dx2line2[i] = "";
+                    dy2line2[i] = "";
+                    dxtext2[i] = "";
+                    dytext2[i] = "";
+
+                    if (msaveIDflag == true) {
+                        msaveIDflag = false;
+                        break;
+                    }
+
+                    // increment y-axis of line and circle
+                    yvaluec += ydistance;
+                    cyvaluec += ydistance;
+
+                    console.log("case 6 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvaluec, cyvaluec);
                 }
             }
 
@@ -7980,16 +9218,16 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     console.log("checkboxsvg in reflectCheckbox: ", checkboxsvg._groups[0][0].textContent);
 
                     ydistancechk = 50;
-                    yinitialchk = 185;
-                    ytextinitialchk = 200;
+                    yinitialchk = 215;
+                    ytextinitialchk = 230;
 
                     for (var i = 0; i < combinedMembrane.length; i++) {
                         var textvaluechk = combinedMembrane[i].med_pr_text;
                         var indexOfParen = textvaluechk.indexOf("(");
                         textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + " (" + combinedMembrane[i].med_pr_text_syn + ")";
 
-                        checkBox[i].x(850).y(yinitialchk).checked(false).clickEvent(update);
-                        checkBox[i].xtext(890).ytext(ytextinitialchk).text("" + textvaluechk + "");
+                        checkBox[i].x(960).y(yinitialchk).checked(false).clickEvent(update);
+                        checkBox[i].xtext(1000).ytext(ytextinitialchk).text("" + textvaluechk + "");
 
                         checkboxsvg.call(checkBox[i]);
 
@@ -8147,16 +9385,25 @@ exports.epithelialPlatform = epithelialPlatform;
  */
 var solutesBouncing = function (newg, solutes) {
 
+    console.log("solutes: ", solutes);
+    console.log("solutes.compartment: ", solutes.compartment);
+
     var nodes = [],
         m = 10,
         maxSpeed = 1,
         color = d3.scaleOrdinal(d3.schemeCategory20).domain(d3.range(m));
 
     for (var i = 0; i < solutes.length; i++) {
+
+        var colour;
+        if (solutes[i].compartment == "http://identifiers.org/fma/FMA:263901")
+            colour = "white";
+        else colour = color(Math.floor(Math.random() * m)); // assuming initial text length is 100
+
         nodes.push({
             text: solutes[i].value,
             // fma: solutes[i].fma,
-            color: color(Math.floor(Math.random() * m)), // assuming initial text length is 100
+            color: colour,
             x: Math.random() * ((solutes[i].xrect + solutes[i].width) - (solutes[i].xrect + 100)) + (solutes[i].xrect),
             y: Math.random() * ((solutes[i].yrect + solutes[i].height) - solutes[i].yrect) + solutes[i].yrect,
             speedX: Math.random() * maxSpeed,
@@ -8273,7 +9520,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
                 .style("font", "16px sans-serif")
                 .attr("stroke", "purple")
                 .attr("opacity", 0.5)
-                .attr("x", 850)
+                .attr("x", 960)
                 .attr("y", 70)
                 .text("Luminal Compartment");
 
@@ -8294,7 +9541,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
                 .style("font", "16px sans-serif")
                 .attr("stroke", "blue")
                 .attr("opacity", 0.5)
-                .attr("x", 850)
+                .attr("x", 960)
                 .attr("y", 95)
                 .text("Cytosol Compartment");
 
@@ -8315,7 +9562,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
                 .style("font", "16px sans-serif")
                 .attr("stroke", "teal")
                 .attr("opacity", 0.5)
-                .attr("x", 850)
+                .attr("x", 960)
                 .attr("y", 120)
                 .text("Interstitial Fluid");
 
@@ -8323,6 +9570,28 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
         })
         .attr("stroke-width", 1)
         .attr("fill", "white");
+
+    // Blood capillary rectangle
+    var bloodcapillary = newg.append("rect")
+        .attr("id", sparqlUtils.bloodCapillary)
+        .attr("x", w + 20 + 40)
+        .attr("y", 0)
+        .attr("width", 70)
+        .attr("height", h)
+        .attr("stroke", function (d) {
+            svg.append("text")
+                .style("font", "16px sans-serif")
+                .attr("stroke", "darkred")
+                // .attr("opacity", 0.5)
+                .attr("x", 960)
+                .attr("y", 145)
+                .text("Blood Capillary");
+
+            return "red";
+        })
+        .attr("stroke-width", 1)
+        .attr("fill", "darkred");
+        // .attr("opacity", 0.5);
 
     // Paracellular rectangle
     var paracellular = newg.append("rect")
@@ -8336,8 +9605,8 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
                 .style("font", "16px sans-serif")
                 .attr("stroke", "violet")
                 .attr("opacity", 0.5)
-                .attr("x", 850)
-                .attr("y", 145)
+                .attr("x", 960)
+                .attr("y", 170)
                 .text("Paracellular Pathway");
 
             return "violet";

@@ -118,6 +118,16 @@ var dictionary = [
         "chebi": "<http://identifiers.org/chebi/CHEBI:29103>"
     },
     {
+        "key1": "flux", "key2": "bicarbonate",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://identifiers.org/chebi/CHEBI:17544>"
+    },
+    {
+        "key1": "flux", "key2": "glucose",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+    },
+    {
         "key1": "concentration", "key2": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
     },
@@ -145,6 +155,16 @@ var dictionary = [
         "key1": "concentration", "key2": "potassium",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
         "chebi": "<http://identifiers.org/chebi/CHEBI:29103>"
+    },
+    {
+        "key1": "concentration", "key2": "bicarbonate",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://identifiers.org/chebi/CHEBI:17544>"
+    },
+    {
+        "key1": "concentration", "key2": "glucose",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
     }
 ];
 
@@ -174,6 +194,12 @@ var Nachannel = "http://purl.obolibrary.org/obo/PR_000014527";
 var Clchannel = "http://purl.obolibrary.org/obo/PR_Q06393";
 var Kchannel = "http://purl.obolibrary.org/obo/PR_P15387";
 var partOfFMAUri = "http://identifiers.org/fma/FMA";
+
+var naENaC = "http://purl.obolibrary.org/obo/PR_P37089";
+var clChannel = "http://purl.obolibrary.org/obo/PR_P35524";
+var kChannel = "http://purl.obolibrary.org/obo/PR_000001916";
+var bloodCapillary = "http://identifiers.org/fma/FMA:263901";
+var capillaryID = "http://identifiers.org/fma/FMA:63194";
 
 var myWorkspaneName = "https://models.physiomeproject.org/workspace/267";
 var uriSEDML = "https://sed-ml.github.io/index.html";
@@ -369,10 +395,11 @@ var relatedMembraneSPARQL = function (fstCHEBI, sndCHEBI, membrane) {
     return query;
 };
 
-var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, membrane, combinedMembrane) {
+var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, capillaryMembrane, membrane, combinedMembrane) {
 
     var tempapical = [],
         tempBasolateral = [],
+        tempCapillary = [],
         paracellularMembrane = [];
 
     // Extract apical fluxes
@@ -405,6 +432,21 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
         });
     }
 
+    // Extract capillary fluxes
+    for (var i in capillaryMembrane) {
+        tempCapillary.push({
+            srctext: capillaryMembrane[i].variable_text,
+            srcfma: capillaryMembrane[i].source_fma,
+            snkfma: capillaryMembrane[i].sink_fma
+        });
+
+        tempCapillary.push({
+            srctext: capillaryMembrane[i].variable_text2,
+            srcfma: capillaryMembrane[i].source_fma2,
+            snkfma: capillaryMembrane[i].sink_fma2
+        });
+    }
+
     // remove apical fluxes from membrane array
     for (var i in tempapical) {
         for (var j in membrane) {
@@ -423,6 +465,18 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
             if (tempBasolateral[i].srctext == membrane[j].variable_text &&
                 tempBasolateral[i].srcfma == membrane[j].source_fma &&
                 tempBasolateral[i].snkfma == membrane[j].sink_fma) {
+
+                membrane.splice(j, 1);
+            }
+        }
+    }
+
+    // remove capillary fluxes from membrane array
+    for (var i in tempCapillary) {
+        for (var j in membrane) {
+            if (tempCapillary[i].srctext == membrane[j].variable_text &&
+                tempCapillary[i].srcfma == membrane[j].source_fma &&
+                tempCapillary[i].snkfma == membrane[j].sink_fma) {
 
                 membrane.splice(j, 1);
             }
@@ -462,13 +516,21 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
     // Nachannel, Clchannel, Kchannel
     for (var i in membrane) {
         if (membrane[i].med_fma == apicalID && (membrane[i].med_pr == Nachannel ||
-            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
+            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel ||
+            membrane[i].med_pr == naENaC || membrane[i].med_pr == clChannel || membrane[i].med_pr == kChannel)) {
             abpmembraneObject(apicalMembrane, "channel", membrane[i]);
         }
 
         if (membrane[i].med_fma == basolateralID && (membrane[i].med_pr == Nachannel ||
-            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel)) {
+            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel ||
+            membrane[i].med_pr == naENaC || membrane[i].med_pr == clChannel || membrane[i].med_pr == kChannel)) {
             abpmembraneObject(basolateralMembrane, "channel", membrane[i]);
+        }
+
+        if (membrane[i].med_fma == capillaryID && (membrane[i].med_pr == Nachannel ||
+            membrane[i].med_pr == Clchannel || membrane[i].med_pr == Kchannel ||
+            membrane[i].med_pr == naENaC || membrane[i].med_pr == clChannel || membrane[i].med_pr == kChannel)) {
+            abpmembraneObject(capillaryMembrane, "channel", membrane[i]);
         }
 
         if (membrane[i].source_fma == luminalID && membrane[i].sink_fma == interstitialID) {
@@ -485,6 +547,8 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
                 apicalbasoMembraneObj = apicalMembrane;
             else if (membrane[i].med_fma == basolateralID)
                 apicalbasoMembraneObj = basolateralMembrane;
+            else if (membrane[i].med_fma == capillaryID)
+                apicalbasoMembraneObj = capillaryMembrane;
 
             apicalbasoMembraneObj.push({
                 solute_chebi: membrane[i].solute_chebi,
@@ -512,6 +576,8 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, mem
         combinedMembrane.push(apicalMembrane[i]);
     for (var i in basolateralMembrane)
         combinedMembrane.push(basolateralMembrane[i]);
+    for (var i in capillaryMembrane)
+        combinedMembrane.push(capillaryMembrane[i]);
     for (var i in paracellularMembrane)
         combinedMembrane.push(paracellularMembrane[i]);
 
@@ -631,6 +697,9 @@ exports.interstitialID = interstitialID;
 exports.Nachannel = Nachannel;
 exports.Clchannel = Clchannel;
 exports.Kchannel = Kchannel;
+exports.naENaC = naENaC;
+exports.clChannel = clChannel;
+exports.kChannel = kChannel;
 exports.partOfFMAUri = partOfFMAUri;
 exports.myWorkspaneName = myWorkspaneName;
 exports.uriSEDML = uriSEDML;
@@ -643,3 +712,5 @@ exports.ebiOntoEndpoint = ebiOntoEndpoint;
 exports.abiOntoEndpoint = abiOntoEndpoint;
 exports.epithelialcellID = epithelialcellID;
 exports.mediatorSPARQL = mediatorSPARQL;
+exports.bloodCapillary = bloodCapillary;
+exports.capillaryID = capillaryID;
