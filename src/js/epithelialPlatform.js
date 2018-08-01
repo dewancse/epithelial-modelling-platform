@@ -34,6 +34,37 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     console.log("epithelialPlatform combinedMembrane: ", combinedMembrane);
 
+    // making transporters after rediscovering member of a pair
+    for (var i = 0; i < combinedMembrane.length; i++) {
+        for (var j = i + 1; j < combinedMembrane.length; j++) {
+            if (combinedMembrane[i].med_pr == combinedMembrane[j].med_pr && combinedMembrane[i].variable_text2 == "flux") {
+                combinedMembrane[i].solute_chebi2 = combinedMembrane[j].solute_chebi;
+                combinedMembrane[i].solute_text2 = combinedMembrane[j].solute_text;
+                combinedMembrane[i].model_entity2 = combinedMembrane[j].model_entity;
+                combinedMembrane[i].variable_text2 = combinedMembrane[j].variable_text;
+                combinedMembrane[i].source_fma2 = combinedMembrane[j].source_fma;
+                combinedMembrane[i].sink_fma2 = combinedMembrane[j].sink_fma;
+
+                // assign empty string to avoid drawing middle line like NKCC1
+                combinedMembrane[i].variable_text3 = "";
+
+                combinedMembrane.splice(j, 1);
+                j--;
+            }
+            else if (combinedMembrane[i].med_pr == combinedMembrane[j].med_pr && combinedMembrane[i].variable_text2 != "flux" && combinedMembrane[i].variable_text2 != "channel") { // NKCC1 tri-transporter
+                combinedMembrane[i].solute_chebi3 = combinedMembrane[j].solute_chebi;
+                combinedMembrane[i].solute_text3 = combinedMembrane[j].solute_text;
+                combinedMembrane[i].model_entity3 = combinedMembrane[j].model_entity;
+                combinedMembrane[i].variable_text3 = combinedMembrane[j].variable_text;
+                combinedMembrane[i].source_fma3 = combinedMembrane[j].source_fma;
+                combinedMembrane[i].sink_fma3 = combinedMembrane[j].sink_fma;
+
+                combinedMembrane.splice(j, 1);
+                j--;
+            }
+        }
+    }
+
     var g = $("#svgVisualize"),
         wth = 2000, // 1200
         hth = 900,
