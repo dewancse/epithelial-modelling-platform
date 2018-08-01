@@ -11,7 +11,7 @@ var uniqueifyCombinedMembrane = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
-            if ((retval[j].model_entity === e.model_entity) && (retval[j].model_entity2 === e.model_entity2))
+            if ((retval[j].model_entity === e.model_entity) && (retval[j].model_entity2 === e.model_entity2) && (retval[j].model_entity3 === e.model_entity3))
                 return;
         }
         retval.push(e);
@@ -341,7 +341,7 @@ var similarityMatrixEBI = function (identityMatrix, PID, draggedMedPrID, membran
                 if ((membraneModelObj[m].pid == similarityOBJ[n].PID1 &&
                     draggedMedPrID == similarityOBJ[n].PID2) ||
                     (membraneModelObj[m].pid == similarityOBJ[n].PID2 &&
-                    draggedMedPrID == similarityOBJ[n].PID1)) {
+                        draggedMedPrID == similarityOBJ[n].PID1)) {
                     membraneModelObj[m].similar = similarityOBJ[n].similarity;
                 }
             }

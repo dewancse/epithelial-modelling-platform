@@ -200,6 +200,7 @@ var clChannel = "http://purl.obolibrary.org/obo/PR_P35524";
 var kChannel = "http://purl.obolibrary.org/obo/PR_000001916";
 var bloodCapillary = "http://identifiers.org/fma/FMA:263901";
 var capillaryID = "http://identifiers.org/fma/FMA:63194";
+var nkcc1 = "http://purl.obolibrary.org/obo/PR_P55012";
 
 var myWorkspaneName = "https://models.physiomeproject.org/workspace/267";
 var uriSEDML = "https://sed-ml.github.io/index.html";
@@ -224,6 +225,32 @@ var makecotransporterSPARQL = function (membrane1, membrane2) {
 
     return query;
 };
+
+var maketritransporterSPARQL = function (membrane1, membrane2, membrane3) {
+    var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+        "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+        "SELECT ?med_entity_uri ?med_entity_uriCl ?med_entity_uriK " +
+        "WHERE { GRAPH ?Workspace { " +
+        "<" + membrane1 + "> semsim:isComputationalComponentFor ?model_prop. " +
+        "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+        "?model_proc semsim:hasMediatorParticipant ?model_medparticipant. " +
+        "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity. " +
+        "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri. " +
+        "<" + membrane2 + "> semsim:isComputationalComponentFor ?model_propCl. " +
+        "?model_propCl semsim:physicalPropertyOf ?model_procCl. " +
+        "?model_procCl semsim:hasMediatorParticipant ?model_medparticipantCl. " +
+        "?model_medparticipantCl semsim:hasPhysicalEntityReference ?med_entityCl. " +
+        "?med_entityCl semsim:hasPhysicalDefinition ?med_entity_uriCl. " +
+        "<" + membrane3 + "> semsim:isComputationalComponentFor ?model_propK. " +
+        "?model_propK semsim:physicalPropertyOf ?model_procK. " +
+        "?model_procK semsim:hasMediatorParticipant ?model_medparticipantK. " +
+        "?model_medparticipantK semsim:hasPhysicalEntityReference ?med_entityK. " +
+        "?med_entityK semsim:hasPhysicalDefinition ?med_entity_uriK. " +
+        "FILTER (?med_entity_uri = ?med_entity_uriCl && ?med_entity_uri = ?med_entity_uriK). " +
+        "}}";
+
+    return query;
+}
 
 var mediatorSPARQL = function (modelEntity) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -415,6 +442,12 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
             srcfma: apicalMembrane[i].source_fma2,
             snkfma: apicalMembrane[i].sink_fma2
         });
+
+        tempapical.push({
+            srctext: apicalMembrane[i].variable_text3,
+            srcfma: apicalMembrane[i].source_fma3,
+            snkfma: apicalMembrane[i].sink_fma3
+        });
     }
 
     // Extract basolateral fluxes
@@ -430,6 +463,12 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
             srcfma: basolateralMembrane[i].source_fma2,
             snkfma: basolateralMembrane[i].sink_fma2
         });
+
+        tempBasolateral.push({
+            srctext: basolateralMembrane[i].variable_text3,
+            srcfma: basolateralMembrane[i].source_fma3,
+            snkfma: basolateralMembrane[i].sink_fma3
+        });
     }
 
     // Extract capillary fluxes
@@ -444,6 +483,12 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
             srctext: capillaryMembrane[i].variable_text2,
             srcfma: capillaryMembrane[i].source_fma2,
             snkfma: capillaryMembrane[i].sink_fma2
+        });
+
+        tempCapillary.push({
+            srctext: capillaryMembrane[i].variable_text3,
+            srcfma: capillaryMembrane[i].source_fma3,
+            snkfma: capillaryMembrane[i].sink_fma3
         });
     }
 
@@ -497,8 +542,14 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
                 variable_text2: type,
                 source_fma2: type,
                 sink_fma2: type,
+                solute_chebi3: type,
+                solute_text3: type,
+                variable_text3: type,
+                source_fma3: type,
+                sink_fma3: type,
                 model_entity: membrane.model_entity,
                 model_entity2: "",
+                model_entity3: "",
                 med_fma: membrane.med_fma,
                 med_pr: membrane.med_pr,
                 med_pr_text: membrane.med_pr_text,
@@ -511,6 +562,11 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
         membrane.variable_text2 = type;
         membrane.source_fma2 = type;
         membrane.sink_fma2 = type;
+        membrane.solute_chebi3 = type;
+        membrane.solute_text3 = type;
+        membrane.variable_text3 = type;
+        membrane.source_fma3 = type;
+        membrane.sink_fma3 = type;
     }
 
     // Nachannel, Clchannel, Kchannel
@@ -561,8 +617,14 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
                 variable_text2: "flux",
                 source_fma2: "",
                 sink_fma2: "",
+                solute_chebi3: "",
+                solute_text3: "",
+                variable_text3: "flux",
+                source_fma3: "",
+                sink_fma3: "",
                 model_entity: membrane[i].model_entity,
                 model_entity2: "",
+                model_entity3: "",
                 med_fma: membrane[i].med_fma,
                 med_pr: membrane[i].med_pr,
                 med_pr_text: membrane[i].med_pr_text,
@@ -714,3 +776,5 @@ exports.epithelialcellID = epithelialcellID;
 exports.mediatorSPARQL = mediatorSPARQL;
 exports.bloodCapillary = bloodCapillary;
 exports.capillaryID = capillaryID;
+exports.nkcc1 = nkcc1;
+exports.maketritransporterSPARQL = maketritransporterSPARQL;

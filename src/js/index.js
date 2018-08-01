@@ -1219,14 +1219,18 @@ var EMP = (function (global) {
                         model_entity2: membrane2.model_entity,
                         variable_text2: membrane2.variable_text,
                         source_fma2: membrane2.source_fma,
-                        sink_fma2: membrane2.sink_fma
+                        sink_fma2: membrane2.sink_fma,
+                        solute_chebi3: "",
+                        solute_text3: "",
+                        model_entity3: "",
+                        variable_text3: "",
+                        source_fma3: "",
+                        sink_fma3: ""
                     };
 
                     // console.log("tempprotein: ", tempProtein);
 
                     for (var i = 0; i < tempProtein.length; i++) {
-
-                        // console.log("tempprotein inside: ", tempProtein);
 
                         // cotransporter in apical membrane
                         if (tempProtein.length != 0 && tempApical.length != 0) {
@@ -1238,39 +1242,197 @@ var EMP = (function (global) {
                             basolateralMembrane.push(membraneOBJ);
                         }
 
-                        // cotransporter in basolateral membrane
+                        // cotransporter in capillary membrane
                         if (tempProtein.length != 0 && tempCapillary.length != 0) {
                             capillaryMembrane.push(membraneOBJ);
                         }
                     }
 
-                    // same solute cotransporter in apical membrane
+                    // cotransporter in apical membrane
                     if (membrane1.med_fma == sparqlUtils.apicalID && membrane2.med_fma == sparqlUtils.apicalID &&
-                        membrane1.med_pr == membrane2.med_pr &&
-                        membrane1.model_entity == membrane2.model_entity) {
-
-                        // console.log("tempprotein inside same solute: ", tempProtein);
-
+                        membrane1.med_pr == membrane2.med_pr) {
                         apicalMembrane.push(membraneOBJ);
                     }
 
-                    // same solute cotransporter in basolateral membrane
+                    // cotransporter in basolateral membrane
                     if (membrane1.med_fma == sparqlUtils.basolateralID && membrane2.med_fma == sparqlUtils.basolateralID &&
-                        membrane1.med_pr == membrane2.med_pr &&
-                        membrane1.model_entity == membrane2.model_entity) {
+                        membrane1.med_pr == membrane2.med_pr) {
                         basolateralMembrane.push(membraneOBJ);
                     }
 
-                    // same solute cotransporter in capillary membrane
+                    // cotransporter in capillary membrane
                     if (membrane1.med_fma == sparqlUtils.capillaryID && membrane2.med_fma == sparqlUtils.capillaryID &&
-                        membrane1.med_pr == membrane2.med_pr &&
-                        membrane1.model_entity == membrane2.model_entity) {
+                        membrane1.med_pr == membrane2.med_pr) {
                         capillaryMembrane.push(membraneOBJ);
                     }
 
                     counter++;
 
                     if (counter == miscellaneous.iteration(membrane.length)) {
+
+                        console.log("membrane in index.js: ", membrane);
+                        console.log("apicalMembrane in index.js: ", apicalMembrane);
+                        console.log("basolateralMembrane in index.js: ", basolateralMembrane);
+                        console.log("capillaryMembrane in index.js: ", capillaryMembrane);
+
+                        rmFromModelEntityFullNameArray(membrane, concentration_fma);
+
+                        console.log("model2DArr: ", model2DArray);
+                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                        console.log("templistOfModel: ", templistOfModel);
+
+                        epithelialPlatform.epithelialPlatform(
+                            combinedMembrane,
+                            concentration_fma,
+                            source_fma2,
+                            sink_fma2,
+                            apicalMembrane,
+                            basolateralMembrane,
+                            capillaryMembrane,
+                            membrane);
+                    }
+                },
+                true);
+        };
+
+        // make tritransporters between fluxes
+        mainUtils.maketritransporter = function (membrane1, membrane2, membrane3) {
+
+            var query = sparqlUtils.maketritransporterSPARQL(membrane1.model_entity, membrane2.model_entity, membrane3.model_entity);
+
+            ajaxUtils.sendPostRequest(
+                sparqlUtils.endpoint,
+                query,
+                function (jsonObj) {
+
+                    // console.log("jsonObj in makecotransporter: ", jsonObj);
+
+                    var tempProtein = [], tempApical = [], tempBasolateral = [], tempCapillary = [];
+
+                    // loop to iterate over med_fma and med_pr in jsonObj
+                    for (var m = 0; m < jsonObj.results.bindings.length; m++) {
+                        var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
+                        var tmpApi = jsonObj.results.bindings[m].med_entity_uri.value;
+                        var tmpBas = jsonObj.results.bindings[m].med_entity_uri.value;
+                        var tmpCap = jsonObj.results.bindings[m].med_entity_uri.value;
+
+                        if (tmpPro.indexOf(sparqlUtils.partOfProteinUri) != -1) {
+                            tempProtein.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
+
+                        if (tmpApi.indexOf(sparqlUtils.apicalID) != -1) {
+                            tempApical.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
+
+                        if (tmpBas.indexOf(sparqlUtils.basolateralID) != -1) {
+                            tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
+
+                        if (tmpCap.indexOf(sparqlUtils.capillaryID) != -1) {
+                            tempCapillary.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                        }
+                    }
+
+                    // remove duplicate protein ID
+                    // TODO: probably no need to do this!
+                    tempProtein = tempProtein.filter(function (item, pos) {
+                        return tempProtein.indexOf(item) == pos;
+                    });
+
+                    tempApical = tempApical.filter(function (item, pos) {
+                        return tempApical.indexOf(item) == pos;
+                    });
+
+                    tempBasolateral = tempBasolateral.filter(function (item, pos) {
+                        return tempBasolateral.indexOf(item) == pos;
+                    });
+
+                    tempCapillary = tempCapillary.filter(function (item, pos) {
+                        return tempCapillary.indexOf(item) == pos;
+                    });
+
+                    // console.log("temp protein, apical, and basolateral: ", tempProtein, tempApical, tempBasolateral);
+                    // console.log("med_pr in makecotransporter : ", membrane1, membrane1.med_pr, membrane2, membrane2.med_pr);
+
+                    // check med_pr, med_pr_text and med_pr_text_syn
+                    var tmp_med_pr, tmp_med_pr_text, tmp_med_pr_text_syn;
+                    if (tempProtein[0] == membrane1.med_pr) {
+                        tmp_med_pr = membrane1.med_pr;
+                        tmp_med_pr_text = membrane1.med_pr_text;
+                        tmp_med_pr_text_syn = membrane1.med_pr_text_syn;
+                    }
+                    else {
+                        tmp_med_pr = membrane2.med_pr;
+                        tmp_med_pr_text = membrane2.med_pr_text;
+                        tmp_med_pr_text_syn = membrane2.med_pr_text_syn;
+                    }
+
+                    var membraneOBJ = {
+                        solute_chebi: membrane1.solute_chebi,
+                        solute_text: membrane1.solute_text,
+                        model_entity: membrane1.model_entity,
+                        med_fma: membrane1.med_fma,
+                        med_pr: tmp_med_pr, // membrane1.med_pr,
+                        med_pr_text: tmp_med_pr_text, // membrane1.med_pr_text,
+                        med_pr_text_syn: tmp_med_pr_text_syn, // membrane1.med_pr_text_syn,
+                        variable_text: membrane1.variable_text,
+                        source_fma: membrane1.source_fma,
+                        sink_fma: membrane1.sink_fma,
+                        protein_name: membrane1.protein_name,
+                        solute_chebi2: membrane2.solute_chebi,
+                        solute_text2: membrane2.solute_text,
+                        model_entity2: membrane2.model_entity,
+                        variable_text2: membrane2.variable_text,
+                        source_fma2: membrane2.source_fma,
+                        sink_fma2: membrane2.sink_fma,
+                        solute_chebi3: membrane3.solute_chebi,
+                        solute_text3: membrane3.solute_text,
+                        model_entity3: membrane3.model_entity,
+                        variable_text3: membrane3.variable_text,
+                        source_fma3: membrane3.source_fma,
+                        sink_fma3: membrane3.sink_fma
+                    };
+
+                    // console.log("tempprotein: ", tempProtein);
+
+                    for (var i = 0; i < tempProtein.length; i++) {
+
+                        // tritransporter in apical membrane
+                        if (tempProtein.length != 0 && tempApical.length != 0) {
+                            apicalMembrane.push(membraneOBJ);
+                        }
+
+                        // tritransporter in basolateral membrane
+                        if (tempProtein.length != 0 && tempBasolateral.length != 0) {
+                            basolateralMembrane.push(membraneOBJ);
+                        }
+
+                        // tritransporter in capillary membrane
+                        if (tempProtein.length != 0 && tempCapillary.length != 0) {
+                            capillaryMembrane.push(membraneOBJ);
+                        }
+                    }
+
+                    // transporter in apical membrane
+                    if (membrane1.med_fma == sparqlUtils.apicalID && membrane2.med_fma == sparqlUtils.apicalID && membrane3.med_fma == sparqlUtils.apicalID &&
+                        membrane1.med_pr == membrane2.med_pr && membrane2.med_pr == membrane3.med_pr) {
+                        apicalMembrane.push(membraneOBJ);
+                    }
+
+                    // transporter in basolateral membrane
+                    if (membrane1.med_fma == sparqlUtils.basolateralID && membrane2.med_fma == sparqlUtils.basolateralID && membrane3.med_fma == sparqlUtils.basolateralID &&
+                        membrane1.med_pr == membrane2.med_pr && membrane2.med_pr == membrane3.med_pr) {
+                        basolateralMembrane.push(membraneOBJ);
+                    }
+
+                    // transporter in capillary membrane
+                    if (membrane1.med_fma == sparqlUtils.capillaryID && membrane2.med_fma == sparqlUtils.capillaryID && membrane3.med_fma == sparqlUtils.capillaryID &&
+                        membrane1.med_pr == membrane2.med_pr && membrane2.med_pr == membrane3.med_pr) {
+                        capillaryMembrane.push(membraneOBJ);
+                    }
+
+                    if (membrane.length == 0) {
 
                         console.log("membrane in index.js: ", membrane);
                         console.log("apicalMembrane in index.js: ", apicalMembrane);
@@ -1568,9 +1730,20 @@ var EMP = (function (global) {
                                                             capillaryMembrane,
                                                             membrane);
                                                     }
-                                                    else {
+                                                    else if (membrane.length <= 2) {
 
-                                                        console.log("membrane.length >= 1 membrane: ", membrane);
+                                                        console.log("membrane.length <= 2 membrane: ", membrane);
+
+                                                        // make co-transporter
+                                                        for (i = 0; i < membrane.length; i++) {
+                                                            for (var j = i + 1; j < membrane.length; j++) {
+                                                                mainUtils.makecotransporter(membrane[i], membrane[j]);
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (membrane.length >= 3) {
+
+                                                        console.log("membrane.length >= 3 membrane: ", membrane);
 
                                                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
@@ -1580,6 +1753,27 @@ var EMP = (function (global) {
                                                         console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
                                                         console.log("templistOfModel: ", templistOfModel);
 
+                                                        var arr = [];
+                                                        for (var i = 0; i < membrane.length; i++) {
+                                                            if (membrane[i].med_pr == sparqlUtils.nkcc1) {
+                                                                arr.push(membrane[i]);
+
+                                                                membrane.splice(i, 1);
+                                                                i--;
+                                                            }
+                                                        }
+
+                                                        if (arr.length == 3) {
+                                                            mainUtils.maketritransporter(arr[0], arr[1], arr[2]);
+                                                        }
+                                                        else {
+                                                            for (var i = 0; i < arr.length; i++) {
+                                                                membrane.push(arr.pop());
+                                                                i--;
+                                                            }
+                                                        }
+
+                                                        // make co-transporter
                                                         for (i = 0; i < membrane.length; i++) {
                                                             for (var j = i + 1; j < membrane.length; j++) {
                                                                 mainUtils.makecotransporter(membrane[i], membrane[j]);
