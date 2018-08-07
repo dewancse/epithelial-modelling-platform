@@ -3,9 +3,10 @@
  */
 // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
-    cors_api_url = "http://localhost:8080/",
-    // endpoint = cors_api_url + pmrEndpoint;
-    endpoint = pmrEndpoint;
+    // cors_api_url = "http://localhost:8080/",
+    // endpoint = pmrEndpoint,
+    cors_api_url = "https://cors-anywhere.herokuapp.com/",
+    endpoint = cors_api_url + pmrEndpoint;
 
 var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/ontologies";
 var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
