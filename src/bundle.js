@@ -1766,19 +1766,19 @@ var EMP = (function (global) {
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
                     // pr_uri = undefined;
-                    endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 }
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
 
                     if (pr_uri == sparqlUtils.epithelialcellID)
-                        endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
                     else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
                         var go_uri = "http://purl.obolibrary.org/obo/GO_" + pr_uri.slice(pr_uri.indexOf("GO:") + 3);
-                        endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
                     }
                     else
-                        endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
 
                     // dropdown list
                     listOfProteinURIs.push(pr_uri);
@@ -1803,7 +1803,7 @@ var EMP = (function (global) {
 
                                 if (temp.indexOf(sparqlUtils.partOfProteinUri) != -1) {
                                     var mediatorURI = jsonepithelialobj.results.bindings[i].mediator.value;
-                                    endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + mediatorURI;
+                                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + mediatorURI;
                                     break;
                                 }
                             }
@@ -1821,7 +1821,7 @@ var EMP = (function (global) {
                                 if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
                                     endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
                                 else
-                                    endpointgeneOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                                    endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                                 ajaxUtils.sendGetRequest(
                                     endpointgeneOLS,
@@ -1833,7 +1833,7 @@ var EMP = (function (global) {
                                         if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
                                             endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
                                         else
-                                            endpointspeciesOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                                            endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                                         ajaxUtils.sendGetRequest(
                                             endpointspeciesOLS,
@@ -2035,7 +2035,7 @@ var EMP = (function (global) {
             var fma_uri = compartment[i].Compartment.value;
             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
 
-            var endpointOLS = sparqlUtils.ebiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
+            var endpointOLS = sparqlUtils.abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
             ajaxUtils.sendGetRequest(
                 endpointOLS,
@@ -2055,7 +2055,7 @@ var EMP = (function (global) {
                             var fma_uri = location[i].Located_in.value;
                             fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
 
-                            var endpointOLS = sparqlUtils.ebiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
+                            var endpointOLS = sparqlUtils.abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
                             ajaxUtils.sendGetRequest(
                                 endpointOLS,
@@ -2108,19 +2108,19 @@ var EMP = (function (global) {
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
                     // pr_uri = undefined;
-                    endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                    endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 }
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
 
                     if (pr_uri == sparqlUtils.epithelialcellID)
-                        endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
                     else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
                         var go_uri = "http://purl.obolibrary.org/obo/GO_" + pr_uri.slice(pr_uri.indexOf("GO:") + 3);
-                        endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
                     }
                     else
-                        endpointproteinOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 console.log("loadMOdel pr_uri: ", pr_uri);
@@ -2134,7 +2134,7 @@ var EMP = (function (global) {
 
                         var endpointgeneOLS;
                         if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.has_gene_template == undefined)
-                            endpointgeneOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                            endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                         else
                             endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
 
@@ -2144,7 +2144,7 @@ var EMP = (function (global) {
 
                                 var endpointspeciesOLS;
                                 if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.only_in_taxon == undefined)
-                                    endpointspeciesOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                                    endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                 else
                                     endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
 
@@ -2971,7 +2971,7 @@ var EMP = (function (global) {
                                 var indexofColon = chebi_uri.indexOf("CHEBI:");
                                 chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
 
-                                var endpointOLS = sparqlUtils.ebiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
+                                var endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
 
                                 console.log("endpointOLS in index.js: ", endpointOLS);
 
@@ -3065,14 +3065,14 @@ var EMP = (function (global) {
 
                                         if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                             chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(medURI.indexOf("CHEBI:") + 6);
-                                            endpointOLS = sparqlUtils.ebiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                         }
                                         else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
                                             var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(medURI.indexOf("GO:") + 3);
-                                            endpointOLS = sparqlUtils.ebiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
                                         }
                                         else
-                                            endpointOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + medURI;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;
 
                                         ajaxUtils.sendGetRequest(
                                             endpointOLS,
@@ -8432,12 +8432,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     var endpointprOLS;
                                     if (proteinName != undefined) {
                                         if (proteinName == sparqlUtils.epithelialcellID)
-                                            endpointprOLS = sparqlUtils.ebiOntoEndpoint + "/cl/terms?iri=" + proteinName;
+                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + proteinName;
                                         else
-                                            endpointprOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + proteinName;
+                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + proteinName;
                                     }
                                     else
-                                        endpointprOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
 
                                     ajaxUtils.sendGetRequest(
                                         endpointprOLS,
@@ -8445,7 +8445,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                             var endpointgeneOLS;
                                             if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.has_gene_template == undefined)
-                                                endpointgeneOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                                                endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                             else
                                                 endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
 
@@ -8455,7 +8455,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                     var endpointspeciesOLS;
                                                     if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.only_in_taxon == undefined)
-                                                        endpointspeciesOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                                                        endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                                                     else
                                                         endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
 
@@ -8582,13 +8582,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 var endpointprOLS;
                 if (jsonProtein.results.bindings.length == 0)
-                    endpointprOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                    endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 else {
                     var pr_uri = jsonProtein.results.bindings[0].Protein.value;
                     if (pr_uri == sparqlUtils.epithelialcellID)
-                        endpointprOLS = sparqlUtils.ebiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
                     else
-                        endpointprOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(
@@ -8647,13 +8647,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             function (jsonAltProtein) {
 
                 if (jsonAltProtein.results.bindings.length == 0)
-                    endpointOLS = sparqlUtils.ebiOntoEndpoint + "/pr";
+                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr";
                 else {
                     var pr_uri = jsonAltProtein.results.bindings[0].Protein.value;
                     if (pr_uri == sparqlUtils.epithelialcellID)
-                        endpointOLS = sparqlUtils.ebiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
                     else
-                        endpointOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(
@@ -8908,9 +8908,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 } else {
                     var pr_uri = jsonRelatedMembraneModel.results.bindings[0].Protein.value;
                     if (pr_uri == sparqlUtils.epithelialcellID)
-                        endpointprOLS = sparqlUtils.ebiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
                     else
-                        endpointprOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
                 ajaxUtils.sendGetRequest(
@@ -8935,7 +8935,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value,
                                         indexofColon = chebi_uri.indexOf("CHEBI:");
                                     chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
-                                    endpointOLS = sparqlUtils.ebiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
+                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                 }
 
                                 ajaxUtils.sendGetRequest(
@@ -8951,7 +8951,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 indexofColon2 = chebi_uri2.indexOf("CHEBI:");
                                             chebi_uri2 = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri2.slice(indexofColon2 + 6);
 
-                                            endpointOLS2 = sparqlUtils.ebiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri2;
+                                            endpointOLS2 = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri2;
                                         }
 
                                         ajaxUtils.sendGetRequest(
@@ -9211,15 +9211,15 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                                     var indexofColon = medURI.indexOf("CHEBI:");
                                                     chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
-                                                    endpointOLS = sparqlUtils.ebiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
+                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                                 }
                                                 else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
                                                     var indexofColon = medURI.indexOf("GO:");
                                                     var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
-                                                    endpointOLS = sparqlUtils.ebiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
                                                 }
                                                 else
-                                                    endpointOLS = sparqlUtils.ebiOntoEndpoint + "/pr/terms?iri=" + medURI;
+                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;
 
                                                 ajaxUtils.sendGetRequest(
                                                     endpointOLS,
