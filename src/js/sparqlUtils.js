@@ -8,7 +8,7 @@ var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
     cors_api_url = "https://cors-anywhere.herokuapp.com/",
     endpoint = cors_api_url + pmrEndpoint;
 
-var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/ontologies";
+var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/api/ontologies";
 var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
 
 var organ = [
