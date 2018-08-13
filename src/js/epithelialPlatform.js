@@ -221,13 +221,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .attr("stroke", function (d) {
             svg.append("text")
                 .style("font", "16px sans-serif")
-                .attr("stroke", "red")
+                .attr("stroke", "darkred")
                 .attr("x", 960)
                 .attr("y", 195)
                 .text("Capillary Membrane")
                 .attr("opacity", 0.5);
 
-            return "red";
+            return "darkred";
         })
         .attr("stroke-width", 25)
         .attr("opacity", 0.5);
@@ -316,7 +316,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     //     .style("opacity", 0);
 
     // closing tooltip
-    $(document).on("mousedown", function () {
+    $(document).on("mousedown", function (event) {
         // console.log("mousedown: ", event.which);
 
         // 1 => left click, 2 => middle click, 3 => right click
@@ -325,7 +325,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     });
 
     // add models without dragging
-    $(document).on("click", function () {
+    $(document).on("click", function (event) {
 
         console.log("click FUNCTION!");
 
@@ -5277,10 +5277,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     endpointOLS = undefined;
                                 }
                                 else {
-                                    var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value,
-                                        indexofColon = chebi_uri.indexOf("CHEBI:");
-                                    chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
-                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
+                                    var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
+                                    var endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                 }
 
                                 ajaxUtils.sendGetRequest(
@@ -5292,11 +5290,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                             endpointOLS2 = undefined;
                                         }
                                         else {
-                                            var chebi_uri2 = jsonObjFlux.results.bindings[0].solute_chebi2.value,
-                                                indexofColon2 = chebi_uri2.indexOf("CHEBI:");
-                                            chebi_uri2 = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri2.slice(indexofColon2 + 6);
-
-                                            endpointOLS2 = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri2;
+                                            var chebi_uri2 = jsonObjFlux.results.bindings[0].solute_chebi2.value;
+                                            var endpointOLS2 = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri2;
                                         }
 
                                         ajaxUtils.sendGetRequest(
@@ -5554,14 +5549,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 // console.log("medURI: ", medURI);
 
                                                 if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
-                                                    var indexofColon = medURI.indexOf("CHEBI:");
-                                                    chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(indexofColon + 6);
-                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
+                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + medURI;
                                                 }
                                                 else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                                                    var indexofColon = medURI.indexOf("GO:");
-                                                    var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(indexofColon + 3);
-                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                                                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + medURI;
                                                 }
                                                 else
                                                     endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;
@@ -5754,10 +5745,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             // https://www.ebi.ac.uk/seqdb/confluence/display/WEBSERVICES/clustalo_rest
             var WSDbfetchREST = function () {
 
-                var cors_api_url = "http://localhost:8080/",
-                    dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
-                // cors_api_url = "https://cors-anywhere.herokuapp.com/",
-                // dbfectendpoint = cors_api_url + "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+                var cors_api_url = "https://cors-anywhere.herokuapp.com/",
+                    dbfectendpoint = cors_api_url + "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
 
                 ajaxUtils.sendGetRequest(
                     dbfectendpoint,

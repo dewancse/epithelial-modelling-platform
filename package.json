@@ -2,9 +2,9 @@
   "name": "epithelial-modelling-platform",
   "version": "0.0.1",
   "description": "A web-based epithelial transport discovery, exploration and assembly tool",
-  "main": "./src/index.html",
+  "main": "server.js",
   "scripts": {
-    "build": "node ./src/js/server.js"
+    "start": "node server.js"
   },
   "authors": [
     "Dewan Sarwar <dsar941@aucklanduni.ac.nz>"
@@ -30,7 +30,10 @@
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
     "proxy-from-env": "^1.0.0",
-    "selenium-webdriver": "^3.6.0"
+    "selenium-webdriver": "^3.6.0",
+    "express": "^4.16.3",
+    "body-parser": "^1.18.3",
+    "path": "^0.12.7"
   },
   "keywords": [
     "epithelial",

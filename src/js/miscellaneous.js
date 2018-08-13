@@ -3,7 +3,7 @@
  */
 // Show loading icon inside element identified by 'selector'.
 var showLoading = function (selector) {
-    $(selector).html("<div class='text-center'><img src='../src/img/ajax-loader.gif'></div>");
+    $(selector).html("<div class='text-center'><img src='../img/ajax-loader.gif'></div>");
 };
 
 // remove duplicate model entity and biological meaning

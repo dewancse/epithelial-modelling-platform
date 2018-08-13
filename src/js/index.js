@@ -188,13 +188,13 @@ var EMP = (function (global) {
     };
 
     // ACTIONS: if there is an action with the given name, call it
-    $(document).on("click", function () {
+    $(document).on("click", function (event) {
         if (typeof actions[event.target.dataset.action] === "function")
             actions[event.target.dataset.action].call(this, event);
     });
 
     // MODEL DISCOVERY: enter search texts
-    $(document).on("keydown", function () {
+    $(document).on("keydown", function (event) {
         if (event.key == "Enter") {
 
             var uriOPB, uriCHEBI, keyValue;
@@ -296,8 +296,7 @@ var EMP = (function (global) {
                     if (pr_uri == sparqlUtils.epithelialcellID)
                         endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
                     else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                        var go_uri = "http://purl.obolibrary.org/obo/GO_" + pr_uri.slice(pr_uri.indexOf("GO:") + 3);
-                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
                     }
                     else
                         endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
@@ -556,7 +555,7 @@ var EMP = (function (global) {
 
             var fma_uri = compartment[i].Compartment.value;
             console.log("fma_uri: ", fma_uri);
-            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
+            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
 
             var endpointOLS = sparqlUtils.abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
@@ -578,7 +577,7 @@ var EMP = (function (global) {
                         for (var i in location) {
 
                             var fma_uri = location[i].Located_in.value;
-                            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA:") + 4);
+                            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
 
                             var endpointOLS = sparqlUtils.abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
@@ -641,8 +640,7 @@ var EMP = (function (global) {
                     if (pr_uri == sparqlUtils.epithelialcellID)
                         endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
                     else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                        var go_uri = "http://purl.obolibrary.org/obo/GO_" + pr_uri.slice(pr_uri.indexOf("GO:") + 3);
-                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                        endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
                     }
                     else
                         endpointproteinOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
@@ -1493,9 +1491,6 @@ var EMP = (function (global) {
                                 console.log("jsonObjFlux in index.js: ", jsonObjFlux);
 
                                 var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
-                                var indexofColon = chebi_uri.indexOf("CHEBI:");
-                                chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + chebi_uri.slice(indexofColon + 6);
-
                                 var endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
 
                                 console.log("endpointOLS in index.js: ", endpointOLS);
@@ -1589,12 +1584,10 @@ var EMP = (function (global) {
                                             medURI = med_pr[0].fma;
 
                                         if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
-                                            chebi_uri = "http://purl.obolibrary.org/obo/CHEBI_" + medURI.slice(medURI.indexOf("CHEBI:") + 6);
                                             endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                         }
                                         else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                                            var go_uri = "http://purl.obolibrary.org/obo/GO_" + medURI.slice(medURI.indexOf("GO:") + 3);
-                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + go_uri;
+                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + medURI;
                                         }
                                         else
                                             endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;

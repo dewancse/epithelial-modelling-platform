@@ -106,8 +106,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
         .attr("stroke", function (d) {
             svg.append("text")
                 .style("font", "16px sans-serif")
-                .attr("stroke", "darkred")
-                // .attr("opacity", 0.5)
+                .attr("stroke", "red")
                 .attr("x", 960)
                 .attr("y", 145)
                 .text("Blood Capillary");
@@ -115,8 +114,7 @@ var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerH
             return "red";
         })
         .attr("stroke-width", 1)
-        .attr("fill", "darkred");
-        // .attr("opacity", 0.5);
+        .attr("fill", "white");
 
     // Paracellular rectangle
     var paracellular = newg.append("rect")

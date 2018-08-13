@@ -1,12 +1,8 @@
 /**
  * Created by Dewan Sarwar on 14/01/2018.
  */
-// var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
-var pmrEndpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search",
-    cors_api_url = "http://localhost:8080/",
-    endpoint = pmrEndpoint;
-// cors_api_url = "https://cors-anywhere.herokuapp.com/",
-// endpoint = cors_api_url + pmrEndpoint;
+var cors_api_url = "https://cors-anywhere.herokuapp.com/",
+    endpoint = cors_api_url + "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
 var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/api/ontologies";
 var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
@@ -15,47 +11,47 @@ var organ = [
     {
         "key": [
             {
-                "key": "http://identifiers.org/fma/FMA:7203",
+                "key": "http://purl.obolibrary.org/obo/FMA_7203",
                 "value": "kidney"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:84666",
+                "key": "http://purl.obolibrary.org/obo/FMA_84666",
                 "value": "apical plasma membrane"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:70973",
+                "key": "http://purl.obolibrary.org/obo/FMA_70973",
                 "value": "epithelial cell of proximal tubule"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:70981",
+                "key": "http://purl.obolibrary.org/obo/FMA_70981",
                 "value": "epithelial cell of Distal tubule"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:17693",
+                "key": "http://purl.obolibrary.org/obo/FMA_17693",
                 "value": "proximal convoluted tubule"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:17721",
+                "key": "http://purl.obolibrary.org/obo/FMA_17721",
                 "value": "distal convoluted tubule"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:66836",
+                "key": "http://purl.obolibrary.org/obo/FMA_66836",
                 "value": "portion of cytosol"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:84669",
+                "key": "http://purl.obolibrary.org/obo/FMA_84669",
                 "value": "basolateralMembrane plasma membrane"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:17716",
+                "key": "http://purl.obolibrary.org/obo/FMA_17716",
                 "value": "proximal straight tubule"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:17717",
+                "key": "http://purl.obolibrary.org/obo/FMA_17717",
                 "value": "ascending limb of loop of Henle"
             },
             {
-                "key": "http://identifiers.org/fma/FMA:17705",
+                "key": "http://purl.obolibrary.org/obo/FMA_17705",
                 "value": "descending limb of loop of Henle"
             },
             {
@@ -96,37 +92,37 @@ var dictionary = [
     {
         "key1": "flux", "key2": "sodium",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:29101>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>"
     },
     {
         "key1": "flux", "key2": "hydrogen",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:15378>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>"
     },
     {
         "key1": "flux", "key2": "ammonium",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>"
     },
     {
         "key1": "flux", "key2": "chloride",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>"
     },
     {
         "key1": "flux", "key2": "potassium",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:29103>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>"
     },
     {
         "key1": "flux", "key2": "bicarbonate",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:17544>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>"
     },
     {
         "key1": "flux", "key2": "glucose",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>"
     },
     {
         "key1": "concentration", "key2": "",
@@ -135,37 +131,37 @@ var dictionary = [
     {
         "key1": "concentration", "key2": "sodium",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:29101>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>"
     },
     {
         "key1": "concentration", "key2": "hydrogen",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:15378>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>"
     },
     {
         "key1": "concentration", "key2": "ammonium",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:28938>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>"
     },
     {
         "key1": "concentration", "key2": "chloride",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:17996>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>"
     },
     {
         "key1": "concentration", "key2": "potassium",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:29103>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>"
     },
     {
         "key1": "concentration", "key2": "bicarbonate",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:17544>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>"
     },
     {
         "key1": "concentration", "key2": "glucose",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://identifiers.org/chebi/CHEBI:17234>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>"
     }
 ];
 
@@ -178,29 +174,29 @@ var similarityHtml = "./snippets/similarity-snippet.html";
 var epithelialHtml = "./snippets/epithelial-snippet.html";
 
 var epithelialcellID = "http://purl.obolibrary.org/obo/CL_0000066";
-var apicalID = "http://identifiers.org/fma/FMA:84666";
-var basolateralID = "http://identifiers.org/fma/FMA:84669";
+var apicalID = "http://purl.obolibrary.org/obo/FMA_84666";
+var basolateralID = "http://purl.obolibrary.org/obo/FMA_84669";
 var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
 var partOfCellUri = "http://purl.obolibrary.org/obo/CL";
-var partOfGOUri = "http://identifiers.org/go/GO";
-var partOfCHEBIUri = "http://identifiers.org/chebi/CHEBI";
+var partOfGOUri = "http://purl.obolibrary.org/obo/GO";
+var partOfCHEBIUri = "http://purl.obolibrary.org/obo/CHEBI";
 var fluxOPB = "http://identifiers.org/opb/OPB_00593";
 var concentrationOPB = "http://identifiers.org/opb/OPB_00340";
 
-var paracellularID = "http://identifiers.org/fma/FMA:67394";
-var luminalID = "http://identifiers.org/fma/FMA:74550";
-var cytosolID = "http://identifiers.org/fma/FMA:66836";
-var interstitialID = "http://identifiers.org/fma/FMA:9673";
+var paracellularID = "http://purl.obolibrary.org/obo/FMA_67394";
+var luminalID = "http://purl.obolibrary.org/obo/FMA_74550";
+var cytosolID = "http://purl.obolibrary.org/obo/FMA_66836";
+var interstitialID = "http://purl.obolibrary.org/obo/FMA_9673";
 var Nachannel = "http://purl.obolibrary.org/obo/PR_000014527";
 var Clchannel = "http://purl.obolibrary.org/obo/PR_Q06393";
 var Kchannel = "http://purl.obolibrary.org/obo/PR_P15387";
-var partOfFMAUri = "http://identifiers.org/fma/FMA";
+var partOfFMAUri = "http://purl.obolibrary.org/obo/FMA";
 
 var naENaC = "http://purl.obolibrary.org/obo/PR_P37089";
 var clChannel = "http://purl.obolibrary.org/obo/PR_P35524";
 var kChannel = "http://purl.obolibrary.org/obo/PR_000001916";
-var bloodCapillary = "http://identifiers.org/fma/FMA:263901";
-var capillaryID = "http://identifiers.org/fma/FMA:63194";
+var bloodCapillary = "http://purl.obolibrary.org/obo/FMA_263901";
+var capillaryID = "http://purl.obolibrary.org/obo/FMA_63194";
 var nkcc1 = "http://purl.obolibrary.org/obo/PR_P55012";
 
 var myWorkspaneName = "https://models.physiomeproject.org/workspace/267";
