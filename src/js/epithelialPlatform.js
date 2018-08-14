@@ -2967,7 +2967,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -3027,7 +3027,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text3);
                     }
@@ -3058,7 +3058,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             return d.y + radius;
                         })
                         .attr("r", radius)
-                        .attr("fill", "red")
+                        .attr("fill", "darkred")
                         .attr("opacity", 0.6)
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
@@ -3160,7 +3160,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text2);
                     }
@@ -3224,7 +3224,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -3284,7 +3284,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text3);
                     }
@@ -3315,7 +3315,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             return d.y + radius;
                         })
                         .attr("r", radius)
-                        .attr("fill", "red")
+                        .attr("fill", "darkred")
                         .attr("opacity", 0.6)
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
@@ -3417,7 +3417,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text2);
                     }
@@ -3478,7 +3478,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -3538,7 +3538,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text3);
                     }
@@ -3569,7 +3569,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             return d.y + radius;
                         })
                         .attr("r", radius)
-                        .attr("fill", "red")
+                        .attr("fill", "darkred")
                         .attr("opacity", 0.6)
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
@@ -3671,7 +3671,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text2);
                     }
@@ -3732,7 +3732,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -3792,7 +3792,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text3);
                     }
@@ -3823,7 +3823,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             return d.y + radius;
                         })
                         .attr("r", radius)
-                        .attr("fill", "red")
+                        .attr("fill", "darkred")
                         .attr("opacity", 0.6)
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
@@ -3925,7 +3925,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text2);
                     }
@@ -3989,7 +3989,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -4145,7 +4145,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -4889,6 +4889,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }
         }
         else {
+            moveBack();
+
             if (mindex == 1)
                 $($("line")[mindex]).css("stroke", "orange");
             else
@@ -5974,7 +5976,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     };
 
     // circles, polygons and arrows move back if close clicked
-    // circles, polygons and arrows move back if close clicked
     var moveBack = function () {
         if (linewithlineg[icircleGlobal] != undefined) {
             linewithlineg[icircleGlobal]
@@ -6046,6 +6047,30 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     .duration(1000)
                     .attr("x", dxtext2[icircleGlobal])
                     .attr("y", dytext2[icircleGlobal]);
+            }
+        }
+
+        if (linewithlineg3[icircleGlobal] != undefined) {
+            if (linewithlineg3[icircleGlobal] != "") {
+                linewithlineg3[icircleGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x1", dx1line3[icircleGlobal])
+                    .attr("y1", dy1line3[icircleGlobal])
+                    .attr("x2", dx2line3[icircleGlobal])
+                    .attr("y2", dy2line3[icircleGlobal]);
+            }
+        }
+
+        if (linewithtextg3[icircleGlobal] != undefined) {
+            if (linewithtextg3[icircleGlobal] != "") {
+                linewithtextg3[icircleGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x", dxtext3[icircleGlobal])
+                    .attr("y", dytext3[icircleGlobal]);
             }
         }
     };

@@ -1919,10 +1919,6 @@ var EMP = (function (global) {
         else {
             console.log("loadSearchHtml ELSE");
 
-            // remove from the 'Add Models' list
-            modelEntityName.splice(modelEntityName.indexOf(mainUtils.selectedTempidWithStr), 1);
-            workspaceNameList.splice(workspaceNameList.indexOf(mainUtils.selectedWorkspaceName), 1);
-
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
             filterByProtein(); // reload protein in the dropdown list
@@ -2003,6 +1999,10 @@ var EMP = (function (global) {
     // VIEW MODEL: load the view page to display details of a selected model
     mainUtils.loadViewHtml = function () {
 
+        // remove if visited the view html page
+        modelEntityName.splice(modelEntityName.indexOf(mainUtils.selectedTempidWithStr), 1);
+        workspaceNameList.splice(workspaceNameList.indexOf(mainUtils.selectedWorkspaceName), 1);
+
         var cellmlModel = mainUtils.selectedWorkspaceName;
 
         if (cellmlModel == undefined) {
@@ -2078,9 +2078,6 @@ var EMP = (function (global) {
                                     else tempLocation += "";
 
                                     if (counterOLSLoc == location.length) {
-
-                                        console.log("jsonObj: ", workspaceNameList[workspaceCnt], protein, species);
-
                                         workspacejsonObj.push(
                                             {
                                                 "Model_entity": modelEntityName[workspaceCnt],
@@ -2251,6 +2248,8 @@ var EMP = (function (global) {
     // LOAD MODELS: display a selected model
     mainUtils.showModel = function (jsonObj) {
 
+        console.log("jsonObj: ", jsonObj);
+
         for (var i = 0; i < jsonObj.length; i++) {
             // add this model temporarily to display in MODEL DISCOVERY when deleted
             if (modelEntityInLoadModels.indexOf(jsonObj[i].Model_entity) == -1) {
@@ -2386,9 +2385,17 @@ var EMP = (function (global) {
         }
 
         lengthOfLoadModelTable = $("table tr").length;
+
+        console.log("lengthOfLoadModelTable in showodel: ", lengthOfLoadModelTable);
+        console.log("workspaceNameList in showodel: ", workspaceNameList);
+        console.log("modelEntityName in showodel: ", modelEntityName);
+        console.log("workspaceCnt in showodel: ", workspaceCnt);
+        console.log("workspacejsonObj in showodel: ", workspacejsonObj);
+
         if (lengthOfLoadModelTable == 1) {
-            mainUtils.workspaceName = "";
             workspaceNameList = [];
+            workspaceCnt = 0;
+            modelEntityName = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
@@ -2492,9 +2499,17 @@ var EMP = (function (global) {
         });
 
         lengthOfLoadModelTable = $("table tr").length;
+
+        console.log("lengthOfLoadModelTable in deleteRowModelHtml: ", lengthOfLoadModelTable);
+        console.log("workspaceNameList in deleteRowModelHtml: ", workspaceNameList);
+        console.log("modelEntityName in deleteRowModelHtml: ", modelEntityName);
+        console.log("workspaceCnt in showodel: ", workspaceCnt);
+        console.log("workspacejsonObj in showodel: ", workspacejsonObj);
+
         if (lengthOfLoadModelTable == 1) {
-            mainUtils.workspaceName = "";
             workspaceNameList = [];
+            workspaceCnt = 0;
+            modelEntityName = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
@@ -2528,9 +2543,17 @@ var EMP = (function (global) {
     mainUtils.loadEpithelialHtml = function () {
 
         // make empty list in LOAD MODELS
+
+        console.log("lengthOfLoadModelTable in loadEpithelialHtml: ", lengthOfLoadModelTable);
+        console.log("workspaceNameList in loadEpithelialHtml: ", workspaceNameList);
+        console.log("modelEntityName in loadEpithelialHtml: ", modelEntityName);
+        console.log("workspaceCnt in showodel: ", workspaceCnt);
+        console.log("workspacejsonObj in showodel: ", workspacejsonObj);
+
         if (lengthOfLoadModelTable == 2) {
-            // mainUtils.workspaceName = "";
             workspaceNameList = [];
+            workspaceCnt = 0;
+            modelEntityName = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
         }
 
@@ -6657,7 +6680,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -6717,7 +6740,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text3);
                     }
@@ -6748,7 +6771,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             return d.y + radius;
                         })
                         .attr("r", radius)
-                        .attr("fill", "red")
+                        .attr("fill", "darkred")
                         .attr("opacity", 0.6)
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
@@ -6850,7 +6873,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text2);
                     }
@@ -6914,7 +6937,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -6974,7 +6997,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text3);
                     }
@@ -7005,7 +7028,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             return d.y + radius;
                         })
                         .attr("r", radius)
-                        .attr("fill", "red")
+                        .attr("fill", "darkred")
                         .attr("opacity", 0.6)
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
@@ -7107,7 +7130,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text2);
                     }
@@ -7168,7 +7191,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -7228,7 +7251,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text3);
                     }
@@ -7259,7 +7282,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             return d.y + radius;
                         })
                         .attr("r", radius)
-                        .attr("fill", "red")
+                        .attr("fill", "darkred")
                         .attr("opacity", 0.6)
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
@@ -7361,7 +7384,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text2);
                     }
@@ -7422,7 +7445,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -7482,7 +7505,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text3);
                     }
@@ -7513,7 +7536,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             return d.y + radius;
                         })
                         .attr("r", radius)
-                        .attr("fill", "red")
+                        .attr("fill", "darkred")
                         .attr("opacity", 0.6)
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
@@ -7615,7 +7638,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             .attr("font-family", "Times New Roman")
                             .attr("font-size", "12px")
                             .attr("font-weight", "bold")
-                            .attr("fill", "white")
+                            .attr("fill", "red")
                             .attr("cursor", "pointer")
                             .text(solute_text2);
                     }
@@ -7679,7 +7702,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -7835,7 +7858,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("font-family", "Times New Roman")
                         .attr("font-size", "12px")
                         .attr("font-weight", "bold")
-                        .attr("fill", "white")
+                        .attr("fill", "red")
                         .attr("cursor", "pointer")
                         .text(solute_text);
 
@@ -8579,6 +8602,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }
         }
         else {
+            moveBack();
+
             if (mindex == 1)
                 $($("line")[mindex]).css("stroke", "orange");
             else
@@ -9664,7 +9689,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     };
 
     // circles, polygons and arrows move back if close clicked
-    // circles, polygons and arrows move back if close clicked
     var moveBack = function () {
         if (linewithlineg[icircleGlobal] != undefined) {
             linewithlineg[icircleGlobal]
@@ -9736,6 +9760,30 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     .duration(1000)
                     .attr("x", dxtext2[icircleGlobal])
                     .attr("y", dytext2[icircleGlobal]);
+            }
+        }
+
+        if (linewithlineg3[icircleGlobal] != undefined) {
+            if (linewithlineg3[icircleGlobal] != "") {
+                linewithlineg3[icircleGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x1", dx1line3[icircleGlobal])
+                    .attr("y1", dy1line3[icircleGlobal])
+                    .attr("x2", dx2line3[icircleGlobal])
+                    .attr("y2", dy2line3[icircleGlobal]);
+            }
+        }
+
+        if (linewithtextg3[icircleGlobal] != undefined) {
+            if (linewithtextg3[icircleGlobal] != "") {
+                linewithtextg3[icircleGlobal]
+                    .transition()
+                    .delay(1000)
+                    .duration(1000)
+                    .attr("x", dxtext3[icircleGlobal])
+                    .attr("y", dytext3[icircleGlobal]);
             }
         }
     };

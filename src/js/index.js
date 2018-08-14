@@ -445,10 +445,6 @@ var EMP = (function (global) {
         else {
             console.log("loadSearchHtml ELSE");
 
-            // remove from the 'Add Models' list
-            modelEntityName.splice(modelEntityName.indexOf(mainUtils.selectedTempidWithStr), 1);
-            workspaceNameList.splice(workspaceNameList.indexOf(mainUtils.selectedWorkspaceName), 1);
-
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
             filterByProtein(); // reload protein in the dropdown list
@@ -529,6 +525,10 @@ var EMP = (function (global) {
     // VIEW MODEL: load the view page to display details of a selected model
     mainUtils.loadViewHtml = function () {
 
+        // remove if visited the view html page
+        modelEntityName.splice(modelEntityName.indexOf(mainUtils.selectedTempidWithStr), 1);
+        workspaceNameList.splice(workspaceNameList.indexOf(mainUtils.selectedWorkspaceName), 1);
+
         var cellmlModel = mainUtils.selectedWorkspaceName;
 
         if (cellmlModel == undefined) {
@@ -604,9 +604,6 @@ var EMP = (function (global) {
                                     else tempLocation += "";
 
                                     if (counterOLSLoc == location.length) {
-
-                                        console.log("jsonObj: ", workspaceNameList[workspaceCnt], protein, species);
-
                                         workspacejsonObj.push(
                                             {
                                                 "Model_entity": modelEntityName[workspaceCnt],
@@ -912,9 +909,11 @@ var EMP = (function (global) {
         }
 
         lengthOfLoadModelTable = $("table tr").length;
+
         if (lengthOfLoadModelTable == 1) {
-            mainUtils.workspaceName = "";
             workspaceNameList = [];
+            workspaceCnt = 0;
+            modelEntityName = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
@@ -1018,9 +1017,11 @@ var EMP = (function (global) {
         });
 
         lengthOfLoadModelTable = $("table tr").length;
+
         if (lengthOfLoadModelTable == 1) {
-            mainUtils.workspaceName = "";
             workspaceNameList = [];
+            workspaceCnt = 0;
+            modelEntityName = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
@@ -1055,8 +1056,9 @@ var EMP = (function (global) {
 
         // make empty list in LOAD MODELS
         if (lengthOfLoadModelTable == 2) {
-            // mainUtils.workspaceName = "";
             workspaceNameList = [];
+            workspaceCnt = 0;
+            modelEntityName = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
         }
 
