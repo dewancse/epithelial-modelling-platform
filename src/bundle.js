@@ -1501,7 +1501,8 @@ var EMP = (function (global) {
         modelEntityFullNameArray = [],
         modelEntityInLoadModels = [], // Load Models Entity
         lengthOfLoadModelTable, // switching between pages
-        visualizedModelsOnPlatform = [];
+        visualizedModelsOnPlatform = [],
+        alreadyDiscoveredModels = []; // will not appear in case of re-discover phase
 
     // MODEL DISCOVERY
     var modelEntity = [],
@@ -1937,6 +1938,19 @@ var EMP = (function (global) {
     // MODEL DISCOVERY: display discovered models from PMR
     mainUtils.showDiscoverModels = function () {
 
+        // already discovered models will not appear in re-discover phase
+        for (var i = 0; i < alreadyDiscoveredModels.length; i++) {
+            // delete this model to hide in re-DISCOVERY
+            if (modelEntity.indexOf(alreadyDiscoveredModels[i]) != -1) {
+                var index = modelEntity.indexOf(alreadyDiscoveredModels);
+                modelEntity.splice(index, 1);
+                biologicalMeaning.splice(index, 1);
+                speciesList.splice(index, 1);
+                geneList.splice(index, 1);
+                proteinList.splice(index, 1);
+            }
+        }
+
         // Empty search result
         if (head.length == 0) {
             $("#searchList").html("<section class=container-fluid><label><br>No Search Results!</label></section>");
@@ -2248,8 +2262,6 @@ var EMP = (function (global) {
     // LOAD MODELS: display a selected model
     mainUtils.showModel = function (jsonObj) {
 
-        console.log("jsonObj: ", jsonObj);
-
         for (var i = 0; i < jsonObj.length; i++) {
             // add this model temporarily to display in MODEL DISCOVERY when deleted
             if (modelEntityInLoadModels.indexOf(jsonObj[i].Model_entity) == -1) {
@@ -2360,6 +2372,11 @@ var EMP = (function (global) {
         table.append(tbody);
         $("#modelList").append(table);
 
+        // already disocvered models will not appear in case of rediscover phase
+        for (var i = 0; i < model2DArray.length; i++) {
+            alreadyDiscoveredModels.push(model2DArray[i][1]);
+        }
+
         // delete already visualized models on the platform
         visualizedModelsOnPlatform.forEach(function (element) {
             for (var i = 0; i < $("table tr").length; i++) {
@@ -2385,12 +2402,6 @@ var EMP = (function (global) {
         }
 
         lengthOfLoadModelTable = $("table tr").length;
-
-        console.log("lengthOfLoadModelTable in showodel: ", lengthOfLoadModelTable);
-        console.log("workspaceNameList in showodel: ", workspaceNameList);
-        console.log("modelEntityName in showodel: ", modelEntityName);
-        console.log("workspaceCnt in showodel: ", workspaceCnt);
-        console.log("workspacejsonObj in showodel: ", workspacejsonObj);
 
         if (lengthOfLoadModelTable == 1) {
             workspaceNameList = [];
@@ -2500,12 +2511,6 @@ var EMP = (function (global) {
 
         lengthOfLoadModelTable = $("table tr").length;
 
-        console.log("lengthOfLoadModelTable in deleteRowModelHtml: ", lengthOfLoadModelTable);
-        console.log("workspaceNameList in deleteRowModelHtml: ", workspaceNameList);
-        console.log("modelEntityName in deleteRowModelHtml: ", modelEntityName);
-        console.log("workspaceCnt in showodel: ", workspaceCnt);
-        console.log("workspacejsonObj in showodel: ", workspacejsonObj);
-
         if (lengthOfLoadModelTable == 1) {
             workspaceNameList = [];
             workspaceCnt = 0;
@@ -2543,13 +2548,6 @@ var EMP = (function (global) {
     mainUtils.loadEpithelialHtml = function () {
 
         // make empty list in LOAD MODELS
-
-        console.log("lengthOfLoadModelTable in loadEpithelialHtml: ", lengthOfLoadModelTable);
-        console.log("workspaceNameList in loadEpithelialHtml: ", workspaceNameList);
-        console.log("modelEntityName in loadEpithelialHtml: ", modelEntityName);
-        console.log("workspaceCnt in showodel: ", workspaceCnt);
-        console.log("workspacejsonObj in showodel: ", workspacejsonObj);
-
         if (lengthOfLoadModelTable == 2) {
             workspaceNameList = [];
             workspaceCnt = 0;

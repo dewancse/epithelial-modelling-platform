@@ -27,7 +27,8 @@ var EMP = (function (global) {
         modelEntityFullNameArray = [],
         modelEntityInLoadModels = [], // Load Models Entity
         lengthOfLoadModelTable, // switching between pages
-        visualizedModelsOnPlatform = [];
+        visualizedModelsOnPlatform = [],
+        alreadyDiscoveredModels = []; // will not appear in case of re-discover phase
 
     // MODEL DISCOVERY
     var modelEntity = [],
@@ -463,6 +464,19 @@ var EMP = (function (global) {
     // MODEL DISCOVERY: display discovered models from PMR
     mainUtils.showDiscoverModels = function () {
 
+        // already discovered models will not appear in re-discover phase
+        for (var i = 0; i < alreadyDiscoveredModels.length; i++) {
+            // delete this model to hide in re-DISCOVERY
+            if (modelEntity.indexOf(alreadyDiscoveredModels[i]) != -1) {
+                var index = modelEntity.indexOf(alreadyDiscoveredModels);
+                modelEntity.splice(index, 1);
+                biologicalMeaning.splice(index, 1);
+                speciesList.splice(index, 1);
+                geneList.splice(index, 1);
+                proteinList.splice(index, 1);
+            }
+        }
+
         // Empty search result
         if (head.length == 0) {
             $("#searchList").html("<section class=container-fluid><label><br>No Search Results!</label></section>");
@@ -883,6 +897,11 @@ var EMP = (function (global) {
 
         table.append(tbody);
         $("#modelList").append(table);
+
+        // already disocvered models will not appear in case of rediscover phase
+        for (var i = 0; i < model2DArray.length; i++) {
+            alreadyDiscoveredModels.push(model2DArray[i][1]);
+        }
 
         // delete already visualized models on the platform
         visualizedModelsOnPlatform.forEach(function (element) {
