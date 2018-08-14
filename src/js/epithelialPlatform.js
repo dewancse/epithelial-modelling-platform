@@ -471,7 +471,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue, y: yvalue + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -710,7 +710,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue, y: yvalue + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -946,7 +946,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue, y: yvalue + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -1182,7 +1182,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" || textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue, y: yvalue + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -1723,7 +1723,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -1965,7 +1965,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -2203,7 +2203,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -2439,7 +2439,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -2982,7 +2982,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{
                             x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                             y: yvaluec + radius
@@ -3239,7 +3239,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{
                             x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                             y: yvaluec + radius
@@ -3493,7 +3493,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{
                             x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                             y: yvaluec + radius
@@ -3747,7 +3747,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (textvalue3 != "flux" && textvalue3 != "") {
+                    if (mediator_pr == sparqlUtils.nkcc1) {
                         var lineg3 = lineg.append("g").data([{
                             x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                             y: yvaluec + radius

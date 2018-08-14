@@ -2,13 +2,12 @@
 Epithelial modelling platform is a web-based epithelial transport discovery, exploration and assembly tool. It allows users to discover, explore and assemble computational models for investigating their experimental or clinical hypotheses. In particular, this platform will aid biologists and clinicians to test their clinical or experimental hypotheses for a given collection of disparate mechanisms and/or observations such as diseases, drug actions and clinical observations.
 
 ### Installing EPM
-Please do the following steps to clone the EPM in your workspace:
+Please do the following steps to install the MDT in your workspace:
 
-- git clone https://github.com/dewancse/epithelial-modelling-platform.git
-- run the "server.js" with this command: "node ./src/js/server.js"
-- open "index.html" in the browser
-- install "CORS Toggle" to deal with cross browser origin issue.
-- if you change something in any js files of the project, you need to execute webpack with this command: "webpack --progress --profile" 
+- `git clone https://github.com/dewancse/epithelial-modelling-platform.git`
+- `npm install` to install packages
+- `npm start` to run server.js
+- Open `http://127.0.0.1:8080/` in the browser to start index.html home page
 
 ### EPM workflow
 
@@ -73,13 +72,13 @@ We have testing in place to make sure the code is functioning as expected (TODOs
 ### Programming Language
 - JavaScript
 - SPARQL
+- Node.js
 
 ### Limitations
 Need to solve the TODOs under the `Quality control` section.
 
 ### List of contributors
 - Dewan Sarwar
-- Tommy Yu
 - David Nickerson
 
 ### Licencing

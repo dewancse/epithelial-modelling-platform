@@ -18,7 +18,11 @@ var EMP = (function (global) {
         model2DArray = [],
         combinedMembrane = []; // combine all membranes in epithelialPlatform.js
 
-    var modelEntityName, // search action
+    var workspaceNameList = [],
+        workspaceCnt = 0,
+        workspacejsonObj = [];
+
+    var modelEntityName = [], // search action
         modelEntityNameArray = [], // model action
         modelEntityFullNameArray = [],
         modelEntityInLoadModels = [], // Load Models Entity
@@ -91,14 +95,18 @@ var EMP = (function (global) {
                     var tempidWithStr = event.target.id,
                         workspaceName = tempidWithStr.slice(0, tempidWithStr.search("#"));
 
-                    mainUtils.workspaceName = workspaceName;
-                    mainUtils.tempidWithStr = tempidWithStr;
+                    workspaceNameList.push(workspaceName);
+                    modelEntityName.push(tempidWithStr);
 
-                    modelEntityName = tempidWithStr;
+                    mainUtils.selectedWorkspaceName = workspaceName; // view a model's detailed information
+                    mainUtils.selectedTempidWithStr = tempidWithStr; // view a model's detailed information
                 }
                 else {
-                    mainUtils.workspaceName = "";
-                    mainUtils.tempidWithStr = "";
+                    var tempidWithStr = event.target.id,
+                        workspaceName = tempidWithStr.slice(0, tempidWithStr.search("#"));
+
+                    modelEntityName.splice(modelEntityName.indexOf(tempidWithStr), 1);
+                    workspaceNameList.splice(workspaceNameList.indexOf(workspaceName), 1);
                 }
             }
         },
@@ -134,8 +142,8 @@ var EMP = (function (global) {
                     workspaceName = tempidWithStr.slice(0, tempidWithStr.search("#"));
 
                 // @modelEntityNameArray for similarity graph
-                mainUtils.workspaceName = workspaceName;
-                mainUtils.tempidWithStr = tempidWithStr;
+                workspaceNameList.push(workspaceName);
+                modelEntityName.push(tempidWithStr);
             }
 
             // select all
@@ -437,6 +445,10 @@ var EMP = (function (global) {
         else {
             console.log("loadSearchHtml ELSE");
 
+            // remove from the 'Add Models' list
+            modelEntityName.splice(modelEntityName.indexOf(mainUtils.selectedTempidWithStr), 1);
+            workspaceNameList.splice(workspaceNameList.indexOf(mainUtils.selectedWorkspaceName), 1);
+
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
             filterByProtein(); // reload protein in the dropdown list
@@ -517,7 +529,7 @@ var EMP = (function (global) {
     // VIEW MODEL: load the view page to display details of a selected model
     mainUtils.loadViewHtml = function () {
 
-        var cellmlModel = mainUtils.workspaceName;
+        var cellmlModel = mainUtils.selectedWorkspaceName;
 
         if (cellmlModel == undefined) {
             $("#main-content").html("Please select a model from MODEL DISCOVERY");
@@ -592,16 +604,28 @@ var EMP = (function (global) {
                                     else tempLocation += "";
 
                                     if (counterOLSLoc == location.length) {
-                                        var jsonObj = {
-                                            "Model_entity": mainUtils.tempidWithStr,
-                                            "Protein": protein,
-                                            "Species": species,
-                                            "Gene": gene,
-                                            "Compartment": tempCompartment,
-                                            "Located_in": tempLocation
-                                        };
 
-                                        mainUtils.showModel(jsonObj);
+                                        console.log("jsonObj: ", workspaceNameList[workspaceCnt], protein, species);
+
+                                        workspacejsonObj.push(
+                                            {
+                                                "Model_entity": modelEntityName[workspaceCnt],
+                                                "Protein": protein,
+                                                "Species": species,
+                                                "Gene": gene,
+                                                "Compartment": tempCompartment,
+                                                "Located_in": tempLocation
+                                            }
+                                        )
+
+                                        workspaceCnt++;
+
+                                        if (workspaceCnt == modelEntityName.length) {
+                                            mainUtils.showModel(workspacejsonObj);
+                                        }
+                                        else {
+                                            loadModelHtmlInner(workspaceNameList[workspaceCnt]);
+                                        }
                                     }
                                 },
                                 true);
@@ -612,10 +636,8 @@ var EMP = (function (global) {
         }
     };
 
-    // LOAD MODELS: load a selected model
-    mainUtils.loadModelHtml = function () {
-
-        var model = mainUtils.workspaceName;
+    var loadModelHtmlInner = function (model) {
+        console.log("loadModelHtmlInner: ", model);
 
         if (model != undefined)
             model = model + "#" + model.slice(0, model.indexOf("."));
@@ -653,7 +675,7 @@ var EMP = (function (global) {
                     endpointproteinOLS,
                     function (jsonProtein) {
 
-                        console.log("loadMOdel jsonProtein: ", jsonProtein);
+                        console.log("loadModel jsonProtein: ", jsonProtein);
 
                         var endpointgeneOLS;
                         if (jsonProtein._embedded == undefined || jsonProtein._embedded.terms[0]._links.has_gene_template == undefined)
@@ -674,8 +696,6 @@ var EMP = (function (global) {
                                 ajaxUtils.sendGetRequest(
                                     endpointspeciesOLS,
                                     function (jsonSpecies) {
-
-                                        // console.log("loadModelHtml: jsonSpecies -> ", jsonSpecies);
 
                                         var query = "SELECT ?Compartment " +
                                             "WHERE { " + "<" + model + "> <http://www.obofoundry.org/ro/ro.owl#compartmentOf> ?Compartment. }";
@@ -701,8 +721,7 @@ var EMP = (function (global) {
 
                                                                 if (jsonObjCompartment.results.bindings.length == 0 &&
                                                                     jsonObjLocation.results.bindings.length == 0) {
-                                                                    var jsonObj = {};
-                                                                    mainUtils.showModel(jsonObj);
+                                                                    mainUtils.showModel(workspacejsonObj);
                                                                 }
 
                                                                 var species, gene, protein;
@@ -748,30 +767,39 @@ var EMP = (function (global) {
                     true);
             },
             true);
+    }
+
+    // LOAD MODELS: load a selected model
+    mainUtils.loadModelHtml = function () {
+        loadModelHtmlInner(workspaceNameList[workspaceCnt]);
     };
 
     // LOAD MODELS: display a selected model
     mainUtils.showModel = function (jsonObj) {
 
-        // add this model temporarily to display in MODEL DISCOVERY when deleted
-        if (modelEntityInLoadModels.indexOf(jsonObj.Model_entity) == -1) {
-            var index = modelEntity.indexOf(jsonObj.Model_entity);
-            modelEntityInLoadModels.push([
-                jsonObj.Model_entity,
-                biologicalMeaning[index],
-                speciesList[index],
-                geneList[index],
-                proteinList[index]]);
+        for (var i = 0; i < jsonObj.length; i++) {
+            // add this model temporarily to display in MODEL DISCOVERY when deleted
+            if (modelEntityInLoadModels.indexOf(jsonObj[i].Model_entity) == -1) {
+                var index = modelEntity.indexOf(jsonObj[i].Model_entity);
+                modelEntityInLoadModels.push([
+                    jsonObj[i].Model_entity,
+                    biologicalMeaning[index],
+                    speciesList[index],
+                    geneList[index],
+                    proteinList[index]]);
+            }
         }
 
-        // delete this model to hide in MODEL DISCOVERY when revisited
-        if (modelEntity.indexOf(jsonObj.Model_entity) != -1) {
-            var index = modelEntity.indexOf(jsonObj.Model_entity);
-            modelEntity.splice(index, 1);
-            biologicalMeaning.splice(index, 1);
-            speciesList.splice(index, 1);
-            geneList.splice(index, 1);
-            proteinList.splice(index, 1);
+        for (var i = 0; i < jsonObj.length; i++) {
+            // delete this model to hide in MODEL DISCOVERY when revisited
+            if (modelEntity.indexOf(jsonObj[i].Model_entity) != -1) {
+                var index = modelEntity.indexOf(jsonObj[i].Model_entity);
+                modelEntity.splice(index, 1);
+                biologicalMeaning.splice(index, 1);
+                speciesList.splice(index, 1);
+                geneList.splice(index, 1);
+                proteinList.splice(index, 1);
+            }
         }
 
         // Empty result
@@ -781,7 +809,7 @@ var EMP = (function (global) {
         }
 
         var head = [];
-        for (var name in jsonObj) {
+        for (var name in jsonObj[0]) {
             head.push(name);
         }
 
@@ -803,30 +831,36 @@ var EMP = (function (global) {
         thead.append(tr);
         table.append(thead);
 
-        for (var i in head) {
-            if (i == 0) {
-                // search list to model list with empty model
-                if (jsonObj.length == 0) break;
+        for (var m = 0; m < jsonObj.length; m++) {
+            for (var i in head) {
+                if (i == 0) {
+                    // search list to model list with empty model
+                    if (jsonObj[m].length == 0) break;
 
-                if (miscellaneous.isExistModel2DArray(modelEntityName, model2DArray))
-                    break;
+                    if (miscellaneous.isExistModel2DArray(jsonObj[m]["Model_entity"], model2DArray))
+                        break;
 
-                model.push($("<label/>").html("<input id=" + modelEntityName + " + type=checkbox " +
-                    "name=attribute class=attribute data-action=model value=" + modelEntityName + " >"));
+                    model.push($("<label/>").html("<input id=" + jsonObj[m]["Model_entity"] + " + type=checkbox " +
+                        "name=attribute class=attribute data-action=model value=" + jsonObj[m]["Model_entity"] + " >"));
+                }
+
+                if (head[i] == "Model_entity")
+                    model.push(jsonObj[m]["Model_entity"]);
+                else
+                    model.push(jsonObj[m][head[i]]);
             }
-
-            if (head[i] == "Model_entity")
-                model.push(modelEntityName);
-            else
-                model.push(jsonObj[head[i]]);
         }
 
+        console.log("model: ", model);
+
         // 1D to 2D array
-        while (model.length) {
+        for (var i = 0; i < model.length; i++) {
             model2DArray.push(model.splice(0, 7)); // 6 + 1 (checkbox) header element
         }
 
         model2DArray = miscellaneous.uniqueifymodel2DArray(model2DArray);
+
+        console.log("model2DArray: ", model2DArray);
 
         // Table body
         var tbody = $("<tbody/>"), td = [];
@@ -880,6 +914,7 @@ var EMP = (function (global) {
         lengthOfLoadModelTable = $("table tr").length;
         if (lengthOfLoadModelTable == 1) {
             mainUtils.workspaceName = "";
+            workspaceNameList = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
@@ -985,6 +1020,7 @@ var EMP = (function (global) {
         lengthOfLoadModelTable = $("table tr").length;
         if (lengthOfLoadModelTable == 1) {
             mainUtils.workspaceName = "";
+            workspaceNameList = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
             return;
         }
@@ -1019,7 +1055,8 @@ var EMP = (function (global) {
 
         // make empty list in LOAD MODELS
         if (lengthOfLoadModelTable == 2) {
-            mainUtils.workspaceName = "";
+            // mainUtils.workspaceName = "";
+            workspaceNameList = [];
             $("#modelList").html("Please load models from MODEL DISCOVERY");
         }
 
@@ -1271,17 +1308,17 @@ var EMP = (function (global) {
 
                     if (counter == miscellaneous.iteration(membrane.length)) {
 
-                        console.log("membrane in index.js: ", membrane);
-                        console.log("apicalMembrane in index.js: ", apicalMembrane);
-                        console.log("basolateralMembrane in index.js: ", basolateralMembrane);
-                        console.log("capillaryMembrane in index.js: ", capillaryMembrane);
+                        console.log("membrane in makecotransporter: ", membrane);
+                        console.log("apicalMembrane in makecotransporter: ", apicalMembrane);
+                        console.log("basolateralMembrane in makecotransporter: ", basolateralMembrane);
+                        console.log("capillaryMembrane in makecotransporter: ", capillaryMembrane);
 
                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
-                        console.log("model2DArr: ", model2DArray);
-                        console.log("modelEntityNameArray: ", modelEntityNameArray);
-                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
-                        console.log("templistOfModel: ", templistOfModel);
+                        console.log("model2DArr in makecotransporter: ", model2DArray);
+                        console.log("modelEntityNameArray in makecotransporter: ", modelEntityNameArray);
+                        console.log("modelEntityFullNameArray in makecotransporter: ", modelEntityFullNameArray);
+                        console.log("templistOfModel in makecotransporter: ", templistOfModel);
 
                         epithelialPlatform.epithelialPlatform(
                             combinedMembrane,
@@ -1435,17 +1472,17 @@ var EMP = (function (global) {
 
                     if (membrane.length == 0) {
 
-                        console.log("membrane in index.js: ", membrane);
-                        console.log("apicalMembrane in index.js: ", apicalMembrane);
-                        console.log("basolateralMembrane in index.js: ", basolateralMembrane);
-                        console.log("capillaryMembrane in index.js: ", capillaryMembrane);
+                        console.log("membrane in maketritransporter: ", membrane);
+                        console.log("apicalMembrane maketritransporter: ", apicalMembrane);
+                        console.log("basolateralMembrane in maketritransporter: ", basolateralMembrane);
+                        console.log("capillaryMembrane in maketritransporter: ", capillaryMembrane);
 
                         rmFromModelEntityFullNameArray(membrane, concentration_fma);
 
-                        console.log("model2DArr: ", model2DArray);
-                        console.log("modelEntityNameArray: ", modelEntityNameArray);
-                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
-                        console.log("templistOfModel: ", templistOfModel);
+                        console.log("model2DArr in maketritransporter: ", model2DArray);
+                        console.log("modelEntityNameArray in maketritransporter: ", modelEntityNameArray);
+                        console.log("modelEntityFullNameArray in maketritransporter: ", modelEntityFullNameArray);
+                        console.log("templistOfModel in maketritransporter: ", templistOfModel);
 
                         epithelialPlatform.epithelialPlatform(
                             combinedMembrane,
@@ -1729,6 +1766,12 @@ var EMP = (function (global) {
                                                     else if (membrane.length <= 2) {
 
                                                         console.log("membrane.length <= 2 membrane: ", membrane);
+
+                                                        console.log("membrane: ", membrane);
+                                                        console.log("model2DArr: ", model2DArray);
+                                                        console.log("modelEntityNameArray: ", modelEntityNameArray);
+                                                        console.log("modelEntityFullNameArray: ", modelEntityFullNameArray);
+                                                        console.log("templistOfModel: ", templistOfModel);
 
                                                         // make co-transporter
                                                         for (i = 0; i < membrane.length; i++) {
