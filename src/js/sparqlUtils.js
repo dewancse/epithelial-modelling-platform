@@ -1,8 +1,9 @@
 /**
  * Created by Dewan Sarwar on 14/01/2018.
  */
-var cors_api_url = "https://cors-anywhere.herokuapp.com/",
-    endpoint = cors_api_url + "https://models.physiomeproject.org/pmr2_virtuoso_search";
+// var cors_api_url = "https://cors-anywhere.herokuapp.com/";
+// var endpoint = cors_api_url + "https://models.physiomeproject.org/pmr2_virtuoso_search";
+var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
 
 var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/api/ontologies";
 var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
@@ -199,6 +200,7 @@ var bloodCapillary = "http://purl.obolibrary.org/obo/FMA_263901";
 var capillaryID = "http://purl.obolibrary.org/obo/FMA_63194";
 var nkcc1 = "http://purl.obolibrary.org/obo/PR_P55012";
 
+// var myWorkspaneName = cors_api_url + "https://models.physiomeproject.org/workspace/267";
 var myWorkspaneName = "https://models.physiomeproject.org/workspace/267";
 var uriSEDML = "https://sed-ml.github.io/index.html";
 
@@ -775,3 +777,4 @@ exports.bloodCapillary = bloodCapillary;
 exports.capillaryID = capillaryID;
 exports.nkcc1 = nkcc1;
 exports.maketritransporterSPARQL = maketritransporterSPARQL;
+// exports.cors_api_url = cors_api_url;

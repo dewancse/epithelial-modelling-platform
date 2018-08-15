@@ -356,9 +356,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         // Change marker direction and text position
         if (event.target.localName == "line" && event.target.nodeName == "line") {
-            console.log("event.srcElement.id: ", event.srcElement.id);
-            if (event.srcElement.id == sparqlUtils.apicalID || event.srcElement.id == sparqlUtils.basolateralID)
-                modalWindowToAddModels(event.srcElement.id);
+            console.log("event.target.id: ", event.target.id);
+            if (event.target.id == sparqlUtils.apicalID || event.target.id == sparqlUtils.basolateralID)
+                modalWindowToAddModels(event.target.id);
         }
     });
 
@@ -3048,7 +3048,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", sparqlUtils.capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -3305,7 +3305,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", sparqlUtils.capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -3559,7 +3559,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", sparqlUtils.capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -3813,7 +3813,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", sparqlUtils.capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -4007,9 +4007,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", sparqlUtils.capillaryID)
                         .attr("cx", function (d) {
-                            dx[i] = xvalue - 5 + width;
+                            dx[i] = xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20;
                             return dx[i];
                         })
                         .attr("cy", function (d) {
@@ -4163,9 +4163,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", sparqlUtils.capillaryID)
                         .attr("cx", function (d) {
-                            dx[i] = xvalue - 5 + width;
+                            dx[i] = xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20;
                             return dx[i];
                         })
                         .attr("cy", function (d) {
@@ -4256,26 +4256,16 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             /*  Paracellular Membrane */
             if (textvalue2 == "diffusiveflux") {
                 var lineg = newg.append("g").data([{x: xpvalue, y: ypvalue + 5}]);
-                circlewithlineg[i] = lineg.append("text") // linewithtextg
+                linewithtextg[i] = lineg.append("text")
                     .attr("id", "linewithtextg" + tempID)
-                    .attr("idParacellular", function (d) {
-                        return [
-                            model_entity, model_entity2, model_entity3,
-                            textvalue, textvalue2, textvalue3,
-                            src_fma, snk_fma, src_fma2, snk_fma2, src_fma3, snk_fma3,
-                            mediator_fma, mediator_pr,
-                            solute_chebi, solute_chebi2, solute_chebi3, solute_text, solute_text2, solute_text3,
-                            mediator_pr_text, mediator_pr_text_syn, protein_name
-                        ];
-                    })
                     .attr("index", tempID)
                     .attr("membrane", sparqlUtils.paracellularID)
                     .attr("x", function (d) {
-                        dx[i] = d.x; // dxtext
+                        dxtext[i] = d.x;
                         return d.x;
                     })
                     .attr("y", function (d) {
-                        dy[i] = d.y; // dytext
+                        dytext[i] = d.y;
                         return d.y;
                     })
                     .attr("font-family", "Times New Roman")
@@ -4283,34 +4273,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     .attr("font-weight", "bold")
                     .attr("fill", "red")
                     .attr("cursor", "move")
-                    .text(solute_text)
-                    .on("mouseover", function () {
-                        div.style("display", "inline");
-                        div.transition()
-                            .duration(200)
-                            .style("opacity", 1);
-
-                        // console.log("INSIDE PARACELLULAR: ", $(this).attr("idParacellular"));
-
-                        // var id = d3.select(this)._groups[0][0].id,
-                        var id = $(this).attr("idParacellular"),
-                            indexOfComma = id.indexOf(","),
-                            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                        div.html(
-                            "<b>CellML </b> " +
-                            "<a href=" + tempworkspace + " + target=_blank>" +
-                            "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                            "<br/>" +
-                            "<b>SEDML </b> " +
-                            "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                            "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                            "<br/>" +
-                            "<b>Click middle mouse to close</b>")
-                            .style("left", d3.mouse(this)[0] + 540 + "px")
-                            .style("top", d3.mouse(this)[1] + 90 + "px");
-                    });
+                    .text(solute_text);
 
                 var linetextg = lineg.append("g").data([{x: xpvalue + 25, y: ypvalue}]);
                 linewithlineg[i] = linetextg.append("line")
@@ -4339,15 +4302,15 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 dxcircletext[i] = "";
                 dycircletext[i] = "";
-                linewithtextg[i] = "";
+                circlewithlineg[i] = "";
                 linewithlineg2[i] = "";
                 linewithtextg2[i] = "";
                 dx1line2[i] = "";
                 dy1line2[i] = "";
                 dx2line2[i] = "";
                 dy2line2[i] = "";
-                dxtext[i] = "";
-                dytext[i] = "";
+                dx[i] = "";
+                dy[i] = "";
                 dxtext2[i] = "";
                 dytext2[i] = "";
 
@@ -4479,6 +4442,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         var membrane = $(cthis).attr("membrane");
+
         for (var i = 0; i < $("line").length; i++) {
             if ($("line")[i].id == membrane && i == 0) {
                 mindex = 1;
@@ -5305,7 +5269,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     var temparr = jsonObjOLSChebi._embedded.terms[0].annotation["has_related_synonym"],
                                                         solute_chebi_name;
                                                     for (var m = 0; m < temparr.length; m++) {
-                                                        if (temparr[m].slice(-1) == "+" || temparr[m].slice(-1) == "-") {
+                                                        if (temparr[m].slice(-1) == "+" || temparr[m].slice(-1) == "-" || temparr[m] == "Glc") {
                                                             solute_chebi_name = temparr[m];
                                                             break;
                                                         }
@@ -5395,6 +5359,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                 if (jsonRelatedMembraneModel.results.bindings.length != 0) {
 
+                                                    console.log("jsonRelatedMembraneModel: ", jsonRelatedMembraneModel);
+
                                                     var tempVal, PID;
                                                     if (med_pr.length == 0) {
                                                         tempVal = jsonRelatedMembraneModel.results.bindings[0].Protein.value;
@@ -5412,6 +5378,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         }
                                                     }
 
+                                                    console.log("PID: ", PID);
+
                                                     membraneModelObj.push({
                                                         protein: jsonRelatedMembraneModel.results.bindings[0].Protein.value,
                                                         pid: PID, // med PID
@@ -5420,6 +5388,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         medpr: tempVal,
                                                         similar: 0 // initial percent
                                                     });
+
+                                                    console.log("membraneModelObj: ", membraneModelObj);
 
                                                     var sourcefma2, sinkfma2, modelentity2, variabletext,
                                                         variabletext2, sourcefma, sinkfma, solutechebi2, medfma, medpr,
@@ -5548,7 +5518,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 else
                                                     medURI = medpr;
 
-                                                // console.log("medURI: ", medURI);
+                                                console.log("medURI: ", medURI);
 
                                                 if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
                                                     endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + medURI;
@@ -5713,8 +5683,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 "<b>Protein: </b>" + proteinText + "</p>";
 
             // Related apical or basolateral model
-            var index = 0, ProteinSeq = "", requestData, PID = [],
-                baseUrl = "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
+            var index = 0, ProteinSeq = "", requestData, PID = [];
+            // var baseUrl = sparqlUtils.cors_api_url + "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
+            var baseUrl = "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
+
+            console.log("membraneModelID: ", membraneModelID);
 
             miscellaneous.proteinOrMedPrID(membraneModelID, PID);
             console.log("PID BEFORE: ", PID);
@@ -5747,8 +5720,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             // https://www.ebi.ac.uk/seqdb/confluence/display/WEBSERVICES/clustalo_rest
             var WSDbfetchREST = function () {
 
-                var cors_api_url = "https://cors-anywhere.herokuapp.com/",
-                    dbfectendpoint = cors_api_url + "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+                // var dbfectendpoint = sparqlUtils.cors_api_url + "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+                var dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
 
                 ajaxUtils.sendGetRequest(
                     dbfectendpoint,
@@ -5977,6 +5950,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     // circles, polygons and arrows move back if close clicked
     var moveBack = function () {
+
+        console.log("circlewithlineg: ", circlewithlineg);
+        console.log("icircleGlobal: ", icircleGlobal);
+
         if (linewithlineg[icircleGlobal] != undefined) {
             linewithlineg[icircleGlobal]
                 .transition()
