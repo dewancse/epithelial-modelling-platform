@@ -311,9 +311,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     combinedMemChk(0);
 
     // tooltip
-    // var div = d3.select("#svgVisualize").append("div")
-    //     .attr("class", "tooltip")
-    //     .style("opacity", 0);
+    var div = d3.select("#svgVisualize").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
     // closing tooltip
     $(document).on("mousedown", function (event) {
@@ -361,6 +361,31 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 modalWindowToAddModels(event.target.id);
         }
     });
+
+    var tooltipFunc = function (div, id, left, top) {
+        div.style("display", "inline");
+        div.transition()
+            .duration(200)
+            .style("opacity", 1);
+
+        // var id = d3.select(this)._groups[0][0].id,
+        var indexOfComma = id.indexOf(","),
+            tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
+                "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
+
+        div.html(
+            "<b>CellML </b> " +
+            "<a href=" + tempworkspace + " + target=_blank>" +
+            "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+            "<br/>" +
+            "<b>SEDML </b> " +
+            "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
+            "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+            "<br/>" +
+            "<b>Click middle mouse to close</b>")
+            .style("left", left + 240 + "px") // 540
+            .style("top", top + 90 + "px");
+    }
 
     // apical, basolateral and paracellular membrane
     var combinedMemFunc = function (index, msaveIDflag) {
@@ -544,28 +569,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -783,28 +787,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -1019,28 +1002,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -1255,28 +1217,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -1438,28 +1379,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-linejoin", "round")
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // text inside polygon
@@ -1590,28 +1510,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-linejoin", "round")
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // text inside polygon
@@ -1796,28 +1695,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -2039,28 +1917,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);s
                         });
 
                     // protein name inside this circle
@@ -2276,28 +2133,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -2512,28 +2348,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -2697,28 +2512,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-linejoin", "round")
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     var polygontext = polygong.append("g").data([{x: xvalue + 12 + width, y: yvalueb + 4}]);
@@ -2844,28 +2638,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-linejoin", "round")
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     var polygontext = polygong.append("g").data([{x: xvalue + 12 + width, y: yvalueb + 4}]);
@@ -3063,28 +2836,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -3320,28 +3072,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -3574,28 +3305,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -3828,28 +3538,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-width", 20)
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     // protein name inside this circle
@@ -4023,28 +3712,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-linejoin", "round")
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     var polygontext = polygong.append("g").data([{
@@ -4179,28 +3847,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .attr("stroke-linejoin", "round")
                         .attr("cursor", "move")
                         .on("mouseover", function () {
-                            div.style("display", "inline");
-                            div.transition()
-                                .duration(200)
-                                .style("opacity", 1);
-
-                            var id = d3.select(this)._groups[0][0].id,
-                                indexOfComma = id.indexOf(","),
-                                tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
-                                    "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
-
-                            div.html(
-                                "<b>CellML </b> " +
-                                "<a href=" + tempworkspace + " + target=_blank>" +
-                                "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>SEDML </b> " +
-                                "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
-                                "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
-                                "<br/>" +
-                                "<b>Click middle mouse to close</b>")
-                                .style("left", d3.mouse(this)[0] + 540 + "px")
-                                .style("top", d3.mouse(this)[1] + 90 + "px");
+                            tooltipFunc(div, d3.select(this)._groups[0][0].id, d3.mouse(this)[0], d3.mouse(this)[1]);
                         });
 
                     var polygontext = polygong.append("g").data([{
