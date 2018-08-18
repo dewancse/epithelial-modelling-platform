@@ -227,28 +227,28 @@ var circleIDSplitUtils = function (cthis, paracellularID) {
 // split PR_ from protein identifier
 var splitPRFromProtein = function (tempMemModelID) {
     var indexOfPR;
-    if (tempMemModelID[9] == "") {
-        indexOfPR = tempMemModelID[16].search("PR_");
-        return tempMemModelID[16].slice(indexOfPR + 3, tempMemModelID[16].length);
+    if (tempMemModelID[13] == "") {
+        indexOfPR = tempMemModelID[22].search("PR_");
+        return tempMemModelID[22].slice(indexOfPR + 3, tempMemModelID[22].length);
     }
     else {
-        indexOfPR = tempMemModelID[9].search("PR_");
-        return tempMemModelID[9].slice(indexOfPR + 3, tempMemModelID[9].length);
+        indexOfPR = tempMemModelID[13].search("PR_");
+        return tempMemModelID[13].slice(indexOfPR + 3, tempMemModelID[13].length);
     }
 };
 
 // split PR_ from protein identifier
 var proteinOrMedPrID = function (membraneModelID, PID) {
     for (var i = 0; i < membraneModelID.length; i++) {
-        if (membraneModelID[i][9] == "") {
-            var indexOfPR = membraneModelID[i][16].search("PR_"),
-                medProteinID = membraneModelID[i][16].slice(indexOfPR + 3, membraneModelID[i][16].length);
+        if (membraneModelID[i][13] == "") {
+            var indexOfPR = membraneModelID[i][22].search("PR_"),
+                medProteinID = membraneModelID[i][22].slice(indexOfPR + 3, membraneModelID[i][22].length);
 
             PID.push(medProteinID); // Mediator PROTEIN id
         }
         else {
-            var indexOfPR = membraneModelID[i][9].search("PR_"),
-                medProteinID = membraneModelID[i][9].slice(indexOfPR + 3, membraneModelID[i][9].length);
+            var indexOfPR = membraneModelID[i][13].search("PR_"),
+                medProteinID = membraneModelID[i][13].slice(indexOfPR + 3, membraneModelID[i][13].length);
 
             PID.push(medProteinID); // Mediator PROTEIN id
         }
