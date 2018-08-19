@@ -4122,7 +4122,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         lineb_id = $($("line")[mindex]).prop("id");
-        circle_id = miscellaneous.circleIDSplitUtils($(this), sparqlUtils.paracellularID);
+        circle_id = $(this).prop("id").split(",");
 
         // determine position on apical or basolateral membrane
         if ($(this).prop("tagName") == "circle") {
@@ -4359,7 +4359,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                             miscellaneous.showLoading("#modalBody");
 
-                            var circleID = miscellaneous.circleIDSplitUtils($(cthis), sparqlUtils.paracellularID);
+                            var circleID = $(cthis).prop("id").split(",");
                             console.log("circleID in myWelcomeModal: ", circleID);
 
                             // parsing
@@ -4869,7 +4869,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         console.log("relatedMembrane: ", membrane, membraneName);
         console.log("relatedMembrane -> combinedMembrane: ", combinedMembrane);
 
-        var circleID = miscellaneous.circleIDSplitUtils($(cthis), sparqlUtils.paracellularID);
+        var circleID = $(cthis).prop("id").split(",");
         console.log("relatedMembrane circleID: ", circleID);
 
         // A flux may look for a cotransporter and vice-versa
@@ -4892,7 +4892,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 for (var i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
 
                     // allow only related apical or basolateral membrane from my workspace
-                    if (jsonRelatedMembrane.results.bindings[i].g.value != sparqlUtils.myWorkspaneName)
+                    if (jsonRelatedMembrane.results.bindings[i].g.value != sparqlUtils.myWorkspaceName)
                         continue;
 
                     fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
@@ -5529,10 +5529,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 console.log("membraneModelID: ", membraneModelID);
 
                 // Do not display already visualized models on the apical or basolateral membrane
-                if (miscellaneous.searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], combinedMembrane))
+                if (miscellaneous.searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], membraneModelID[i][2], combinedMembrane))
                     continue;
 
-                var workspaceuri = sparqlUtils.myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
+                var workspaceuri = sparqlUtils.myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
 
                 var variableName;
                 if (membraneModelID[i][1] != "") {
@@ -5579,12 +5579,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         else if (flag == 1) {
             idMembrane = 0;
 
-            var circleID = miscellaneous.circleIDSplitUtils($(cthis), sparqlUtils.paracellularID);
+            var circleID = $(cthis).prop("id").split(",");
 
             var msg2 = "<p><b>" + proteinText + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
                 "<b>" + locationOfModel + "</b><\p>";
 
-            var workspaceuri = sparqlUtils.myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + circleID[0];
+            var workspaceuri = sparqlUtils.myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + circleID[0];
 
             var model = "<b>Model: </b><a href=" + workspaceuri + " + target=_blank " +
                 "data-toggle=tooltip data-placement=right " +
@@ -5733,10 +5733,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         for (var i = 0; i < membraneModelObj.length; i++) {
 
                                                             // Do not display visualized models
-                                                            if (miscellaneous.searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], combinedMembrane))
+                                                            if (miscellaneous.searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], membraneModelID[i][2], combinedMembrane))
                                                                 continue;
 
-                                                            var workspaceuri = sparqlUtils.myWorkspaneName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
+                                                            var workspaceuri = sparqlUtils.myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
 
                                                             var label = document.createElement("label");
                                                             label.innerHTML = '<br><input id="' + membraneModelID[i] + '" ' +
@@ -5971,6 +5971,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     .attr("y", dytext3[icircleGlobal]);
             }
         }
+
+        reflectCheckbox(icircleGlobal);
     };
 
     // retain color of membranes
@@ -6213,6 +6215,29 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         cotransporterList = [];
     };
 
+    var reflectCheckbox = function (icircleGlobal) {
+        checkboxsvg.call(checkBox[icircleGlobal])._groups[0][0].textContent = combinedMembrane[icircleGlobal].med_pr_text;
+        console.log("checkboxsvg in reflectCheckbox: ", checkboxsvg._groups[0][0].textContent);
+
+        ydistancechk = 50;
+        yinitialchk = 215;
+        ytextinitialchk = 230;
+
+        for (var i = 0; i < combinedMembrane.length; i++) {
+            var textvaluechk = combinedMembrane[i].med_pr_text;
+            var indexOfParen = textvaluechk.indexOf("(");
+            textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + " (" + combinedMembrane[i].med_pr_text_syn + ")";
+
+            checkBox[i].x(960).y(yinitialchk).checked(false).clickEvent(update);
+            checkBox[i].xtext(1000).ytext(ytextinitialchk).text("" + textvaluechk + "");
+
+            checkboxsvg.call(checkBox[i]);
+
+            yinitialchk += ydistancechk;
+            ytextinitialchk += ydistancechk;
+        }
+    };
+
     var Modal = function (options) {
 
         console.log("Modal function");
@@ -6387,7 +6412,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 membraneColorBack();
 
-                var circleID = miscellaneous.circleIDSplitUtils($(cthis), sparqlUtils.paracellularID);
+                var circleID = $(cthis).prop("id").split(",");
                 console.log("circleID at the end: ", circleID);
 
                 var totalCheckboxes = $("input:checkbox").length,
@@ -6571,28 +6596,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     circleRearrange();
                 }
 
-                var reflectCheckbox = function (icircleGlobal) {
-                    checkboxsvg.call(checkBox[icircleGlobal])._groups[0][0].textContent = combinedMembrane[icircleGlobal].med_pr_text;
-                    console.log("checkboxsvg in reflectCheckbox: ", checkboxsvg._groups[0][0].textContent);
-
-                    ydistancechk = 50;
-                    yinitialchk = 215;
-                    ytextinitialchk = 230;
-
-                    for (var i = 0; i < combinedMembrane.length; i++) {
-                        var textvaluechk = combinedMembrane[i].med_pr_text;
-                        var indexOfParen = textvaluechk.indexOf("(");
-                        textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + " (" + combinedMembrane[i].med_pr_text_syn + ")";
-
-                        checkBox[i].x(960).y(yinitialchk).checked(false).clickEvent(update);
-                        checkBox[i].xtext(1000).ytext(ytextinitialchk).text("" + textvaluechk + "");
-
-                        checkboxsvg.call(checkBox[i]);
-
-                        yinitialchk += ydistancechk;
-                        ytextinitialchk += ydistancechk;
-                    }
-                };
+                // reflect changes in respective checkbox
                 reflectCheckbox(icircleGlobal);
 
                 console.log("circleID at the end 3: ", circleID);

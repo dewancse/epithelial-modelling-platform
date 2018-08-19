@@ -30,10 +30,7 @@ var parserFmaNameText = function (fma) {
 
 // extract species, gene, and protein names
 var parseModelName = function (modelEntity) {
-    var indexOfHash = modelEntity.search("#"),
-        modelName = modelEntity.slice(0, indexOfHash);
-
-    return modelName;
+    return modelEntity.slice(0, modelEntity.search("#"));
 };
 
 // remove duplicate relatedModel
@@ -142,13 +139,11 @@ var createAnchor = function (value) {
 
 // Find duplicate items
 var searchFn = function (searchItem, arrayOfItems) {
-    var counter = 0;
-    for (var i = 0; i < arrayOfItems.length; i++) {
-        if (arrayOfItems[i] == searchItem)
-            counter++;
-    }
+    var newArray = arrayOfItems.filter(function (item) {
+        return item === searchItem;
+    });
 
-    return counter;
+    return newArray.length;
 };
 
 // TODO: temp solution, fix this in svg
@@ -215,15 +210,6 @@ var isExistModel2DArray = function (element, model2DArray) {
     return false;
 };
 
-var circleIDSplitUtils = function (cthis, paracellularID) {
-    var circleID;
-    if (cthis.attr("membrane") == paracellularID)
-        circleID = cthis.attr("idParacellular").split(",");
-    else
-        circleID = cthis.prop("id").split(",");
-    return circleID;
-};
-
 // split PR_ from protein identifier
 var splitPRFromProtein = function (tempMemModelID) {
     var indexOfPR;
@@ -255,15 +241,15 @@ var proteinOrMedPrID = function (membraneModelID, PID) {
     }
 };
 
-var searchInCombinedMembrane = function (model1, model2, combinedMembrane) {
+var searchInCombinedMembrane = function (model1, model2, model3, combinedMembrane) {
 
     console.log("searchInCombinedMembrane combinedMembrane: ", combinedMembrane);
 
     for (var i = 0; i < combinedMembrane.length; i++) {
-        if ((combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == model2) ||
-            (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == model1) ||
-            (combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == "") ||
-            (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == ""))
+        if ((combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == model2 && combinedMembrane[i].model_entity3 == model3) ||
+            (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == model1 && combinedMembrane[i].model_entity3 == model3) ||
+            (combinedMembrane[i].model_entity == model1 && combinedMembrane[i].model_entity2 == "" && combinedMembrane[i].model_entity3 == model3) ||
+            (combinedMembrane[i].model_entity == model2 && combinedMembrane[i].model_entity2 == "" && combinedMembrane[i].model_entity3 == model3))
             return true;
     }
 
@@ -508,7 +494,6 @@ exports.uniqueifyjsonModel = uniqueifyjsonModel;
 exports.isExist = isExist;
 exports.isExistModel2DArray = isExistModel2DArray;
 exports.uniqueifyCombinedMembrane = uniqueifyCombinedMembrane;
-exports.circleIDSplitUtils = circleIDSplitUtils;
 exports.splitPRFromProtein = splitPRFromProtein;
 exports.proteinOrMedPrID = proteinOrMedPrID;
 exports.searchInCombinedMembrane = searchInCombinedMembrane;

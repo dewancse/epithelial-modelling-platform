@@ -200,8 +200,8 @@ var bloodCapillary = "http://purl.obolibrary.org/obo/FMA_263901";
 var capillaryID = "http://purl.obolibrary.org/obo/FMA_63194";
 var nkcc1 = "http://purl.obolibrary.org/obo/PR_P55012";
 
-// var myWorkspaneName = cors_api_url + "https://models.physiomeproject.org/workspace/267";
-var myWorkspaneName = "https://models.physiomeproject.org/workspace/267";
+// var myWorkspaceName = cors_api_url + "https://models.physiomeproject.org/workspace/267";
+var myWorkspaceName = "https://models.physiomeproject.org/workspace/267";
 var uriSEDML = "https://sed-ml.github.io/index.html";
 
 var makecotransporterSPARQL = function (membrane1, membrane2) {
@@ -425,6 +425,138 @@ var relatedMembraneSPARQL = function (fstCHEBI, sndCHEBI, membrane) {
         "?process2 semsim:hasMediatorParticipant ?model_medparticipant2." +
         "?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2." +
         "?med_entity2 semsim:hasPhysicalDefinition <" + membrane + ">." +
+        "}}";
+
+    return query;
+};
+
+var relatedMembraneModelSPARQL = function (model_entity, model_entity2, model_entity3) {
+    var query;
+    if (model_entity2 == "" && model_entity3 == "") {
+        console.log("relatedMembraneModel: model_entity");
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+            "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?solute_chebi2 ?solute_chebi3 " +
+            "WHERE { " +
+            "<" + model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
+            "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+            "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
+            "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
+            "?source_entity ro:part_of ?source_part_of_entity. " +
+            "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
+            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
+            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi2. " + // change this later
+            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi3. " + // change this later
+            "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
+            "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
+            "?sink_entity ro:part_of ?sink_part_of_entity. " +
+            "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
+            "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
+            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
+            "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
+            "}";
+    }
+    else if (model_entity3 == "") {
+        console.log("relatedMembraneModel: ELSE model_entity and model_entity2");
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+            "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?source_fma2 ?sink_fma2 ?med_entity_uri2 ?solute_chebi2 ?solute_chebi3 " +
+            "WHERE { " +
+            "<" + model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
+            "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+            "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
+            "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
+            "?source_entity ro:part_of ?source_part_of_entity. " +
+            "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
+            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
+            "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
+            "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
+            "?sink_entity ro:part_of ?sink_part_of_entity. " +
+            "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
+            "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
+            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
+            "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
+            "<" + model_entity2 + "> semsim:isComputationalComponentFor ?model_prop2. " +
+            "?model_prop2 semsim:physicalPropertyOf ?model_proc2. " +
+            "?model_proc2 semsim:hasSourceParticipant ?model_srcparticipant2. " +
+            "?model_srcparticipant2 semsim:hasPhysicalEntityReference ?source_entity2. " +
+            "?source_entity2 ro:part_of ?source_part_of_entity2. " +
+            "?source_part_of_entity2 semsim:hasPhysicalDefinition ?source_fma2. " +
+            "?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi2. " +
+            "?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi3. " + // change this later
+            "?model_proc2 semsim:hasSinkParticipant ?model_sinkparticipant2. " +
+            "?model_sinkparticipant2 semsim:hasPhysicalEntityReference ?sink_entity2. " +
+            "?sink_entity2 ro:part_of ?sink_part_of_entity2. " +
+            "?sink_part_of_entity2 semsim:hasPhysicalDefinition ?sink_fma2." +
+            "?model_proc2 semsim:hasMediatorParticipant ?model_medparticipant2." +
+            "?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2." +
+            "?med_entity2 semsim:hasPhysicalDefinition ?med_entity_uri2." +
+            "}";
+    }
+    else {
+        console.log("relatedMembraneModel: ELSE model_entity and model_entity2 and model_entity3");
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+            "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?source_fma2 ?sink_fma2 ?med_entity_uri2 ?solute_chebi2 ?source_fma3 ?sink_fma3 ?med_entity_uri3 ?solute_chebi3 " +
+            "WHERE { " +
+            "<" + model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
+            "?model_prop semsim:physicalPropertyOf ?model_proc. " +
+            "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
+            "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
+            "?source_entity ro:part_of ?source_part_of_entity. " +
+            "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
+            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
+            "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
+            "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
+            "?sink_entity ro:part_of ?sink_part_of_entity. " +
+            "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
+            "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
+            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
+            "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
+            "<" + model_entity2 + "> semsim:isComputationalComponentFor ?model_prop2. " +
+            "?model_prop2 semsim:physicalPropertyOf ?model_proc2. " +
+            "?model_proc2 semsim:hasSourceParticipant ?model_srcparticipant2. " +
+            "?model_srcparticipant2 semsim:hasPhysicalEntityReference ?source_entity2. " +
+            "?source_entity2 ro:part_of ?source_part_of_entity2. " +
+            "?source_part_of_entity2 semsim:hasPhysicalDefinition ?source_fma2. " +
+            "?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi2. " +
+            "?model_proc2 semsim:hasSinkParticipant ?model_sinkparticipant2. " +
+            "?model_sinkparticipant2 semsim:hasPhysicalEntityReference ?sink_entity2. " +
+            "?sink_entity2 ro:part_of ?sink_part_of_entity2. " +
+            "?sink_part_of_entity2 semsim:hasPhysicalDefinition ?sink_fma2." +
+            "?model_proc2 semsim:hasMediatorParticipant ?model_medparticipant2." +
+            "?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2." +
+            "?med_entity2 semsim:hasPhysicalDefinition ?med_entity_uri2." +
+            "<" + model_entity3 + "> semsim:isComputationalComponentFor ?model_prop3. " +
+            "?model_prop3 semsim:physicalPropertyOf ?model_proc3. " +
+            "?model_proc3 semsim:hasSourceParticipant ?model_srcparticipant3. " +
+            "?model_srcparticipant3 semsim:hasPhysicalEntityReference ?source_entity3. " +
+            "?source_entity3 ro:part_of ?source_part_of_entity3. " +
+            "?source_part_of_entity3 semsim:hasPhysicalDefinition ?source_fma3. " +
+            "?source_entity3 semsim:hasPhysicalDefinition ?solute_chebi3. " +
+            "?model_proc3 semsim:hasSinkParticipant ?model_sinkparticipant3. " +
+            "?model_sinkparticipant3 semsim:hasPhysicalEntityReference ?sink_entity3. " +
+            "?sink_entity3 ro:part_of ?sink_part_of_entity3. " +
+            "?sink_part_of_entity3 semsim:hasPhysicalDefinition ?sink_fma3." +
+            "?model_proc3 semsim:hasMediatorParticipant ?model_medparticipant3." +
+            "?model_medparticipant3 semsim:hasPhysicalEntityReference ?med_entity3." +
+            "?med_entity3 semsim:hasPhysicalDefinition ?med_entity_uri3." +
+            "}";
+    }
+
+    return query;
+};
+
+var modalWindowToAddModelsSPARQL = function (located_in) {
+    var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+        "SELECT ?modelEntity ?biological " +
+        "WHERE { GRAPH ?g { " +
+        "?entity semsim:hasPhysicalDefinition <" + located_in + ">." +
+        "?mediator semsim:hasPhysicalEntityReference ?entity." +
+        "?process semsim:hasMediatorParticipant ?mediator." +
+        "?property semsim:physicalPropertyOf ?process." +
+        "?modelEntity semsim:isComputationalComponentFor ?property." +
+        "?modelEntity <http://purl.org/dc/terms/description> ?biological. " +
         "}}";
 
     return query;
@@ -654,138 +786,6 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
     return combinedMembrane;
 };
 
-var relatedMembraneModelSPARQL = function (model_entity, model_entity2, model_entity3) {
-    var query;
-    if (model_entity2 == "" && model_entity3 == "") {
-        console.log("relatedMembraneModel: model_entity");
-        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
-            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
-            "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?solute_chebi2 ?solute_chebi3 " +
-            "WHERE { " +
-            "<" + model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
-            "?model_prop semsim:physicalPropertyOf ?model_proc. " +
-            "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
-            "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
-            "?source_entity ro:part_of ?source_part_of_entity. " +
-            "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
-            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
-            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi2. " + // change this later
-            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi3. " + // change this later
-            "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
-            "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
-            "?sink_entity ro:part_of ?sink_part_of_entity. " +
-            "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
-            "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
-            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
-            "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
-            "}";
-    }
-    else if (model_entity3 == "") {
-        console.log("relatedMembraneModel: ELSE model_entity and model_entity2");
-        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
-            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
-            "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?source_fma2 ?sink_fma2 ?med_entity_uri2 ?solute_chebi2 ?solute_chebi3 " +
-            "WHERE { " +
-            "<" + model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
-            "?model_prop semsim:physicalPropertyOf ?model_proc. " +
-            "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
-            "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
-            "?source_entity ro:part_of ?source_part_of_entity. " +
-            "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
-            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
-            "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
-            "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
-            "?sink_entity ro:part_of ?sink_part_of_entity. " +
-            "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
-            "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
-            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
-            "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
-            "<" + model_entity2 + "> semsim:isComputationalComponentFor ?model_prop2. " +
-            "?model_prop2 semsim:physicalPropertyOf ?model_proc2. " +
-            "?model_proc2 semsim:hasSourceParticipant ?model_srcparticipant2. " +
-            "?model_srcparticipant2 semsim:hasPhysicalEntityReference ?source_entity2. " +
-            "?source_entity2 ro:part_of ?source_part_of_entity2. " +
-            "?source_part_of_entity2 semsim:hasPhysicalDefinition ?source_fma2. " +
-            "?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi2. " +
-            "?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi3. " + // change this later
-            "?model_proc2 semsim:hasSinkParticipant ?model_sinkparticipant2. " +
-            "?model_sinkparticipant2 semsim:hasPhysicalEntityReference ?sink_entity2. " +
-            "?sink_entity2 ro:part_of ?sink_part_of_entity2. " +
-            "?sink_part_of_entity2 semsim:hasPhysicalDefinition ?sink_fma2." +
-            "?model_proc2 semsim:hasMediatorParticipant ?model_medparticipant2." +
-            "?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2." +
-            "?med_entity2 semsim:hasPhysicalDefinition ?med_entity_uri2." +
-            "}";
-    }
-    else {
-        console.log("relatedMembraneModel: ELSE model_entity and model_entity2 and model_entity3");
-        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
-            "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
-            "SELECT ?source_fma ?sink_fma ?med_entity_uri ?solute_chebi ?source_fma2 ?sink_fma2 ?med_entity_uri2 ?solute_chebi2 ?source_fma3 ?sink_fma3 ?med_entity_uri3 ?solute_chebi3 " +
-            "WHERE { " +
-            "<" + model_entity + "> semsim:isComputationalComponentFor ?model_prop. " +
-            "?model_prop semsim:physicalPropertyOf ?model_proc. " +
-            "?model_proc semsim:hasSourceParticipant ?model_srcparticipant. " +
-            "?model_srcparticipant semsim:hasPhysicalEntityReference ?source_entity. " +
-            "?source_entity ro:part_of ?source_part_of_entity. " +
-            "?source_part_of_entity semsim:hasPhysicalDefinition ?source_fma. " +
-            "?source_entity semsim:hasPhysicalDefinition ?solute_chebi. " +
-            "?model_proc semsim:hasSinkParticipant ?model_sinkparticipant. " +
-            "?model_sinkparticipant semsim:hasPhysicalEntityReference ?sink_entity. " +
-            "?sink_entity ro:part_of ?sink_part_of_entity. " +
-            "?sink_part_of_entity semsim:hasPhysicalDefinition ?sink_fma." +
-            "?model_proc semsim:hasMediatorParticipant ?model_medparticipant." +
-            "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
-            "?med_entity semsim:hasPhysicalDefinition ?med_entity_uri." +
-            "<" + model_entity2 + "> semsim:isComputationalComponentFor ?model_prop2. " +
-            "?model_prop2 semsim:physicalPropertyOf ?model_proc2. " +
-            "?model_proc2 semsim:hasSourceParticipant ?model_srcparticipant2. " +
-            "?model_srcparticipant2 semsim:hasPhysicalEntityReference ?source_entity2. " +
-            "?source_entity2 ro:part_of ?source_part_of_entity2. " +
-            "?source_part_of_entity2 semsim:hasPhysicalDefinition ?source_fma2. " +
-            "?source_entity2 semsim:hasPhysicalDefinition ?solute_chebi2. " +
-            "?model_proc2 semsim:hasSinkParticipant ?model_sinkparticipant2. " +
-            "?model_sinkparticipant2 semsim:hasPhysicalEntityReference ?sink_entity2. " +
-            "?sink_entity2 ro:part_of ?sink_part_of_entity2. " +
-            "?sink_part_of_entity2 semsim:hasPhysicalDefinition ?sink_fma2." +
-            "?model_proc2 semsim:hasMediatorParticipant ?model_medparticipant2." +
-            "?model_medparticipant2 semsim:hasPhysicalEntityReference ?med_entity2." +
-            "?med_entity2 semsim:hasPhysicalDefinition ?med_entity_uri2." +
-            "<" + model_entity3 + "> semsim:isComputationalComponentFor ?model_prop3. " +
-            "?model_prop3 semsim:physicalPropertyOf ?model_proc3. " +
-            "?model_proc3 semsim:hasSourceParticipant ?model_srcparticipant3. " +
-            "?model_srcparticipant3 semsim:hasPhysicalEntityReference ?source_entity3. " +
-            "?source_entity3 ro:part_of ?source_part_of_entity3. " +
-            "?source_part_of_entity3 semsim:hasPhysicalDefinition ?source_fma3. " +
-            "?source_entity3 semsim:hasPhysicalDefinition ?solute_chebi3. " +
-            "?model_proc3 semsim:hasSinkParticipant ?model_sinkparticipant3. " +
-            "?model_sinkparticipant3 semsim:hasPhysicalEntityReference ?sink_entity3. " +
-            "?sink_entity3 ro:part_of ?sink_part_of_entity3. " +
-            "?sink_part_of_entity3 semsim:hasPhysicalDefinition ?sink_fma3." +
-            "?model_proc3 semsim:hasMediatorParticipant ?model_medparticipant3." +
-            "?model_medparticipant3 semsim:hasPhysicalEntityReference ?med_entity3." +
-            "?med_entity3 semsim:hasPhysicalDefinition ?med_entity_uri3." +
-            "}";
-    }
-
-    return query;
-};
-
-var modalWindowToAddModelsSPARQL = function (located_in) {
-    var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
-        "SELECT ?modelEntity ?biological " +
-        "WHERE { GRAPH ?g { " +
-        "?entity semsim:hasPhysicalDefinition <" + located_in + ">." +
-        "?mediator semsim:hasPhysicalEntityReference ?entity." +
-        "?process semsim:hasMediatorParticipant ?mediator." +
-        "?property semsim:physicalPropertyOf ?process." +
-        "?modelEntity semsim:isComputationalComponentFor ?property." +
-        "?modelEntity <http://purl.org/dc/terms/description> ?biological. " +
-        "}}";
-
-    return query;
-};
-
 exports.makecotransporterSPARQL = makecotransporterSPARQL;
 exports.srcDescMediatorOfFluxesSPARQL = srcDescMediatorOfFluxesSPARQL;
 exports.opbSPARQL = opbSPARQL;
@@ -823,10 +823,9 @@ exports.naENaC = naENaC;
 exports.clChannel = clChannel;
 exports.kChannel = kChannel;
 exports.partOfFMAUri = partOfFMAUri;
-exports.myWorkspaneName = myWorkspaneName;
+exports.myWorkspaceName = myWorkspaceName;
 exports.uriSEDML = uriSEDML;
 exports.endpoint = endpoint;
-exports.processCombinedMembrane = processCombinedMembrane;
 exports.relatedMembraneModelSPARQL = relatedMembraneModelSPARQL;
 exports.modalWindowToAddModelsSPARQL = modalWindowToAddModelsSPARQL;
 exports.concentrationOPBSPARQL = concentrationOPBSPARQL;
@@ -838,4 +837,5 @@ exports.bloodCapillary = bloodCapillary;
 exports.capillaryID = capillaryID;
 exports.nkcc1 = nkcc1;
 exports.maketritransporterSPARQL = maketritransporterSPARQL;
+exports.processCombinedMembrane = processCombinedMembrane;
 // exports.cors_api_url = cors_api_url;
