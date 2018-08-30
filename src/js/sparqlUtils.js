@@ -3,10 +3,14 @@
  */
 // var cors_api_url = "https://cors-anywhere.herokuapp.com/";
 // var endpoint = cors_api_url + "https://models.physiomeproject.org/pmr2_virtuoso_search";
-var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+//var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+var nginx_proxy = "/.api/pmr/sparql",
+        endpoint = nginx_proxy;
+    
 
-var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/api/ontologies";
-var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
+// var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/api/ontologies";
+// var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
+var abiOntoEndpoint = "/.api/ols/ontologies";
 
 var organ = [
     {
