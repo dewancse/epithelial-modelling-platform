@@ -1,5 +1,5 @@
-var abiOntoEndpointInternal = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
-var abiOntoEndpoint = "/.api/ols/ontologies";
+// var abiOntoEndpointInternal = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
+// var abiOntoEndpoint = "/.api/ols/ontologies";
 
 // Returns an HTTP request object
 function getRequestObject() {
@@ -16,9 +16,9 @@ function getRequestObject() {
     }
 }
 
-var checkRequestUrl = function (url) {
-    return url.replace(abiOntoEndpointInternal, abiOntoEndpoint);
-}
+// var checkRequestUrl = function (url) {
+//     return url.replace(abiOntoEndpointInternal, abiOntoEndpoint);
+// }
 
 // Makes an Ajax GET request to 'requestUrl'
 var sendGetRequest = function (requestUrl, responseHandler, isJsonResponse) {
@@ -28,9 +28,9 @@ var sendGetRequest = function (requestUrl, responseHandler, isJsonResponse) {
         handleResponse(request, responseHandler, isJsonResponse);
     };
 
-    var url = checkRequestUrl(requestUrl);
+    // var url = checkRequestUrl(requestUrl);
 
-    request.open("GET", url, true);
+    request.open("GET", requestUrl, true);
     request.send(null); // for POST only
 };
 
@@ -42,8 +42,8 @@ var sendPostRequest = function (requestUrl, query, responseHandler, isJsonRespon
         handleResponse(request, responseHandler, isJsonResponse);
     };
 
-    var url = checkRequestUrl(requestUrl);
-    request.open("POST", url, true);
+    // var url = checkRequestUrl(requestUrl);
+    request.open("POST", requestUrl, true);
 
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/sparql-results+json");
@@ -59,8 +59,8 @@ var sendEBIPostRequest = function (requestUrl, query, responseHandler, isJsonRes
         handleResponse(request, responseHandler, isJsonResponse);
     };
 
-    var url = checkRequestUrl(requestUrl);
-    request.open("POST", url, true);
+    // var url = checkRequestUrl(requestUrl);
+    request.open("POST", requestUrl, true);
 
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "text/plain");
