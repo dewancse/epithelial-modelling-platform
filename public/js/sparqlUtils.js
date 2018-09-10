@@ -1,16 +1,13 @@
 /**
  * Created by Dewan Sarwar on 14/01/2018.
  */
-// var cors_api_url = "https://cors-anywhere.herokuapp.com/";
-// var endpoint = cors_api_url + "https://models.physiomeproject.org/pmr2_virtuoso_search";
-var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
-// var nginx_proxy = "/.api/pmr/sparql",
-//     endpoint = nginx_proxy;
+// var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+var nginx_proxy = "/.api/pmr/sparql",
+    endpoint = nginx_proxy;
 
 
-// var ebiOntoEndpoint = "https://www.ebi.ac.uk/ols/api/ontologies";
-var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
-// var abiOntoEndpoint = "/.api/ols/ontologies";
+// var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
+var abiOntoEndpoint = "/.api/ols/ontologies";
 
 var organ = [
     {
@@ -833,7 +830,6 @@ exports.endpoint = endpoint;
 exports.relatedMembraneModelSPARQL = relatedMembraneModelSPARQL;
 exports.modalWindowToAddModelsSPARQL = modalWindowToAddModelsSPARQL;
 exports.concentrationOPBSPARQL = concentrationOPBSPARQL;
-// exports.ebiOntoEndpoint = ebiOntoEndpoint;
 exports.abiOntoEndpoint = abiOntoEndpoint;
 exports.epithelialcellID = epithelialcellID;
 exports.mediatorSPARQL = mediatorSPARQL;
@@ -842,4 +838,3 @@ exports.capillaryID = capillaryID;
 exports.nkcc1 = nkcc1;
 exports.maketritransporterSPARQL = maketritransporterSPARQL;
 exports.processCombinedMembrane = processCombinedMembrane;
-// exports.cors_api_url = cors_api_url;
