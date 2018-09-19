@@ -27,7 +27,7 @@ Therefore, mapping follows `exact match` principle. It is case insenstitive and 
 | --- | --- | --- |
 | `concentration` | `flux` | sodium, hydrogen, chloride, potassium, ammonium |
 
-<center><img src=src/img/modeldiscovery-main.png /></center>
+<center><img src=public/img/modeldiscovery-main.png /></center>
 
 #### Load Discovered Models
 After discovering a range of models, user will select some models of interests and store these into a separate list, as presented below in the screenshoot. In this case, we have provided the following options: 
@@ -36,12 +36,12 @@ After discovering a range of models, user will select some models of interests a
 - `visualisation` to get a comparison between models
 - `Epithelial Platform` option to visualize the selected models as SVG in the epithelial platform.
 
-<center><img src=src/img/loadmodel-main.png /></center>
+<center><img src=public/img/loadmodel-main.png /></center>
 
 #### Model Similarity
 Using this feature, user can easily find similar component between models. As can be seen in the screenshot below, weinstein and mackenzie models have common `compartment`.
 
-<center><img src=src/img/modelsimilarity-main.png /></center>
+<center><img src=public/img/modelsimilarity-main.png /></center>
 
 #### Modelling Platform
 This platform has been generated from the discovered models in the `LOAD MODELS` page. Following screenshoot illustrates semantically generated models’ component as circles, polygons and line with arrows. It has two membranes: apical and basolateral; and four compartments: luminal, cytosol, interstitial fluid and paracellular pathway. Each of this has been depicted with a unique color on the top right corner of the platform.
@@ -53,17 +53,17 @@ Concentrations will be floating around on a specific compartment and the fluxes 
 
 On the right, we have generated checkboxes for each of these representations. User can drag and drop fluxes across membranes. For example, user can drag and drop the NaCl cotransporeter, shown in the screenshot, on the basolateral membrane in order to get some useful suggestion which is discussed below in the `Recommender System` section.
 
-<center><img src=src/img/epithelial-main.png /></center>
+<center><img src=public/img/epithelial-main.png /></center>
 
 #### Recommender System
 This system will appear as a window when user will drag and drop a model across the apical or basolateral membrane. Presented below is an example of a CellML model entity - `flux of sodium` in the weinstein model after dragging from apical to basolateral membrane. Initially this system gives a brief description of the dragged model followed by some suggestions from the annotation in PMR. By using this system, user will get existing basolateral membranes with the sodium solute. Also, alternative models of this model from various workspaces, and related kidney models have been provided for further exploration. User can choose one of the models from this system as a replacement of the dragged model.
 
-<center><img src=src/img/recommender-main.png /></center>
+<center><img src=public/img/recommender-main.png /></center>
 
 ### Accessibility
 The application is accessible by navigating::
 ```
-  https://dewancse.github.io/epithelial-modelling-platform/src/index.html
+  http://epithelial-modelling-platform.nectar.auckland.ac.nz
 ```
 
 ### Quality control
