@@ -1,64 +1,116 @@
-### Epithelial Modelling Platform (EPM)
-Epithelial modelling platform is a web-based epithelial transport discovery, exploration and assembly tool. It allows users to discover, explore and assemble computational models for investigating their experimental or clinical hypotheses. In particular, this platform will aid biologists and clinicians to test their clinical or experimental hypotheses for a given collection of disparate mechanisms and/or observations such as diseases, drug actions and clinical observations. This tool is deployed at this address: http://epithelial-modelling-platform.nectar.auckland.ac.nz; as a demonstration of the capabilities described is the paper: LINK TO PREPRINT HERE?.
+### Epithelial Modelling Platform (EMP)
+Epithelial Modelling Platform is a web-based epithelial transport discovery, exploration and assembly tool. It allows users to discover, explore and assemble computational models for investigating their experimental or clinical hypotheses. In particular, this platform will aid biologists and clinicians to test their clinical or experimental hypotheses for a given collection of disparate mechanisms and/or observations such as diseases, drug actions and clinical observations. This tool is deployed at this address: http://epithelial-modelling-platform.nectar.auckland.ac.nz; as a demonstration of the capabilities described is the paper: LINK TO PREPRINT HERE?.
 
-### Installing EPM
-Please do the following steps to install the MDT in your workspace:
+### Installing EMP
+This tool makes use of webservices provided by [PMR](https://models.physiomeproject.org) as well as several services from the [European Bioinformatics Institute (EBI)](https://www.ebi.ac.uk/services). In oder to develop web applications which make use of services in this way, it is best to make use of a reverse proxy to ensure the web application plays nicely with modern web browsers. In this project, we use a Docker-based [NGINX](http://nginx.org/) reverse proxy for this purpose, which makes it reasonably easy to get this demonstration up and running locally as well as deploying it on various cloud platforms.
 
-- `git clone https://github.com/dewancse/epithelial-modelling-platform.git`
-- `npm install` to install packages
-- `npm start` to run server.js
-- Open `http://127.0.0.1:8080/` in the browser to start index.html home page
+If you have Docker and git installed on your machine, then the following should get you up and running:
+```
+git clone https://github.com/dewancse/epithelial-modelling-platform
+docker build -f Dockerfile -t unique-name/mdt-nginx .
+docker run -p 49160:8181 -d unique-name/mdt-nginx
+```
+And then http://localhost:49160 should work.
 
-### EPM workflow
+### EMP workflow
 
-#### Discover CellML Models
-Presented below screenshot is an example of discovered models from the annotated information in the Physiome Model Repository (PMR) for a search term `flux of sodium`. From this, user can analyse CellML model entity which consists of name of the model, component name and variable name; biological annotation deposited in PMR; protein name; and species and genes used during the experiments. We have provided two options for further investigation: 
-- `View Model` to explore more information for a specific model 
-- `Add to Model` to include a list of models to be considered for next round.
+#### Discover Relevant Entities
+The first step is to discover entities in PMR relevant to your interests. The discovered entities are typically components or variables in CellML models, but as the annotated content on PMR continues to grow the pool of potentially relevant entities similarly grows. With our current focus on epithelial transport in the kidney, this demonstration is tuned toward the kinds of entities most commonly found in models of such systems - e.g., fluxes of solutes typically found in renal epithelial cells (sodium, potassium, ammonium...) and processes occuring in, or between, the lumen, cytosol, and interstitial compartments.
 
-However, user can come back and rediscover more models in this `MODEL DISCOVERY` page.
+Presented in the screenshot below is an example of discovered entities from PMR for the entered text `flux of sodium`. From these results, the user can access further information on each discovered entity to help them determine which may be most relevant to their work. The additional information usually consists of the name of the model, component name and variable name; associated biological information about the entity deposited in PMR; protein names; and species and genes used during the experiments. For further investigation, we have provided two options:
 
-#### Input requirements
-We have maintained a dictionary as name and value pairs to map searched text with URIs, without applying Natural Language Processing technique. However, this would be integrated later to make this process dynamic.
+- `View Model` to explore detailed information of a model 
+- `Add to Model` to make a collection of models to be considered for visualisation, graphical editing and model asssembly.
 
-Therefore, mapping follows `exact match` principle. It is case insenstitive and users have to include the following terms when searching for a model:
+However, the user can come back and rediscover more models by navigating to this `MODEL DISCOVERY` page.
+
+![Example Model Discovery session](public/img/modeldiscovery-main.png) 
+*A screenshot illustrating an example EMP session, where the user has queried for any entities relevant to the text "flux of sodium".*
+
+#### Input Handling
+We would like users to be able to enter the "plain text" description of what they are interested in, but currently the entered text needs to be converted to one or more semantic queries executed against the PMR knowledgebase. In the future, we are looking to integrate tools such as Natural Language Processing to automate this conversion. Currently we define a dictionary of common phrases that the potential users of renal epithelial cell models might be interested in and use that to map the entered text to the semantic queries. Therefore, mapping follows the *exact match* principle. It is case insenstitive and users have to include the following terms when searching for a model:
 
 | Physical entity | Physical process | Solutes |
 | --- | --- | --- |
 | `concentration` | `flux` | sodium, hydrogen, chloride, potassium, ammonium |
 
-<center><img src=public/img/modeldiscovery-main.png /></center>
-
-#### Load Discovered Models
+#### Collection of Discovered Models
 After discovering a range of models, user will select some models of interests and store these into a separate list, as presented below in the screenshoot. In this case, we have provided the following options: 
-- `view` to get more information of a seleted model
-- `delete` to delete model(s) if user is not happy with that list
-- `visualisation` to get a comparison between models
-- `Epithelial Platform` option to visualize the selected models as SVG in the epithelial platform.
 
-<center><img src=public/img/loadmodel-main.png /></center>
+- `view` to explore detailed information of a model
+- `delete` to remove model(s) from the list if the user is unhappy
+- `visualisation` to visualise a comparison between models species, genes, compartments and anatomical locations
+- `Epithelial Platform` to visualise a collection of selected models for visualisation, graphical editing and model assembly on the SVG-based Epithelial Platform.
+
+![Example Load Model session](public/img/loadmodel-main.png) 
+*A screenshot illustrating an example EMP session, where the user has made a collection of models for visualisation, graphical editing and model assembly.*
 
 #### Model Similarity
-Using this feature, user can easily find similar component between models. As can be seen in the screenshot below, weinstein and mackenzie models have common `compartment`.
+By using this feature, user can easily find similar component between models' species, genes, compartments and anatomical locations. As can be seen in the screenshot below, Weinstein and Mackenzie models have common `compartment`.
 
-<center><img src=public/img/modelsimilarity-main.png /></center>
+![Example Model Similarity session](public/img/modelsimilarity-main.png) 
+*A screenshot illustrating an example EMP session, where the user has made a comparison between models' species, genes, compartments and anatomical locations.*
 
 #### Modelling Platform
-This platform has been generated from the discovered models in the `LOAD MODELS` page. Following screenshoot illustrates semantically generated models’ component as circles, polygons and line with arrows. It has two membranes: apical and basolateral; and four compartments: luminal, cytosol, interstitial fluid and paracellular pathway. Each of this has been depicted with a unique color on the top right corner of the platform.
+This platform has been semantically generated and visualised based on the collection of models in the `LOAD MODELS` page. Following screenshoot illustrates the generated models’ component with circles, polygons and line with arrows. This platform consists of three membranes: apical, basolateral and capillary; and five compartments: luminal, cytosol, paracellular pathway, interstitial fluid and blood capillary. Each of these has been depicted with a unique color on the top-right corner of the platform.
 
-Concentrations will be floating around on a specific compartment and the fluxes will be placed on a specific membrane based on the annotation in PMR. For example, Na+ and Cl- are floating from luminal to cytosol compartment across apical membrane and NaCl cotransporter in the presented below screenshot. In order to make distinction, we have represented physical entities and processes with specific shapes:
-- `single fluxes` and cotransporters with `circles`
+Solutes of concentrations float within a specific compartment and solutes of fluxes have been placed on either apical, basolateral, or capillary membrane based on the annotated information in PMR. For example, presented below in the screenshot, flux of Na+ and flux of Cl- are flowing from luminal to cytosol compartment across apical membrane and through NaCl cotransporter. In order to distinguish physical entities and processes, we have represented them with the following shapes:
+- `single fluxes` and `cotransporters` with `circles`
 - `channels` with `polygons`
 - `diffusive fluxes` in the paracellular pathway with a `text` and an `arrow`. 
 
-On the right, we have generated checkboxes for each of these representations. User can drag and drop fluxes across membranes. For example, user can drag and drop the NaCl cotransporeter, shown in the screenshot, on the basolateral membrane in order to get some useful suggestion which is discussed below in the `Recommender System` section.
+On the right, a list of checkboxes have been generated for each of these shapes, i.e. physical entities and processes. User can tick a checkbox and then drag and drop the associated fluxes across the apical or basolateral membrane. For example, user can drag the NaCl cotransporeter from the apical membrane, as shown in the screenshot below, and drop on the basolateral membrane in order to get useful suggestions which is discussed below in the `Recommender System` section.
 
-<center><img src=public/img/epithelial-main.png /></center>
+![Example Epithelial Platform session](public/img/epithelial-main.png) 
+*A screenshot illustrating an example EMP session, where the user has visualised an instance of the Epithelial Platform for graphical editing, as well as model assembly in order to make a new Epithelial Model.*
 
 #### Recommender System
+As part of the additional information available for the discovered entities, a recommender system has been implemented to present the user with additional entities in PMR that may be of interest. As with the rest of this tool, the recommender system is currently very renal epithelial transport focussed, but the implementation will be easily extendable to a wider range of physiology as the available semantic knowledge in PMR grows.
+
 This system will appear as a window when user will drag and drop a model across the apical or basolateral membrane. Presented below is an example of a CellML model entity - `flux of sodium` in the weinstein model after dragging from apical to basolateral membrane. Initially this system gives a brief description of the dragged model followed by some suggestions from the annotation in PMR. By using this system, user will get existing basolateral membranes with the sodium solute. Also, alternative models of this model from various workspaces, and related kidney models have been provided for further exploration. User can choose one of the models from this system as a replacement of the dragged model.
 
-<center><img src=public/img/recommender-main.png /></center>
+![Example Recommender session](public/img/recommender-main.png)
+
+*A screenshot illustrating an example recommender session, where the user has dragged the Weinstein model from apical to basolateral membrane.*
+
+## Docker Image in Nectar Cloud
+We have deployed our Docker image to Nectar Cloud. In order to begin with the deployment process, please navigate to [Dashboard](https://dashboard.rc.nectar.org.au/auth/login/) in Nectar Cloud and provide login credentials. As a student at the University of Auckland, I have provided my login credentials, as illustrated below. Following screenshots are examples of our Docker image's deployment to Nectar. Please read texts below of each screenshot to know in details.  
+
+![Example Login-1 session](public/img/login-1.png) 
+
+*A login screen, where the user will choose either NZ or Australian.*
+
+![Example Login-2 session](public/img/login-2.png)
+
+*A screenshot illustrating my federation and organization details.*
+
+![Example Docker-1 session](public/img/docker-1.png)
+
+*An example Docker setup session, where the user will click "Quick Deploy" to begin with a session.*
+
+![Example Docker-2 session](public/img/docker-2.png)
+
+*Fill out an application name, a docker image name from the Docker registry, and a port number for the docker container. Then click "Add Application".*
+
+![Example Docker-3 session](public/img/docker-3.png)
+
+*Enter an application name and the remaining fields are optional. Then click "Next".*
+
+![Example Docker-4 session](public/img/docker-4.png)
+
+*Choose the Ubuntu instance name from the dropdown menu, along with your key pair and availability zone. Follow this [key pair](https://support.ehelp.edu.au/support/solutions/articles/6000055376-launching-virtual-machines#Keypair) document to create a key pair, which will appear here under the key pair dropdown menu. Then click "Create".*
+
+![Example Docker-5 session](public/img/docker-5.png)
+
+*Click "Create" to setup an environment for the Docker container.*
+
+![Example Docker-6 session](public/img/docker-6.png)
+
+*Then click "Deploy This Environment" to begin with a deployment session.*
+
+![Example Docker-7 session](public/img/docker-7.png)
+
+*Lastly, navigate to the IP address with the port number mentioned in the screenshot to visit the up and running docker image. Note that the user can apply for a DNS host name for this IP address to Nectar support team [Ask For Help](https://support.ehelp.edu.au/support/home).*
 
 ### Accessibility
 The application is accessible by navigating::
