@@ -118,20 +118,15 @@ The application is accessible by navigating::
   http://epithelial-modelling-platform.nectar.auckland.ac.nz
 ```
 
-### Quality control
-We have testing in place to make sure the code is functioning as expected (TODOs). In addition, the code allows reproducibility and reuse of modules (TODOs). 
-
 ### Programming Language
 - JavaScript
 - SPARQL
-- Node.js
 
 ### Limitations
-Need to solve the TODOs under the `Quality control` section.
-
+We will implement Unit testing and Functional testing to make sure the code is functioning as expected. While the underlying tools are not specific to renal epithelial transport, the currently supported text-to-query mappings and recommender system are very specific to renal epithelial transport.
 ### List of contributors
-- Dewan Sarwar
-- David Nickerson
+- Dewan Sarwar - @dewancse
+- David Nickerson - @nickerso
 
 ### Licencing
 MIT license!
