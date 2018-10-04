@@ -576,13 +576,13 @@ exports.d3CheckBox = d3CheckBox;
 /**
  * Created by Dewan Sarwar on 14/01/2018.
  */
-// var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
-var nginx_proxy = "/.api/pmr/sparql",
-    endpoint = nginx_proxy;
+var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
+// var nginx_proxy = "/.api/pmr/sparql",
+//     endpoint = nginx_proxy;
 
 
-// var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
-var abiOntoEndpoint = "/.api/ols/ontologies";
+var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
+// var abiOntoEndpoint = "/.api/ols/ontologies";
 
 var organ = [
     {
@@ -1419,8 +1419,8 @@ exports.processCombinedMembrane = processCombinedMembrane;
 /***/ (function(module, exports) {
 
 var abiOntoEndpointInternal = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
-var abiOntoEndpoint = "/.api/ols/ontologies";
-
+// var abiOntoEndpoint = "/.api/ols/ontologies";
+var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
 
 // Returns an HTTP request object
 function getRequestObject() {
@@ -9377,8 +9377,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             // Related apical or basolateral model
             var index = 0, ProteinSeq = "", requestData, PID = [];
-            var baseUrl = "/.api/ebi/clustalo";
-            // var baseUrl = "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
+            var baseUrl = "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
+            // var baseUrl = "/.api/ebi/clustalo";
 
             console.log("membraneModelID: ", membraneModelID);
 
@@ -9413,8 +9413,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             // https://www.ebi.ac.uk/seqdb/confluence/display/WEBSERVICES/clustalo_rest
             var WSDbfetchREST = function () {
 
-                var dbfectendpoint = "/.api/ebi/uniprotkb/" + PID[index] + "/fasta";
-                // var dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+                var dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+                // var dbfectendpoint = "/.api/ebi/uniprotkb/" + PID[index] + "/fasta";
 
                 ajaxUtils.sendGetRequest(
                     dbfectendpoint,

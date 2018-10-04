@@ -1,6 +1,6 @@
 var abiOntoEndpointInternal = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
-var abiOntoEndpoint = "/.api/ols/ontologies";
-
+// var abiOntoEndpoint = "/.api/ols/ontologies";
+var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
 
 // Returns an HTTP request object
 function getRequestObject() {
