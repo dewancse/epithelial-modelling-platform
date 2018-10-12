@@ -1,12 +1,6 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
-var solutesBouncing = require("./solutesBouncing.js");
-var miscellaneous = require("./miscellaneous.js");
-var ajaxUtils = require("../libs/ajax-utils.js");
-var sparqlUtils = require("./sparqlUtils.js");
-var svgPlatform = require("./svgPlatform.js");
-
 var epithelialPlatform = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
                                    apicalMembrane, basolateralMembrane, capillaryMembrane, membrane) {
 
@@ -23,8 +17,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var i, j, msaveIDflag = false;
 
-    combinedMembrane = sparqlUtils.processCombinedMembrane(apicalMembrane, basolateralMembrane, capillaryMembrane, membrane, combinedMembrane);
-    combinedMembrane = miscellaneous.uniqueifyCombinedMembrane(combinedMembrane);
+    combinedMembrane = processCombinedMembrane(apicalMembrane, basolateralMembrane, capillaryMembrane, membrane, combinedMembrane);
+    combinedMembrane = uniqueifyCombinedMembrane(combinedMembrane);
 
     console.log("epithelialPlatform membrane: ", membrane);
     console.log("epithelialPlatform concentration_fma: ", concentration_fma);
@@ -78,9 +72,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var prevHeight = height, lengthOfApicalMem = 0, lengthOfBasoMem = 0;
 
     for (var i = 0; i < combinedMembrane.length; i++) {
-        if (combinedMembrane[i].med_fma == sparqlUtils.apicalID)
+        if (combinedMembrane[i].med_fma == apicalID)
             lengthOfApicalMem++;
-        else if (combinedMembrane[i].med_fma == sparqlUtils.basolateralID)
+        else if (combinedMembrane[i].med_fma == basolateralID)
             lengthOfBasoMem++;
     }
 
@@ -109,7 +103,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     // draw svg platform
     var markerWidth = 4, markerHeight = 4;
-    svgPlatform.svgPlatform(svg, newg, height, width, w, h, markerWidth, markerHeight);
+    svgPlatform(svg, newg, height, width, w, h, markerWidth, markerHeight);
 
     var solutes = [];
 
@@ -148,14 +142,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     }
 
     // solutes bouncing on the platform
-    solutesBouncing.solutesBouncing(newg, solutes);
+    solutesBouncing(newg, solutes);
 
     // line apical and basolateral
     var x = $("rect")[0].x.baseVal.value;
     var y = $("rect")[0].y.baseVal.value;
 
     var lineapical = newg.append("line")
-        .attr("id", sparqlUtils.apicalID)
+        .attr("id", apicalID)
         .attr("x1", function (d) {
             return d.x;
         })
@@ -182,7 +176,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .attr("opacity", 0.5);
 
     var linebasolateral = newg.append("line")
-        .attr("id", sparqlUtils.basolateralID)
+        .attr("id", basolateralID)
         .attr("x1", function (d) {
             return d.x + width;
         })
@@ -209,7 +203,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .attr("opacity", 0.5);
 
     var linecapillary = newg.append("line")
-        .attr("id", sparqlUtils.capillaryID)
+        .attr("id", capillaryID)
         .attr("x1", w + 10 + 20)
         .attr("y1", function (d) {
             return d.y + 10;
@@ -288,7 +282,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         console.log("combinedMemChk combinedMembrane and index: ", combinedMembrane, index);
 
         for (i = index; i < combinedMembrane.length; i++) {
-            checkBox[i] = new miscellaneous.d3CheckBox();
+            checkBox[i] = new d3CheckBox();
         }
 
         for (i = index; i < combinedMembrane.length; i++) {
@@ -357,7 +351,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         // Change marker direction and text position
         if (event.target.localName == "line" && event.target.nodeName == "line") {
             console.log("event.target.id: ", event.target.id);
-            if (event.target.id == sparqlUtils.apicalID || event.target.id == sparqlUtils.basolateralID)
+            if (event.target.id == apicalID || event.target.id == basolateralID)
                 modalWindowToAddModels(event.target.id);
         }
     });
@@ -379,7 +373,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
             "<br/>" +
             "<b>SEDML </b> " +
-            "<a href=" + sparqlUtils.uriSEDML + " + target=_blank>" +
+            "<a href=" + uriSEDML + " + target=_blank>" +
             "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
             "<br/>" +
             "<b>Click middle mouse to close</b>")
@@ -426,7 +420,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 snk_fma = combinedMembrane[i].sink_fma,
                 snk_fma2 = combinedMembrane[i].sink_fma2,
                 snk_fma3 = combinedMembrane[i].sink_fma3,
-                textWidth = miscellaneous.getTextWidth(textvalue, 12),
+                textWidth = getTextWidth(textvalue, 12),
                 tempID;
 
             if (msaveIDflag == true)
@@ -437,12 +431,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             console.log("combinedMemFunc -> index, icircleGlobal and circlewithlineg: ", index, icircleGlobal, circlewithlineg);
 
             /*  Apical Membrane */
-            if (mediator_fma == sparqlUtils.apicalID) {
+            if (mediator_fma == apicalID) {
                 // case 1
-                if ((src_fma == sparqlUtils.luminalID && snk_fma == sparqlUtils.cytosolID) &&
-                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.luminalID && snk_fma2 == sparqlUtils.cytosolID))) {
+                if ((src_fma == luminalID && snk_fma == cytosolID) &&
+                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == luminalID && snk_fma2 == cytosolID))) {
 
-                    console.log("case 1 sparqlUtils.luminalID ==> sparqlUtils.cytosolID: ", yvalue, cyvalue);
+                    console.log("case 1 luminalID ==> cytosolID: ", yvalue, cyvalue);
 
                     var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                     linewithlineg[i] = lineg.append("line")
@@ -496,7 +490,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue, y: yvalue + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -555,7 +549,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.apicalID)
+                        .attr("membrane", apicalID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -655,12 +649,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvalue += ydistance;
                     cyvalue += ydistance;
 
-                    console.log("case 1 2 sparqlUtils.luminalID ==> sparqlUtils.cytosolID: ", yvalue, cyvalue);
+                    console.log("case 1 2 luminalID ==> cytosolID: ", yvalue, cyvalue);
                 }
 
                 // case 2
-                if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.luminalID) &&
-                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.cytosolID && snk_fma2 == sparqlUtils.luminalID))) {
+                if ((src_fma == cytosolID && snk_fma == luminalID) &&
+                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == cytosolID && snk_fma2 == luminalID))) {
                     var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                     linewithlineg[i] = lineg.append("line")
                         .attr("id", "linewithlineg" + tempID)
@@ -714,7 +708,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue, y: yvalue + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -773,7 +767,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.apicalID)
+                        .attr("membrane", apicalID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -875,7 +869,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 3
-                if ((src_fma == sparqlUtils.luminalID && snk_fma == sparqlUtils.cytosolID) && (src_fma2 == sparqlUtils.cytosolID && snk_fma2 == sparqlUtils.luminalID)) {
+                if ((src_fma == luminalID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == luminalID)) {
                     var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                     linewithlineg[i] = lineg.append("line")
                         .attr("id", "linewithlineg" + tempID)
@@ -929,7 +923,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue, y: yvalue + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -988,7 +982,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.apicalID)
+                        .attr("membrane", apicalID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -1090,7 +1084,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 4
-                if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.luminalID) && (src_fma2 == sparqlUtils.luminalID && snk_fma2 == sparqlUtils.cytosolID)) {
+                if ((src_fma == cytosolID && snk_fma == luminalID) && (src_fma2 == luminalID && snk_fma2 == cytosolID)) {
                     var lineg = newg.append("g").data([{x: xvalue, y: yvalue}]);
                     linewithlineg[i] = lineg.append("line")
                         .attr("id", "linewithlineg" + tempID)
@@ -1144,7 +1138,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue, y: yvalue + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -1203,7 +1197,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.apicalID)
+                        .attr("membrane", apicalID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -1305,8 +1299,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 5
-                if ((src_fma == sparqlUtils.luminalID && snk_fma == sparqlUtils.cytosolID) && (textvalue2 == "channel")) {
-                    console.log("case 5 sparqlUtils.cytosolID ==> sparqlUtils.luminalID and channel: ", yvalue, cyvalue);
+                if ((src_fma == luminalID && snk_fma == cytosolID) && (textvalue2 == "channel")) {
+                    console.log("case 5 cytosolID ==> luminalID and channel: ", yvalue, cyvalue);
 
                     var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
                     linewithlineg[i] = polygong.append("line")
@@ -1363,7 +1357,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.apicalID)
+                        .attr("membrane", apicalID)
                         .attr("cx", function (d) {
                             dx[i] = xvalue - 5;
                             return dx[i];
@@ -1431,13 +1425,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvalue += ydistance;
                     cyvalue += ydistance;
 
-                    console.log("case 5 2 sparqlUtils.cytosolID ==> sparqlUtils.luminalID and channel: ", yvalue, cyvalue);
+                    console.log("case 5 2 cytosolID ==> luminalID and channel: ", yvalue, cyvalue);
                 }
 
                 // case 6
-                if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.luminalID) && (textvalue2 == "channel")) {
+                if ((src_fma == cytosolID && snk_fma == luminalID) && (textvalue2 == "channel")) {
 
-                    console.log("case 6 sparqlUtils.cytosolID ==> sparqlUtils.luminalID and channel: ", yvalue, cyvalue);
+                    console.log("case 6 cytosolID ==> luminalID and channel: ", yvalue, cyvalue);
 
                     var polygong = newg.append("g").data([{x: xvalue - 5, y: yvalue}]);
                     linewithlineg[i] = polygong.append("line")
@@ -1494,7 +1488,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.apicalID)
+                        .attr("membrane", apicalID)
                         .attr("cx", function (d) {
                             dx[i] = xvalue - 5;
                             return dx[i];
@@ -1557,17 +1551,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvalue += ydistance;
                     cyvalue += ydistance;
 
-                    console.log("case 6 2 sparqlUtils.cytosolID ==> sparqlUtils.luminalID and channel: ", yvalue, cyvalue);
+                    console.log("case 6 2 cytosolID ==> luminalID and channel: ", yvalue, cyvalue);
                 }
             }
 
             /*  Basolateral Membrane */
-            if (mediator_fma == sparqlUtils.basolateralID) {
+            if (mediator_fma == basolateralID) {
                 // case 1
-                if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.interstitialID) &&
-                    (((src_fma2 == "" && snk_fma2 == "") && (src_fma3 == "" && snk_fma3 == "")) || (src_fma2 == sparqlUtils.cytosolID && snk_fma2 == sparqlUtils.interstitialID))) {
+                if ((src_fma == cytosolID && snk_fma == interstitialID) &&
+                    (((src_fma2 == "" && snk_fma2 == "") && (src_fma3 == "" && snk_fma3 == "")) || (src_fma2 == cytosolID && snk_fma2 == interstitialID))) {
 
-                    console.log("case 1 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID: ", yvalueb, cyvalueb);
+                    console.log("case 1 cytosolID ==> interstitialID: ", yvalueb, cyvalueb);
 
                     var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                     linewithlineg[i] = lineg.append("line")
@@ -1622,7 +1616,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -1681,7 +1675,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", basolateralID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -1781,12 +1775,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvalueb += ydistance;
                     cyvalueb += ydistance;
 
-                    console.log("case 1 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID: ", yvalueb, cyvalueb);
+                    console.log("case 1 2 cytosolID ==> interstitialID: ", yvalueb, cyvalueb);
                 }
 
                 // case 2
-                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.cytosolID) &&
-                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.interstitialID && snk_fma2 == sparqlUtils.cytosolID))) {
+                if ((src_fma == interstitialID && snk_fma == cytosolID) &&
+                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == interstitialID && snk_fma2 == cytosolID))) {
 
                     // line 1
                     var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
@@ -1843,7 +1837,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -1903,7 +1897,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", basolateralID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -2007,7 +2001,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 3
-                if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.interstitialID) && (src_fma2 == sparqlUtils.interstitialID && snk_fma2 == sparqlUtils.cytosolID)) {
+                if ((src_fma == cytosolID && snk_fma == interstitialID) && (src_fma2 == interstitialID && snk_fma2 == cytosolID)) {
                     var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                     linewithlineg[i] = lineg.append("line")
                         .attr("id", "linewithlineg" + tempID)
@@ -2061,7 +2055,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -2120,7 +2114,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", basolateralID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -2222,7 +2216,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 4
-                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.cytosolID) && (src_fma2 == sparqlUtils.cytosolID && snk_fma2 == sparqlUtils.interstitialID)) {
+                if ((src_fma == interstitialID && snk_fma == cytosolID) && (src_fma2 == cytosolID && snk_fma2 == interstitialID)) {
                     var lineg = newg.append("g").data([{x: xvalue + width, y: yvalueb}]);
                     linewithlineg[i] = lineg.append("line")
                         .attr("id", "linewithlineg" + tempID)
@@ -2276,7 +2270,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{x: xvalue + width, y: yvalueb + radius}]);
                         linewithlineg3[i] = lineg3.append("line")
                             .attr("id", "linewithlineg3" + tempID)
@@ -2335,7 +2329,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", basolateralID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -2437,9 +2431,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 5
-                if ((src_fma == sparqlUtils.cytosolID && snk_fma == sparqlUtils.interstitialID) && (textvalue2 == "channel")) {
+                if ((src_fma == cytosolID && snk_fma == interstitialID) && (textvalue2 == "channel")) {
 
-                    console.log("case 5 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
+                    console.log("case 5 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
 
                     var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
                     linewithlineg[i] = polygong.append("line")
@@ -2497,7 +2491,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", basolateralID)
                         .attr("cx", function (d) {
                             dx[i] = xvalue - 5 + width;
                             return dx[i];
@@ -2559,13 +2553,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvalueb += ydistance;
                     cyvalueb += ydistance;
 
-                    console.log("case 5 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
+                    console.log("case 5 2 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
                 }
 
                 // case 6
-                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.cytosolID) && (textvalue2 == "channel")) {
+                if ((src_fma == interstitialID && snk_fma == cytosolID) && (textvalue2 == "channel")) {
 
-                    console.log("case 6 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
+                    console.log("case 6 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
 
                     var polygong = newg.append("g").data([{x: xvalue - 5 + width, y: yvalueb}]);
                     linewithlineg[i] = polygong.append("line")
@@ -2623,7 +2617,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.basolateralID)
+                        .attr("membrane", basolateralID)
                         .attr("cx", function (d) {
                             dx[i] = xvalue - 5 + width;
                             return dx[i];
@@ -2685,17 +2679,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvalueb += ydistance;
                     cyvalueb += ydistance;
 
-                    console.log("case 6 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvalueb, cyvalueb);
+                    console.log("case 6 2 cytosolID ==> interstitialID and channel: ", yvalueb, cyvalueb);
                 }
             }
 
             /*  Capillary Membrane */
-            if (mediator_fma == sparqlUtils.capillaryID) {
+            if (mediator_fma == capillaryID) {
                 // case 1
-                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.bloodCapillary) &&
-                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.interstitialID && snk_fma2 == sparqlUtils.bloodCapillary))) {
+                if ((src_fma == interstitialID && snk_fma == bloodCapillary) &&
+                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == interstitialID && snk_fma2 == bloodCapillary))) {
 
-                    console.log("case 1 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID: ", yvalueb, cyvalueb);
+                    console.log("case 1 cytosolID ==> interstitialID: ", yvalueb, cyvalueb);
 
                     var lineg = newg.append("g").data([{
                         x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
@@ -2756,7 +2750,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{
                             x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                             y: yvaluec + radius
@@ -2822,7 +2816,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.capillaryID)
+                        .attr("membrane", capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -2927,12 +2921,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvaluec += ydistance;
                     cyvaluec += ydistance;
 
-                    console.log("case 1 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID: ", yvaluec, cyvaluec);
+                    console.log("case 1 2 cytosolID ==> interstitialID: ", yvaluec, cyvaluec);
                 }
 
                 // case 2
-                if ((src_fma == sparqlUtils.bloodCapillary && snk_fma == sparqlUtils.interstitialID) &&
-                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == sparqlUtils.bloodCapillary && snk_fma2 == sparqlUtils.interstitialID))) {
+                if ((src_fma == bloodCapillary && snk_fma == interstitialID) &&
+                    ((src_fma2 == "" && snk_fma2 == "") || (src_fma2 == bloodCapillary && snk_fma2 == interstitialID))) {
                     var lineg = newg.append("g").data([{
                         x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                         y: yvaluec
@@ -2992,7 +2986,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{
                             x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                             y: yvaluec + radius
@@ -3058,7 +3052,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.capillaryID)
+                        .attr("membrane", capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -3165,7 +3159,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 3
-                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.bloodCapillary) && (src_fma2 == sparqlUtils.bloodCapillary && snk_fma2 == sparqlUtils.interstitialID)) {
+                if ((src_fma == interstitialID && snk_fma == bloodCapillary) && (src_fma2 == bloodCapillary && snk_fma2 == interstitialID)) {
                     var lineg = newg.append("g").data([{
                         x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                         y: yvaluec
@@ -3225,7 +3219,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{
                             x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                             y: yvaluec + radius
@@ -3291,7 +3285,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.capillaryID)
+                        .attr("membrane", capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -3398,7 +3392,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 4
-                if ((src_fma == sparqlUtils.bloodCapillary && snk_fma == sparqlUtils.interstitialID) && (src_fma2 == sparqlUtils.interstitialID && snk_fma2 == sparqlUtils.bloodCapillary)) {
+                if ((src_fma == bloodCapillary && snk_fma == interstitialID) && (src_fma2 == interstitialID && snk_fma2 == bloodCapillary)) {
                     var lineg = newg.append("g").data([{
                         x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                         y: yvaluec
@@ -3458,7 +3452,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         dytext3[i] = "";
                     }
 
-                    if (mediator_pr == sparqlUtils.nkcc1) {
+                    if (mediator_pr == nkcc1) {
                         var lineg3 = lineg.append("g").data([{
                             x: xvalue + width + (w - (w / 3 + width + 30)) + 40 + 20,
                             y: yvaluec + radius
@@ -3524,7 +3518,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.capillaryID)
+                        .attr("membrane", capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = d.x;
                             return d.x;
@@ -3631,9 +3625,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // case 5
-                if ((src_fma == sparqlUtils.interstitialID && snk_fma == sparqlUtils.bloodCapillary) && (textvalue2 == "channel")) {
+                if ((src_fma == interstitialID && snk_fma == bloodCapillary) && (textvalue2 == "channel")) {
 
-                    console.log("case 5 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvaluec, cyvaluec);
+                    console.log("case 5 cytosolID ==> interstitialID and channel: ", yvaluec, cyvaluec);
 
                     var polygong = newg.append("g").data([{
                         x: xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20,
@@ -3697,7 +3691,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.capillaryID)
+                        .attr("membrane", capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20;
                             return dx[i];
@@ -3762,13 +3756,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvaluec += ydistance;
                     cyvaluec += ydistance;
 
-                    console.log("case 5 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvaluec, cyvaluec);
+                    console.log("case 5 2 cytosolID ==> interstitialID and channel: ", yvaluec, cyvaluec);
                 }
 
                 // case 6
-                if ((src_fma == sparqlUtils.bloodCapillary && snk_fma == sparqlUtils.interstitialID) && (textvalue2 == "channel")) {
+                if ((src_fma == bloodCapillary && snk_fma == interstitialID) && (textvalue2 == "channel")) {
 
-                    console.log("case 6 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvaluec, cyvaluec);
+                    console.log("case 6 cytosolID ==> interstitialID and channel: ", yvaluec, cyvaluec);
 
                     var polygong = newg.append("g").data([{
                         x: xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20,
@@ -3832,7 +3826,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             ];
                         })
                         .attr("index", tempID)
-                        .attr("membrane", sparqlUtils.capillaryID)
+                        .attr("membrane", capillaryID)
                         .attr("cx", function (d) {
                             dx[i] = xvalue - 5 + width + (w - (w / 3 + width + 30)) + 40 + 20;
                             return dx[i];
@@ -3897,7 +3891,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     yvaluec += ydistance;
                     cyvaluec += ydistance;
 
-                    console.log("case 6 2 sparqlUtils.cytosolID ==> sparqlUtils.interstitialID and channel: ", yvaluec, cyvaluec);
+                    console.log("case 6 2 cytosolID ==> interstitialID and channel: ", yvaluec, cyvaluec);
                 }
             }
 
@@ -3907,7 +3901,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 linewithtextg[i] = lineg.append("text")
                     .attr("id", "linewithtextg" + tempID)
                     .attr("index", tempID)
-                    .attr("membrane", sparqlUtils.paracellularID)
+                    .attr("membrane", paracellularID)
                     .attr("x", function (d) {
                         dxtext[i] = d.x;
                         return d.x;
@@ -4116,7 +4110,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         // paracellular
-        if ($(this).prop("tagName") == "text") { // OR if ($(this).attr("membrane") == sparqlUtils.paracellularID) {}
+        if ($(this).prop("tagName") == "text") { // OR if ($(this).attr("membrane") == paracellularID) {}
             cx = $(this).attr("x");
             cy = $(this).attr("y");
         }
@@ -4159,8 +4153,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             "}}";
 
         // location of that cellml model
-        ajaxUtils.sendPostRequest(
-            sparqlUtils.endpoint,
+        sendPostRequest(
+            endpoint,
             query,
             function (jsonLocatedin) {
 
@@ -4169,13 +4163,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 var jsonLocatedinCounter = 0;
                 // Type of model - kidney, lungs, etc
                 for (i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                    for (j = 0; j < sparqlUtils.organ.length; j++) {
-                        for (var k = 0; k < sparqlUtils.organ[j].key.length; k++) {
-                            if (jsonLocatedin.results.bindings[i].located_in.value == sparqlUtils.organ[j].key[k].key)
+                    for (j = 0; j < organ.length; j++) {
+                        for (var k = 0; k < organ[j].key.length; k++) {
+                            if (jsonLocatedin.results.bindings[i].located_in.value == organ[j].key[k].key)
                                 jsonLocatedinCounter++;
 
                             if (jsonLocatedinCounter == jsonLocatedin.results.bindings.length) {
-                                typeOfModel = sparqlUtils.organ[j].value;
+                                typeOfModel = organ[j].value;
                                 organIndex = j;
                                 break;
                             }
@@ -4191,9 +4185,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 jsonLocatedinCounter = 0;
                 // location of the above type of model
                 for (i = 0; i < jsonLocatedin.results.bindings.length; i++) {
-                    for (j = 0; j < sparqlUtils.organ[organIndex].key.length; j++) {
-                        if (jsonLocatedin.results.bindings[i].located_in.value == sparqlUtils.organ[organIndex].key[j].key) {
-                            locationOfModel += sparqlUtils.organ[organIndex].key[j].value;
+                    for (j = 0; j < organ[organIndex].key.length; j++) {
+                        if (jsonLocatedin.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
+                            locationOfModel += organ[organIndex].key[j].value;
 
                             if (i == jsonLocatedin.results.bindings.length - 1)
                                 locationOfModel += ".";
@@ -4214,14 +4208,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     "WHERE { GRAPH ?g { ?cellmlmodel <http://www.obofoundry.org/ro/ro.owl#located_in> ?located_in. " +
                     "}}";
 
-                ajaxUtils.sendPostRequest(
-                    sparqlUtils.endpoint,
+                sendPostRequest(
+                    endpoint,
                     query,
                     function (jsonRelatedModel) {
 
                         for (i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
-                            for (j = 0; j < sparqlUtils.organ[organIndex].key.length; j++) {
-                                if (jsonRelatedModel.results.bindings[i].located_in.value == sparqlUtils.organ[organIndex].key[j].key) {
+                            for (j = 0; j < organ[organIndex].key.length; j++) {
+                                if (jsonRelatedModel.results.bindings[i].located_in.value == organ[organIndex].key[j].key) {
                                     // parsing
                                     var tempModel = jsonRelatedModel.results.bindings[i].cellmlmodel.value;
                                     var indexOfHash = tempModel.search("#");
@@ -4234,7 +4228,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             }
                         }
 
-                        relatedModel = miscellaneous.uniqueify(relatedModel);
+                        relatedModel = uniqueify(relatedModel);
 
                         // kidney, lungs, heart, etc
                         // console.log("relatedModel: ", relatedModel);
@@ -4357,7 +4351,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             m.getBody().html("<div id=modalBody></div>");
                             m.show();
 
-                            miscellaneous.showLoading("#modalBody");
+                            showLoading("#modalBody");
 
                             var circleID = $(cthis).prop("id").split(",");
                             console.log("circleID in myWelcomeModal: ", circleID);
@@ -4370,13 +4364,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             cellmlModel = cellmlModel + "#" + cellmlModel.slice(0, cellmlModel.indexOf("."));
 
                             console.log("cellmlModel: ", cellmlModel);
-                            query = sparqlUtils.circleIDmyWelcomeWindowSPARQL(circleID, cellmlModel);
+                            query = circleIDmyWelcomeWindowSPARQL(circleID, cellmlModel);
 
                             console.log("query: ", query);
 
                             // protein name
-                            ajaxUtils.sendPostRequest(
-                                sparqlUtils.endpoint,
+                            sendPostRequest(
+                                endpoint,
                                 query,
                                 function (jsonModel) {
 
@@ -4389,38 +4383,38 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                     var endpointprOLS;
                                     if (proteinName != undefined) {
-                                        if (proteinName == sparqlUtils.epithelialcellID)
-                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + proteinName;
-                                        else if (proteinName.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + proteinName;
+                                        if (proteinName == epithelialcellID)
+                                            endpointprOLS = abiOntoEndpoint + "/cl/terms?iri=" + proteinName;
+                                        else if (proteinName.indexOf(partOfGOUri) != -1) {
+                                            endpointprOLS = abiOntoEndpoint + "/go/terms?iri=" + proteinName;
                                         }
                                         else
-                                            endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + proteinName;
+                                            endpointprOLS = abiOntoEndpoint + "/pr/terms?iri=" + proteinName;
                                     }
                                     else
-                                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
+                                        endpointprOLS = abiOntoEndpoint + "/pr";
 
-                                    ajaxUtils.sendGetRequest(
+                                    sendGetRequest(
                                         endpointprOLS,
                                         function (jsonPr) {
 
                                             var endpointgeneOLS;
                                             if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.has_gene_template == undefined)
-                                                endpointgeneOLS = sparqlUtils.abiOntoEndpoint + "/pr";
+                                                endpointgeneOLS = abiOntoEndpoint + "/pr";
                                             else
                                                 endpointgeneOLS = jsonPr._embedded.terms[0]._links.has_gene_template.href;
 
-                                            ajaxUtils.sendGetRequest(
+                                            sendGetRequest(
                                                 endpointgeneOLS,
                                                 function (jsonGene) {
 
                                                     var endpointspeciesOLS;
                                                     if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.only_in_taxon == undefined)
-                                                        endpointspeciesOLS = sparqlUtils.abiOntoEndpoint + "/pr";
+                                                        endpointspeciesOLS = abiOntoEndpoint + "/pr";
                                                     else
                                                         endpointspeciesOLS = jsonPr._embedded.terms[0]._links.only_in_taxon.href;
 
-                                                    ajaxUtils.sendGetRequest(
+                                                    sendGetRequest(
                                                         endpointspeciesOLS,
                                                         function (jsonSpecies) {
 
@@ -4544,26 +4538,26 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             "WHERE { GRAPH ?workspaceName { <" + modelname + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "}}";
 
-        ajaxUtils.sendPostRequest(
-            sparqlUtils.endpoint,
+        sendPostRequest(
+            endpoint,
             query,
             function (jsonProtein) {
 
                 var endpointprOLS;
                 if (jsonProtein.results.bindings.length == 0)
-                    endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr";
+                    endpointprOLS = abiOntoEndpoint + "/pr";
                 else {
                     var pr_uri = jsonProtein.results.bindings[0].Protein.value;
-                    if (pr_uri == sparqlUtils.epithelialcellID)
-                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
-                    else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
+                    if (pr_uri == epithelialcellID)
+                        endpointprOLS = abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else if (pr_uri.indexOf(partOfGOUri) != -1) {
+                        endpointprOLS = abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
                     }
                     else
-                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+                        endpointprOLS = abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
-                ajaxUtils.sendGetRequest(
+                sendGetRequest(
                     endpointprOLS,
                     function (jsonPr) {
 
@@ -4612,25 +4606,25 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             "WHERE { GRAPH ?workspaceName { <" + modelname + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "}}";
 
-        ajaxUtils.sendPostRequest(
-            sparqlUtils.endpoint,
+        sendPostRequest(
+            endpoint,
             query,
             function (jsonAltProtein) {
 
                 if (jsonAltProtein.results.bindings.length == 0)
-                    endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr";
+                    endpointOLS = abiOntoEndpoint + "/pr";
                 else {
                     var pr_uri = jsonAltProtein.results.bindings[0].Protein.value;
-                    if (pr_uri == sparqlUtils.epithelialcellID)
-                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
-                    else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
+                    if (pr_uri == epithelialcellID)
+                        endpointOLS = abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else if (pr_uri.indexOf(partOfGOUri) != -1) {
+                        endpointOLS = abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
                     }
                     else
-                        endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+                        endpointOLS = abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
-                ajaxUtils.sendGetRequest(
+                sendGetRequest(
                     endpointOLS,
                     function (jsonOLSObj) {
 
@@ -4653,14 +4647,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                             // If apical Then basolateral and vice versa
                             var membraneName;
-                            if (membrane == sparqlUtils.apicalID) {
-                                membrane = sparqlUtils.basolateralID;
+                            if (membrane == apicalID) {
+                                membrane = basolateralID;
                                 membraneName = "Basolateral membrane";
 
                                 console.log("membrane TESTING: ", membrane);
                             }
-                            else if (membrane == sparqlUtils.basolateralID) {
-                                membrane = sparqlUtils.apicalID;
+                            else if (membrane == basolateralID) {
+                                membrane = apicalID;
                                 membraneName = "Apical membrane";
 
                                 console.log("membrane TESTING: ", membrane);
@@ -4681,9 +4675,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var makecotransporter = function (membrane1, membrane2, fluxList, membraneName, flag) {
 
-        var query = sparqlUtils.makecotransporterSPARQL(membrane1, membrane2);
-        ajaxUtils.sendPostRequest(
-            sparqlUtils.endpoint,
+        var query = makecotransporterSPARQL(membrane1, membrane2);
+        sendPostRequest(
+            endpoint,
             query,
             function (jsonObj) {
 
@@ -4726,7 +4720,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 counter++;
 
-                if (counter == miscellaneous.iteration(fluxList.length)) {
+                if (counter == iteration(fluxList.length)) {
 
                     // delete cotransporter indices from fluxList
                     for (var i in cotransporterList) {
@@ -4772,9 +4766,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var maketritransporter = function (membrane1, membrane2, membrane3, fluxList, membraneName, flag) {
 
-        var query = sparqlUtils.maketritransporterSPARQL(membrane1, membrane2, membrane3);
-        ajaxUtils.sendPostRequest(
-            sparqlUtils.endpoint,
+        var query = maketritransporterSPARQL(membrane1, membrane2, membrane3);
+        sendPostRequest(
+            endpoint,
             query,
             function (jsonObj) {
 
@@ -4817,7 +4811,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 counter++;
 
-                if (counter == miscellaneous.iteration(fluxList.length)) {
+                if (counter == iteration(fluxList.length)) {
 
                     // delete cotransporter indices from fluxList
                     for (var i in cotransporterList) {
@@ -4879,10 +4873,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             sndCHEBI = fstCHEBI;
         else sndCHEBI = circleID[15];
 
-        var query = sparqlUtils.relatedMembraneSPARQL(fstCHEBI, sndCHEBI, membrane);
+        var query = relatedMembraneSPARQL(fstCHEBI, sndCHEBI, membrane);
 
-        ajaxUtils.sendPostRequest(
-            sparqlUtils.endpoint,
+        sendPostRequest(
+            endpoint,
             query,
             function (jsonRelatedMembrane) {
 
@@ -4892,7 +4886,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 for (var i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
 
                     // allow only related apical or basolateral membrane from my workspace
-                    if (jsonRelatedMembrane.results.bindings[i].g.value != sparqlUtils.myWorkspaceName)
+                    if (jsonRelatedMembrane.results.bindings[i].g.value != myWorkspaceName)
                         continue;
 
                     fluxList.push(jsonRelatedMembrane.results.bindings[i].Model_entity.value);
@@ -4904,7 +4898,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 var tempfluxList = [];
                 for (var i = 0; i < fluxList.length; i++) {
-                    if (!miscellaneous.isExist(fluxList[i], tempfluxList)) {
+                    if (!isExist(fluxList[i], tempfluxList)) {
                         tempfluxList.push(fluxList[i]);
                     }
                 }
@@ -4939,7 +4933,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                     var arr = [];
                     for (var i = 0; i < fluxList.length; i++) {
-                        if (fluxList[i].med_pr == sparqlUtils.nkcc1) {
+                        if (fluxList[i].med_pr == nkcc1) {
                             arr.push(fluxList[i]);
 
                             fluxList.splice(i, 1);
@@ -4997,8 +4991,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             "SELECT ?Protein WHERE { <" + tempmembraneModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "}";
 
-        ajaxUtils.sendPostRequest(
-            sparqlUtils.endpoint,
+        sendPostRequest(
+            endpoint,
             query,
             function (jsonRelatedMembraneModel) {
 
@@ -5013,25 +5007,25 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     return;
                 } else {
                     var pr_uri = jsonRelatedMembraneModel.results.bindings[0].Protein.value;
-                    if (pr_uri == sparqlUtils.epithelialcellID)
-                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
-                    else if (pr_uri.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
+                    if (pr_uri == epithelialcellID)
+                        endpointprOLS = abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
+                    else if (pr_uri.indexOf(partOfGOUri) != -1) {
+                        endpointprOLS = abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
                     }
                     else
-                        endpointprOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
+                        endpointprOLS = abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
-                ajaxUtils.sendGetRequest(
+                sendGetRequest(
                     endpointprOLS,
                     function (jsonPr) {
 
-                        var query = sparqlUtils.relatedMembraneModelSPARQL(modelEntityObj[idMembrane].model_entity, modelEntityObj[idMembrane].model_entity2, modelEntityObj[idMembrane].model_entity3);
+                        var query = relatedMembraneModelSPARQL(modelEntityObj[idMembrane].model_entity, modelEntityObj[idMembrane].model_entity2, modelEntityObj[idMembrane].model_entity3);
 
                         // console.log("query: ", query);
 
-                        ajaxUtils.sendPostRequest(
-                            sparqlUtils.endpoint,
+                        sendPostRequest(
+                            endpoint,
                             query,
                             function (jsonObjFlux) {
                                 // console.log("relatedMembraneModel: jsonObjFlux -> ", jsonObjFlux);
@@ -5042,10 +5036,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 }
                                 else {
                                     var chebi_uri = jsonObjFlux.results.bindings[0].solute_chebi.value;
-                                    var endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
+                                    var endpointOLS = abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
                                 }
 
-                                ajaxUtils.sendGetRequest(
+                                sendGetRequest(
                                     endpointOLS,
                                     function (jsonObjOLSChebi) {
 
@@ -5055,10 +5049,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                         }
                                         else {
                                             var chebi_uri2 = jsonObjFlux.results.bindings[0].solute_chebi2.value;
-                                            var endpointOLS2 = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri2;
+                                            var endpointOLS2 = abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri2;
                                         }
 
-                                        ajaxUtils.sendGetRequest(
+                                        sendGetRequest(
                                             endpointOLS2,
                                             function (jsonObjOLSChebi2) {
 
@@ -5068,10 +5062,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 }
                                                 else {
                                                     var chebi_uri3 = jsonObjFlux.results.bindings[0].solute_chebi3.value;
-                                                    var endpointOLS3 = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri3;
+                                                    var endpointOLS3 = abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri3;
                                                 }
 
-                                                ajaxUtils.sendGetRequest(
+                                                sendGetRequest(
                                                     endpointOLS3,
                                                     function (jsonObjOLSChebi3) {
 
@@ -5173,7 +5167,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             }
                                                             else {
                                                                 var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
-                                                                if (temp.indexOf(sparqlUtils.partOfProteinUri) != -1 || temp.indexOf(sparqlUtils.partOfGOUri) != -1 || temp.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
+                                                                if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfGOUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
                                                                     med_pr.push({
                                                                         // name of med_pr from OLS
                                                                         // TODO: J_sc_K two PR and one FMA URI!!
@@ -5181,7 +5175,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                                     });
                                                                 }
                                                                 else {
-                                                                    if (temp.indexOf(sparqlUtils.partOfFMAUri) != -1) {
+                                                                    if (temp.indexOf(partOfFMAUri) != -1) {
                                                                         med_fma.push({med_fma: jsonObjFlux.results.bindings[i].med_entity_uri.value});
                                                                     }
                                                                 }
@@ -5189,17 +5183,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         }
 
                                                         // remove duplicate fma
-                                                        solute_chebi = miscellaneous.uniqueifyEpithelial(solute_chebi);
-                                                        solute_chebi2 = miscellaneous.uniqueifyEpithelial(solute_chebi2);
-                                                        solute_chebi3 = miscellaneous.uniqueifyEpithelial(solute_chebi3);
-                                                        source_fma = miscellaneous.uniqueifyEpithelial(source_fma);
-                                                        sink_fma = miscellaneous.uniqueifyEpithelial(sink_fma);
-                                                        source_fma2 = miscellaneous.uniqueifyEpithelial(source_fma2);
-                                                        sink_fma2 = miscellaneous.uniqueifyEpithelial(sink_fma2);
-                                                        source_fma3 = miscellaneous.uniqueifyEpithelial(source_fma3);
-                                                        sink_fma3 = miscellaneous.uniqueifyEpithelial(sink_fma3);
-                                                        med_pr = miscellaneous.uniqueifyEpithelial(med_pr);
-                                                        med_fma = miscellaneous.uniqueifyEpithelial(med_fma);
+                                                        solute_chebi = uniqueifyEpithelial(solute_chebi);
+                                                        solute_chebi2 = uniqueifyEpithelial(solute_chebi2);
+                                                        solute_chebi3 = uniqueifyEpithelial(solute_chebi3);
+                                                        source_fma = uniqueifyEpithelial(source_fma);
+                                                        sink_fma = uniqueifyEpithelial(sink_fma);
+                                                        source_fma2 = uniqueifyEpithelial(source_fma2);
+                                                        sink_fma2 = uniqueifyEpithelial(sink_fma2);
+                                                        source_fma3 = uniqueifyEpithelial(source_fma3);
+                                                        sink_fma3 = uniqueifyEpithelial(sink_fma3);
+                                                        med_pr = uniqueifyEpithelial(med_pr);
+                                                        med_fma = uniqueifyEpithelial(med_fma);
 
                                                         if (jsonRelatedMembraneModel.results.bindings.length != 0) {
 
@@ -5248,20 +5242,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                                 variabletext = variabletext.slice(indexOfdot + 1);
 
-                                                                var tempjsonObjFlux = miscellaneous.uniqueifyjsonFlux(jsonObjFlux.results.bindings);
+                                                                var tempjsonObjFlux = uniqueifyjsonFlux(jsonObjFlux.results.bindings);
 
                                                                 // console.log("tempjsonObjFlux: ", tempjsonObjFlux);
 
                                                                 if (tempjsonObjFlux.length == 1) {
                                                                     var vartext2, vartext3;
                                                                     if (med_pr.length != 0) {
-                                                                        if (med_pr[0].med_pr == sparqlUtils.Nachannel || med_pr[0].med_pr == sparqlUtils.Kchannel ||
-                                                                            med_pr[0].med_pr == sparqlUtils.Clchannel) {
+                                                                        if (med_pr[0].med_pr == Nachannel || med_pr[0].med_pr == Kchannel ||
+                                                                            med_pr[0].med_pr == Clchannel) {
                                                                             vartext2 = "channel";
                                                                             vartext3 = "channel";
                                                                         }
-                                                                        else if (tempjsonObjFlux[0].source_fma.value == sparqlUtils.luminalID &&
-                                                                            tempjsonObjFlux[0].sink_fma.value == sparqlUtils.interstitialID) {
+                                                                        else if (tempjsonObjFlux[0].source_fma.value == luminalID &&
+                                                                            tempjsonObjFlux[0].sink_fma.value == interstitialID) {
                                                                             vartext2 = "diffusiveflux";
                                                                             vartext3 = "diffusiveflux";
                                                                         }
@@ -5428,16 +5422,16 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                         console.log("medURI: ", medURI);
 
-                                                        if (medURI.indexOf(sparqlUtils.partOfCHEBIUri) != -1) {
-                                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/chebi/terms?iri=" + medURI;
+                                                        if (medURI.indexOf(partOfCHEBIUri) != -1) {
+                                                            endpointOLS = abiOntoEndpoint + "/chebi/terms?iri=" + medURI;
                                                         }
-                                                        else if (medURI.indexOf(sparqlUtils.partOfGOUri) != -1) {
-                                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/go/terms?iri=" + medURI;
+                                                        else if (medURI.indexOf(partOfGOUri) != -1) {
+                                                            endpointOLS = abiOntoEndpoint + "/go/terms?iri=" + medURI;
                                                         }
                                                         else
-                                                            endpointOLS = sparqlUtils.abiOntoEndpoint + "/pr/terms?iri=" + medURI;
+                                                            endpointOLS = abiOntoEndpoint + "/pr/terms?iri=" + medURI;
 
-                                                        ajaxUtils.sendGetRequest(
+                                                        sendGetRequest(
                                                             endpointOLS,
                                                             function (jsonObjOLSMedPr) {
 
@@ -5529,10 +5523,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 console.log("membraneModelID: ", membraneModelID);
 
                 // Do not display already visualized models on the apical or basolateral membrane
-                if (miscellaneous.searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], membraneModelID[i][2], combinedMembrane))
+                if (searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], membraneModelID[i][2], combinedMembrane))
                     continue;
 
-                var workspaceuri = sparqlUtils.myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
+                var workspaceuri = myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
 
                 var variableName;
                 if (membraneModelID[i][1] != "") {
@@ -5584,7 +5578,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             var msg2 = "<p><b>" + proteinText + "</b> is a <b>" + typeOfModel + "</b> model. It is located in " +
                 "<b>" + locationOfModel + "</b><\p>";
 
-            var workspaceuri = sparqlUtils.myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + circleID[0];
+            var workspaceuri = myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + circleID[0];
 
             var model = "<b>Model: </b><a href=" + workspaceuri + " + target=_blank " +
                 "data-toggle=tooltip data-placement=right " +
@@ -5610,10 +5604,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             console.log("membraneModelID: ", membraneModelID);
 
-            miscellaneous.proteinOrMedPrID(membraneModelID, PID);
+            proteinOrMedPrID(membraneModelID, PID);
             console.log("PID BEFORE: ", PID);
 
-            var draggedMedPrID = miscellaneous.splitPRFromProtein(circleID);
+            var draggedMedPrID = splitPRFromProtein(circleID);
             PID.push(draggedMedPrID);
 
             console.log("PID BEFORE Filter: ", PID);
@@ -5644,7 +5638,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 var dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
                 // var dbfectendpoint = "/.api/ebi/uniprotkb/" + PID[index] + "/fasta";
 
-                ajaxUtils.sendGetRequest(
+                sendGetRequest(
                     dbfectendpoint,
                     function (psequence) {
                         ProteinSeq += psequence;
@@ -5674,7 +5668,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                             var requestUrl = baseUrl + "/run/";
 
-                            ajaxUtils.sendEBIPostRequest(
+                            sendEBIPostRequest(
                                 requestUrl,
                                 requestData,
                                 function (jobId) {
@@ -5682,7 +5676,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                     var chkJobStatus = function (jobId) {
                                         var jobIdUrl = baseUrl + "/status/" + jobId;
-                                        ajaxUtils.sendGetRequest(
+                                        sendGetRequest(
                                             jobIdUrl,
                                             function (resultObj) {
                                                 console.log("result: ", resultObj); // jobId status
@@ -5694,18 +5688,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 }
 
                                                 var pimUrl = baseUrl + "/result/" + jobId + "/pim";
-                                                ajaxUtils.sendGetRequest(
+                                                sendGetRequest(
                                                     pimUrl,
                                                     function (identityMatrix) {
 
-                                                        var similarityOBJ = miscellaneous.similarityMatrixEBI(
+                                                        var similarityOBJ = similarityMatrixEBI(
                                                             identityMatrix, PID, draggedMedPrID, membraneModelObj);
 
                                                         var tempList = [];
                                                         for (var i = 0; i < membraneModelObj.length; i++) {
                                                             for (var j = 0; j < membraneModelID.length; j++) {
 
-                                                                var tempID = miscellaneous.splitPRFromProtein(membraneModelID[j]);
+                                                                var tempID = splitPRFromProtein(membraneModelID[j]);
                                                                 if (tempID.charAt(0) != "P") {
                                                                     if (tempID.charAt(0) != "Q") {
                                                                         tempID = "P" + tempID.replace(/^0+/, "");
@@ -5733,10 +5727,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                         for (var i = 0; i < membraneModelObj.length; i++) {
 
                                                             // Do not display visualized models
-                                                            if (miscellaneous.searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], membraneModelID[i][2], combinedMembrane))
+                                                            if (searchInCombinedMembrane(membraneModelID[i][0], membraneModelID[i][1], membraneModelID[i][2], combinedMembrane))
                                                                 continue;
 
-                                                            var workspaceuri = sparqlUtils.myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
+                                                            var workspaceuri = myWorkspaceName + "/" + "rawfile" + "/" + "HEAD" + "/" + membraneModelID[i][0];
 
                                                             var label = document.createElement("label");
                                                             label.innerHTML = '<br><input id="' + membraneModelID[i] + '" ' +
@@ -6010,7 +6004,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             dytextinitial = 198.3333282470703,
             dytextinitial2 = 237.3333282470703;
         for (i = 0; i < circlewithlineg.length; i++) {
-            if (circlewithlineg[i].attr("membrane") == sparqlUtils.apicalID) {
+            if (circlewithlineg[i].attr("membrane") == apicalID) {
                 console.log("circleRearrange on apical membrane!");
 
                 // line 1
@@ -6105,7 +6099,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             dytextinitialb = 198.3333282470703,
             dytextinitialb2 = 237.3333282470703;
         for (i = 0; i < circlewithlineg.length; i++) {
-            if (circlewithlineg[i].attr("membrane") == sparqlUtils.basolateralID) {
+            if (circlewithlineg[i].attr("membrane") == basolateralID) {
                 console.log("circleRearrange on basolateral membrane!");
 
                 // line 1
@@ -6196,7 +6190,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
     };
 
-    // reinitialize variable for next miscellaneous.iteration
+    // reinitialize variable for next iteration
     var reinitVariable = function () {
         idProtein = 0;
         idAltProtein = 0;
@@ -6355,7 +6349,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             med_pr_text_syn: circleID[21], // synonym of a mediator protein text (e.g. NHE3, SGLT1) using the mediator protein uri from OLS
                             protein_name: circleID[22] // protein name
                         });
-                        // combinedMembrane = miscellaneous.uniqueifyCombinedMembrane(combinedMembrane);
+                        // combinedMembrane = uniqueifyCombinedMembrane(combinedMembrane);
 
                         console.log("combinedMembrane in addModelsID input: ", combinedMembrane);
 
@@ -6374,7 +6368,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         console.log("Apical or Basolateral membrane!!");
 
                         // paracellular
-                        if ($(cthis).attr("membrane") == sparqlUtils.paracellularID) {
+                        if ($(cthis).attr("membrane") == paracellularID) {
                             $(cthis).attr("idParacellular", $("#membraneModelsID input")[i].id);
                         }
                         else {
@@ -6430,75 +6424,75 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     console.log("icircleGlobal: ", icircleGlobal);
 
                     // mediator FMA uri
-                    if (combinedMembrane[icircleGlobal].med_fma == sparqlUtils.apicalID) {
-                        circleID[12] = sparqlUtils.basolateralID;
-                        combinedMembrane[icircleGlobal].med_fma = sparqlUtils.basolateralID;
+                    if (combinedMembrane[icircleGlobal].med_fma == apicalID) {
+                        circleID[12] = basolateralID;
+                        combinedMembrane[icircleGlobal].med_fma = basolateralID;
 
                         // source and sink FMA uri
-                        if (combinedMembrane[icircleGlobal].source_fma == sparqlUtils.luminalID && combinedMembrane[icircleGlobal].sink_fma == sparqlUtils.cytosolID) {
-                            circleID[6] = sparqlUtils.cytosolID;
-                            combinedMembrane[icircleGlobal].source_fma = sparqlUtils.cytosolID;
-                            circleID[7] = sparqlUtils.interstitialID;
-                            combinedMembrane[icircleGlobal].sink_fma = sparqlUtils.interstitialID;
+                        if (combinedMembrane[icircleGlobal].source_fma == luminalID && combinedMembrane[icircleGlobal].sink_fma == cytosolID) {
+                            circleID[6] = cytosolID;
+                            combinedMembrane[icircleGlobal].source_fma = cytosolID;
+                            circleID[7] = interstitialID;
+                            combinedMembrane[icircleGlobal].sink_fma = interstitialID;
                         }
 
-                        if (combinedMembrane[icircleGlobal].source_fma == sparqlUtils.cytosolID && combinedMembrane[icircleGlobal].sink_fma == sparqlUtils.luminalID) {
-                            circleID[6] = sparqlUtils.interstitialID;
-                            combinedMembrane[icircleGlobal].source_fma = sparqlUtils.interstitialID;
-                            circleID[7] = sparqlUtils.cytosolID;
-                            combinedMembrane[icircleGlobal].sink_fma = sparqlUtils.cytosolID;
+                        if (combinedMembrane[icircleGlobal].source_fma == cytosolID && combinedMembrane[icircleGlobal].sink_fma == luminalID) {
+                            circleID[6] = interstitialID;
+                            combinedMembrane[icircleGlobal].source_fma = interstitialID;
+                            circleID[7] = cytosolID;
+                            combinedMembrane[icircleGlobal].sink_fma = cytosolID;
                         }
 
                         // source2 and sink2 FMA uri
                         if (combinedMembrane[icircleGlobal].source_fma2 != "" && combinedMembrane[icircleGlobal].sink_fma2 != "") {
-                            if (combinedMembrane[icircleGlobal].source_fma2 == sparqlUtils.luminalID && combinedMembrane[icircleGlobal].sink_fma2 == sparqlUtils.cytosolID) {
-                                circleID[8] = sparqlUtils.cytosolID;
-                                combinedMembrane[icircleGlobal].source_fma2 = sparqlUtils.cytosolID;
-                                circleID[9] = sparqlUtils.interstitialID;
-                                combinedMembrane[icircleGlobal].sink_fma2 = sparqlUtils.interstitialID;
+                            if (combinedMembrane[icircleGlobal].source_fma2 == luminalID && combinedMembrane[icircleGlobal].sink_fma2 == cytosolID) {
+                                circleID[8] = cytosolID;
+                                combinedMembrane[icircleGlobal].source_fma2 = cytosolID;
+                                circleID[9] = interstitialID;
+                                combinedMembrane[icircleGlobal].sink_fma2 = interstitialID;
                             }
 
-                            if (combinedMembrane[icircleGlobal].source_fma2 == sparqlUtils.cytosolID && combinedMembrane[icircleGlobal].sink_fma2 == sparqlUtils.luminalID) {
-                                circleID[8] = sparqlUtils.interstitialID;
-                                combinedMembrane[icircleGlobal].source_fma2 = sparqlUtils.interstitialID;
-                                circleID[9] = sparqlUtils.cytosolID;
-                                combinedMembrane[icircleGlobal].sink_fma2 = sparqlUtils.cytosolID;
+                            if (combinedMembrane[icircleGlobal].source_fma2 == cytosolID && combinedMembrane[icircleGlobal].sink_fma2 == luminalID) {
+                                circleID[8] = interstitialID;
+                                combinedMembrane[icircleGlobal].source_fma2 = interstitialID;
+                                circleID[9] = cytosolID;
+                                combinedMembrane[icircleGlobal].sink_fma2 = cytosolID;
                             }
                         }
                     }
                     else {
-                        circleID[12] = sparqlUtils.apicalID;
-                        combinedMembrane[icircleGlobal].med_fma = sparqlUtils.apicalID;
+                        circleID[12] = apicalID;
+                        combinedMembrane[icircleGlobal].med_fma = apicalID;
 
                         // source and sink FMA uri
-                        if (combinedMembrane[icircleGlobal].source_fma == sparqlUtils.cytosolID && combinedMembrane[icircleGlobal].sink_fma == sparqlUtils.interstitialID) {
-                            circleID[6] = sparqlUtils.luminalID;
-                            combinedMembrane[icircleGlobal].source_fma = sparqlUtils.luminalID;
-                            circleID[7] = sparqlUtils.cytosolID;
-                            combinedMembrane[icircleGlobal].sink_fma = sparqlUtils.cytosolID;
+                        if (combinedMembrane[icircleGlobal].source_fma == cytosolID && combinedMembrane[icircleGlobal].sink_fma == interstitialID) {
+                            circleID[6] = luminalID;
+                            combinedMembrane[icircleGlobal].source_fma = luminalID;
+                            circleID[7] = cytosolID;
+                            combinedMembrane[icircleGlobal].sink_fma = cytosolID;
                         }
 
-                        if (combinedMembrane[icircleGlobal].source_fma == sparqlUtils.interstitialID && combinedMembrane[icircleGlobal].sink_fma == sparqlUtils.cytosolID) {
-                            circleID[6] = sparqlUtils.cytosolID;
-                            combinedMembrane[icircleGlobal].source_fma = sparqlUtils.cytosolID;
-                            circleID[7] = sparqlUtils.luminalID;
-                            combinedMembrane[icircleGlobal].sink_fma = sparqlUtils.luminalID;
+                        if (combinedMembrane[icircleGlobal].source_fma == interstitialID && combinedMembrane[icircleGlobal].sink_fma == cytosolID) {
+                            circleID[6] = cytosolID;
+                            combinedMembrane[icircleGlobal].source_fma = cytosolID;
+                            circleID[7] = luminalID;
+                            combinedMembrane[icircleGlobal].sink_fma = luminalID;
                         }
 
                         // source2 and sink2 FMA uri
                         if (circleID[8] != "" && circleID[9] != "") {
-                            if (combinedMembrane[icircleGlobal].source_fma2 == sparqlUtils.cytosolID && combinedMembrane[icircleGlobal].sink_fma2 == sparqlUtils.interstitialID) {
-                                circleID[8] = sparqlUtils.luminalID;
-                                combinedMembrane[icircleGlobal].source_fma2 = sparqlUtils.luminalID;
-                                circleID[9] = sparqlUtils.cytosolID;
-                                combinedMembrane[icircleGlobal].sink_fma2 = sparqlUtils.cytosolID;
+                            if (combinedMembrane[icircleGlobal].source_fma2 == cytosolID && combinedMembrane[icircleGlobal].sink_fma2 == interstitialID) {
+                                circleID[8] = luminalID;
+                                combinedMembrane[icircleGlobal].source_fma2 = luminalID;
+                                circleID[9] = cytosolID;
+                                combinedMembrane[icircleGlobal].sink_fma2 = cytosolID;
                             }
 
-                            if (combinedMembrane[icircleGlobal].source_fma2 == sparqlUtils.interstitialID && combinedMembrane[icircleGlobal].sink_fma2 == sparqlUtils.cytosolID) {
-                                circleID[8] = sparqlUtils.cytosolID;
-                                combinedMembrane[icircleGlobal].source_fma2 = sparqlUtils.cytosolID;
-                                circleID[9] = sparqlUtils.luminalID;
-                                combinedMembrane[icircleGlobal].sink_fma2 = sparqlUtils.luminalID;
+                            if (combinedMembrane[icircleGlobal].source_fma2 == interstitialID && combinedMembrane[icircleGlobal].sink_fma2 == cytosolID) {
+                                circleID[8] = cytosolID;
+                                combinedMembrane[icircleGlobal].source_fma2 = cytosolID;
+                                circleID[9] = luminalID;
+                                combinedMembrane[icircleGlobal].sink_fma2 = luminalID;
                             }
                         }
                     }
@@ -6555,7 +6549,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 }
 
                 // circle placement and rearrangement
-                if ($(cthis).attr("membrane") == sparqlUtils.apicalID) {
+                if ($(cthis).attr("membrane") == apicalID) {
                     linebasolateral
                         .transition()
                         .delay(1000)
@@ -6676,7 +6670,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         console.log("modalWindowToAddModels located_in: ", located_in);
 
         var membraneName;
-        if (located_in == sparqlUtils.apicalID)
+        if (located_in == apicalID)
             membraneName = "Apical";
         else
             membraneName = "Basolateral";
@@ -6693,18 +6687,18 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         m.getBody().html("<div id=modalBody></div>");
         m.show();
 
-        miscellaneous.showLoading("#modalBody");
+        showLoading("#modalBody");
 
-        var query = sparqlUtils.modalWindowToAddModelsSPARQL(located_in);
+        var query = modalWindowToAddModelsSPARQL(located_in);
 
-        ajaxUtils.sendPostRequest(
-            sparqlUtils.endpoint,
+        sendPostRequest(
+            endpoint,
             query,
             function (jsonRelatedModelEntity) {
 
                 console.log("modalWindowToAddModels jsonRelatedModelEntity: ", jsonRelatedModelEntity, combinedMembrane);
                 for (var i = 0; i < jsonRelatedModelEntity.results.bindings.length; i++) {
-                    if (!miscellaneous.isExist(jsonRelatedModelEntity.results.bindings[i].modelEntity.value, relatedModelEntity)) {
+                    if (!isExist(jsonRelatedModelEntity.results.bindings[i].modelEntity.value, relatedModelEntity)) {
                         relatedModelEntity.push(jsonRelatedModelEntity.results.bindings[i].modelEntity.value);
                     }
                 }
@@ -6738,5 +6732,3 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         jQuery(window).trigger("resize");
     }
 };
-
-exports.epithelialPlatform = epithelialPlatform;

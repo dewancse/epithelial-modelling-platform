@@ -477,25 +477,3 @@ function d3CheckBox() {
 
     return checkBox;
 }
-
-exports.parseModelName = parseModelName;
-exports.parserFmaNameText = parserFmaNameText;
-exports.uniqueify = uniqueify;
-exports.uniqueifyEpithelial = uniqueifyEpithelial;
-exports.uniqueifySVG = uniqueifySVG;
-exports.uniqueifyjsonFlux = uniqueifyjsonFlux;
-exports.createAnchor = createAnchor;
-exports.searchFn = searchFn;
-exports.getTextWidth = getTextWidth;
-exports.iteration = iteration;
-exports.showLoading = showLoading;
-exports.uniqueifymodel2DArray = uniqueifymodel2DArray;
-exports.uniqueifyjsonModel = uniqueifyjsonModel;
-exports.isExist = isExist;
-exports.isExistModel2DArray = isExistModel2DArray;
-exports.uniqueifyCombinedMembrane = uniqueifyCombinedMembrane;
-exports.splitPRFromProtein = splitPRFromProtein;
-exports.proteinOrMedPrID = proteinOrMedPrID;
-exports.searchInCombinedMembrane = searchInCombinedMembrane;
-exports.similarityMatrixEBI = similarityMatrixEBI;
-exports.d3CheckBox = d3CheckBox;

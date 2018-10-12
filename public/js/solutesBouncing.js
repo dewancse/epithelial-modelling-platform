@@ -84,5 +84,3 @@ var solutesBouncing = function (newg, solutes) {
         };
     }
 };
-
-exports.solutesBouncing = solutesBouncing;

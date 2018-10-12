@@ -1,8 +1,6 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
-var miscellaneous = require("./miscellaneous.js");
-
 // TODO: change this function later and make it readable
 // Show a selected entry from search results
 var viewModel = function (jsonObj) {
@@ -34,14 +32,14 @@ var viewModel = function (jsonObj) {
 
             // TODO: regular expression to validate a URL
             if (tempValue.indexOf("http") != -1) {
-                var aText = miscellaneous.createAnchor(tempValue);
+                var aText = createAnchor(tempValue);
                 tempArrayOfURL.push(tempValue);
-                if (miscellaneous.searchFn(tempValue, tempArrayOfURL) <= 1)
+                if (searchFn(tempValue, tempArrayOfURL) <= 1)
                     divText.append(aText);
             }
             else {
                 tempArray.push(tempValue);
-                if (miscellaneous.searchFn(tempValue, tempArray) <= 1)
+                if (searchFn(tempValue, tempArray) <= 1)
                     divText.append(tempValue);
             }
 
@@ -51,5 +49,3 @@ var viewModel = function (jsonObj) {
         $("#viewList").append("<br>");
     }
 };
-
-exports.viewModel = viewModel;

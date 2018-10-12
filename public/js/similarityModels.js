@@ -1,8 +1,6 @@
 /**
  * Created by dsar941 on 5/11/2017.
  */
-var miscellaneous = require("./miscellaneous.js");
-
 var similarityModels = function (model2DArray, modelEntityNameArray) {
 
     var links = [];
@@ -56,7 +54,7 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
         }
     }
 
-    links = miscellaneous.uniqueifySVG(links);
+    links = uniqueifySVG(links);
 
     var nodes = {};
 
@@ -223,5 +221,3 @@ var similarityModels = function (model2DArray, modelEntityNameArray) {
     // Empty list
     modelEntityNameArray = [];
 };
-
-exports.similarityModels = similarityModels;

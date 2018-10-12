@@ -115,7 +115,7 @@ We have deployed our Docker image to Nectar Cloud. In order to begin with the de
 ### Accessibility
 The application is accessible by navigating::
 ```
-  http://epithelial-modelling-platform.nectar.auckland.ac.nz
+  http://epithelial-modelling-platform.nectar.auckland.ac.nz or http://130.216.216.81
 ```
 
 ### Programming Language
