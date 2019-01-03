@@ -20,9 +20,11 @@
     "mocha-phantomjs": "^4.1.0"
   },
   "dependencies": {
-    "selenium-webdriver": "^3.6.0",
+    "body-parser": "^1.18.3",
     "express": "^4.16.3",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "request-promise": "^4.2.2",
+    "selenium-webdriver": "^3.6.0"
   },
   "keywords": [
     "epithelial",

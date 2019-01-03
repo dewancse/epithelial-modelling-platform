@@ -6,7 +6,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var relatedModel = [], membraneModelObj = [], alternativeModelObj = [], relatedModelObj = [],
         modelEntityObj = [], membraneModelID = [], proteinName, proteinText, cellmlModel, biological_meaning,
-        biological_meaning2, biological_meaning3, speciesName, geneName, idProtein = 0, idAltProtein = 0, idMembrane = 0,
+        biological_meaning2, biological_meaning3, speciesName, geneName, idProtein = 0, idAltProtein = 0,
+        idMembrane = 0,
         locationOfModel, typeOfModel, cthis, icircleGlobal, organIndex, model_entity, model_entity2, model_entity3,
         relatedModelEntity = [], cotransporterList = [], counter = 0;
 
@@ -5229,9 +5230,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                                                             console.log("membraneModelObj: ", membraneModelObj);
 
-                                                            var sourcefma, sinkfma, variabletext, solutechebi, solutetext,
-                                                                modelentity2, sourcefma2, sinkfma2, variabletext2,  solutechebi2, solutetext2,
-                                                                modelentity3, sourcefma3, sinkfma3, variabletext3,  solutechebi3, solutetext3,
+                                                            var sourcefma, sinkfma, variabletext, solutechebi,
+                                                                solutetext,
+                                                                modelentity2, sourcefma2, sinkfma2, variabletext2,
+                                                                solutechebi2, solutetext2,
+                                                                modelentity3, sourcefma3, sinkfma3, variabletext3,
+                                                                solutechebi3, solutetext3,
                                                                 medfma, medpr, indexOfdot, indexOfHash;
 
                                                             if (modelEntityObj[idMembrane].model_entity2 == "" && modelEntityObj[idMembrane].model_entity3 == "") {
@@ -5599,8 +5603,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             // Related apical or basolateral model
             var index = 0, ProteinSeq = "", requestData, PID = [];
-            var baseUrl = "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
-            // var baseUrl = "/.api/ebi/clustalo";
+            // var baseUrl = "https://www.ebi.ac.uk/Tools/services/rest/clustalo";
+            var baseUrl = "/.api/ebi/clustalo";
 
             console.log("membraneModelID: ", membraneModelID);
 
@@ -5635,8 +5639,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             // https://www.ebi.ac.uk/seqdb/confluence/display/WEBSERVICES/clustalo_rest
             var WSDbfetchREST = function () {
 
-                var dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
-                // var dbfectendpoint = "/.api/ebi/uniprotkb/" + PID[index] + "/fasta";
+                // var dbfectendpoint = "https://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/" + PID[index] + "/fasta";
+                var dbfectendpoint = "/.api/ebi/uniprotkb/" + PID[index] + "/fasta";
 
                 sendGetRequest(
                     dbfectendpoint,
@@ -6731,4 +6735,74 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         jQuery(window).trigger("resize");
     }
+
+    $("#modelassembly").html("<div><h3>Model Assembly Service:</h3> <button id='btnModel'>Click Here</button></div>");
+
+    var data = [
+        {
+            "med_fma": "http://purl.obolibrary.org/obo/FMA_84666",
+            "med_pr": "http://purl.obolibrary.org/obo/PR_P55018",
+            "med_pr_text": "solute carrier family 12 member 3 (rat)",
+            "med_pr_text_syn": "TSC",
+            "model_entity": "chang_fujita_b_1999.cellml#total_transepithelial_sodium_flux.J_mc_Na",
+            "model_entity2": "chang_fujita_b_1999.cellml#solute_concentrations.J_mc_Cl",
+            "model_entity3": "",
+            "protein_name": "http://purl.obolibrary.org/obo/CL_0000066",
+            "sink_fma": "http://purl.obolibrary.org/obo/FMA_66836",
+            "sink_fma2": "http://purl.obolibrary.org/obo/FMA_66836",
+            "sink_fma3": "",
+            "solute_chebi": "http://purl.obolibrary.org/obo/CHEBI_29101",
+            "solute_chebi2": "http://purl.obolibrary.org/obo/CHEBI_17996",
+            "solute_chebi3": "",
+            "solute_text": "Na+",
+            "solute_text2": "Cl-",
+            "solute_text3": "",
+            "source_fma": "http://purl.obolibrary.org/obo/FMA_74550",
+            "source_fma2": "http://purl.obolibrary.org/obo/FMA_74550",
+            "source_fma3": "",
+            "variable_text": "J_mc_Na",
+            "variable_text2": "J_mc_Cl",
+            "variable_text3": ""
+        },
+        {
+            "med_fma": "http://purl.obolibrary.org/obo/FMA_84666",
+            "med_pr": "http://purl.obolibrary.org/obo/PR_Q63633",
+            "med_pr_text": "solute carrier family 12 member 5 (rat)",
+            "med_pr_text_syn": "Q63633",
+            "model_entity": "chang_fujita_b_1999.cellml#solute_concentrations.J_mc_Cl",
+            "model_entity2": "chang_fujita_b_1999.cellml#total_transepithelial_potassium_flux.J_mc_K",
+            "model_entity3": "",
+            "protein_name": "http://purl.obolibrary.org/obo/CL_0000066",
+            "sink_fma": "http://purl.obolibrary.org/obo/FMA_66836",
+            "sink_fma2": "http://purl.obolibrary.org/obo/FMA_66836",
+            "sink_fma3": "",
+            "solute_chebi": "http://purl.obolibrary.org/obo/CHEBI_17996",
+            "solute_chebi2": "http://purl.obolibrary.org/obo/CHEBI_29103",
+            "solute_chebi3": "",
+            "solute_text": "Cl-",
+            "solute_text2": "K+",
+            "solute_text3": "",
+            "source_fma": "http://purl.obolibrary.org/obo/FMA_74550",
+            "source_fma2": "http://purl.obolibrary.org/obo/FMA_74550",
+            "source_fma3": "",
+            "variable_text": "J_mc_Cl",
+            "variable_text2": "J_mc_K",
+            "variable_text3": ""
+        }
+    ];
+
+    $("#btnModel").click(function () {
+        console.log("inside button model!");
+        showLoading("#newmodel");
+        // var url = "http://127.0.0.1:8000/post";
+        var url = "http://130.216.216.219:8000/post";
+        sendPostRequest(
+            url,
+            JSON.stringify(combinedMembrane),
+            function (content) {
+                console.log(content);
+                $("#newmodel").html(content);
+            },
+            false);
+    });
 };

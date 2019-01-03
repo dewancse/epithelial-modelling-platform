@@ -42,6 +42,73 @@ var EMP = (function (global) {
                 $("#main-content").html(homeHtmlContent);
             },
             false);
+
+        // var data = [
+        //     {
+        //         "med_fma": "http://purl.obolibrary.org/obo/FMA_84666",
+        //         "med_pr": "http://purl.obolibrary.org/obo/PR_P55018",
+        //         "med_pr_text": "solute carrier family 12 member 3 (rat)",
+        //         "med_pr_text_syn": "TSC",
+        //         "model_entity": "chang_fujita_b_1999.cellml#total_transepithelial_sodium_flux.J_mc_Na",
+        //         "model_entity2": "chang_fujita_b_1999.cellml#solute_concentrations.J_mc_Cl",
+        //         "model_entity3": "",
+        //         "protein_name": "http://purl.obolibrary.org/obo/CL_0000066",
+        //         "sink_fma": "http://purl.obolibrary.org/obo/FMA_66836",
+        //         "sink_fma2": "http://purl.obolibrary.org/obo/FMA_66836",
+        //         "sink_fma3": "",
+        //         "solute_chebi": "http://purl.obolibrary.org/obo/CHEBI_29101",
+        //         "solute_chebi2": "http://purl.obolibrary.org/obo/CHEBI_17996",
+        //         "solute_chebi3": "",
+        //         "solute_text": "Na+",
+        //         "solute_text2": "Cl-",
+        //         "solute_text3": "",
+        //         "source_fma": "http://purl.obolibrary.org/obo/FMA_74550",
+        //         "source_fma2": "http://purl.obolibrary.org/obo/FMA_74550",
+        //         "source_fma3": "",
+        //         "variable_text": "J_mc_Na",
+        //         "variable_text2": "J_mc_Cl",
+        //         "variable_text3": ""
+        //     },
+        //     {
+        //         "med_fma": "http://purl.obolibrary.org/obo/FMA_84666",
+        //         "med_pr": "http://purl.obolibrary.org/obo/PR_Q63633",
+        //         "med_pr_text": "solute carrier family 12 member 5 (rat)",
+        //         "med_pr_text_syn": "Q63633",
+        //         "model_entity": "chang_fujita_b_1999.cellml#solute_concentrations.J_mc_Cl",
+        //         "model_entity2": "chang_fujita_b_1999.cellml#total_transepithelial_potassium_flux.J_mc_K",
+        //         "model_entity3": "",
+        //         "protein_name": "http://purl.obolibrary.org/obo/CL_0000066",
+        //         "sink_fma": "http://purl.obolibrary.org/obo/FMA_66836",
+        //         "sink_fma2": "http://purl.obolibrary.org/obo/FMA_66836",
+        //         "sink_fma3": "",
+        //         "solute_chebi": "http://purl.obolibrary.org/obo/CHEBI_17996",
+        //         "solute_chebi2": "http://purl.obolibrary.org/obo/CHEBI_29103",
+        //         "solute_chebi3": "",
+        //         "solute_text": "Cl-",
+        //         "solute_text2": "K+",
+        //         "solute_text3": "",
+        //         "source_fma": "http://purl.obolibrary.org/obo/FMA_74550",
+        //         "source_fma2": "http://purl.obolibrary.org/obo/FMA_74550",
+        //         "source_fma3": "",
+        //         "variable_text": "J_mc_Cl",
+        //         "variable_text2": "J_mc_K",
+        //         "variable_text3": ""
+        //     }
+        // ];
+
+        // var url = "http://127.0.0.1:8000/model";
+        // var url = "./snippets/newmodel-snippet.html";
+        // $("#main-content").html("Model Assembly Service: <a href=" + url + " + target=_blank>Click here</a>");
+
+        // var url = "http://127.0.0.1:8000/post";
+        // sendPostRequest(
+        //     url,
+        //     JSON.stringify(data),
+        //     function (content) {
+        //         console.log(content);
+        //         $("#main-content").html(content);
+        //     },
+        //     false);
     };
 
     // DOCUMENTATION: load documentation from github
