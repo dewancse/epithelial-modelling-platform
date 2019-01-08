@@ -1,0 +1,152 @@
+<div class="container">
+    <div id="proteinBox" class="container input-group">
+        <span style="font-size: medium; ">Protein Name</span>
+        <input id="proteinTxt" name="proteinTxt" value="" type="text"
+               placeholder="Search Proteins (e.g. SGLT4)" class="form-control input-lg"
+               aria-label="...">
+    </div>
+    <br/>
+    <div id="speciesBox" class="container input-group">
+        <span style="font-size: medium; ">Species Name</span>
+        <input id="speciesTxt" name="speciesTxt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
+    </div>
+    <br/>
+    <div id="geneBox" class="container input-group">
+        <span style="font-size: medium; ">Gene Name</span>
+        <input id="geneTxt" name="geneTxt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
+    </div>
+    <br/>
+    <div id="compartmentBox" class="container input-group">
+        <span style="font-size: medium; ">Compartment</span>
+        <select id="compartmentTxt" name="compartmentTxt" class="form-control input-lg">
+            <option value="select a compartment" selected>select a compartment</option>
+            <option value="FMA_74550">Luminal</option>
+            <option value="FMA_74550,FMA_66836">Luminal, Cytosol</option>
+            <option value="FMA_74550,FMA_66836,FMA_9673">Luminal, Cytosol, Interstitial Fluid</option>
+        </select>
+    </div>
+    <br/>
+    <div id="soluteFlux1Box" class="container input-group">
+        <span style="font-size: medium; ">Solute Flux 1</span>
+        <select id="soluteFlux1Txt" name="soluteFlux1Txt" class="form-control input-lg">
+            <option value="select a solute" selected>select a solute</option>
+            <option value="CHEBI_29101">Sodium</option>
+            <option value="CHEBI_29103">Potassium</option>
+            <option value="CHEBI_17996">Chloride</option>
+        </select>
+    </div>
+    <br/>
+    <div id="sourceFlux1Box" class="container input-group">
+        <span style="font-size: medium; ">Source Flux 1</span>
+        <select id="sourceFlux1Txt" name="sourceFlux1Txt" class="form-control input-lg">
+            <option value="select a source compartment" selected>select a source compartment</option>
+            <option value="FMA_74550">Luminal</option>
+            <option value="FMA_66836">Cytosol</option>
+            <option value="FMA_9673">Interstitial Fluid</option>
+        </select>
+    </div>
+    <br/>
+    <div id="sinkFlux1Box" class="container input-group">
+        <span style="font-size: medium; ">Sink Flux 1</span>
+        <select id="sinkFlux1Txt" name="sinkFlux1Txt" class="form-control input-lg">
+            <option value="select a sink compartment" selected>select a sink compartment</option>
+            <option value="FMA_74550">Luminal</option>
+            <option value="FMA_66836">Cytosol</option>
+            <option value="FMA_9673">Interstitial Fluid</option>
+        </select>
+    </div>
+    <br/>
+    <div id="mediatorFlux1Box" class="container input-group">
+        <span style="font-size: medium; ">Mediator Flux 1</span>
+        <select id="mediatorFlux1Txt" name="mediatorFlux1Txt" class="form-control input-lg">
+            <option value="select a mediator" selected>select a mediator</option>
+            <option value="FMA_84666">Apical plasma membrane</option>
+            <option value="FMA_84669">Basolateral plasma membrane</option>
+        </select>
+    </div>
+    <br/>
+    <div id="sourceCon1Box" class="container input-group">
+        <span style="font-size: medium; ">Solute Concentration 1</span>
+        <input id="sourceCon1Txt" name="sourceCon1Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
+    </div>
+    <br/>
+    <div id="sourceSrcComp1Box" class="container input-group">
+        <span style="font-size: medium; ">Solute Src Compartment 1</span>
+        <input id="sourceSrcComp1Txt" name="sourceSrcComp1Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
+    </div>
+    <br/>
+    <div id="sourceSnkComp1Box" class="container input-group">
+        <span style="font-size: medium; ">Solute Snk Compartment 1</span>
+        <input id="sourceSnkComp1Txt" name="sourceSnkComp1Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
+    </div>
+    <br/>
+    <div id="soluteFlux2Box" class="container input-group">
+        <span style="font-size: medium; ">Solute Flux 2</span>
+        <select id="soluteFlux2Txt" name="soluteFlux2Txt" class="form-control input-lg">
+            <option value="select a solute" selected>select a solute</option>
+            <option value="CHEBI_29101">Sodium</option>
+            <option value="CHEBI_29103">Potassium</option>
+            <option value="CHEBI_17996">Chloride</option>
+        </select>
+    </div>
+    <br/>
+    <div id="sourceFlux2Box" class="container input-group">
+        <span style="font-size: medium; ">Source Flux 2</span>
+        <select id="sourceFlux2Txt" name="sourceFlux2Txt" class="form-control input-lg">
+            <option value="select a source compartment" selected>select a source compartment</option>
+            <option value="FMA_74550">Luminal</option>
+            <option value="FMA_66836">Cytosol</option>
+            <option value="FMA_9673">Interstitial Fluid</option>
+        </select>
+    </div>
+    <br/>
+    <div id="sinkFlux2Box" class="container input-group">
+        <span style="font-size: medium; ">Sink Flux 2</span>
+        <select id="sinkFlux2Txt" name="sinkFlux2Txt" class="form-control input-lg">
+            <option value="select a sink compartment" selected>select a sink compartment</option>
+            <option value="FMA_74550">Luminal</option>
+            <option value="FMA_66836">Cytosol</option>
+            <option value="FMA_9673">Interstitial Fluid</option>
+        </select>
+    </div>
+    <br/>
+    <div id="mediatorFlux2Box" class="container input-group">
+        <span style="font-size: medium; ">Mediator Flux 2</span>
+        <select id="mediatorFlux2Txt" name="mediatorFlux2Txt" class="form-control input-lg">
+            <option value="select a mediator" selected>select a mediator</option>
+            <option value="FMA_84666">Apical plasma membrane</option>
+            <option value="FMA_84669">Basolateral plasma membrane</option>
+        </select>
+    </div>
+    <br/>
+    <div id="sourceCon2Box" class="container input-group">
+        <span style="font-size: medium; ">Solute Concentration 2</span>
+        <input id="sourceCon2Txt" name="sourceCon2Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
+    </div>
+    <br/>
+    <div id="sourceSrcComp2Box" class="container input-group">
+        <span style="font-size: medium; ">Solute Src Compartment 2</span>
+        <input id="sourceSrcComp2Txt" name="sourceSrcComp1Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
+    </div>
+    <br/>
+    <div id="sourceSnkComp2Box" class="container input-group">
+        <span style="font-size: medium; ">Solute Snk Compartment 2</span>
+        <input id="sourceSnkComp2Txt" name="sourceSnkComp2Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
+    </div>
+    <br/>
+    <div class="container btn-group" role="group" aria-label="...">
+        <button id="createCellMLBtn" type="button" onclick="$mainUtils.createCellML();"
+                class="btn btn-default btn-lg">Create CellML
+        </button>
+    </div>
+    <hr/>
+    <div id="proteinList" class="container"></div>
+</div>

@@ -6794,8 +6794,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     $("#btnModel").click(function () {
         console.log("inside button model!");
         showLoading("#newmodel");
-        // var url = "http://127.0.0.1:8000/post";
-        var url = "http://130.216.216.219:8000/post";
+        var url = "http://127.0.0.1:8000/post";
+        // var url = "http://130.216.216.219:8000/post";
         sendPostRequest(
             url,
             JSON.stringify(combinedMembrane),

@@ -33,6 +33,12 @@ var EMP = (function (global) {
         head = [],
         discoverIndex = 0;
 
+    var compartmentVal, proteinVal;
+    var soluteFlux1, soluteFlux1val, sourceFlux1, sourceFlux1val,
+        sinkFlux1, sinkFlux1val, mediatorFlux1, mediatorFlux1val;
+    var soluteFlux2, soluteFlux2val, sourceFlux2, sourceFlux2val,
+        sinkFlux2, sinkFlux2val, mediatorFlux2, mediatorFlux2val;
+
     // HOME: load the home page
     mainUtils.loadHomeHtml = function () {
         showLoading("#main-content");
@@ -260,11 +266,71 @@ var EMP = (function (global) {
     $(document).on("click", function (event) {
         if (typeof actions[event.target.dataset.action] === "function")
             actions[event.target.dataset.action].call(this, event);
+
+        if (event.target.id == "compartmentTxt") {
+            var index = event.target.options.selectedIndex;
+            // console.log("InnerText:", $("#compartmentTxt option")[i].innerText);
+            compartmentVal = $("#compartmentTxt option")[index].value;
+        }
+        if (event.target.id == "soluteFlux1Txt") {
+            var index = event.target.options.selectedIndex;
+
+            console.log($("#soluteFlux1Txt option")[index].innerText);
+            console.log($("#soluteFlux1Txt option")[index].value);
+            $("#sourceCon1Txt").val($("#soluteFlux1Txt option")[index].innerText);
+        }
+
+        if (event.target.id == "soluteFlux1Txt") {
+            var index = event.target.options.selectedIndex;
+            soluteFlux1 = $("#soluteFlux1Txt option")[index].innerText;
+            soluteFlux1val = $("#soluteFlux1Txt option")[index].value;
+            $("#sourceCon1Txt").val(soluteFlux1);
+        }
+        if (event.target.id == "sourceFlux1Txt") {
+            var index = event.target.options.selectedIndex;
+            sourceFlux1 = $("#sourceFlux1Txt option")[index].innerText;
+            sourceFlux1val = $("#sourceFlux1Txt option")[index].value;
+            $("#sourceSrcComp1Txt").val(sourceFlux1);
+        }
+        if (event.target.id == "sinkFlux1Txt") {
+            var index = event.target.options.selectedIndex;
+            sinkFlux1 = $("#sinkFlux1Txt option")[index].innerText;
+            sinkFlux1val = $("#sinkFlux1Txt option")[index].value;
+            $("#sourceSnkComp1Txt").val(sinkFlux1);
+        }
+        if (event.target.id == "mediatorFlux1Txt") {
+            var index = event.target.options.selectedIndex;
+            mediatorFlux1 = $("#mediatorFlux1Txt option")[index].innerText;
+            mediatorFlux1val = $("#mediatorFlux1Txt option")[index].value;
+        }
+        if (event.target.id == "soluteFlux2Txt") {
+            var index = event.target.options.selectedIndex;
+            soluteFlux2 = $("#soluteFlux2Txt option")[index].innerText;
+            soluteFlux2val = $("#soluteFlux2Txt option")[index].value;
+            $("#sourceCon2Txt").val(soluteFlux2);
+        }
+        if (event.target.id == "sourceFlux2Txt") {
+            var index = event.target.options.selectedIndex;
+            sourceFlux2 = $("#sourceFlux2Txt option")[index].innerText;
+            sourceFlux2val = $("#sourceFlux2Txt option")[index].value;
+            $("#sourceSrcComp2Txt").val(sourceFlux2);
+        }
+        if (event.target.id == "sinkFlux2Txt") {
+            var index = event.target.options.selectedIndex;
+            sinkFlux2 = $("#sinkFlux2Txt option")[index].innerText;
+            sinkFlux2val = $("#sinkFlux2Txt option")[index].value;
+            $("#sourceSnkComp2Txt").val(sinkFlux2);
+        }
+        if (event.target.id == "mediatorFlux2Txt") {
+            var index = event.target.options.selectedIndex;
+            mediatorFlux2 = $("#mediatorFlux2Txt option")[index].innerText;
+            mediatorFlux2val = $("#mediatorFlux2Txt option")[index].value;
+        }
     });
 
     // MODEL DISCOVERY: enter search texts
     $(document).on("keydown", function (event) {
-        if (event.key == "Enter") {
+        if (event.key == "Enter" && document.getElementById("searchTxt")) {
 
             var uriOPB, uriCHEBI, keyValue;
             var searchTxt = document.getElementById("searchTxt").value;
@@ -322,7 +388,611 @@ var EMP = (function (global) {
                 },
                 true);
         }
+        if (event.key == "Enter" && document.getElementById("proteinTxt")) {
+
+            var m = new AddModal({
+                id: "myAddModel",
+                header: "Protein Information from Bioportal and OLS",
+                footer: "My footer",
+                footerCloseButton: "Close",
+                footerSaveButton: "Save"
+            });
+
+            $("#myModal").modal({backdrop: "static", keyboard: false});
+            m.getBody().html("<div id=addModalBody></div>");
+            m.show();
+
+            showLoading("#addModalBody");
+
+            var proteinTxt = document.getElementById("proteinTxt").value;
+            var proteinIDs = [], proteinNames = [], speciesNames = [], geneNames = [];
+
+            // showLoading("#proteinList");
+            var endpointbioportal = bioportalEndpoint +
+                "apikey=fc5d5241-1e8e-4b44-b401-310ca39573f6&q=" + proteinTxt + "&ontologies=PR&roots_only=true";
+
+            sendGetRequest(
+                endpointbioportal,
+                function (jsonProteinList) {
+                    console.log(jsonProteinList);
+                    for (var i = 0; i < jsonProteinList.collection.length; i++) {
+                        proteinIDs.push(jsonProteinList.collection[i]["@id"]);
+                        console.log(jsonProteinList.collection[i]["@id"]);
+                    }
+
+                    var proteinIDFunction = function (proteinIDCnt) {
+                        var endpointproteinOLS = abiOntoEndpoint + "/pr/terms?iri=" + proteinIDs[proteinIDCnt];
+                        sendGetRequest(
+                            endpointproteinOLS,
+                            function (jsonProtein) {
+                                var endpointgeneOLS;
+                                if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
+                                    endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
+                                else
+                                    endpointgeneOLS = abiOntoEndpoint + "/pr";
+
+                                sendGetRequest(
+                                    endpointgeneOLS,
+                                    function (jsonGene) {
+                                        var endpointspeciesOLS;
+                                        if (jsonProtein._embedded.terms[0]._links.only_in_taxon != undefined)
+                                            endpointspeciesOLS = jsonProtein._embedded.terms[0]._links.only_in_taxon.href;
+                                        else
+                                            endpointspeciesOLS = abiOntoEndpoint + "/pr";
+
+                                        sendGetRequest(
+                                            endpointspeciesOLS,
+                                            function (jsonSpecies) {
+                                                // species
+                                                if (jsonSpecies._embedded == undefined)
+                                                    speciesNames.push("Not Found"); // Or undefined
+                                                else
+                                                    speciesNames.push(jsonSpecies._embedded.terms[0].label);
+
+                                                // gene
+                                                if (jsonGene._embedded == undefined)
+                                                    geneNames.push("Not Found"); // Or undefined
+                                                else {
+                                                    var geneName = jsonGene._embedded.terms[0].label;
+                                                    geneName = geneName.slice(0, geneName.indexOf("(") - 1);
+                                                    geneNames.push(geneName); // Or undefined
+                                                }
+
+                                                // protein
+                                                if (jsonProtein._embedded == undefined)
+                                                    proteinNames.push("Not Found"); // Or undefined
+                                                else {
+                                                    var proteinName = jsonProtein._embedded.terms[0].label;
+                                                    proteinName = proteinName.slice(0, proteinName.indexOf("(") - 1);
+                                                    proteinNames.push(proteinName);
+                                                }
+
+                                                if (proteinIDCnt == proteinIDs.length - 1) {
+                                                    mainUtils.showProteinIDs(proteinIDs, proteinNames, speciesNames, geneNames);
+                                                    return;
+                                                }
+
+                                                proteinIDCnt++;
+                                                proteinIDFunction(proteinIDCnt); // callback
+                                            },
+                                            true);
+                                    },
+                                    true);
+                            },
+                            true);
+                    }
+                    proteinIDFunction(0); // first call
+                },
+                true
+            );
+        }
     });
+
+    // ADD MODAL WINDOW
+    var AddModal = function (options) {
+
+        console.log("Add Modal function");
+
+        var $this = this;
+
+        options = options ? options : {};
+        $this.options = {};
+        $this.options.header = options.header !== undefined ? options.header : false;
+        $this.options.footer = options.footer !== undefined ? options.footer : false;
+        $this.options.closeButton = options.closeButton !== undefined ? options.closeButton : true;
+        $this.options.footerCloseButton = options.footerCloseButton !== undefined ? options.footerCloseButton : false;
+        $this.options.footerSaveButton = options.footerSaveButton !== undefined ? options.footerSaveButton : false;
+        $this.options.id = options.id !== undefined ? options.id : "myAddModel";
+
+        /**
+         * Append modal window html to body
+         */
+        $this.createModal = function () {
+            $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
+            $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
+            var win = $('.modal-content', $this.selector);
+
+            var someText = "Retrieving protein identifiers from Bioportal \n" +
+                "and then looking at the Auckland OLS to get protein names, \n" +
+                "species and gene names by utilizing the protein identifiers!";
+
+            var headerHtml = '<div class="modal-header">' +
+                '<h4 class="modal-title" data-toggle="tooltip" data-placement="right" title="' + someText + '" lang="de">' +
+                '</h4></div>';
+
+            if ($this.options.header) {
+                // win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
+                win.append(headerHtml);
+
+                if ($this.options.closeButton) {
+                    win.find('.modal-header').prepend('<button type="button" ' +
+                        'class="close" data-dismiss="modal">&times;</button>');
+                }
+            }
+
+            win.append('<div class="modal-body"></div>');
+            if ($this.options.footer) {
+                win.append('<div class="modal-footer"></div>');
+
+                if ($this.options.footerCloseButton) {
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="addModelcloseID" href="#" ' +
+                        'class="btn btn-default" lang="de">' + $this.options.footerCloseButton + '</a>');
+                }
+
+                if ($this.options.footerSaveButton) {
+                    win.find('.modal-footer').append('<a data-dismiss="modal" id="addModelsaveID" href="#" ' +
+                        'class="btn btn-default" lang="de">' + $this.options.footerSaveButton + '</a>');
+                }
+            }
+
+            // close button clicked!
+            $("#addModelcloseID").click(function (event) {
+                return;
+            });
+
+            // save button clicked!
+            $("#addModelsaveID").click(function (event) {
+                for (var i = 0; i < $("#addModelTableID input").length; i++) {
+                    if ($("#addModelTableID input")[i].checked) {
+                        for (var j = 0; j < $("#addModelTableID tbody tr td").length; j = j + 4) {
+                            if (i == 0) {
+                                proteinVal = $("#addModelTableID tbody tr td input")[i].id;
+                                $("#proteinTxt").val($("#addModelTableID tbody tr td")[i + 1].innerText);
+                                $("#speciesTxt").val($("#addModelTableID tbody tr td")[i + 2].innerText);
+                                $("#geneTxt").val($("#addModelTableID tbody tr td")[i + 3].innerText);
+                                break;
+                            }
+                            else {
+                                proteinVal = $("#addModelTableID tbody tr td input")[i].id;
+                                $("#proteinTxt").val($("#addModelTableID tbody tr td")[i + 3 * i + 1].innerText);
+                                $("#speciesTxt").val($("#addModelTableID tbody tr td")[i + 3 * i + 2].innerText);
+                                $("#geneTxt").val($("#addModelTableID tbody tr td")[i + 3 * i + 3].innerText);
+                                break;
+                            }
+                        }
+                    }
+                }
+                return;
+            });
+        };
+
+        /**
+         * Set header text. It makes sense only if the options.header is logical true.
+         * @param {String} html New header text.
+         */
+        $this.setHeader = function (html) {
+            $this.window.find(".modal-title").html(html);
+        };
+
+        /**
+         * Set body HTML.
+         * @param {String} html New body HTML
+         */
+        $this.setBody = function (html) {
+            $this.window.find(".modal-body").html(html);
+        };
+
+        /**
+         * Set footer HTML.
+         * @param {String} html New footer HTML
+         */
+        $this.setFooter = function (html) {
+            $this.window.find(".modal-footer").html(html);
+        };
+
+        /**
+         * Return window body element.
+         * @returns {jQuery} The body element
+         */
+        $this.getBody = function () {
+            return $this.window.find(".modal-body");
+        };
+
+        /**
+         * Show modal window
+         */
+        $this.show = function () {
+            $this.window.modal("show");
+        };
+
+        /**
+         * Hide modal window
+         */
+        $this.hide = function () {
+            $this.window.modal("hide");
+        };
+
+        /**
+         * Toggle modal window
+         */
+        $this.toggle = function () {
+            $this.window.modal("toggle");
+        };
+
+        $this.selector = "#" + $this.options.id;
+        if (!$($this.selector).length) {
+            $this.createModal();
+        }
+
+        $this.window = $($this.selector);
+        $this.setHeader($this.options.header);
+    };
+
+    mainUtils.createCellML = function () {
+        var parser, xmlDoc;
+        sendGetRequest(
+            modelXML,
+            function (str) {
+                parser = new DOMParser();
+                xmlDoc = parser.parseFromString(str, "text/xml");
+
+                // component
+                var newEle = xmlDoc.createElement("component");
+                newEle.setAttribute("name", "myComponent");
+                var varEle = xmlDoc.createElement("variable");
+                varEle.setAttribute("name", "time");
+                varEle.setAttribute("units", "second");
+                varEle.setAttribute("interface", "public");
+                varEle.setAttribute("id", "environment");
+
+                // math
+                var mathEle = xmlDoc.createElement("math");
+                mathEle.setAttribute("xmls", "http://www.w3.org/1998/Math/MathML");
+                var mathText = xmlDoc.createTextNode("<!--Please fill out this section-->");
+                mathEle.appendChild(mathText);
+
+                newEle.appendChild(varEle);
+                newEle.appendChild(mathEle);
+
+                var element = xmlDoc.getElementsByTagName("component")[0];
+                console.log(element);
+                element.parentNode.insertBefore(newEle, element.nextSibling);
+
+                var concentrationRDF = function (xmlDoc, propCnt, entCnt, flux, fluxval, soluteFlux, soluteFluxval) {
+                    var entComp, variableName;
+                    if ("http://purl.obolibrary.org/obo/" + fluxval == luminalID) {
+                        entComp = 0;
+                        variableName = "C_m_" + soluteFlux;
+                    }
+                    else if ("http://purl.obolibrary.org/obo/" + fluxval == cytosolID) {
+                        entComp = 1;
+                        variableName = "C_c_" + soluteFlux;
+                    }
+                    else if ("http://purl.obolibrary.org/obo/" + fluxval == interstitialID) {
+                        entComp = 2;
+                        variableName = "C_s_" + soluteFlux;
+                    }
+
+                    var rdfDescription = xmlDoc.createElement("rdf:Description");
+                    rdfDescription.setAttribute("rdf:about", "#model." + variableName);
+
+                    var semsimIsComputationalComponentFor = xmlDoc.createElement("semsim:isComputationalComponentFor");
+                    var dctermsDescription = xmlDoc.createElement("dcterms:description");
+                    var newText = xmlDoc.createTextNode("Concentration of " + soluteFlux + " in the " + flux + " compartment");
+                    dctermsDescription.appendChild(newText);
+
+                    var rdfDescriptionProp = xmlDoc.createElement("rdf:Description");
+                    rdfDescriptionProp.setAttribute("rdf:about", "#property_" + propCnt);
+                    var semsimPhysicalPropertyOf = xmlDoc.createElement("semsim:physicalPropertyOf");
+                    var semsimHasPhysicalDefinition3 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition3.setAttribute("rdf:resource", "http://identifiers.org/opb/OPB_00340");
+                    var rdfDescriptionEntity = xmlDoc.createElement("rdf:Description");
+                    rdfDescriptionEntity.setAttribute("rdf:about", "#entity_" + entCnt);
+
+                    var roPartOf = xmlDoc.createElement("ro:part_of");
+                    var rdfDescriptionEntity2 = xmlDoc.createElement("rdf:Description");
+                    rdfDescriptionEntity2.setAttribute("rdf:about", "#entity_" + entComp);
+                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + fluxval);
+                    var semsimHasPhysicalDefinition2 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition2.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + soluteFluxval);
+
+                    rdfDescriptionEntity2.appendChild(semsimHasPhysicalDefinition);
+                    roPartOf.appendChild(rdfDescriptionEntity2);
+                    rdfDescriptionEntity.appendChild(roPartOf);
+                    rdfDescriptionEntity.appendChild(semsimHasPhysicalDefinition2);
+                    semsimPhysicalPropertyOf.appendChild(rdfDescriptionEntity);
+                    rdfDescriptionProp.appendChild(semsimPhysicalPropertyOf);
+                    rdfDescriptionProp.appendChild(semsimHasPhysicalDefinition3);
+                    semsimIsComputationalComponentFor.appendChild(rdfDescriptionProp);
+                    rdfDescription.appendChild(semsimIsComputationalComponentFor);
+                    rdfDescription.appendChild(dctermsDescription);
+
+                    var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
+                    console.log(element);
+                    element.parentNode.insertBefore(rdfDescription, element.nextSibling);
+                }
+
+                // RDF for concentration
+                var propCnt = -1, entCnt = 5;
+                concentrationRDF(xmlDoc, ++propCnt, ++entCnt, sourceFlux1, sourceFlux1val, soluteFlux1, soluteFlux1val);
+                concentrationRDF(xmlDoc, ++propCnt, ++entCnt, sinkFlux1, sinkFlux1val, soluteFlux1, soluteFlux1val);
+                concentrationRDF(xmlDoc, ++propCnt, ++entCnt, sourceFlux2, sourceFlux2val, soluteFlux2, soluteFlux2val);
+                concentrationRDF(xmlDoc, ++propCnt, ++entCnt, sinkFlux2, sinkFlux2val, soluteFlux2, soluteFlux2val);
+
+                // RDF for protein and compartment
+                var rdfDescription = xmlDoc.createElement("rdf:Description");
+                rdfDescription.setAttribute("rdf:about", "#model");
+                var roModelOf = xmlDoc.createElement("ro:modelOf");
+                roModelOf.setAttribute("rdf:resource", proteinVal);
+                rdfDescription.appendChild(roModelOf);
+                for (var i = 0; i < compartmentVal.split(",").length; i++) {
+                    var roCompartmentOf = xmlDoc.createElement("ro:compartmentOf");
+                    roCompartmentOf.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + compartmentVal.split(",")[i]);
+                    rdfDescription.appendChild(roCompartmentOf);
+                }
+                var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
+                console.log(element);
+                element.parentNode.insertBefore(rdfDescription, element.nextSibling);
+
+                // RDF for flux
+                var fluxRDF = function (xmlDoc, propCnt, entCnt, processCnt, sourceCnt, sinkCnt, mediatorCnt,
+                                        mediatorCnt2, soluteFlux, soluteFluxval, sourceFlux, sourceFluxval,
+                                        sinkFlux, sinkFluxval, mediatorFlux, mediatorFluxval, proteinName, proteinVal) {
+                    var entSrcComp, entSnkComp, entMedComp, entMedPrComp = 5;
+                    var variableName = "J_" + soluteFlux;
+
+                    if ("http://purl.obolibrary.org/obo/" + sourceFluxval == luminalID)
+                        entSrcComp = 0;
+                    else if ("http://purl.obolibrary.org/obo/" + sourceFluxval == cytosolID)
+                        entSrcComp = 1;
+                    else if ("http://purl.obolibrary.org/obo/" + sourceFluxval == interstitialID)
+                        entSrcComp = 2;
+                    else if ("http://purl.obolibrary.org/obo/" + sourceFluxval == apicalID)
+                        entSrcComp = 3;
+                    else if ("http://purl.obolibrary.org/obo/" + sourceFluxval == basolateralID)
+                        entSrcComp = 4;
+
+                    if ("http://purl.obolibrary.org/obo/" + sinkFluxval == luminalID)
+                        entSnkComp = 0;
+                    else if ("http://purl.obolibrary.org/obo/" + sinkFluxval == cytosolID)
+                        entSnkComp = 1;
+                    else if ("http://purl.obolibrary.org/obo/" + sinkFluxval == interstitialID)
+                        entSnkComp = 2;
+                    else if ("http://purl.obolibrary.org/obo/" + sinkFluxval == apicalID)
+                        entSnkComp = 3;
+                    else if ("http://purl.obolibrary.org/obo/" + sinkFluxval == basolateralID)
+                        entSnkComp = 4;
+
+                    if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == luminalID)
+                        entMedComp = 0;
+                    else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == cytosolID)
+                        entMedComp = 1;
+                    else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == interstitialID)
+                        entMedComp = 2;
+                    else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == apicalID)
+                        entMedComp = 3;
+                    else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == basolateralID)
+                        entMedComp = 4;
+
+                    var rdfDescription = xmlDoc.createElement("rdf:Description");
+                    rdfDescription.setAttribute("rdf:about", "#model." + variableName);
+                    var semsimIsComputationalComponentFor = xmlDoc.createElement("semsim:isComputationalComponentFor");
+                    var rdfDescription2 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription2.setAttribute("rdf:about", "#Property_" + propCnt);
+                    var semsimPhysicalProperyOf = xmlDoc.createElement("semsim:physicalPropertyOf");
+                    var rdfDescription3 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription3.setAttribute("rdf:about", "#process_" + processCnt);
+                    rdfDescription3.setAttribute("dcterms:description", "");
+
+                    // mediator participant
+                    var semsimHasMediatorParticipant = xmlDoc.createElement("semsim:hasMediatorParticipant");
+                    var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription4.setAttribute("rdf:about", "#mediator_" + mediatorCnt2);
+                    var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+                    var rdfDescription5 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription5.setAttribute("rdf:about", "#entity_" + entMedPrComp);
+                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", proteinVal);
+                    rdfDescription5.appendChild(semsimHasPhysicalDefinition);
+                    semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
+                    rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+                    semsimHasMediatorParticipant.appendChild(rdfDescription4);
+                    rdfDescription3.appendChild(semsimHasMediatorParticipant);
+
+                    // mediator participant 2
+                    var semsimHasMediatorParticipant2 = xmlDoc.createElement("semsim:hasMediatorParticipant");
+                    var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription4.setAttribute("rdf:about", "#mediator_" + mediatorCnt);
+                    var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+                    var rdfDescription5 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription5.setAttribute("rdf:about", "#entity_" + entMedComp);
+                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + mediatorFluxval);
+                    rdfDescription5.appendChild(semsimHasPhysicalDefinition);
+                    semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
+                    rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+                    semsimHasMediatorParticipant2.appendChild(rdfDescription4);
+                    rdfDescription3.appendChild(semsimHasMediatorParticipant2);
+
+                    // sink participant
+                    var semsimHasSinkParticipant = xmlDoc.createElement("semsim:hasSinkParticipant");
+                    var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription4.setAttribute("rdf:about", "#sink_" + sinkCnt);
+                    rdfDescription4.setAttribute("semsim:hasMultiplier", "1.0");
+                    var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+                    var rdfDescription5 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription5.setAttribute("rdf:about", "#entity_" + entCnt);
+                    var roPartOf = xmlDoc.createElement("ro:part_of");
+                    var rdfDescription6 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription6.setAttribute("rdf:about", "#entity_" + entSnkComp);
+                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + sinkFluxval);
+                    var semsimHasPhysicalDefinition2 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition2.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + soluteFluxval);
+                    rdfDescription6.appendChild(semsimHasPhysicalDefinition);
+                    roPartOf.appendChild(rdfDescription6);
+                    rdfDescription5.appendChild(roPartOf);
+                    rdfDescription5.appendChild(semsimHasPhysicalDefinition2);
+                    semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
+                    rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+                    semsimHasSinkParticipant.appendChild(rdfDescription4);
+                    rdfDescription3.appendChild(semsimHasSinkParticipant);
+
+                    // source participant
+                    var semsimHasSourceParticipant = xmlDoc.createElement("semsim:hasSourceParticipant");
+                    var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription4.setAttribute("rdf:about", "#source_" + sourceCnt);
+                    rdfDescription4.setAttribute("semsim:hasMultiplier", "1.0");
+                    var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+                    var rdfDescription5 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription5.setAttribute("rdf:about", "#entity_" + entCnt);
+                    var roPartOf = xmlDoc.createElement("ro:part_of");
+                    var rdfDescription6 = xmlDoc.createElement("rdf:Description");
+                    rdfDescription6.setAttribute("rdf:about", "#entity_" + entSrcComp);
+                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + sourceFluxval);
+                    var semsimHasPhysicalDefinition2 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+                    semsimHasPhysicalDefinition2.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + soluteFluxval);
+                    rdfDescription6.appendChild(semsimHasPhysicalDefinition);
+                    roPartOf.appendChild(rdfDescription6);
+                    rdfDescription5.appendChild(roPartOf);
+                    rdfDescription5.appendChild(semsimHasPhysicalDefinition2);
+                    semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
+                    rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+                    semsimHasSourceParticipant.appendChild(rdfDescription4);
+                    rdfDescription3.appendChild(semsimHasSourceParticipant);
+
+                    // name
+                    var semsimName = xmlDoc.createElement("semsim:name");
+                    var newText = xmlDoc.createTextNode(soluteFlux + " flow through " + mediatorFlux);
+                    semsimName.appendChild(newText);
+                    rdfDescription3.appendChild(semsimName);
+
+                    semsimPhysicalProperyOf.appendChild(rdfDescription3);
+                    rdfDescription2.appendChild(semsimPhysicalProperyOf);
+                    semsimIsComputationalComponentFor.appendChild(rdfDescription2);
+                    rdfDescription.appendChild(semsimIsComputationalComponentFor);
+
+                    var dctermsDescription = xmlDoc.createElement("dcterms:description");
+                    var newText = xmlDoc.createTextNode("Flux of " + soluteFlux + " from " + sourceFlux + " to " + sinkFlux + " through " + mediatorFlux + " and " + proteinName);
+                    dctermsDescription.appendChild(newText);
+                    rdfDescription.appendChild(dctermsDescription);
+
+                    var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
+                    console.log(element);
+                    element.parentNode.insertBefore(rdfDescription, element.nextSibling);
+                }
+
+                var processCnt = -1, sourceCnt = -1, sinkCnt = -1, mediatorCnt = -1;
+                mediatorCnt = mediatorCnt + 1;
+                var mediatorCnt2 = mediatorCnt + 1;
+                fluxRDF(xmlDoc, ++propCnt, ++entCnt, ++processCnt, ++sourceCnt, ++sinkCnt,
+                    mediatorCnt, mediatorCnt2, soluteFlux1, soluteFlux1val, sourceFlux1, sourceFlux1val,
+                    sinkFlux1, sinkFlux1val, mediatorFlux1, mediatorFlux1val, $("#proteinTxt").val(), proteinVal);
+
+                mediatorCnt = mediatorCnt2 + 1;
+                var mediatorCnt2 = mediatorCnt + 1;
+                fluxRDF(xmlDoc, ++propCnt, ++entCnt, ++processCnt, ++sourceCnt, ++sinkCnt,
+                    mediatorCnt, mediatorCnt2, soluteFlux2, soluteFlux2val, sourceFlux2, sourceFlux2val,
+                    sinkFlux2, sinkFlux2val, mediatorFlux2, mediatorFlux2val, $("#proteinTxt").val(), proteinVal);
+
+                console.log(xmlDoc);
+
+                var xmlText = new XMLSerializer().serializeToString(xmlDoc);
+                var uri = 'data:application/xml;charset=utf-8,' + xmlText;
+
+                var downloadLink = document.createElement("a");
+                downloadLink.href = uri;
+                downloadLink.download = "model.xml";
+
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            },
+            false);
+
+
+        // var myWindow = window.open(modelXML, "_blank");
+        // myWindow.onload = function () {
+        //     // var xmlText = new XMLSerializer().serializeToString(xmlDoc);
+        //     myWindow.document.getElementById('mainBody').innerHTML = xmlText;
+        // }
+
+        // console.log("option: ", $("#compartmentTxt option"));
+        // console.log("option: ", $("#soluteFlux1Txt option"));
+        // console.log("option: ", $("#sourceFlux1Txt option"));
+        // console.log("option: ", $("#sinkFlux1Txt option"));
+        // console.log("option: ", $("#mediatorFlux1Txt option"));
+        // console.log("option: ", $("#soluteFlux2Txt option"));
+        // console.log("option: ", $("#sourceFlux2Txt option"));
+        // console.log("option: ", $("#sinkFlux2Txt option"));
+        // console.log("option: ", $("#mediatorFlux2Txt option"));
+    }
+
+    // ADD MODEL: show proteins from bioportal
+    mainUtils.showProteinIDs = function (proteinIDs, proteinNames, speciesNames, geneNames) {
+        // Reinitialize for a new search result
+        $("#addModalBody").html("");
+
+        var table = $("<table id='addModelTableID'/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
+
+        // Table header
+        var thead = $("<thead/>"), tr = $("<tr/>"), i;
+        for (var i in head) {
+            // Empty header for checkbox column
+            if (i == 0)
+                tr.append($("<th/>").append(""));
+
+            tr.append($("<th/>").append(head[i]));
+        }
+
+        thead.append(tr);
+        table.append(thead);
+
+        // Table body
+        var tbody = $("<tbody/>");
+        for (var i in proteinIDs) {
+            var temp = [];
+            tr = $("<tr/>");
+            // temp.push(proteinIDs[i], proteinNames[i], speciesNames[i], geneNames[i]);
+            temp.push(proteinNames[i], speciesNames[i], geneNames[i]);
+
+            for (var j in temp) {
+                if (j == 0) {
+                    tr.append($("<td/>")
+                        .append($("<label/>")
+                            .html("<input id=" + proteinIDs[i] + " uri=" + proteinIDs[i] + " type=checkbox " +
+                                "data-action=search value=" + proteinIDs[i] + " + class=checkbox>")));
+                }
+
+                if (j == 1)
+                    tr.append($("<td/>").append(temp[j]));
+                else
+                    tr.append($("<td/>").append(temp[j]));
+            }
+
+            tbody.append(tr);
+        }
+
+        table.append(tbody);
+        // $("#proteinList").append(table);
+
+        $("#addModalBody")
+            .append(table);
+
+        console.log("outside addModalBody!");
+    }
 
     // MODEL DISCOVERY: SPARQL queries to retrieve search results from PMR
     mainUtils.discoverModels = function (jsonModel) {
@@ -594,6 +1264,16 @@ var EMP = (function (global) {
 
         // SET main content in local storage
         sessionStorage.setItem("searchListContent", $("#main-content").html());
+    };
+
+    // ADD MODEL
+    mainUtils.loadAddmodelHtml = function () {
+        sendGetRequest(
+            addmodelHtml,
+            function (addmodelHtmlContent) {
+                $("#main-content").html(addmodelHtmlContent);
+            },
+            false);
     };
 
     // VIEW MODEL: load the view page to display details of a selected model

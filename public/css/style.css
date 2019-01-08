@@ -47,6 +47,114 @@ body {
     background-position: center;
 }
 
+#proteinTxt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#speciesTxt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#geneTxt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#compartmentTxt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#soluteFlux1Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sourceFlux1Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sinkFlux1Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#mediatorFlux1Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sourceCon1Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sourceSrcComp1Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sourceSnkComp1Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#soluteFlux2Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sourceFlux2Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sinkFlux2Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#mediatorFlux2Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sourceCon2Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sourceSrcComp2Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
+#sourceSnkComp2Txt {
+    width: 500px;
+    float: right;
+    margin-right: 350px;
+}
+
 #btnText {
     font-weight: bold;
     font-size: 14px;

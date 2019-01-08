@@ -9,6 +9,9 @@ var nginx_proxy = "/.api/pmr/sparql",
 // var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
 var abiOntoEndpoint = "/.api/ols/ontologies";
 
+// var bioportalEndpoint = "http://data.bioontology.org/search?";
+var bioportalEndpoint = "/.api/bioportal";
+
 var organ = [
     {
         "key": [
@@ -174,6 +177,8 @@ var searchHtml = "./snippets/search-snippet.html";
 var usecaseHtml = "./snippets/usecase-snippet.html";
 var similarityHtml = "./snippets/similarity-snippet.html";
 var epithelialHtml = "./snippets/epithelial-snippet.html";
+var addmodelHtml = "./snippets/addmodel-snippet.html";
+var modelXML = "./snippets/newmodel.xml";
 
 var epithelialcellID = "http://purl.obolibrary.org/obo/CL_0000066";
 var apicalID = "http://purl.obolibrary.org/obo/FMA_84666";

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.cellml.org/cellml/2.0#" name="model" id="model">
+    <units name="mmol_per_s_per_cm2">
+        <unit exponent="-1.0" units="second"/>
+        <unit exponent="-1.0" units="cm2"/>
+        <unit units="mmol"/>
+    </units>
+    <units name="nmol">
+        <unit prefix="nano" units="mole"/>
+    </units>
+    <units name="mM_per_s">
+        <unit units="mM"/>
+        <unit exponent="-1.0" units="second"/>
+    </units>
+    <units name="per_s">
+        <unit exponent="-1.0" units="second"/>
+    </units>
+    <units name="umol">
+        <unit prefix="micro" units="mole"/>
+    </units>
+    <units name="mM">
+        <unit prefix="milli" units="mole"/>
+        <unit exponent="-1.0" units="litre"/>
+    </units>
+    <units name="nmol_per_s_per_cm2">
+        <unit exponent="-1.0" units="second"/>
+        <unit units="nmol"/>
+        <unit exponent="-1.0" units="cm2"/>
+    </units>
+    <units name="M">
+        <unit units="mole"/>
+        <unit exponent="-1.0" units="litre"/>
+    </units>
+    <units name="cm2">
+        <unit exponent="2.0" prefix="centi" units="metre"/>
+    </units>
+    <units name="mmol">
+        <unit prefix="milli" units="mole"/>
+    </units>
+    <units name="cm">
+        <unit prefix="centi" units="metre"/>
+    </units>
+    <component name="environment">
+        <variable name="time" units="second" interface="public" id="environment.time"/>
+    </component>
+    <rdf:RDF xmlns:bqmodel="http://biomodels.net/model-qualifiers/"
+             xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"
+             xmlns:ro="http://www.obofoundry.org/ro/ro.owl#"
+             xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:bqs="http://www.cellml.org/bqs/1.0#"
+             xmlns:semsim="http://www.bhi.washington.edu/SemSim#"
+             xmlns:dcterms="http://purl.org/dc/terms/"
+             xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#"
+             xmlns:opb="http://bhi.washington.edu/OPB#">
+        <rdf:Description rdf:about="#environment.time" dcterms:description="Time">
+            <semsim:hasPhysicalDefinition rdf:resource="http://identifiers.org/opb/OPB_01023"/>
+        </rdf:Description>
+    </rdf:RDF>
+</model>
