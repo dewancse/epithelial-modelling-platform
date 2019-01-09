@@ -9,7 +9,7 @@ var nginx_proxy = "/.api/pmr/sparql",
 // var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
 var abiOntoEndpoint = "/.api/ols/ontologies";
 
-// var bioportalEndpoint = "http://data.bioontology.org/search?";
+// var bioportalEndpoint = "http://data.bioontology.org/search?apikey=fc5d5241-1e8e-4b44-b401-310ca39573f6&q=";
 var bioportalEndpoint = "/.api/bioportal";
 
 var organ = [

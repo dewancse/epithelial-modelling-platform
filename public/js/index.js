@@ -335,8 +335,7 @@ var EMP = (function (global) {
             var proteinIDs = [], proteinNames = [], speciesNames = [], geneNames = [];
 
             // showLoading("#proteinList");
-            var endpointbioportal = bioportalEndpoint +
-                "apikey=fc5d5241-1e8e-4b44-b401-310ca39573f6&q=" + proteinTxt + "&ontologies=PR&roots_only=true";
+            var endpointbioportal = bioportalEndpoint + proteinTxt + "&ontologies=PR&roots_only=true";
 
             sendGetRequest(
                 endpointbioportal,
