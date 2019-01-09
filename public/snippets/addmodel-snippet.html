@@ -35,6 +35,7 @@
             <option value="CHEBI_29101">Sodium</option>
             <option value="CHEBI_29103">Potassium</option>
             <option value="CHEBI_17996">Chloride</option>
+            <option value="CHEBI_17234">Glucose</option>
         </select>
     </div>
     <br/>
@@ -92,36 +93,26 @@
             <option value="CHEBI_29101">Sodium</option>
             <option value="CHEBI_29103">Potassium</option>
             <option value="CHEBI_17996">Chloride</option>
+            <option value="CHEBI_17234">Glucose</option>
         </select>
     </div>
     <br/>
     <div id="sourceFlux2Box" class="container input-group">
         <span style="font-size: medium; ">Source Flux 2</span>
-        <select id="sourceFlux2Txt" name="sourceFlux2Txt" class="form-control input-lg">
-            <option value="select a source compartment" selected>select a source compartment</option>
-            <option value="FMA_74550">Luminal</option>
-            <option value="FMA_66836">Cytosol</option>
-            <option value="FMA_9673">Interstitial Fluid</option>
-        </select>
+        <input id="sourceFlux2Txt" name="sourceFlux2Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
     </div>
     <br/>
     <div id="sinkFlux2Box" class="container input-group">
         <span style="font-size: medium; ">Sink Flux 2</span>
-        <select id="sinkFlux2Txt" name="sinkFlux2Txt" class="form-control input-lg">
-            <option value="select a sink compartment" selected>select a sink compartment</option>
-            <option value="FMA_74550">Luminal</option>
-            <option value="FMA_66836">Cytosol</option>
-            <option value="FMA_9673">Interstitial Fluid</option>
-        </select>
+        <input id="sinkFlux2Txt" name="sinkFlux2Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
     </div>
     <br/>
     <div id="mediatorFlux2Box" class="container input-group">
         <span style="font-size: medium; ">Mediator Flux 2</span>
-        <select id="mediatorFlux2Txt" name="mediatorFlux2Txt" class="form-control input-lg">
-            <option value="select a mediator" selected>select a mediator</option>
-            <option value="FMA_84666">Apical plasma membrane</option>
-            <option value="FMA_84669">Basolateral plasma membrane</option>
-        </select>
+        <input id="mediatorFlux2Txt" name="mediatorFlux2Txt" value="" type="text"
+               class="form-control input-lg" aria-label="..." disabled>
     </div>
     <br/>
     <div id="sourceCon2Box" class="container input-group">

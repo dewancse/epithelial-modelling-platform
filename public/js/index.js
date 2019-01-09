@@ -48,73 +48,6 @@ var EMP = (function (global) {
                 $("#main-content").html(homeHtmlContent);
             },
             false);
-
-        // var data = [
-        //     {
-        //         "med_fma": "http://purl.obolibrary.org/obo/FMA_84666",
-        //         "med_pr": "http://purl.obolibrary.org/obo/PR_P55018",
-        //         "med_pr_text": "solute carrier family 12 member 3 (rat)",
-        //         "med_pr_text_syn": "TSC",
-        //         "model_entity": "chang_fujita_b_1999.cellml#total_transepithelial_sodium_flux.J_mc_Na",
-        //         "model_entity2": "chang_fujita_b_1999.cellml#solute_concentrations.J_mc_Cl",
-        //         "model_entity3": "",
-        //         "protein_name": "http://purl.obolibrary.org/obo/CL_0000066",
-        //         "sink_fma": "http://purl.obolibrary.org/obo/FMA_66836",
-        //         "sink_fma2": "http://purl.obolibrary.org/obo/FMA_66836",
-        //         "sink_fma3": "",
-        //         "solute_chebi": "http://purl.obolibrary.org/obo/CHEBI_29101",
-        //         "solute_chebi2": "http://purl.obolibrary.org/obo/CHEBI_17996",
-        //         "solute_chebi3": "",
-        //         "solute_text": "Na+",
-        //         "solute_text2": "Cl-",
-        //         "solute_text3": "",
-        //         "source_fma": "http://purl.obolibrary.org/obo/FMA_74550",
-        //         "source_fma2": "http://purl.obolibrary.org/obo/FMA_74550",
-        //         "source_fma3": "",
-        //         "variable_text": "J_mc_Na",
-        //         "variable_text2": "J_mc_Cl",
-        //         "variable_text3": ""
-        //     },
-        //     {
-        //         "med_fma": "http://purl.obolibrary.org/obo/FMA_84666",
-        //         "med_pr": "http://purl.obolibrary.org/obo/PR_Q63633",
-        //         "med_pr_text": "solute carrier family 12 member 5 (rat)",
-        //         "med_pr_text_syn": "Q63633",
-        //         "model_entity": "chang_fujita_b_1999.cellml#solute_concentrations.J_mc_Cl",
-        //         "model_entity2": "chang_fujita_b_1999.cellml#total_transepithelial_potassium_flux.J_mc_K",
-        //         "model_entity3": "",
-        //         "protein_name": "http://purl.obolibrary.org/obo/CL_0000066",
-        //         "sink_fma": "http://purl.obolibrary.org/obo/FMA_66836",
-        //         "sink_fma2": "http://purl.obolibrary.org/obo/FMA_66836",
-        //         "sink_fma3": "",
-        //         "solute_chebi": "http://purl.obolibrary.org/obo/CHEBI_17996",
-        //         "solute_chebi2": "http://purl.obolibrary.org/obo/CHEBI_29103",
-        //         "solute_chebi3": "",
-        //         "solute_text": "Cl-",
-        //         "solute_text2": "K+",
-        //         "solute_text3": "",
-        //         "source_fma": "http://purl.obolibrary.org/obo/FMA_74550",
-        //         "source_fma2": "http://purl.obolibrary.org/obo/FMA_74550",
-        //         "source_fma3": "",
-        //         "variable_text": "J_mc_Cl",
-        //         "variable_text2": "J_mc_K",
-        //         "variable_text3": ""
-        //     }
-        // ];
-
-        // var url = "http://127.0.0.1:8000/model";
-        // var url = "./snippets/newmodel-snippet.html";
-        // $("#main-content").html("Model Assembly Service: <a href=" + url + " + target=_blank>Click here</a>");
-
-        // var url = "http://127.0.0.1:8000/post";
-        // sendPostRequest(
-        //     url,
-        //     JSON.stringify(data),
-        //     function (content) {
-        //         console.log(content);
-        //         $("#main-content").html(content);
-        //     },
-        //     false);
     };
 
     // DOCUMENTATION: load documentation from github
@@ -290,41 +223,35 @@ var EMP = (function (global) {
             var index = event.target.options.selectedIndex;
             sourceFlux1 = $("#sourceFlux1Txt option")[index].innerText;
             sourceFlux1val = $("#sourceFlux1Txt option")[index].value;
+            sourceFlux2 = $("#sourceFlux1Txt option")[index].innerText;
+            sourceFlux2val = $("#sourceFlux1Txt option")[index].value;
             $("#sourceSrcComp1Txt").val(sourceFlux1);
+            $("#sourceSrcComp2Txt").val(sourceFlux2);
+            $("#sourceFlux2Txt").val(sourceFlux2);
         }
         if (event.target.id == "sinkFlux1Txt") {
             var index = event.target.options.selectedIndex;
             sinkFlux1 = $("#sinkFlux1Txt option")[index].innerText;
             sinkFlux1val = $("#sinkFlux1Txt option")[index].value;
+            sinkFlux2 = $("#sinkFlux1Txt option")[index].innerText;
+            sinkFlux2val = $("#sinkFlux1Txt option")[index].value;
             $("#sourceSnkComp1Txt").val(sinkFlux1);
+            $("#sourceSnkComp2Txt").val(sinkFlux2);
+            $("#sinkFlux2Txt").val(sinkFlux2);
         }
         if (event.target.id == "mediatorFlux1Txt") {
             var index = event.target.options.selectedIndex;
             mediatorFlux1 = $("#mediatorFlux1Txt option")[index].innerText;
             mediatorFlux1val = $("#mediatorFlux1Txt option")[index].value;
+            mediatorFlux2 = $("#mediatorFlux1Txt option")[index].innerText;
+            mediatorFlux2val = $("#mediatorFlux1Txt option")[index].value;
+            $("#mediatorFlux2Txt").val(mediatorFlux2);
         }
         if (event.target.id == "soluteFlux2Txt") {
             var index = event.target.options.selectedIndex;
             soluteFlux2 = $("#soluteFlux2Txt option")[index].innerText;
             soluteFlux2val = $("#soluteFlux2Txt option")[index].value;
             $("#sourceCon2Txt").val(soluteFlux2);
-        }
-        if (event.target.id == "sourceFlux2Txt") {
-            var index = event.target.options.selectedIndex;
-            sourceFlux2 = $("#sourceFlux2Txt option")[index].innerText;
-            sourceFlux2val = $("#sourceFlux2Txt option")[index].value;
-            $("#sourceSrcComp2Txt").val(sourceFlux2);
-        }
-        if (event.target.id == "sinkFlux2Txt") {
-            var index = event.target.options.selectedIndex;
-            sinkFlux2 = $("#sinkFlux2Txt option")[index].innerText;
-            sinkFlux2val = $("#sinkFlux2Txt option")[index].value;
-            $("#sourceSnkComp2Txt").val(sinkFlux2);
-        }
-        if (event.target.id == "mediatorFlux2Txt") {
-            var index = event.target.options.selectedIndex;
-            mediatorFlux2 = $("#mediatorFlux2Txt option")[index].innerText;
-            mediatorFlux2val = $("#mediatorFlux2Txt option")[index].value;
         }
     });
 
@@ -638,6 +565,204 @@ var EMP = (function (global) {
         $this.setHeader($this.options.header);
     };
 
+    // RDF for concentration
+    var concentrationRDF = function (xmlDoc, propCnt, entCnt, flux, fluxval, soluteFlux, soluteFluxval) {
+        var entComp, variableName;
+        if ("http://purl.obolibrary.org/obo/" + fluxval == luminalID) {
+            entComp = 0;
+            variableName = "C_m_" + soluteFlux;
+        }
+        else if ("http://purl.obolibrary.org/obo/" + fluxval == cytosolID) {
+            entComp = 1;
+            variableName = "C_c_" + soluteFlux;
+        }
+        else if ("http://purl.obolibrary.org/obo/" + fluxval == interstitialID) {
+            entComp = 2;
+            variableName = "C_s_" + soluteFlux;
+        }
+
+        var rdfDescription = xmlDoc.createElement("rdf:Description");
+        rdfDescription.setAttribute("rdf:about", "#modelComp." + variableName);
+
+        var semsimIsComputationalComponentFor = xmlDoc.createElement("semsim:isComputationalComponentFor");
+        var dctermsDescription = xmlDoc.createElement("dcterms:description");
+        var newText = xmlDoc.createTextNode("Concentration of " + soluteFlux + " in the " + flux + " compartment");
+        dctermsDescription.appendChild(newText);
+
+        var rdfDescriptionProp = xmlDoc.createElement("rdf:Description");
+        rdfDescriptionProp.setAttribute("rdf:about", "#property_" + propCnt);
+        var semsimPhysicalPropertyOf = xmlDoc.createElement("semsim:physicalPropertyOf");
+        var semsimHasPhysicalDefinition3 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+        semsimHasPhysicalDefinition3.setAttribute("rdf:resource", "http://identifiers.org/opb/OPB_00340");
+        var rdfDescriptionEntity = xmlDoc.createElement("rdf:Description");
+        rdfDescriptionEntity.setAttribute("rdf:about", "#entity_" + entCnt);
+
+        var roPartOf = xmlDoc.createElement("ro:part_of");
+        var rdfDescriptionEntity2 = xmlDoc.createElement("rdf:Description");
+        rdfDescriptionEntity2.setAttribute("rdf:about", "#entity_" + entComp);
+        var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+        semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + fluxval);
+        var semsimHasPhysicalDefinition2 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+        semsimHasPhysicalDefinition2.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + soluteFluxval);
+
+        rdfDescriptionEntity2.appendChild(semsimHasPhysicalDefinition);
+        roPartOf.appendChild(rdfDescriptionEntity2);
+        rdfDescriptionEntity.appendChild(roPartOf);
+        rdfDescriptionEntity.appendChild(semsimHasPhysicalDefinition2);
+        semsimPhysicalPropertyOf.appendChild(rdfDescriptionEntity);
+        rdfDescriptionProp.appendChild(semsimPhysicalPropertyOf);
+        rdfDescriptionProp.appendChild(semsimHasPhysicalDefinition3);
+        semsimIsComputationalComponentFor.appendChild(rdfDescriptionProp);
+        rdfDescription.appendChild(semsimIsComputationalComponentFor);
+        rdfDescription.appendChild(dctermsDescription);
+
+        var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
+        console.log(element);
+        element.parentNode.insertBefore(rdfDescription, element.nextSibling);
+    }
+
+    // RDF for flux
+    var fluxRDF = function (xmlDoc, coTransCnt, propCnt, srcEntCnt, snkEntCnt, processCnt, sourceCnt, sinkCnt, mediatorCnt,
+                            mediatorCnt2, soluteFlux, soluteFluxval, sourceFlux, sourceFluxval,
+                            sinkFlux, sinkFluxval, mediatorFlux, mediatorFluxval, proteinName, proteinVal) {
+        var entMedComp, entMedPrComp = 5;
+        var variableName = "J_" + soluteFlux;
+
+        if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == apicalID)
+            entMedComp = 3;
+        else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == basolateralID)
+            entMedComp = 4;
+
+        var rdfDescription = xmlDoc.createElement("rdf:Description");
+        rdfDescription.setAttribute("rdf:about", "#modelComp." + variableName);
+        var semsimIsComputationalComponentFor = xmlDoc.createElement("semsim:isComputationalComponentFor");
+        var rdfDescription2 = xmlDoc.createElement("rdf:Description");
+        rdfDescription2.setAttribute("rdf:about", "#Property_" + propCnt);
+        var semsimPhysicalProperyOf = xmlDoc.createElement("semsim:physicalPropertyOf");
+        var semsimHasPhysicalDefinition0 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+        semsimHasPhysicalDefinition0.setAttribute("rdf:resource", "http://identifiers.org/opb/OPB_00593");
+        var rdfDescription3 = xmlDoc.createElement("rdf:Description");
+        rdfDescription3.setAttribute("rdf:about", "#process_" + processCnt);
+        rdfDescription3.setAttribute("dcterms:description", "");
+
+        // mediator participant
+        if (coTransCnt == 1) {
+            // mediator participant PR
+            var semsimHasMediatorParticipant = xmlDoc.createElement("semsim:hasMediatorParticipant");
+            var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+            rdfDescription4.setAttribute("rdf:about", "#mediator_" + mediatorCnt2);
+            var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+            var rdfDescription5 = xmlDoc.createElement("rdf:Description");
+            rdfDescription5.setAttribute("rdf:about", "#entity_" + entMedPrComp);
+            var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+            semsimHasPhysicalDefinition.setAttribute("rdf:resource", proteinVal);
+            rdfDescription5.appendChild(semsimHasPhysicalDefinition);
+            semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
+            rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+            semsimHasMediatorParticipant.appendChild(rdfDescription4);
+            rdfDescription3.appendChild(semsimHasMediatorParticipant);
+
+            // mediator participant FMA
+            var semsimHasMediatorParticipant2 = xmlDoc.createElement("semsim:hasMediatorParticipant");
+            var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+            rdfDescription4.setAttribute("rdf:about", "#mediator_" + mediatorCnt);
+            var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+            var rdfDescription5 = xmlDoc.createElement("rdf:Description");
+            rdfDescription5.setAttribute("rdf:about", "#entity_" + entMedComp);
+            var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
+            semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + mediatorFluxval);
+            rdfDescription5.appendChild(semsimHasPhysicalDefinition);
+            semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
+            rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+            semsimHasMediatorParticipant2.appendChild(rdfDescription4);
+            rdfDescription3.appendChild(semsimHasMediatorParticipant2);
+        }
+        else if (coTransCnt == 2) {
+            // mediator participant PR
+            var semsimHasMediatorParticipant = xmlDoc.createElement("semsim:hasMediatorParticipant");
+            var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+            rdfDescription4.setAttribute("rdf:about", "#mediator_" + mediatorCnt2);
+            var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+            semsimHasPhysicalEntityReference.setAttribute("rdf:resource", "#entity_" + entMedPrComp);
+            rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+            semsimHasMediatorParticipant.appendChild(rdfDescription4);
+            rdfDescription3.appendChild(semsimHasMediatorParticipant);
+
+            // mediator participant FMA
+            var semsimHasMediatorParticipant2 = xmlDoc.createElement("semsim:hasMediatorParticipant");
+            var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+            rdfDescription4.setAttribute("rdf:about", "#mediator_" + mediatorCnt);
+            var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+            semsimHasPhysicalEntityReference.setAttribute("rdf:resource", "#entity_" + entMedComp);
+            rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+            semsimHasMediatorParticipant2.appendChild(rdfDescription4);
+            rdfDescription3.appendChild(semsimHasMediatorParticipant2);
+        }
+
+        // sink participant
+        var semsimHasSinkParticipant = xmlDoc.createElement("semsim:hasSinkParticipant");
+        var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+        rdfDescription4.setAttribute("rdf:about", "#sink_" + sinkCnt);
+        rdfDescription4.setAttribute("semsim:hasMultiplier", "1.0");
+        var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+        semsimHasPhysicalEntityReference.setAttribute("rdf:resource", "#entity_" + snkEntCnt);
+        rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+        semsimHasSinkParticipant.appendChild(rdfDescription4);
+        rdfDescription3.appendChild(semsimHasSinkParticipant);
+
+        // source participant
+        var semsimHasSourceParticipant = xmlDoc.createElement("semsim:hasSourceParticipant");
+        var rdfDescription4 = xmlDoc.createElement("rdf:Description");
+        rdfDescription4.setAttribute("rdf:about", "#source_" + sourceCnt);
+        rdfDescription4.setAttribute("semsim:hasMultiplier", "1.0");
+        var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
+        semsimHasPhysicalEntityReference.setAttribute("rdf:resource", "#entity_" + srcEntCnt);
+        rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
+        semsimHasSourceParticipant.appendChild(rdfDescription4);
+        rdfDescription3.appendChild(semsimHasSourceParticipant);
+
+        // name
+        var semsimName = xmlDoc.createElement("semsim:name");
+        var newText = xmlDoc.createTextNode(soluteFlux + " flow through " + mediatorFlux);
+        semsimName.appendChild(newText);
+        rdfDescription3.appendChild(semsimName);
+
+        semsimPhysicalProperyOf.appendChild(rdfDescription3);
+        rdfDescription2.appendChild(semsimPhysicalProperyOf);
+        rdfDescription2.appendChild(semsimHasPhysicalDefinition0);
+        semsimIsComputationalComponentFor.appendChild(rdfDescription2);
+        rdfDescription.appendChild(semsimIsComputationalComponentFor);
+
+        var dctermsDescription = xmlDoc.createElement("dcterms:description");
+        var newText = xmlDoc.createTextNode("Flux of " + soluteFlux + " from " + sourceFlux + " to " + sinkFlux + " through " + mediatorFlux + " and " + proteinName);
+        dctermsDescription.appendChild(newText);
+        rdfDescription.appendChild(dctermsDescription);
+
+        var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
+        console.log(element);
+        element.parentNode.insertBefore(rdfDescription, element.nextSibling);
+    }
+
+    // Name of concentration and flux variable
+    var conandfluxVariable = function (varCon, fluxval, soluteFlux, unit) {
+        var variableName;
+        if (unit == "flux")
+            variableName = "J_" + soluteFlux;
+        else {
+            if ("http://purl.obolibrary.org/obo/" + fluxval == luminalID)
+                variableName = "C_m_" + soluteFlux;
+            else if ("http://purl.obolibrary.org/obo/" + fluxval == cytosolID)
+                variableName = "C_c_" + soluteFlux;
+            else if ("http://purl.obolibrary.org/obo/" + fluxval == interstitialID)
+                variableName = "C_s_" + soluteFlux;
+        }
+
+        varCon.setAttribute("name", variableName);
+        varCon.setAttribute("units", unit);
+        varCon.setAttribute("interface", "public");
+        varCon.setAttribute("id", "modelComp." + variableName);
+    }
+
     mainUtils.createCellML = function () {
         var parser, xmlDoc;
         sendGetRequest(
@@ -647,88 +772,70 @@ var EMP = (function (global) {
                 xmlDoc = parser.parseFromString(str, "text/xml");
 
                 // component
-                var newEle = xmlDoc.createElement("component");
-                newEle.setAttribute("name", "myComponent");
-                var varEle = xmlDoc.createElement("variable");
-                varEle.setAttribute("name", "time");
-                varEle.setAttribute("units", "second");
-                varEle.setAttribute("interface", "public");
-                varEle.setAttribute("id", "environment");
+                var componentEle = xmlDoc.createElement("component");
+                componentEle.setAttribute("name", "modelComp");
 
-                // math
+                // component: time variable
+                var varTime = xmlDoc.createElement("variable");
+                varTime.setAttribute("name", "time");
+                varTime.setAttribute("units", "second");
+                varTime.setAttribute("interface", "public");
+                varTime.setAttribute("id", "modelComp.time");
+
+                // component: concentration variable
+                var varCon1 = xmlDoc.createElement("variable");
+                conandfluxVariable(varCon1, sourceFlux1val, soluteFlux1, "mmol_per_cm3");
+                var varCon2 = xmlDoc.createElement("variable");
+                conandfluxVariable(varCon2, sinkFlux1val, soluteFlux1, "mmol_per_cm3");
+                var varCon3 = xmlDoc.createElement("variable");
+                conandfluxVariable(varCon3, sourceFlux2val, soluteFlux2, "mmol_per_cm3");
+                var varCon4 = xmlDoc.createElement("variable");
+                conandfluxVariable(varCon4, sinkFlux2val, soluteFlux2, "mmol_per_cm3");
+
+                // component: flux variable
+                var varFlux1 = xmlDoc.createElement("variable");
+                conandfluxVariable(varFlux1, "", soluteFlux1, "flux");
+                var varFlux2 = xmlDoc.createElement("variable");
+                conandfluxVariable(varFlux2, "", soluteFlux2, "flux");
+
+                // component: math section
                 var mathEle = xmlDoc.createElement("math");
                 mathEle.setAttribute("xmls", "http://www.w3.org/1998/Math/MathML");
                 var mathText = xmlDoc.createTextNode("<!--Please fill out this section-->");
                 mathEle.appendChild(mathText);
 
-                newEle.appendChild(varEle);
-                newEle.appendChild(mathEle);
+                componentEle.appendChild(varCon1);
+                componentEle.appendChild(varCon2);
+                componentEle.appendChild(varCon3);
+                componentEle.appendChild(varCon4);
+                componentEle.appendChild(varFlux1);
+                componentEle.appendChild(varFlux2);
+                componentEle.appendChild(varTime);
+                componentEle.appendChild(mathEle);
 
                 var element = xmlDoc.getElementsByTagName("component")[0];
                 console.log(element);
-                element.parentNode.insertBefore(newEle, element.nextSibling);
+                element.parentNode.insertBefore(componentEle, element.nextSibling);
 
-                var concentrationRDF = function (xmlDoc, propCnt, entCnt, flux, fluxval, soluteFlux, soluteFluxval) {
-                    var entComp, variableName;
-                    if ("http://purl.obolibrary.org/obo/" + fluxval == luminalID) {
-                        entComp = 0;
-                        variableName = "C_m_" + soluteFlux;
-                    }
-                    else if ("http://purl.obolibrary.org/obo/" + fluxval == cytosolID) {
-                        entComp = 1;
-                        variableName = "C_c_" + soluteFlux;
-                    }
-                    else if ("http://purl.obolibrary.org/obo/" + fluxval == interstitialID) {
-                        entComp = 2;
-                        variableName = "C_s_" + soluteFlux;
-                    }
+                // connection
+                var connectionEle = xmlDoc.createElement("connection");
+                var connectionText = xmlDoc.createTextNode("<!--Please fill out this section-->");
+                connectionEle.appendChild(connectionText);
 
-                    var rdfDescription = xmlDoc.createElement("rdf:Description");
-                    rdfDescription.setAttribute("rdf:about", "#model." + variableName);
-
-                    var semsimIsComputationalComponentFor = xmlDoc.createElement("semsim:isComputationalComponentFor");
-                    var dctermsDescription = xmlDoc.createElement("dcterms:description");
-                    var newText = xmlDoc.createTextNode("Concentration of " + soluteFlux + " in the " + flux + " compartment");
-                    dctermsDescription.appendChild(newText);
-
-                    var rdfDescriptionProp = xmlDoc.createElement("rdf:Description");
-                    rdfDescriptionProp.setAttribute("rdf:about", "#property_" + propCnt);
-                    var semsimPhysicalPropertyOf = xmlDoc.createElement("semsim:physicalPropertyOf");
-                    var semsimHasPhysicalDefinition3 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition3.setAttribute("rdf:resource", "http://identifiers.org/opb/OPB_00340");
-                    var rdfDescriptionEntity = xmlDoc.createElement("rdf:Description");
-                    rdfDescriptionEntity.setAttribute("rdf:about", "#entity_" + entCnt);
-
-                    var roPartOf = xmlDoc.createElement("ro:part_of");
-                    var rdfDescriptionEntity2 = xmlDoc.createElement("rdf:Description");
-                    rdfDescriptionEntity2.setAttribute("rdf:about", "#entity_" + entComp);
-                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + fluxval);
-                    var semsimHasPhysicalDefinition2 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition2.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + soluteFluxval);
-
-                    rdfDescriptionEntity2.appendChild(semsimHasPhysicalDefinition);
-                    roPartOf.appendChild(rdfDescriptionEntity2);
-                    rdfDescriptionEntity.appendChild(roPartOf);
-                    rdfDescriptionEntity.appendChild(semsimHasPhysicalDefinition2);
-                    semsimPhysicalPropertyOf.appendChild(rdfDescriptionEntity);
-                    rdfDescriptionProp.appendChild(semsimPhysicalPropertyOf);
-                    rdfDescriptionProp.appendChild(semsimHasPhysicalDefinition3);
-                    semsimIsComputationalComponentFor.appendChild(rdfDescriptionProp);
-                    rdfDescription.appendChild(semsimIsComputationalComponentFor);
-                    rdfDescription.appendChild(dctermsDescription);
-
-                    var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
-                    console.log(element);
-                    element.parentNode.insertBefore(rdfDescription, element.nextSibling);
-                }
+                var element = xmlDoc.getElementsByTagName("component")[1];
+                console.log(element);
+                element.parentNode.insertBefore(connectionEle, element.nextSibling);
 
                 // RDF for concentration
-                var propCnt = -1, entCnt = 5;
-                concentrationRDF(xmlDoc, ++propCnt, ++entCnt, sourceFlux1, sourceFlux1val, soluteFlux1, soluteFlux1val);
-                concentrationRDF(xmlDoc, ++propCnt, ++entCnt, sinkFlux1, sinkFlux1val, soluteFlux1, soluteFlux1val);
-                concentrationRDF(xmlDoc, ++propCnt, ++entCnt, sourceFlux2, sourceFlux2val, soluteFlux2, soluteFlux2val);
-                concentrationRDF(xmlDoc, ++propCnt, ++entCnt, sinkFlux2, sinkFlux2val, soluteFlux2, soluteFlux2val);
+                var propCnt = -1, entCnt = 5, srcEntCnt1, snkEntCnt1, srcEntCnt2, snkEntCnt2;
+                srcEntCnt1 = ++entCnt;
+                concentrationRDF(xmlDoc, ++propCnt, srcEntCnt1, sourceFlux1, sourceFlux1val, soluteFlux1, soluteFlux1val);
+                snkEntCnt1 = ++entCnt;
+                concentrationRDF(xmlDoc, ++propCnt, snkEntCnt1, sinkFlux1, sinkFlux1val, soluteFlux1, soluteFlux1val);
+                srcEntCnt2 = ++entCnt;
+                concentrationRDF(xmlDoc, ++propCnt, srcEntCnt2, sourceFlux2, sourceFlux2val, soluteFlux2, soluteFlux2val);
+                snkEntCnt2 = ++entCnt;
+                concentrationRDF(xmlDoc, ++propCnt, snkEntCnt2, sinkFlux2, sinkFlux2val, soluteFlux2, soluteFlux2val);
 
                 // RDF for protein and compartment
                 var rdfDescription = xmlDoc.createElement("rdf:Description");
@@ -746,164 +853,16 @@ var EMP = (function (global) {
                 element.parentNode.insertBefore(rdfDescription, element.nextSibling);
 
                 // RDF for flux
-                var fluxRDF = function (xmlDoc, propCnt, entCnt, processCnt, sourceCnt, sinkCnt, mediatorCnt,
-                                        mediatorCnt2, soluteFlux, soluteFluxval, sourceFlux, sourceFluxval,
-                                        sinkFlux, sinkFluxval, mediatorFlux, mediatorFluxval, proteinName, proteinVal) {
-                    var entSrcComp, entSnkComp, entMedComp, entMedPrComp = 5;
-                    var variableName = "J_" + soluteFlux;
-
-                    if ("http://purl.obolibrary.org/obo/" + sourceFluxval == luminalID)
-                        entSrcComp = 0;
-                    else if ("http://purl.obolibrary.org/obo/" + sourceFluxval == cytosolID)
-                        entSrcComp = 1;
-                    else if ("http://purl.obolibrary.org/obo/" + sourceFluxval == interstitialID)
-                        entSrcComp = 2;
-                    else if ("http://purl.obolibrary.org/obo/" + sourceFluxval == apicalID)
-                        entSrcComp = 3;
-                    else if ("http://purl.obolibrary.org/obo/" + sourceFluxval == basolateralID)
-                        entSrcComp = 4;
-
-                    if ("http://purl.obolibrary.org/obo/" + sinkFluxval == luminalID)
-                        entSnkComp = 0;
-                    else if ("http://purl.obolibrary.org/obo/" + sinkFluxval == cytosolID)
-                        entSnkComp = 1;
-                    else if ("http://purl.obolibrary.org/obo/" + sinkFluxval == interstitialID)
-                        entSnkComp = 2;
-                    else if ("http://purl.obolibrary.org/obo/" + sinkFluxval == apicalID)
-                        entSnkComp = 3;
-                    else if ("http://purl.obolibrary.org/obo/" + sinkFluxval == basolateralID)
-                        entSnkComp = 4;
-
-                    if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == luminalID)
-                        entMedComp = 0;
-                    else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == cytosolID)
-                        entMedComp = 1;
-                    else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == interstitialID)
-                        entMedComp = 2;
-                    else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == apicalID)
-                        entMedComp = 3;
-                    else if ("http://purl.obolibrary.org/obo/" + mediatorFluxval == basolateralID)
-                        entMedComp = 4;
-
-                    var rdfDescription = xmlDoc.createElement("rdf:Description");
-                    rdfDescription.setAttribute("rdf:about", "#model." + variableName);
-                    var semsimIsComputationalComponentFor = xmlDoc.createElement("semsim:isComputationalComponentFor");
-                    var rdfDescription2 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription2.setAttribute("rdf:about", "#Property_" + propCnt);
-                    var semsimPhysicalProperyOf = xmlDoc.createElement("semsim:physicalPropertyOf");
-                    var rdfDescription3 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription3.setAttribute("rdf:about", "#process_" + processCnt);
-                    rdfDescription3.setAttribute("dcterms:description", "");
-
-                    // mediator participant
-                    var semsimHasMediatorParticipant = xmlDoc.createElement("semsim:hasMediatorParticipant");
-                    var rdfDescription4 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription4.setAttribute("rdf:about", "#mediator_" + mediatorCnt2);
-                    var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
-                    var rdfDescription5 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription5.setAttribute("rdf:about", "#entity_" + entMedPrComp);
-                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", proteinVal);
-                    rdfDescription5.appendChild(semsimHasPhysicalDefinition);
-                    semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
-                    rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
-                    semsimHasMediatorParticipant.appendChild(rdfDescription4);
-                    rdfDescription3.appendChild(semsimHasMediatorParticipant);
-
-                    // mediator participant 2
-                    var semsimHasMediatorParticipant2 = xmlDoc.createElement("semsim:hasMediatorParticipant");
-                    var rdfDescription4 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription4.setAttribute("rdf:about", "#mediator_" + mediatorCnt);
-                    var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
-                    var rdfDescription5 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription5.setAttribute("rdf:about", "#entity_" + entMedComp);
-                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + mediatorFluxval);
-                    rdfDescription5.appendChild(semsimHasPhysicalDefinition);
-                    semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
-                    rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
-                    semsimHasMediatorParticipant2.appendChild(rdfDescription4);
-                    rdfDescription3.appendChild(semsimHasMediatorParticipant2);
-
-                    // sink participant
-                    var semsimHasSinkParticipant = xmlDoc.createElement("semsim:hasSinkParticipant");
-                    var rdfDescription4 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription4.setAttribute("rdf:about", "#sink_" + sinkCnt);
-                    rdfDescription4.setAttribute("semsim:hasMultiplier", "1.0");
-                    var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
-                    var rdfDescription5 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription5.setAttribute("rdf:about", "#entity_" + entCnt);
-                    var roPartOf = xmlDoc.createElement("ro:part_of");
-                    var rdfDescription6 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription6.setAttribute("rdf:about", "#entity_" + entSnkComp);
-                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + sinkFluxval);
-                    var semsimHasPhysicalDefinition2 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition2.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + soluteFluxval);
-                    rdfDescription6.appendChild(semsimHasPhysicalDefinition);
-                    roPartOf.appendChild(rdfDescription6);
-                    rdfDescription5.appendChild(roPartOf);
-                    rdfDescription5.appendChild(semsimHasPhysicalDefinition2);
-                    semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
-                    rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
-                    semsimHasSinkParticipant.appendChild(rdfDescription4);
-                    rdfDescription3.appendChild(semsimHasSinkParticipant);
-
-                    // source participant
-                    var semsimHasSourceParticipant = xmlDoc.createElement("semsim:hasSourceParticipant");
-                    var rdfDescription4 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription4.setAttribute("rdf:about", "#source_" + sourceCnt);
-                    rdfDescription4.setAttribute("semsim:hasMultiplier", "1.0");
-                    var semsimHasPhysicalEntityReference = xmlDoc.createElement("semsim:hasPhysicalEntityReference");
-                    var rdfDescription5 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription5.setAttribute("rdf:about", "#entity_" + entCnt);
-                    var roPartOf = xmlDoc.createElement("ro:part_of");
-                    var rdfDescription6 = xmlDoc.createElement("rdf:Description");
-                    rdfDescription6.setAttribute("rdf:about", "#entity_" + entSrcComp);
-                    var semsimHasPhysicalDefinition = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + sourceFluxval);
-                    var semsimHasPhysicalDefinition2 = xmlDoc.createElement("semsim:hasPhysicalDefinition");
-                    semsimHasPhysicalDefinition2.setAttribute("rdf:resource", "http://purl.obolibrary.org/obo/" + soluteFluxval);
-                    rdfDescription6.appendChild(semsimHasPhysicalDefinition);
-                    roPartOf.appendChild(rdfDescription6);
-                    rdfDescription5.appendChild(roPartOf);
-                    rdfDescription5.appendChild(semsimHasPhysicalDefinition2);
-                    semsimHasPhysicalEntityReference.appendChild(rdfDescription5);
-                    rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
-                    semsimHasSourceParticipant.appendChild(rdfDescription4);
-                    rdfDescription3.appendChild(semsimHasSourceParticipant);
-
-                    // name
-                    var semsimName = xmlDoc.createElement("semsim:name");
-                    var newText = xmlDoc.createTextNode(soluteFlux + " flow through " + mediatorFlux);
-                    semsimName.appendChild(newText);
-                    rdfDescription3.appendChild(semsimName);
-
-                    semsimPhysicalProperyOf.appendChild(rdfDescription3);
-                    rdfDescription2.appendChild(semsimPhysicalProperyOf);
-                    semsimIsComputationalComponentFor.appendChild(rdfDescription2);
-                    rdfDescription.appendChild(semsimIsComputationalComponentFor);
-
-                    var dctermsDescription = xmlDoc.createElement("dcterms:description");
-                    var newText = xmlDoc.createTextNode("Flux of " + soluteFlux + " from " + sourceFlux + " to " + sinkFlux + " through " + mediatorFlux + " and " + proteinName);
-                    dctermsDescription.appendChild(newText);
-                    rdfDescription.appendChild(dctermsDescription);
-
-                    var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
-                    console.log(element);
-                    element.parentNode.insertBefore(rdfDescription, element.nextSibling);
-                }
-
-                var processCnt = -1, sourceCnt = -1, sinkCnt = -1, mediatorCnt = -1;
+                var processCnt = -1, sourceCnt = -1, sinkCnt = -1, mediatorCnt = -1, coTransCnt = 1;
                 mediatorCnt = mediatorCnt + 1;
                 var mediatorCnt2 = mediatorCnt + 1;
-                fluxRDF(xmlDoc, ++propCnt, ++entCnt, ++processCnt, ++sourceCnt, ++sinkCnt,
+                fluxRDF(xmlDoc, coTransCnt, ++propCnt, srcEntCnt1, snkEntCnt1, ++processCnt, ++sourceCnt, ++sinkCnt,
                     mediatorCnt, mediatorCnt2, soluteFlux1, soluteFlux1val, sourceFlux1, sourceFlux1val,
                     sinkFlux1, sinkFlux1val, mediatorFlux1, mediatorFlux1val, $("#proteinTxt").val(), proteinVal);
 
                 mediatorCnt = mediatorCnt2 + 1;
                 var mediatorCnt2 = mediatorCnt + 1;
-                fluxRDF(xmlDoc, ++propCnt, ++entCnt, ++processCnt, ++sourceCnt, ++sinkCnt,
+                fluxRDF(xmlDoc, ++coTransCnt, ++propCnt, srcEntCnt2, snkEntCnt2, ++processCnt, ++sourceCnt, ++sinkCnt,
                     mediatorCnt, mediatorCnt2, soluteFlux2, soluteFlux2val, sourceFlux2, sourceFlux2val,
                     sinkFlux2, sinkFlux2val, mediatorFlux2, mediatorFlux2val, $("#proteinTxt").val(), proteinVal);
 
@@ -921,23 +880,6 @@ var EMP = (function (global) {
                 document.body.removeChild(downloadLink);
             },
             false);
-
-
-        // var myWindow = window.open(modelXML, "_blank");
-        // myWindow.onload = function () {
-        //     // var xmlText = new XMLSerializer().serializeToString(xmlDoc);
-        //     myWindow.document.getElementById('mainBody').innerHTML = xmlText;
-        // }
-
-        // console.log("option: ", $("#compartmentTxt option"));
-        // console.log("option: ", $("#soluteFlux1Txt option"));
-        // console.log("option: ", $("#sourceFlux1Txt option"));
-        // console.log("option: ", $("#sinkFlux1Txt option"));
-        // console.log("option: ", $("#mediatorFlux1Txt option"));
-        // console.log("option: ", $("#soluteFlux2Txt option"));
-        // console.log("option: ", $("#sourceFlux2Txt option"));
-        // console.log("option: ", $("#sinkFlux2Txt option"));
-        // console.log("option: ", $("#mediatorFlux2Txt option"));
     }
 
     // ADD MODEL: show proteins from bioportal

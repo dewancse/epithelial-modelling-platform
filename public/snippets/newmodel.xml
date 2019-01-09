@@ -1,44 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model xmlns="http://www.cellml.org/cellml/2.0#" name="model" id="model">
-    <units name="mmol_per_s_per_cm2">
-        <unit exponent="-1.0" units="second"/>
-        <unit exponent="-1.0" units="cm2"/>
-        <unit units="mmol"/>
-    </units>
-    <units name="nmol">
-        <unit prefix="nano" units="mole"/>
-    </units>
-    <units name="mM_per_s">
-        <unit units="mM"/>
-        <unit exponent="-1.0" units="second"/>
-    </units>
-    <units name="per_s">
-        <unit exponent="-1.0" units="second"/>
-    </units>
-    <units name="umol">
-        <unit prefix="micro" units="mole"/>
-    </units>
-    <units name="mM">
-        <unit prefix="milli" units="mole"/>
-        <unit exponent="-1.0" units="litre"/>
-    </units>
-    <units name="nmol_per_s_per_cm2">
-        <unit exponent="-1.0" units="second"/>
-        <unit units="nmol"/>
-        <unit exponent="-1.0" units="cm2"/>
-    </units>
-    <units name="M">
-        <unit units="mole"/>
-        <unit exponent="-1.0" units="litre"/>
-    </units>
-    <units name="cm2">
-        <unit exponent="2.0" prefix="centi" units="metre"/>
-    </units>
-    <units name="mmol">
+    <units name="mmol_per_cm3">
+        <unit exponent="-3" prefix="centi" units="metre"/>
         <unit prefix="milli" units="mole"/>
     </units>
-    <units name="cm">
-        <unit prefix="centi" units="metre"/>
+    <units name="flux">
+        <unit exponent="-1" units="second"/>
+        <unit exponent="-3" prefix="centi" units="metre"/>
+        <unit prefix="milli" units="mole"/>
     </units>
     <component name="environment">
         <variable name="time" units="second" interface="public" id="environment.time"/>
