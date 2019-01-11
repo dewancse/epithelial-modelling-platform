@@ -9,8 +9,9 @@ var nginx_proxy = "/.api/pmr/sparql",
 // var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";
 var abiOntoEndpoint = "/.api/ols/ontologies";
 
-var bioportalEndpoint = "http://data.bioontology.org/search?apikey=fc5d5241-1e8e-4b44-b401-310ca39573f6&q=";
-// var bioportalEndpoint = "/.api/bioportal";
+var bioportalPrEndpoint = "http://data.bioontology.org/search?apikey=fc5d5241-1e8e-4b44-b401-310ca39573f6&q=";
+
+var bioportalAnnotatorEndpoint = "http://data.bioontology.org/annotator?apikey=fc5d5241-1e8e-4b44-b401-310ca39573f6&text=";
 
 var organ = [
     {
@@ -91,82 +92,306 @@ var organ = [
 
 var dictionary = [
     {
-        "key1": "flux", "key2": "",
-        "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": ""
+        "key1": "flux", "key2": "", "key3": "",
+        "opb": "<http://identifiers.org/opb/OPB_00593>", "chebi": "", "fma": ""
     },
     {
-        "key1": "flux", "key2": "sodium",
+        "key1": "flux", "key2": "sodium", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>",
+        "fma": ""
     },
     {
-        "key1": "flux", "key2": "hydrogen",
+        "key1": "flux", "key2": "hydrogen", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>",
+        "fma": ""
     },
     {
-        "key1": "flux", "key2": "ammonium",
+        "key1": "flux", "key2": "ammonium", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>",
+        "fma": ""
     },
     {
-        "key1": "flux", "key2": "chloride",
+        "key1": "flux", "key2": "chloride", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>",
+        "fma": ""
     },
     {
-        "key1": "flux", "key2": "potassium",
+        "key1": "flux", "key2": "potassium", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>",
+        "fma": ""
     },
     {
-        "key1": "flux", "key2": "bicarbonate",
+        "key1": "flux", "key2": "bicarbonate", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>",
+        "fma": ""
     },
     {
-        "key1": "flux", "key2": "glucose",
+        "key1": "flux", "key2": "glucose", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00593>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>",
+        "fma": ""
     },
     {
-        "key1": "concentration", "key2": "",
-        "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": ""
+        "key1": "flux", "key2": "sodium", "key3": "apical plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
     },
     {
-        "key1": "concentration", "key2": "sodium",
+        "key1": "flux", "key2": "hydrogen", "key3": "apical plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
+    },
+    {
+        "key1": "flux", "key2": "ammonium", "key3": "apical plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
+    },
+    {
+        "key1": "flux", "key2": "chloride", "key3": "apical plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
+    },
+    {
+        "key1": "flux", "key2": "potassium", "key3": "apical plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
+    },
+    {
+        "key1": "flux", "key2": "bicarbonate", "key3": "apical plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
+    },
+    {
+        "key1": "flux", "key2": "glucose", "key3": "apical plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
+    },
+    {
+        "key1": "flux", "key2": "sodium", "key3": "basolateral plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+    },
+    {
+        "key1": "flux", "key2": "hydrogen", "key3": "basolateral plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+    },
+    {
+        "key1": "flux", "key2": "ammonium", "key3": "basolateral plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+    },
+    {
+        "key1": "flux", "key2": "chloride", "key3": "basolateral plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+    },
+    {
+        "key1": "flux", "key2": "potassium", "key3": "basolateral plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+    },
+    {
+        "key1": "flux", "key2": "bicarbonate", "key3": "basolateral plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+    },
+    {
+        "key1": "flux", "key2": "glucose", "key3": "basolateral plasma membrane",
+        "opb": "<http://identifiers.org/opb/OPB_00593>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+    },
+    {
+        "key1": "concentration", "key2": "", "key3": "",
+        "opb": "<http://identifiers.org/opb/OPB_00340>", "chebi": "", "fma": ""
+    },
+    {
+        "key1": "concentration", "key2": "sodium", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>",
+        "fma": ""
     },
     {
-        "key1": "concentration", "key2": "hydrogen",
+        "key1": "concentration", "key2": "hydrogen", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>",
+        "fma": ""
     },
     {
-        "key1": "concentration", "key2": "ammonium",
+        "key1": "concentration", "key2": "ammonium", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>",
+        "fma": ""
     },
     {
-        "key1": "concentration", "key2": "chloride",
+        "key1": "concentration", "key2": "chloride", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>",
+        "fma": ""
     },
     {
-        "key1": "concentration", "key2": "potassium",
+        "key1": "concentration", "key2": "potassium", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>",
+        "fma": ""
     },
     {
-        "key1": "concentration", "key2": "bicarbonate",
+        "key1": "concentration", "key2": "bicarbonate", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>",
+        "fma": ""
     },
     {
-        "key1": "concentration", "key2": "glucose",
+        "key1": "concentration", "key2": "glucose", "key3": "",
         "opb": "<http://identifiers.org/opb/OPB_00340>",
-        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>"
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>",
+        "fma": ""
+    },
+    {
+        "key1": "concentration", "key2": "sodium", "key3": "luminal",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
+    },
+    {
+        "key1": "concentration", "key2": "hydrogen", "key3": "luminal",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
+    },
+    {
+        "key1": "concentration", "key2": "ammonium", "key3": "luminal",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
+    },
+    {
+        "key1": "concentration", "key2": "chloride", "key3": "luminal",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
+    },
+    {
+        "key1": "concentration", "key2": "potassium", "key3": "luminal",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
+    },
+    {
+        "key1": "concentration", "key2": "bicarbonate", "key3": "luminal",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
+    },
+    {
+        "key1": "concentration", "key2": "glucose", "key3": "luminal",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
+    },
+    {
+        "key1": "concentration", "key2": "sodium", "key3": "cytosol",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
+    },
+    {
+        "key1": "concentration", "key2": "hydrogen", "key3": "cytosol",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
+    },
+    {
+        "key1": "concentration", "key2": "ammonium", "key3": "cytosol",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
+    },
+    {
+        "key1": "concentration", "key2": "chloride", "key3": "cytosol",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
+    },
+    {
+        "key1": "concentration", "key2": "potassium", "key3": "cytosol",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
+    },
+    {
+        "key1": "concentration", "key2": "bicarbonate", "key3": "cytosol",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
+    },
+    {
+        "key1": "concentration", "key2": "glucose", "key3": "cytosol",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
+    },
+    {
+        "key1": "concentration", "key2": "sodium", "key3": "interstitial fluid",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
+    },
+    {
+        "key1": "concentration", "key2": "hydrogen", "key3": "interstitial fluid",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
+    },
+    {
+        "key1": "concentration", "key2": "ammonium", "key3": "interstitial fluid",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
+    },
+    {
+        "key1": "concentration", "key2": "chloride", "key3": "interstitial fluid",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
+    },
+    {
+        "key1": "concentration", "key2": "potassium", "key3": "interstitial fluid",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
+    },
+    {
+        "key1": "concentration", "key2": "bicarbonate", "key3": "interstitial fluid",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
+    },
+    {
+        "key1": "concentration", "key2": "glucose", "key3": "interstitial fluid",
+        "opb": "<http://identifiers.org/opb/OPB_00340>",
+        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>",
+        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
     }
 ];
 
@@ -351,6 +576,25 @@ var discoveryWithFluxOfSolute = function (uriCHEBI) {
     return query;
 };
 
+var discoveryWithFluxOfSoluteFMA = function (uriCHEBI, uriFMA) {
+    var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+        "PREFIX dcterms: <http://purl.org/dc/terms/>" +
+        "SELECT DISTINCT ?g ?Model_entity ?Biological_meaning " +
+        "WHERE { GRAPH ?g { " +
+        "?entity semsim:hasPhysicalDefinition " + uriCHEBI + ". " +
+        "?source semsim:hasPhysicalEntityReference ?entity. " +
+        "?process semsim:hasSourceParticipant ?source. " +
+        "?property semsim:physicalPropertyOf ?process. " +
+        "?Model_entity semsim:isComputationalComponentFor ?property. " +
+        "?Model_entity dcterms:description ?Biological_meaning." +
+        "?process semsim:hasMediatorParticipant ?model_medparticipant." +
+        "?model_medparticipant semsim:hasPhysicalEntityReference ?med_entity." +
+        "?med_entity semsim:hasPhysicalDefinition " + uriFMA + "." +
+        "}}";
+
+    return query;
+};
+
 var discoveryWithConcentrationOfSolute = function (uriCHEBI) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
         "PREFIX dcterms: <http://purl.org/dc/terms/>" +
@@ -360,6 +604,24 @@ var discoveryWithConcentrationOfSolute = function (uriCHEBI) {
         "?property semsim:physicalPropertyOf ?entity. " +
         "?Model_entity semsim:isComputationalComponentFor ?property. " +
         "?Model_entity dcterms:description ?Biological_meaning." +
+        "}";
+
+    return query;
+};
+
+var discoveryWithConcentrationOfSoluteFMA = function (uriCHEBI, uriFMA) {
+    var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+        "PREFIX ro: <http://www.obofoundry.org/ro/ro.owl#>" +
+        "PREFIX dcterms: <http://purl.org/dc/terms/>" +
+        "SELECT ?Model_entity ?Biological_meaning " +
+        "WHERE { " +
+        "?entity semsim:hasPhysicalDefinition " + uriCHEBI + ". " +
+        "?property semsim:physicalPropertyOf ?entity. " +
+        "?Model_entity semsim:isComputationalComponentFor ?property. " +
+        "?Model_entity dcterms:description ?Biological_meaning." +
+        "?property semsim:physicalPropertyOf ?source_entity." +
+        "?source_entity ro:part_of ?source_part_of_entity." +
+        "?source_part_of_entity semsim:hasPhysicalDefinition " + uriFMA + "." +
         "}";
 
     return query;

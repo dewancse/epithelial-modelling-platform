@@ -33,7 +33,7 @@ var EMP = (function (global) {
         head = [],
         discoverIndex = 0;
 
-    var compartmentVal, proteinVal;
+    var compartmentVal, proteinVal, searchStatus = "local";
     var soluteFlux1, soluteFlux1val, sourceFlux1, sourceFlux1val,
         sinkFlux1, sinkFlux1val, mediatorFlux1, mediatorFlux1val;
     var soluteFlux2, soluteFlux2val, sourceFlux2, sourceFlux2val,
@@ -200,6 +200,34 @@ var EMP = (function (global) {
         if (typeof actions[event.target.dataset.action] === "function")
             actions[event.target.dataset.action].call(this, event);
 
+        $('#bioportal').change(function () {
+            if (this.checked) {
+                searchStatus = "bioportal";
+                console.log("bioportal checked: ", this.checked);
+                $('#local').attr("checked", false);
+                $('#local').attr("disabled", true);
+            }
+            else {
+                console.log("bioportal unchecked: ", this.checked);
+                $('#local').attr("checked", false);
+                $('#local').attr("disabled", false);
+            }
+        });
+
+        $('#local').change(function () {
+            if (this.checked) {
+                searchStatus = "local";
+                console.log("local checked: ", this.checked);
+                $('#bioportal').attr("checked", false);
+                $('#bioportal').attr("disabled", true);
+            }
+            else {
+                console.log("local unchecked: ", this.checked);
+                $('#bioportal').attr("checked", false);
+                $('#bioportal').attr("disabled", false);
+            }
+        });
+
         if (event.target.id == "compartmentTxt") {
             var index = event.target.options.selectedIndex;
             // console.log("InnerText:", $("#compartmentTxt option")[i].innerText);
@@ -207,9 +235,6 @@ var EMP = (function (global) {
         }
         if (event.target.id == "soluteFlux1Txt") {
             var index = event.target.options.selectedIndex;
-
-            console.log($("#soluteFlux1Txt option")[index].innerText);
-            console.log($("#soluteFlux1Txt option")[index].value);
             $("#sourceCon1Txt").val($("#soluteFlux1Txt option")[index].innerText);
         }
 
@@ -259,61 +284,282 @@ var EMP = (function (global) {
     $(document).on("keydown", function (event) {
         if (event.key == "Enter" && document.getElementById("searchTxt")) {
 
-            var uriOPB, uriCHEBI, keyValue;
-            var searchTxt = document.getElementById("searchTxt").value;
+            var searchListFunc = function (uriOPB, uriCHEBI, uriFMA, keyValue) {
+                showLoading("#searchList");
 
-            // set local storage
-            sessionStorage.setItem("searchTxtContent", searchTxt);
+                modelEntity = [];
+                biologicalMeaning = [];
+                speciesList = [];
+                geneList = [];
+                proteinList = [];
+                listOfProteinURIs = [];
+                head = [];
 
-            // dictionary object
-            for (var i in dictionary) {
-                var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
-                    key2 = searchTxt.indexOf("" + dictionary[i].key2 + "");
+                discoverIndex = 0; // discoverIndex to index each Model_entity
 
-                if (key1 != -1 && key2 != -1) {
-                    uriOPB = dictionary[i].opb;
-                    uriCHEBI = dictionary[i].chebi;
-                    keyValue = dictionary[i].key1;
+                var query;
+                if (uriCHEBI == "") { // model discovery with 'flux'
+                    query = discoveryWithFlux(uriOPB);
                 }
-            }
-
-            showLoading("#searchList");
-
-            modelEntity = [];
-            biologicalMeaning = [];
-            speciesList = [];
-            geneList = [];
-            proteinList = [];
-            listOfProteinURIs = [];
-            head = [];
-
-            discoverIndex = 0; // discoverIndex to index each Model_entity
-
-            var query;
-            if (uriCHEBI == "") { // model discovery with 'flux'
-                query = discoveryWithFlux(uriOPB);
-            }
-            else {
-                if (keyValue == "flux") { // model discovery with 'flux of sodium', etc.
-                    query = discoveryWithFluxOfSolute(uriCHEBI)
+                else {
+                    if (keyValue == "flux" || keyValue == "chemical concentration flow rate") {
+                        // model discovery with 'flux of sodium', etc.
+                        if (uriFMA == "")
+                            query = discoveryWithFluxOfSolute(uriCHEBI);
+                        else
+                            query = discoveryWithFluxOfSoluteFMA(uriCHEBI, uriFMA);
+                    }
+                    else if (keyValue == "concentration" || keyValue == "concentration of chemical") {
+                        // model disocvery with 'concentration of sodium', etc.
+                        if (uriFMA == "")
+                            query = discoveryWithConcentrationOfSolute(uriCHEBI);
+                        else
+                            query = discoveryWithConcentrationOfSoluteFMA(uriCHEBI, uriFMA);
+                    }
                 }
-                else { // model disocvery with 'concentration of sodium', etc.
-                    query = discoveryWithConcentrationOfSolute(uriCHEBI);
-                }
-            }
 
-            // Model
-            sendPostRequest(
-                endpoint,
-                query,
-                function (jsonModel) {
-                    console.log("jsonModel: ", jsonModel);
-                    // REMOVE duplicate cellml model and variable name (NOT component name)
-                    jsonModel.results.bindings = uniqueifyjsonModel(jsonModel.results.bindings);
-                    console.log("After jsonModel: ", jsonModel);
-                    mainUtils.discoverModels(jsonModel);
-                },
-                true);
+                // Model
+                sendPostRequest(
+                    endpoint,
+                    query,
+                    function (jsonModel) {
+                        console.log("jsonModel: ", jsonModel);
+                        // REMOVE duplicate cellml model and variable name (NOT component name)
+                        jsonModel.results.bindings = uniqueifyjsonModel(jsonModel.results.bindings);
+                        console.log("After jsonModel: ", jsonModel);
+                        mainUtils.discoverModels(jsonModel);
+                    },
+                    true);
+            };
+
+            if (searchStatus == "local") {
+                var uriOPB, uriCHEBI, uriFMA, keyValue;
+                var searchTxt = document.getElementById("searchTxt").value.toLowerCase();
+
+                // set local storage
+                sessionStorage.setItem("searchTxtContent", searchTxt);
+
+                // dictionary object
+                for (var i in dictionary) {
+                    var key1 = searchTxt.indexOf("" + dictionary[i].key1 + ""),
+                        key2 = searchTxt.indexOf("" + dictionary[i].key2 + ""),
+                        key3 = searchTxt.indexOf("" + dictionary[i].key3 + "");
+
+                    if (key1 != -1 && key2 != -1 && key3 != -1) {
+                        uriOPB = dictionary[i].opb;
+                        uriCHEBI = dictionary[i].chebi;
+                        uriFMA = dictionary[i].fma;
+                        keyValue = dictionary[i].key1;
+                    }
+                }
+
+                console.log("uriOPB local: ", uriOPB);
+                console.log("uriCHEBI local: ", uriCHEBI);
+                console.log("uriFMA: local", uriFMA);
+
+                searchListFunc(uriOPB, uriCHEBI, uriFMA, keyValue);
+            }
+            else if (searchStatus == "bioportal") {
+                var uriOPB = "", uriOPBTxt = "", uriCHEBI = "", uriCHEBITxt = "", uriFMA = "", uriFMATxt = "", keyValue;
+                var dictKeyWordsCHEBI = [
+                    "sodium", "hydrogen", "ammonium", "chloride", "potassium", "bicarbonate", "glucose"
+                ];
+                var dictKeyWordsFMA = [
+                    "luminal", "cytosol", "portion of cytosol", "interstitial fluid", "tissue fluid", "portion of tissue fluid",
+                    "apical membrane", "apical plasma membrane", "basolateral membrane", "basolateral plasma membrane"
+                ];
+                var dictOPB = [
+                    {
+                        "key1": "concentration",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>"
+                    },
+                    {
+                        "key1": "flux",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>"
+                    }
+                ];
+                var dictCHEBI = [
+                    {
+                        "key1": "sodium",
+                        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29101>"
+                    },
+                    {
+                        "key1": "hydrogen",
+                        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_15378>"
+                    },
+                    {
+                        "key1": "ammonium",
+                        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_28938>"
+                    },
+                    {
+                        "key1": "chloride",
+                        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17996>"
+                    },
+                    {
+                        "key1": "potassium",
+                        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_29103>"
+                    },
+                    {
+                        "key1": "bicarbonate",
+                        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17544>"
+                    },
+                    {
+                        "key1": "glucose",
+                        "chebi": "<http://purl.obolibrary.org/obo/CHEBI_17234>"
+                    }
+                ];
+                var dictFMA = [
+                    {
+                        "key1": "luminal",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
+                    },
+                    {
+                        "key1": "cytosol",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
+                    },
+                    {
+                        "key1": "interstitial fluid",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
+                    },
+                    {
+                        "key1": "tissue fluid",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_9673>"
+                    },
+                    {
+                        "key1": "apical membrane",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
+                    },
+                    {
+                        "key1": "basolateral membrane",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+                    }
+                ];
+
+                var searchTxt = document.getElementById("searchTxt").value.toLowerCase();
+
+                // set local storage
+                sessionStorage.setItem("searchTxtContent", searchTxt);
+
+                var endpointbioportal = bioportalAnnotatorEndpoint + searchTxt + "&ontologies=CHEBI,FMA,OPB,PR&longest_only=true";
+
+                sendGetRequest(
+                    endpointbioportal,
+                    function (jsonAnnotatorList) {
+                        console.log("jsonAnnotatorList: ", jsonAnnotatorList);
+                        // OPB
+                        for (var i = 0; i < jsonAnnotatorList.length; i++) {
+                            var id = jsonAnnotatorList[i].annotatedClass["@id"],
+                                text = jsonAnnotatorList[i].annotations[0].text.toLowerCase(),
+                                mType = jsonAnnotatorList[i].annotations[0].matchType;
+                            if (id.search("OPB_") != -1) {
+                                if (mType == "PREF") {
+                                    uriOPB = "<http://identifiers.org/opb/" + id.slice(id.search("#") + 1) + ">";
+                                    uriOPBTxt = text;
+                                    keyValue = text;
+                                    break;
+                                }
+                            }
+                        }
+                        if (uriOPBTxt == "") {
+                            if (searchTxt.indexOf("flux") != -1)
+                                uriOPBTxt = "flux";
+                            else if (searchTxt.indexOf("concentration") != -1)
+                                uriOPBTxt = "concentration";
+
+                            for (var j in dictOPB) {
+                                var key1 = dictOPB[j].key1;
+                                if (key1 == uriOPBTxt) {
+                                    uriOPB = dictOPB[j].opb;
+                                    uriOPBTxt = dictOPB[j].key1;
+                                    keyValue = uriOPBTxt;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // CHEBI
+                        var chebiArray = [];
+                        for (var i = 0; i < jsonAnnotatorList.length; i++) {
+                            var id = jsonAnnotatorList[i].annotatedClass["@id"],
+                                text = jsonAnnotatorList[i].annotations[0].text.toLowerCase(),
+                                mType = jsonAnnotatorList[i].annotations[0].matchType;
+                            if (id.search("CHEBI_") != -1) {
+                                if (mType == "PREF") {
+                                    if (dictKeyWordsCHEBI.indexOf(text) != -1) {
+                                        uriCHEBI = id;
+                                        uriCHEBITxt = text;
+                                        break;
+                                    }
+                                }
+                                chebiArray.push(text);
+                            }
+                        }
+                        if (uriCHEBITxt == "") {
+                            for (var i = 0; i < chebiArray.length; i++) {
+                                var flag = false;
+                                for (var j in dictCHEBI) {
+                                    var key1 = dictCHEBI[j].key1;
+                                    if (key1 == chebiArray[i]) {
+                                        uriCHEBI = dictCHEBI[j].chebi;
+                                        uriCHEBITxt = dictCHEBI[j].key1;
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                if (flag == true) break;
+                            }
+                        }
+
+                        // FMA
+                        var fmaArray = [];
+                        for (var i = 0; i < jsonAnnotatorList.length; i++) {
+                            var id = jsonAnnotatorList[i].annotatedClass["@id"],
+                                text = jsonAnnotatorList[i].annotations[0].text.toLowerCase(),
+                                mType = jsonAnnotatorList[i].annotations[0].matchType;
+                            if (id.search("/fma") != -1) {
+                                if (mType == "PREF") {
+                                    if (dictKeyWordsFMA.indexOf(text) != -1) {
+                                        uriFMA = "<http://purl.obolibrary.org/obo/FMA_" + id.slice(id.search("/fma") + 8) + ">";
+                                        uriFMATxt = text;
+                                        break;
+                                    }
+                                }
+                                fmaArray.push(text);
+                            }
+                        }
+                        for (var i = 0; i < fmaArray.length; i++) {
+                            if (fmaArray[i] == "membrane") {
+                                if (searchTxt.indexOf("apical") != -1)
+                                    fmaArray[i] = "apical " + fmaArray[i];
+                                else if (searchTxt.indexOf("basolateral") != -1)
+                                    fmaArray[i] = "basolateral " + fmaArray[i];
+                            }
+                        }
+                        if (uriFMATxt == "") {
+                            for (var i = 0; i < fmaArray.length; i++) {
+                                var flag = false;
+                                for (var j in dictFMA) {
+                                    var key1 = dictFMA[j].key1;
+                                    if (key1 == fmaArray[i]) {
+                                        uriFMA = dictFMA[j].fma;
+                                        uriFMATxt = dictFMA[j].key1;
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                if (flag == true) break;
+                            }
+                        }
+
+                        console.log("uriOPB bioportal: ", uriOPB, uriOPBTxt);
+                        console.log("uriCHEBI bioportal: ", uriCHEBI, uriCHEBITxt);
+                        console.log("uriFMA bioportal: ", uriFMA, uriFMATxt);
+
+                        searchListFunc(uriOPB, uriCHEBI, uriFMA, keyValue);
+                    },
+                    true
+                );
+            }
         }
         if (event.key == "Enter" && document.getElementById("proteinTxt")) {
 
@@ -335,7 +581,7 @@ var EMP = (function (global) {
             var proteinIDs = [], proteinNames = [], speciesNames = [], geneNames = [];
 
             // showLoading("#proteinList");
-            var endpointbioportal = bioportalEndpoint + proteinTxt + "&ontologies=PR&roots_only=true";
+            var endpointbioportal = bioportalPrEndpoint + proteinTxt + "&ontologies=PR&roots_only=true";
 
             sendGetRequest(
                 endpointbioportal,
@@ -616,7 +862,6 @@ var EMP = (function (global) {
         rdfDescription.appendChild(dctermsDescription);
 
         var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
-        console.log(element);
         element.parentNode.insertBefore(rdfDescription, element.nextSibling);
     }
 
@@ -738,7 +983,6 @@ var EMP = (function (global) {
         rdfDescription.appendChild(dctermsDescription);
 
         var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
-        console.log(element);
         element.parentNode.insertBefore(rdfDescription, element.nextSibling);
     }
 
@@ -762,6 +1006,7 @@ var EMP = (function (global) {
         varCon.setAttribute("id", "modelComp." + variableName);
     }
 
+    // Create a CellML model
     mainUtils.createCellML = function () {
         var parser, xmlDoc;
         sendGetRequest(
@@ -813,7 +1058,6 @@ var EMP = (function (global) {
                 componentEle.appendChild(mathEle);
 
                 var element = xmlDoc.getElementsByTagName("component")[0];
-                console.log(element);
                 element.parentNode.insertBefore(componentEle, element.nextSibling);
 
                 // connection
@@ -822,7 +1066,6 @@ var EMP = (function (global) {
                 connectionEle.appendChild(connectionText);
 
                 var element = xmlDoc.getElementsByTagName("component")[1];
-                console.log(element);
                 element.parentNode.insertBefore(connectionEle, element.nextSibling);
 
                 // RDF for concentration
@@ -848,7 +1091,6 @@ var EMP = (function (global) {
                     rdfDescription.appendChild(roCompartmentOf);
                 }
                 var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
-                console.log(element);
                 element.parentNode.insertBefore(rdfDescription, element.nextSibling);
 
                 // RDF for flux

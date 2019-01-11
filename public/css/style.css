@@ -42,6 +42,11 @@ body {
     background-position: center;
 }
 
+#tickcheckBox {
+    width: 800px;
+    background-position: center;
+}
+
 .searchEvBox {
     width: 500px;
     background-position: center;
