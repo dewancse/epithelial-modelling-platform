@@ -2,8 +2,7 @@
  * Created by Dewan Sarwar on 14/01/2018.
  */
 // var endpoint = "https://models.physiomeproject.org/pmr2_virtuoso_search";
-var nginx_proxy = "/.api/pmr/sparql",
-    endpoint = nginx_proxy;
+var endpoint = "/.api/pmr/sparql";
 
 
 // var abiOntoEndpoint = "http://ontology.cer.auckland.ac.nz/ols-boot/api/ontologies";

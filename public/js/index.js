@@ -863,7 +863,7 @@ var EMP = (function (global) {
 
         var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
         element.parentNode.insertBefore(rdfDescription, element.nextSibling);
-    }
+    };
 
     // RDF for flux
     var fluxRDF = function (xmlDoc, coTransCnt, propCnt, srcEntCnt, snkEntCnt, processCnt, sourceCnt, sinkCnt, mediatorCnt,
@@ -984,7 +984,7 @@ var EMP = (function (global) {
 
         var element = xmlDoc.getElementsByTagName("rdf:Description")[0];
         element.parentNode.insertBefore(rdfDescription, element.nextSibling);
-    }
+    };
 
     // Name of concentration and flux variable
     var conandfluxVariable = function (varCon, fluxval, soluteFlux, unit) {
@@ -1004,7 +1004,7 @@ var EMP = (function (global) {
         varCon.setAttribute("units", unit);
         varCon.setAttribute("interface", "public");
         varCon.setAttribute("id", "modelComp." + variableName);
-    }
+    };
 
     // Create a CellML model
     mainUtils.createCellML = function () {
@@ -1121,7 +1121,7 @@ var EMP = (function (global) {
                 document.body.removeChild(downloadLink);
             },
             false);
-    }
+    };
 
     // ADD MODEL: show proteins from bioportal
     mainUtils.showProteinIDs = function (proteinIDs, proteinNames, speciesNames, geneNames) {
@@ -1175,7 +1175,7 @@ var EMP = (function (global) {
             .append(table);
 
         console.log("outside addModalBody!");
-    }
+    };
 
     // MODEL DISCOVERY: SPARQL queries to retrieve search results from PMR
     mainUtils.discoverModels = function (jsonModel) {
