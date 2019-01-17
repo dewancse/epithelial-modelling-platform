@@ -8,7 +8,7 @@ If you have Docker and git installed on your machine, then the following should 
 ```
 git clone https://github.com/dewancse/epithelial-modelling-platform
 docker build -f Dockerfile -t unique-name/mdt-nginx .
-docker run -p 49160:8181 -d unique-name/mdt-nginx
+docker run -p 49160:80 -d unique-name/mdt-nginx
 ```
 And then http://localhost:49160 should work.
 
