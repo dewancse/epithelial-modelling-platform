@@ -30,9 +30,12 @@ RUN apk add --no-cache python3 \
 
 ENV PYTHONPATH=/libcellml/build/src/bindings/python
 
-COPY server.py /
+COPY server.py entrypoint.sh /
 
-ENTRYPOINT ["/bin/sh", "-c", "nginx -g 'daemon off;' && python3 server.py"]
+ENTRYPOINT ["/entrypoint.sh"]
+
+# COPY server.py /
+# ENTRYPOINT ["/bin/sh", "-c", "nginx -g 'daemon off;'; python3 server.py"]
 
 # ENTRYPOINT python3 server.py && nginx -g "daemon off;"
 # CMD ["nginx", "-g", "daemon off;"]
