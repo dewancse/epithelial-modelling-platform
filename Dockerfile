@@ -32,4 +32,8 @@ ENV PYTHONPATH=/libcellml/build/src/bindings/python
 
 COPY server.py /
 
-CMD ["python3", "server.py"]
+ENTRYPOINT ["/bin/sh", "-c", "nginx -g 'daemon off;' && python3 server.py"]
+
+# ENTRYPOINT python3 server.py && nginx -g "daemon off;"
+# CMD ["nginx", "-g", "daemon off;"]
+# CMD ["/bin/sh", "-c", "nginx -g 'daemon off;' && python3 server.py"]
