@@ -26,9 +26,6 @@ async def handle_request(request):
     return await response.file('model.xml')
 
 
-# if __name__ == "__main__":
-#     app.run(host="127.0.0.1", port=8000)
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, workers=4)
+    app.run(host="130.216.216.81", port=8000, workers=4)
 
