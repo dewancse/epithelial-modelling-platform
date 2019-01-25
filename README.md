@@ -8,9 +8,16 @@ If you have Docker and git installed on your machine, then the following should 
 ```
 git clone https://github.com/dewancse/epithelial-modelling-platform
 docker build -f Dockerfile -t unique-name/mdt-nginx .
-docker run -p 49160:80 -d unique-name/mdt-nginx
+docker run -d -p 80:80 -p 8000:8000 unique-name/mdt-nginx
 ```
-And then http://localhost:49160 should work.
+Here EMP is running at port 80 and model assembly service is running at port 8000. Then login to the docker container and execute the `entrypoint.sh` script in the background to start both nginx and python server. Note that python server is proving the model assembly service.
+```
+docker ps (to see the container_id)
+docker exec -it container_id /bin/sh
+nohup ./entrypoint.sh &
+enter and exit 
+```
+And then http://localhost:80 should work.
 
 ### EMP workflow
 
