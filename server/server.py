@@ -1,4 +1,4 @@
-# from main import *
+from main import *
 from libcellml import Component
 from sanic import Sanic, response
 from sanic.response import json, text
@@ -16,11 +16,9 @@ async def test(request):
 
 @app.route('/post', methods=['POST'])
 async def post_handler(request):
-    # print("PRINT:", request.json)
-    # obj = request.json
-    # modelAssemblyService(obj)
+    obj = request.json
+    modelAssemblyService(obj)
     return text('New model is at this addreess: <a href=/.api/mas/model target=_blank>Click Here</a>')
-    # return text('New model is at this addreess: <a href=http://130.216.216.219:8000/model target=_blank>Click Here</a>')
 
 
 @app.route('/model')

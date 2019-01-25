@@ -15,6 +15,8 @@ RUN apk add --no-cache python3 \
     pip3 install SPARQLWrapper && \
     apk --no-cache add cmake make && \
     apk --no-cache add doxygen libxml2-dev swig && \
+    apk add --no-cache libxslt-dev && \
+    pip3 install lxml && \
     git clone https://github.com/cellml/libcellml.git && \
     cd libcellml && \
     mkdir build && \
@@ -30,13 +32,6 @@ RUN apk add --no-cache python3 \
 
 ENV PYTHONPATH=/libcellml/build/src/bindings/python
 
-COPY server.py entrypoint.sh /
+COPY server/server.py server/main.py server/miscellaneous.py server/cellml1to2.xsl entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh"]
-
-# COPY server.py /
-# ENTRYPOINT ["/bin/sh", "-c", "nginx -g 'daemon off;'; python3 server.py"]
-
-# ENTRYPOINT python3 server.py && nginx -g "daemon off;"
-# CMD ["nginx", "-g", "daemon off;"]
-# CMD ["/bin/sh", "-c", "nginx -g 'daemon off;' && python3 server.py"]
