@@ -33,6 +33,11 @@ var EMP = (function (global) {
         head = [],
         discoverIndex = 0;
 
+    // Table related
+    var chebiURI, typeOfSearchTerm,
+        tableDiscover = $("<table/>").addClass("table table-hover table-condensed"),
+        theadDiscover = $("<thead/>"), trDiscover = $("<tr/>"), tbodyDiscover = $("<tbody/>");
+
     var compartmentVal, proteinVal, searchStatus = "local";
     var soluteFlux1, soluteFlux1val, sourceFlux1, sourceFlux1val,
         sinkFlux1, sinkFlux1val, mediatorFlux1, mediatorFlux1val;
@@ -283,7 +288,6 @@ var EMP = (function (global) {
     // MODEL DISCOVERY: enter search texts
     $(document).on("keydown", function (event) {
         if (event.key == "Enter" && document.getElementById("searchTxt")) {
-
             var searchListFunc = function (uriOPB, uriCHEBI, uriFMA, keyValue) {
                 showLoading("#searchList");
 
@@ -299,24 +303,37 @@ var EMP = (function (global) {
 
                 var query;
                 if (uriCHEBI == "") { // model discovery with 'flux'
+                    typeOfSearchTerm = keyValue;
                     query = discoveryWithFlux(uriOPB);
                 }
                 else {
                     if (keyValue == "flux" || keyValue == "chemical concentration flow rate") {
                         // model discovery with 'flux of sodium', etc.
-                        if (uriFMA == "")
+                        if (uriFMA == "") {
+                            typeOfSearchTerm = keyValue;
                             query = discoveryWithFluxOfSolute(uriCHEBI);
-                        else
+                        }
+                        else {
+                            typeOfSearchTerm = keyValue;
                             query = discoveryWithFluxOfSoluteFMA(uriCHEBI, uriFMA);
+                        }
                     }
                     else if (keyValue == "concentration" || keyValue == "concentration of chemical") {
                         // model disocvery with 'concentration of sodium', etc.
-                        if (uriFMA == "")
+                        if (uriFMA == "") {
+                            typeOfSearchTerm = keyValue;
                             query = discoveryWithConcentrationOfSolute(uriCHEBI);
-                        else
+                        }
+                        else {
+                            typeOfSearchTerm = keyValue;
                             query = discoveryWithConcentrationOfSoluteFMA(uriCHEBI, uriFMA);
+                        }
                     }
                 }
+
+                // Testing ..
+                console.log("query: ", query);
+                console.log("endpoint: ", endpoint);
 
                 // Model
                 sendPostRequest(
@@ -356,6 +373,16 @@ var EMP = (function (global) {
                 console.log("uriOPB local: ", uriOPB);
                 console.log("uriCHEBI local: ", uriCHEBI);
                 console.log("uriFMA: local", uriFMA);
+
+                if (uriCHEBI == undefined) {
+                    var uri = "https://github.com/dewancse/model-discovery-tool#input-handling";
+                    $("#searchList").html("<div class='alert alert-warning'>" +
+                        "<strong>Info!</strong> Please see input handling section at " +
+                        "<a href=" + uri + " + target=_blank class='alert-link'>README.md in github</a></div>");
+                    return;
+                }
+
+                chebiURI = uriCHEBI.slice(1, uriCHEBI.length - 1);
 
                 searchListFunc(uriOPB, uriCHEBI, uriFMA, keyValue);
             }
@@ -557,8 +584,7 @@ var EMP = (function (global) {
 
                         searchListFunc(uriOPB, uriCHEBI, uriFMA, keyValue);
                     },
-                    true
-                );
+                    true);
             }
         }
         if (event.key == "Enter" && document.getElementById("proteinTxt")) {
@@ -1215,11 +1241,12 @@ var EMP = (function (global) {
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
 
-                    if (pr_uri == epithelialcellID)
+                    if (epithelialcellID.indexOf(pr_uri) != -1)
                         endpointproteinOLS = abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
-                    else if (pr_uri.indexOf(partOfGOUri) != -1) {
+                    else if (pr_uri.indexOf(partOfGOUri) != -1)
                         endpointproteinOLS = abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
-                    }
+                    else if (pr_uri.indexOf(partOfUBERONUri) != -1)
+                        endpointproteinOLS = abiOntoEndpoint + "/uberon/terms?iri=" + pr_uri;
                     else
                         endpointproteinOLS = abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
 
@@ -1240,7 +1267,7 @@ var EMP = (function (global) {
                         console.log("jsonepithelialobj: ", jsonepithelialobj);
 
                         // epithelial cell
-                        if (pr_uri == epithelialcellID) {
+                        if (epithelialcellID.indexOf(pr_uri) != -1) {
                             for (var i = 0; i < jsonepithelialobj.results.bindings.length; i++) {
                                 var temp = jsonepithelialobj.results.bindings[i].mediator.value;
 
@@ -1312,12 +1339,12 @@ var EMP = (function (global) {
                                                     proteinList.push(proteinName);
                                                 }
 
-                                                head = ["Model_entity", "Biological_meaning", "Species", "Gene", "Protein"];
+                                                head = ["Model_entity", "Biological_meaning", "Species", "Gene", "Protein/System"];
 
-                                                mainUtils.showDiscoverModels();
+                                                // display this model entity and associated information
+                                                mainUtils.showDiscoverModels(discoverIndex);
 
                                                 discoverIndex++; // increment index of modelEntity
-
                                                 if (discoverIndex == jsonModel.results.bindings.length) {
 
                                                     listOfProteinURIs = listOfProteinURIs.filter(function (item, pos) {
@@ -1375,7 +1402,7 @@ var EMP = (function (global) {
     };
 
     // MODEL DISCOVERY: display discovered models from PMR
-    mainUtils.showDiscoverModels = function () {
+    mainUtils.showDiscoverModels = function (discoverIndex) {
 
         // already discovered models will not appear in re-discover phase
         for (var i = 0; i < alreadyDiscoveredModels.length; i++) {
@@ -1390,57 +1417,44 @@ var EMP = (function (global) {
             }
         }
 
-        // Empty search result
-        if (head.length == 0) {
-            $("#searchList").html("<section class=container-fluid><label><br>No Search Results!</label></section>");
-            $("#searchTxt").attr("value", "");
-            return;
-        }
-
         // Reinitialize for a new search result
         $("#searchList").html("");
 
-        var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
-
         // Table header
-        var thead = $("<thead/>"), tr = $("<tr/>"), i;
-        for (var i in head) {
-            // Empty header for checkbox column
-            if (i == 0)
-                tr.append($("<th/>").append(""));
-
-            tr.append($("<th/>").append(head[i]));
+        if (discoverIndex == 0) {
+            tableDiscover = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
+            theadDiscover = $("<thead/>");
+            trDiscover = $("<tr/>");
+            tbodyDiscover = $("<tbody/>");
+            for (var i in head) {
+                trDiscover.append($("<th/>").append(head[i]));
+            }
         }
 
-        thead.append(tr);
-        table.append(thead);
+        theadDiscover.append(trDiscover);
+        tableDiscover.append(theadDiscover);
 
         // Table body
-        var tbody = $("<tbody/>");
-        for (var i in modelEntity) {
-            var temp = [];
-            tr = $("<tr/>");
-            temp.push(modelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
+        trDiscover = $("<tr/>");
 
-            for (var j in temp) {
-                if (j == 0) {
-                    tr.append($("<td/>")
-                        .append($("<label/>")
-                            .html("<input id=" + modelEntity[i] + " uri=" + listOfProteinURIs[i] + " type=checkbox " +
-                                "data-action=search value=" + modelEntity[i] + " + class=checkbox>")));
-                }
+        var modelhtm = '<fieldset id="' + modelEntity[discoverIndex] + '" class="majorpoints"><legend class="majorpointslegend">' + modelEntity[discoverIndex] + '</legend>' +
+            '<div id="' + modelEntity[discoverIndex] + '" class="hiders" style="display: none"></div></fieldset>';
 
-                if (j == 1)
-                    tr.append($("<td/>").append(temp[j]));
-                else
-                    tr.append($("<td/>").append(temp[j]));
-            }
+        trDiscover.append($("<td/>").append(modelhtm)); // model
 
-            tbody.append(tr);
-        }
+        // trDiscover.append($("<td/>").append(modelEntity[i].model)); // model
+        trDiscover.append($("<td/>").append(biologicalMeaning[discoverIndex])); // biological meaning
 
-        table.append(tbody);
-        $("#searchList").append(table);
+        trDiscover.append($("<td/>").append(speciesList[discoverIndex])); // species
+
+        trDiscover.append($("<td/>").append(geneList[discoverIndex])); // gene
+
+        trDiscover.append($("<td/>").append(proteinList[discoverIndex])); // protein
+
+        tbodyDiscover.append(trDiscover);
+
+        tableDiscover.append(tbodyDiscover);
+        $("#searchList").append(tableDiscover);
 
         // Fill in search attribute value
         $("#searchTxt").attr("value", sessionStorage.getItem("searchTxtContent"));
@@ -1593,11 +1607,12 @@ var EMP = (function (global) {
                 else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
 
-                    if (pr_uri == epithelialcellID)
+                    if (epithelialcellID.indexOf(pr_uri) != -1)
                         endpointproteinOLS = abiOntoEndpoint + "/cl/terms?iri=" + pr_uri;
-                    else if (pr_uri.indexOf(partOfGOUri) != -1) {
+                    else if (pr_uri.indexOf(partOfGOUri) != -1)
                         endpointproteinOLS = abiOntoEndpoint + "/go/terms?iri=" + pr_uri;
-                    }
+                    else if (pr_uri.indexOf(partOfUBERONUri) != -1)
+                        endpointproteinOLS = abiOntoEndpoint + "/uberon/terms?iri=" + pr_uri;
                     else
                         endpointproteinOLS = abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
@@ -2039,7 +2054,8 @@ var EMP = (function (global) {
                 apicalMembrane,
                 basolateralMembrane,
                 capillaryMembrane,
-                membrane);
+                membrane,
+                typeOfSearchTerm);
 
             return;
         }
@@ -2129,24 +2145,24 @@ var EMP = (function (global) {
                     // loop to iterate over med_fma and med_pr in jsonObj
                     for (var m = 0; m < jsonObj.results.bindings.length; m++) {
                         var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
-                        var tmpApi = jsonObj.results.bindings[m].med_entity_uri.value;
-                        var tmpBas = jsonObj.results.bindings[m].med_entity_uri.value;
-                        var tmpCap = jsonObj.results.bindings[m].med_entity_uri.value;
+                        var tmpApi = jsonObj.results.bindings[m].med_entity_uriFMA.value;
+                        var tmpBas = jsonObj.results.bindings[m].med_entity_uriFMA.value;
+                        var tmpCap = jsonObj.results.bindings[m].med_entity_uriFMA.value;
 
                         if (tmpPro.indexOf(partOfProteinUri) != -1) {
                             tempProtein.push(jsonObj.results.bindings[m].med_entity_uri.value);
                         }
 
                         if (tmpApi.indexOf(apicalID) != -1) {
-                            tempApical.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                            tempApical.push(jsonObj.results.bindings[m].med_entity_uriFMA.value);
                         }
 
                         if (tmpBas.indexOf(basolateralID) != -1) {
-                            tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                            tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uriFMA.value);
                         }
 
                         if (tmpCap.indexOf(capillaryID) != -1) {
-                            tempCapillary.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                            tempCapillary.push(jsonObj.results.bindings[m].med_entity_uriFMA.value);
                         }
                     }
 
@@ -2272,7 +2288,8 @@ var EMP = (function (global) {
                             apicalMembrane,
                             basolateralMembrane,
                             capillaryMembrane,
-                            membrane);
+                            membrane,
+                            typeOfSearchTerm);
                     }
                 },
                 true);
@@ -2295,24 +2312,24 @@ var EMP = (function (global) {
                     // loop to iterate over med_fma and med_pr in jsonObj
                     for (var m = 0; m < jsonObj.results.bindings.length; m++) {
                         var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
-                        var tmpApi = jsonObj.results.bindings[m].med_entity_uri.value;
-                        var tmpBas = jsonObj.results.bindings[m].med_entity_uri.value;
-                        var tmpCap = jsonObj.results.bindings[m].med_entity_uri.value;
+                        var tmpApi = jsonObj.results.bindings[m].med_entity_uriFMA.value;
+                        var tmpBas = jsonObj.results.bindings[m].med_entity_uriFMA.value;
+                        var tmpCap = jsonObj.results.bindings[m].med_entity_uriFMA.value;
 
                         if (tmpPro.indexOf(partOfProteinUri) != -1) {
                             tempProtein.push(jsonObj.results.bindings[m].med_entity_uri.value);
                         }
 
                         if (tmpApi.indexOf(apicalID) != -1) {
-                            tempApical.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                            tempApical.push(jsonObj.results.bindings[m].med_entity_uriFMA.value);
                         }
 
                         if (tmpBas.indexOf(basolateralID) != -1) {
-                            tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                            tempBasolateral.push(jsonObj.results.bindings[m].med_entity_uriFMA.value);
                         }
 
                         if (tmpCap.indexOf(capillaryID) != -1) {
-                            tempCapillary.push(jsonObj.results.bindings[m].med_entity_uri.value);
+                            tempCapillary.push(jsonObj.results.bindings[m].med_entity_uriFMA.value);
                         }
                     }
 
@@ -2436,7 +2453,8 @@ var EMP = (function (global) {
                             apicalMembrane,
                             basolateralMembrane,
                             capillaryMembrane,
-                            membrane);
+                            membrane,
+                            typeOfSearchTerm);
                     }
                 },
                 true);
@@ -2523,27 +2541,28 @@ var EMP = (function (global) {
                                                     }
                                                 );
 
-                                            if (jsonObjFlux.results.bindings[i].med_entity_uri == undefined) {
+                                            if (jsonObjFlux.results.bindings[i].med_entity_uriPR == undefined) {
                                                 med_pr.push("");
+                                            }
+                                            else {
+                                                med_pr.push({
+                                                    // name of med_pr from OLS
+                                                    name: modelEntityFullNameArray[index],
+                                                    fma: jsonObjFlux.results.bindings[i].med_entity_uriPR.value
+                                                });
+                                            }
+
+                                            if (jsonObjFlux.results.bindings[i].med_entity_uriFMA == undefined) {
                                                 med_fma.push("");
                                             }
                                             else {
-                                                var temp = jsonObjFlux.results.bindings[i].med_entity_uri.value;
-                                                if (temp.indexOf(partOfProteinUri) != -1 || temp.indexOf(partOfGOUri) != -1 || temp.indexOf(partOfCHEBIUri) != -1) {
-                                                    med_pr.push({
-                                                        // name of med_pr from OLS
+                                                med_fma.push(
+                                                    {
                                                         name: modelEntityFullNameArray[index],
-                                                        fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
-                                                    });
-                                                }
-                                                else {
-                                                    med_fma.push(
-                                                        {
-                                                            name: modelEntityFullNameArray[index],
-                                                            fma: jsonObjFlux.results.bindings[i].med_entity_uri.value
-                                                        }
-                                                    );
-                                                }
+                                                        fma: jsonObjFlux.results.bindings[i].med_entity_uriFMA.value
+                                                    }
+                                                );
+
                                             }
                                         }
 
@@ -2705,7 +2724,8 @@ var EMP = (function (global) {
                                                             apicalMembrane,
                                                             basolateralMembrane,
                                                             capillaryMembrane,
-                                                            membrane);
+                                                            membrane,
+                                                            typeOfSearchTerm);
                                                     }
                                                     else if (membrane.length <= 2) {
 
@@ -2822,7 +2842,8 @@ var EMP = (function (global) {
                                             apicalMembrane,
                                             basolateralMembrane,
                                             capillaryMembrane,
-                                            membrane);
+                                            membrane,
+                                            typeOfSearchTerm);
                                     }
                                     else {
 

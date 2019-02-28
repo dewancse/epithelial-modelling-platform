@@ -268,7 +268,7 @@ body {
 }
 
 #sub-discover-cellml, #sub-model-overlap, #sub-platform, #sub-recommender, #sub-physiome, #sub-vph {
-    height: 120px;
+    height: 250px;
     width: 100%;
     position: relative;
     /*border: 2px solid #3F0C1F;*/
