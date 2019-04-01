@@ -21,7 +21,7 @@ RUN apk add --no-cache python3 \
     cd libcellml && \
     mkdir build && \
     cd build && \
-    cmake ../ -DBINDINGS_PYTHON=ON -DBUILD_SHARED=ON -DBUILD_TYPE=Debug -DCOVERAGE=ON -DINSTALL_PREFIX=/ -DTREAT_WARNINGS_AS_ER=ON -DUNIT_TESTS=ON && \  
+    cmake ../ -DBINDINGS_PYTHON=ON -DBUILD_SHARED=ON -DBUILD_TYPE=Debug -DCOVERAGE=ON -DINSTALL_PREFIX=/ -DTREAT_WARNINGS_AS_ER=ON -DUNIT_TESTS=ON && \
     make -j && \
     make test && \
     cd ../../ && \

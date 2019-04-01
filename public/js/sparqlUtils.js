@@ -228,7 +228,8 @@ var loadViewHtmlSPARQL = function (cellmlModel) {
 var circleIDmyWelcomeWindowFluxSPARQL = function (circleID, cellmlModel) {
     var query;
     if (circleID[1] == "" && circleID[2] == "") {
-        query = "SELECT ?Protein ?Biological_meaning ?chebi_uri " +
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "SELECT ?Protein ?Biological_meaning ?chebi_uri " +
             "WHERE { GRAPH ?g { " +
             "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "<" + circleID[0] + "> <http://purl.org/dc/terms/description> ?Biological_meaning . " +
@@ -240,7 +241,8 @@ var circleIDmyWelcomeWindowFluxSPARQL = function (circleID, cellmlModel) {
             "}}";
     }
     else if (circleID[1] != "" && circleID[2] == "") { // (circleID[1] != "")
-        query = "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?chebi_uri " +
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?chebi_uri " +
             "WHERE { GRAPH ?g { " +
             "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "<" + circleID[0] + "> <http://purl.org/dc/terms/description> ?Biological_meaning . " +
@@ -253,7 +255,8 @@ var circleIDmyWelcomeWindowFluxSPARQL = function (circleID, cellmlModel) {
             "}}";
     }
     else if (circleID[1] != "" && circleID[2] != "") { // (circleID[1] != "")
-        query = "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Biological_meaning3 ?chebi_uri " +
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Biological_meaning3 ?chebi_uri " +
             "WHERE { GRAPH ?g { " +
             "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "<" + circleID[0] + "> <http://purl.org/dc/terms/description> ?Biological_meaning . " +
@@ -272,7 +275,8 @@ var circleIDmyWelcomeWindowFluxSPARQL = function (circleID, cellmlModel) {
 var circleIDmyWelcomeWindowConSPARQL = function (circleID, cellmlModel) {
     var query;
     if (circleID[1] == "" && circleID[2] == "") {
-        query = "SELECT ?Protein ?Biological_meaning ?chebi_uri " +
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "SELECT ?Protein ?Biological_meaning ?chebi_uri " +
             "WHERE { GRAPH ?g { " +
             "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "<" + circleID[0] + "> <http://purl.org/dc/terms/description> ?Biological_meaning . " +
@@ -282,7 +286,8 @@ var circleIDmyWelcomeWindowConSPARQL = function (circleID, cellmlModel) {
             "}}";
     }
     else if (circleID[1] != "" && circleID[2] == "") { // (circleID[1] != "")
-        query = "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?chebi_uri " +
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?chebi_uri " +
             "WHERE { GRAPH ?g { " +
             "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "<" + circleID[0] + "> <http://purl.org/dc/terms/description> ?Biological_meaning . " +
@@ -292,7 +297,8 @@ var circleIDmyWelcomeWindowConSPARQL = function (circleID, cellmlModel) {
             "}}";
     }
     else if (circleID[1] != "" && circleID[2] != "") { // (circleID[1] != "")
-        query = "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Biological_meaning3 ?chebi_uri " +
+        query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
+            "SELECT ?Protein ?Biological_meaning ?Biological_meaning2 ?Biological_meaning3 ?chebi_uri " +
             "WHERE { GRAPH ?g { " +
             "<" + cellmlModel + "> <http://www.obofoundry.org/ro/ro.owl#modelOf> ?Protein . " +
             "<" + circleID[0] + "> <http://purl.org/dc/terms/description> ?Biological_meaning . " +

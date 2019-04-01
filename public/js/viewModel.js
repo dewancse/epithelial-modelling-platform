@@ -25,8 +25,7 @@ var viewModel = function (jsonObj) {
             if (i == 1) {
                 tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i - 1]].value + "/" +
                     "rawfile" + "/" + "HEAD" + "/" + jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
-            }
-            else {
+            } else {
                 tempValue = jsonObj.results.bindings[j][jsonObj.head.vars[i]].value;
             }
 
@@ -34,13 +33,16 @@ var viewModel = function (jsonObj) {
             if (tempValue.indexOf("http") != -1) {
                 var aText = createAnchor(tempValue);
                 tempArrayOfURL.push(tempValue);
-                if (searchFn(tempValue, tempArrayOfURL) <= 1)
+                if (searchFn(tempValue, tempArrayOfURL) <= 1) {
                     divText.append(aText);
-            }
-            else {
+                    divText.append("<br>");
+                }
+            } else {
                 tempArray.push(tempValue);
-                if (searchFn(tempValue, tempArray) <= 1)
+                if (searchFn(tempValue, tempArray) <= 1) {
                     divText.append(tempValue);
+                    divText.append("<br>");
+                }
             }
 
             $("#viewList").append(divText);

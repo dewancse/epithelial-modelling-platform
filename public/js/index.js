@@ -70,8 +70,7 @@ var EMP = (function (global) {
 
         if (sessionStorage.getItem("searchListContent")) {
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
-        }
-        else {
+        } else {
             // homepage
             sendGetRequest(
                 homeHtml,
@@ -105,8 +104,7 @@ var EMP = (function (global) {
 
                     mainUtils.selectedWorkspaceName = workspaceName; // view a model's detailed information
                     mainUtils.selectedTempidWithStr = tempidWithStr; // view a model's detailed information
-                }
-                else {
+                } else {
                     var tempidWithStr = event.target.id,
                         workspaceName = tempidWithStr.slice(0, tempidWithStr.search("#"));
 
@@ -132,8 +130,7 @@ var EMP = (function (global) {
                         modelEntityNameArray.push(event.target.value);
                         modelEntityFullNameArray.push(event.target.value);
                     }
-                }
-                else {
+                } else {
                     pos = templistOfModel.indexOf(event.target.value);
                     templistOfModel.splice(pos, 1);
 
@@ -167,8 +164,7 @@ var EMP = (function (global) {
                             modelEntityFullNameArray.push($(".attribute")[i].value);
                         }
                     }
-                }
-                else {
+                } else {
                     for (var i = 0; i < $(".attribute").length; i++) {
                         $(".attribute")[i].checked = false;
 
@@ -211,8 +207,7 @@ var EMP = (function (global) {
                 console.log("bioportal checked: ", this.checked);
                 $('#local').attr("checked", false);
                 $('#local').attr("disabled", true);
-            }
-            else {
+            } else {
                 console.log("bioportal unchecked: ", this.checked);
                 $('#local').attr("checked", false);
                 $('#local').attr("disabled", false);
@@ -225,8 +220,7 @@ var EMP = (function (global) {
                 console.log("local checked: ", this.checked);
                 $('#bioportal').attr("checked", false);
                 $('#bioportal').attr("disabled", true);
-            }
-            else {
+            } else {
                 console.log("local unchecked: ", this.checked);
                 $('#bioportal').attr("checked", false);
                 $('#bioportal').attr("disabled", false);
@@ -305,26 +299,22 @@ var EMP = (function (global) {
                 if (uriCHEBI == "") { // model discovery with 'flux'
                     typeOfSearchTerm = keyValue;
                     query = discoveryWithFlux(uriOPB);
-                }
-                else {
+                } else {
                     if (keyValue == "flux" || keyValue == "chemical concentration flow rate") {
                         // model discovery with 'flux of sodium', etc.
                         if (uriFMA == "") {
                             typeOfSearchTerm = keyValue;
                             query = discoveryWithFluxOfSolute(uriCHEBI);
-                        }
-                        else {
+                        } else {
                             typeOfSearchTerm = keyValue;
                             query = discoveryWithFluxOfSoluteFMA(uriCHEBI, uriFMA);
                         }
-                    }
-                    else if (keyValue == "concentration" || keyValue == "concentration of chemical") {
+                    } else if (keyValue == "concentration" || keyValue == "concentration of chemical") {
                         // model disocvery with 'concentration of sodium', etc.
                         if (uriFMA == "") {
                             typeOfSearchTerm = keyValue;
                             query = discoveryWithConcentrationOfSolute(uriCHEBI);
-                        }
-                        else {
+                        } else {
                             typeOfSearchTerm = keyValue;
                             query = discoveryWithConcentrationOfSoluteFMA(uriCHEBI, uriFMA);
                         }
@@ -385,8 +375,7 @@ var EMP = (function (global) {
                 chebiURI = uriCHEBI.slice(1, uriCHEBI.length - 1);
 
                 searchListFunc(uriOPB, uriCHEBI, uriFMA, keyValue);
-            }
-            else if (searchStatus == "bioportal") {
+            } else if (searchStatus == "bioportal") {
                 var uriOPB = "", uriOPBTxt = "", uriCHEBI = "", uriCHEBITxt = "", uriFMA = "", uriFMATxt = "", keyValue;
                 var dictKeyWordsCHEBI = [
                     "sodium", "hydrogen", "ammonium", "chloride", "potassium", "bicarbonate", "glucose"
@@ -402,6 +391,14 @@ var EMP = (function (global) {
                     },
                     {
                         "key1": "flux",
+                        "opb": "<http://identifiers.org/opb/OPB_00593>"
+                    },
+                    {
+                        "key1": "concentration of chemical",
+                        "opb": "<http://identifiers.org/opb/OPB_00340>"
+                    },
+                    {
+                        "key1": "chemical concentration flow rate",
                         "opb": "<http://identifiers.org/opb/OPB_00593>"
                     }
                 ];
@@ -441,6 +438,26 @@ var EMP = (function (global) {
                         "fma": "<http://purl.obolibrary.org/obo/FMA_74550>"
                     },
                     {
+                        "key1": "portion of renal filtrate in proximal convoluted tubule",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_280787>"
+                    },
+                    {
+                        "key1": "portion of renal filtrate in distal convoluted tubule",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_280791>"
+                    },
+                    {
+                        "key1": "portion of renal filtrate",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_280587>"
+                    },
+                    {
+                        "key1": "Extracellular space",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_70022>"
+                    },
+                    {
+                        "key1": "region of mucosa",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_85358>"
+                    },
+                    {
                         "key1": "cytosol",
                         "fma": "<http://purl.obolibrary.org/obo/FMA_66836>"
                     },
@@ -458,6 +475,14 @@ var EMP = (function (global) {
                     },
                     {
                         "key1": "basolateral membrane",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
+                    },
+                    {
+                        "key1": "apical plasma membrane",
+                        "fma": "<http://purl.obolibrary.org/obo/FMA_84666>"
+                    },
+                    {
+                        "key1": "basolateral plasma membrane",
                         "fma": "<http://purl.obolibrary.org/obo/FMA_84669>"
                     }
                 ];
@@ -488,9 +513,9 @@ var EMP = (function (global) {
                             }
                         }
                         if (uriOPBTxt == "") {
-                            if (searchTxt.indexOf("flux") != -1)
+                            if (searchTxt.indexOf("flux") != -1 || searchTxt.indexOf("chemical concentration flow rate") != -1)
                                 uriOPBTxt = "flux";
-                            else if (searchTxt.indexOf("concentration") != -1)
+                            else if (searchTxt.indexOf("concentration") != -1 || searchTxt.indexOf("concentration of chemical") != -1)
                                 uriOPBTxt = "concentration";
 
                             for (var j in dictOPB) {
@@ -554,6 +579,7 @@ var EMP = (function (global) {
                                 fmaArray.push(text);
                             }
                         }
+
                         for (var i = 0; i < fmaArray.length; i++) {
                             if (fmaArray[i] == "membrane") {
                                 if (searchTxt.indexOf("apical") != -1)
@@ -562,6 +588,7 @@ var EMP = (function (global) {
                                     fmaArray[i] = "basolateral " + fmaArray[i];
                             }
                         }
+
                         if (uriFMATxt == "") {
                             for (var i = 0; i < fmaArray.length; i++) {
                                 var flag = false;
@@ -578,9 +605,26 @@ var EMP = (function (global) {
                             }
                         }
 
-                        console.log("uriOPB bioportal: ", uriOPB, uriOPBTxt);
+                        // checking arrow symbol inside OPB, CHEBI, and FMA URIs
+                        if (uriOPB != "" && uriOPB.indexOf("<") == -1)
+                            uriOPB = "<" + uriOPB + ">";
+                        if (uriCHEBI != "" && uriCHEBI.indexOf("<") == -1)
+                            uriCHEBI = "<" + uriCHEBI + ">";
+                        if (uriFMA != "" && uriFMA.indexOf("<") == -1)
+                            uriFMA = "<" + uriFMA + ">";
+
+                        console.log("uriOPB bioportal: ", uriOPB);
+                        console.log("uriOPBTxt bioportal: ", uriOPBTxt);
                         console.log("uriCHEBI bioportal: ", uriCHEBI, uriCHEBITxt);
                         console.log("uriFMA bioportal: ", uriFMA, uriFMATxt);
+
+                        if (uriOPB == "") {
+                            var uri = "https://github.com/dewancse/model-discovery-tool#input-handling";
+                            $("#searchList").html("<div class='alert alert-warning'>" +
+                                "<strong>Info!</strong> Please see input handling section at " +
+                                "<a href=" + uri + " + target=_blank class='alert-link'>README.md in github</a></div>");
+                            return;
+                        }
 
                         searchListFunc(uriOPB, uriCHEBI, uriFMA, keyValue);
                     },
@@ -759,8 +803,7 @@ var EMP = (function (global) {
                                 $("#speciesTxt").val($("#addModelTableID tbody tr td")[i + 2].innerText);
                                 $("#geneTxt").val($("#addModelTableID tbody tr td")[i + 3].innerText);
                                 break;
-                            }
-                            else {
+                            } else {
                                 proteinVal = $("#addModelTableID tbody tr td input")[i].id;
                                 $("#proteinTxt").val($("#addModelTableID tbody tr td")[i + 3 * i + 1].innerText);
                                 $("#speciesTxt").val($("#addModelTableID tbody tr td")[i + 3 * i + 2].innerText);
@@ -836,18 +879,26 @@ var EMP = (function (global) {
         $this.setHeader($this.options.header);
     };
 
+    // TODO: replace luminal variants with FMA_74550 (luminal)
+    var luminalIDs = [
+        "http://purl.obolibrary.org/obo/FMA_280787", // portion of renal filtrate in proximal convoluted tubule
+        "http://purl.obolibrary.org/obo/FMA_280791", // portion of renal filtrate in distal convoluted tubule
+        "http://purl.obolibrary.org/obo/FMA_280587", // portion of renal filtrate
+        "http://purl.obolibrary.org/obo/FMA_70022", // Extracellular space
+        "http://purl.obolibrary.org/obo/FMA_85358", // region of mucosa
+        "http://purl.obolibrary.org/obo/FMA_74550"
+    ];
+
     // RDF for concentration
     var concentrationRDF = function (xmlDoc, propCnt, entCnt, flux, fluxval, soluteFlux, soluteFluxval) {
         var entComp, variableName;
-        if ("http://purl.obolibrary.org/obo/" + fluxval == luminalID) {
+        if (luminalIDs.indexOf("http://purl.obolibrary.org/obo/" + fluxval) != -1) {
             entComp = 0;
             variableName = "C_m_" + soluteFlux;
-        }
-        else if ("http://purl.obolibrary.org/obo/" + fluxval == cytosolID) {
+        } else if ("http://purl.obolibrary.org/obo/" + fluxval == cytosolID) {
             entComp = 1;
             variableName = "C_c_" + soluteFlux;
-        }
-        else if ("http://purl.obolibrary.org/obo/" + fluxval == interstitialID) {
+        } else if ("http://purl.obolibrary.org/obo/" + fluxval == interstitialID) {
             entComp = 2;
             variableName = "C_s_" + soluteFlux;
         }
@@ -946,8 +997,7 @@ var EMP = (function (global) {
             rdfDescription4.appendChild(semsimHasPhysicalEntityReference);
             semsimHasMediatorParticipant2.appendChild(rdfDescription4);
             rdfDescription3.appendChild(semsimHasMediatorParticipant2);
-        }
-        else if (coTransCnt == 2) {
+        } else if (coTransCnt == 2) {
             // mediator participant PR
             var semsimHasMediatorParticipant = xmlDoc.createElement("semsim:hasMediatorParticipant");
             var rdfDescription4 = xmlDoc.createElement("rdf:Description");
@@ -1018,7 +1068,7 @@ var EMP = (function (global) {
         if (unit == "flux")
             variableName = "J_" + soluteFlux;
         else {
-            if ("http://purl.obolibrary.org/obo/" + fluxval == luminalID)
+            if (luminalIDs.indexOf("http://purl.obolibrary.org/obo/" + fluxval) != -1)
                 variableName = "C_m_" + soluteFlux;
             else if ("http://purl.obolibrary.org/obo/" + fluxval == cytosolID)
                 variableName = "C_c_" + soluteFlux;
@@ -1237,8 +1287,7 @@ var EMP = (function (global) {
                 if (jsonProteinUri.results.bindings.length == 0) {
                     // pr_uri = undefined;
                     endpointproteinOLS = abiOntoEndpoint + "/pr";
-                }
-                else {
+                } else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
 
                     if (epithelialcellID.indexOf(pr_uri) != -1)
@@ -1382,15 +1431,14 @@ var EMP = (function (global) {
                     $("#main-content").html(searchHtmlContent);
                 },
                 false);
-        }
-        else {
+        } else {
             console.log("loadSearchHtml ELSE");
 
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
 
             filterByProtein(); // reload protein in the dropdown list
 
-            mainUtils.showDiscoverModels(
+            mainUtils.showDiscoverModelsAll(
                 head,
                 modelEntity,
                 biologicalMeaning,
@@ -1427,6 +1475,10 @@ var EMP = (function (global) {
             trDiscover = $("<tr/>");
             tbodyDiscover = $("<tbody/>");
             for (var i in head) {
+                // Empty header for checkbox column
+                if (i == 0)
+                    trDiscover.append($("<th/>").append(""));
+
                 trDiscover.append($("<th/>").append(head[i]));
             }
         }
@@ -1437,12 +1489,13 @@ var EMP = (function (global) {
         // Table body
         trDiscover = $("<tr/>");
 
-        var modelhtm = '<fieldset id="' + modelEntity[discoverIndex] + '" class="majorpoints"><legend class="majorpointslegend">' + modelEntity[discoverIndex] + '</legend>' +
-            '<div id="' + modelEntity[discoverIndex] + '" class="hiders" style="display: none"></div></fieldset>';
+        var modelhtm = "<input id=" + modelEntity[discoverIndex] + " uri=" + listOfProteinURIs[discoverIndex] + " type=checkbox " +
+            "data-action=search value=" + modelEntity[discoverIndex] + " + class=checkbox>";
 
         trDiscover.append($("<td/>").append(modelhtm)); // model
 
-        // trDiscover.append($("<td/>").append(modelEntity[i].model)); // model
+        trDiscover.append($("<td/>").append(modelEntity[discoverIndex])); // model
+
         trDiscover.append($("<td/>").append(biologicalMeaning[discoverIndex])); // biological meaning
 
         trDiscover.append($("<td/>").append(speciesList[discoverIndex])); // species
@@ -1455,6 +1508,81 @@ var EMP = (function (global) {
 
         tableDiscover.append(tbodyDiscover);
         $("#searchList").append(tableDiscover);
+
+        // Fill in search attribute value
+        $("#searchTxt").attr("value", sessionStorage.getItem("searchTxtContent"));
+
+        // SET main content in local storage
+        sessionStorage.setItem("searchListContent", $("#main-content").html());
+    };
+
+    // MODEL DISCOVERY: display discovered models from PMR
+    mainUtils.showDiscoverModelsAll = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfProteinURIs) {
+
+        // already discovered models will not appear in re-discover phase
+        for (var i = 0; i < alreadyDiscoveredModels.length; i++) {
+            // delete this model to hide in re-DISCOVERY
+            if (modelEntity.indexOf(alreadyDiscoveredModels[i]) != -1) {
+                var index = modelEntity.indexOf(alreadyDiscoveredModels);
+                modelEntity.splice(index, 1);
+                biologicalMeaning.splice(index, 1);
+                speciesList.splice(index, 1);
+                geneList.splice(index, 1);
+                proteinList.splice(index, 1);
+            }
+        }
+
+        // Empty search result
+        if (head.length == 0) {
+            $("#searchList").html("<section class=container-fluid><label><br>No Search Results!</label></section>");
+            $("#searchTxt").attr("value", "");
+            return;
+        }
+
+        // Reinitialize for a new search result
+        $("#searchList").html("");
+
+        var table = $("<table/>").addClass("table table-hover table-condensed"); //table-bordered table-striped
+
+        // Table header
+        var thead = $("<thead/>"), tr = $("<tr/>"), i;
+        for (var i in head) {
+            // Empty header for checkbox column
+            if (i == 0)
+                tr.append($("<th/>").append(""));
+
+            tr.append($("<th/>").append(head[i]));
+        }
+
+        thead.append(tr);
+        table.append(thead);
+
+        // Table body
+        var tbody = $("<tbody/>");
+        for (var i in modelEntity) {
+            var temp = [];
+            tr = $("<tr/>");
+            temp.push(modelEntity[i], biologicalMeaning[i], speciesList[i], geneList[i], proteinList[i]);
+
+            for (var j in temp) {
+                if (j == 0) {
+                    tr.append($("<td/>")
+                        .append($("<label/>")
+                            .html("<input id=" + modelEntity[i] + " uri=" + listOfProteinURIs[i] + " type=checkbox " +
+                                "data-action=search value=" + modelEntity[i] + " + class=checkbox>")));
+                }
+
+                if (j == 1)
+                    tr.append($("<td/>").append(temp[j]));
+                else
+                    tr.append($("<td/>").append(temp[j]));
+            }
+
+            tbody.append(tr);
+        }
+
+        table.append(tbody);
+        $("#searchList").append(table);
 
         // Fill in search attribute value
         $("#searchTxt").attr("value", sessionStorage.getItem("searchTxtContent"));
@@ -1481,6 +1609,8 @@ var EMP = (function (global) {
         workspaceNameList.splice(workspaceNameList.indexOf(mainUtils.selectedWorkspaceName), 1);
 
         var cellmlModel = mainUtils.selectedWorkspaceName;
+
+        console.log("cellmlModel: ", cellmlModel);
 
         if (cellmlModel == undefined) {
             $("#main-content").html("Please select a model from MODEL DISCOVERY");
@@ -1570,8 +1700,7 @@ var EMP = (function (global) {
 
                                         if (workspaceCnt == modelEntityName.length) {
                                             mainUtils.showModel(workspacejsonObj);
-                                        }
-                                        else {
+                                        } else {
                                             loadModelHtmlInner(workspaceNameList[workspaceCnt]);
                                         }
                                     }
@@ -1603,8 +1732,7 @@ var EMP = (function (global) {
                 if (jsonProteinUri.results.bindings.length == 0) {
                     // pr_uri = undefined;
                     endpointproteinOLS = abiOntoEndpoint + "/pr";
-                }
-                else {
+                } else {
                     pr_uri = jsonProteinUri.results.bindings[0].Protein.value;
 
                     if (epithelialcellID.indexOf(pr_uri) != -1)
@@ -1882,8 +2010,7 @@ var EMP = (function (global) {
         if ($("#membraneId").val() == "all") {
             $("table tr").show();
             console.log("IF: ", $("#membraneId").val());
-        }
-        else {
+        } else {
             var selectedprotein = $("#membraneId option:selected").val();
 
             console.log("ELSE selectedprotein: ", selectedprotein);
@@ -2193,8 +2320,7 @@ var EMP = (function (global) {
                         tmp_med_pr = membrane1.med_pr;
                         tmp_med_pr_text = membrane1.med_pr_text;
                         tmp_med_pr_text_syn = membrane1.med_pr_text_syn;
-                    }
-                    else {
+                    } else {
                         tmp_med_pr = membrane2.med_pr;
                         tmp_med_pr_text = membrane2.med_pr_text;
                         tmp_med_pr_text_syn = membrane2.med_pr_text_syn;
@@ -2360,8 +2486,7 @@ var EMP = (function (global) {
                         tmp_med_pr = membrane1.med_pr;
                         tmp_med_pr_text = membrane1.med_pr_text;
                         tmp_med_pr_text_syn = membrane1.med_pr_text_syn;
-                    }
-                    else {
+                    } else {
                         tmp_med_pr = membrane2.med_pr;
                         tmp_med_pr_text = membrane2.med_pr_text;
                         tmp_med_pr_text_syn = membrane2.med_pr_text_syn;
@@ -2543,8 +2668,7 @@ var EMP = (function (global) {
 
                                             if (jsonObjFlux.results.bindings[i].med_entity_uriPR == undefined) {
                                                 med_pr.push("");
-                                            }
-                                            else {
+                                            } else {
                                                 med_pr.push({
                                                     // name of med_pr from OLS
                                                     name: modelEntityFullNameArray[index],
@@ -2554,8 +2678,7 @@ var EMP = (function (global) {
 
                                             if (jsonObjFlux.results.bindings[i].med_entity_uriFMA == undefined) {
                                                 med_fma.push("");
-                                            }
-                                            else {
+                                            } else {
                                                 med_fma.push(
                                                     {
                                                         name: modelEntityFullNameArray[index],
@@ -2585,11 +2708,9 @@ var EMP = (function (global) {
 
                                         if (medURI.indexOf(partOfCHEBIUri) != -1) {
                                             endpointOLS = abiOntoEndpoint + "/chebi/terms?iri=" + chebi_uri;
-                                        }
-                                        else if (medURI.indexOf(partOfGOUri) != -1) {
+                                        } else if (medURI.indexOf(partOfGOUri) != -1) {
                                             endpointOLS = abiOntoEndpoint + "/go/terms?iri=" + medURI;
-                                        }
-                                        else
+                                        } else
                                             endpointOLS = abiOntoEndpoint + "/pr/terms?iri=" + medURI;
 
                                         sendGetRequest(
@@ -2618,8 +2739,7 @@ var EMP = (function (global) {
                                                         if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
                                                             // med_pr_text_syn = undefined;
                                                             med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
-                                                        }
-                                                        else {
+                                                        } else {
                                                             tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
                                                             med_pr_text_syn = tempvar[0].toUpperCase();
                                                         }
@@ -2640,8 +2760,7 @@ var EMP = (function (global) {
 
                                                         source_fma2.push(source_fma[0]);
                                                         sink_fma2.push(sink_fma[0]);
-                                                    }
-                                                    else { // same solute co-transporter
+                                                    } else { // same solute co-transporter
 
                                                         // Swap if source and sink have same direction
                                                         if (source_fma[0].fma == sink_fma[0].fma) {
@@ -2669,8 +2788,7 @@ var EMP = (function (global) {
                                                             if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
                                                                 // med_pr_text_syn = undefined;
                                                                 med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
-                                                            }
-                                                            else {
+                                                            } else {
                                                                 tempvar = jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"];
                                                                 med_pr_text_syn = tempvar[0].toUpperCase();
                                                             }
@@ -2726,8 +2844,7 @@ var EMP = (function (global) {
                                                             capillaryMembrane,
                                                             membrane,
                                                             typeOfSearchTerm);
-                                                    }
-                                                    else if (membrane.length <= 2) {
+                                                    } else if (membrane.length <= 2) {
 
                                                         console.log("membrane.length <= 2 membrane: ", membrane);
 
@@ -2743,8 +2860,7 @@ var EMP = (function (global) {
                                                                 mainUtils.makecotransporter(membrane[i], membrane[j]);
                                                             }
                                                         }
-                                                    }
-                                                    else if (membrane.length >= 3) {
+                                                    } else if (membrane.length >= 3) {
 
                                                         console.log("membrane.length >= 3 membrane: ", membrane);
 
@@ -2768,8 +2884,7 @@ var EMP = (function (global) {
 
                                                         if (arr.length == 3) {
                                                             mainUtils.maketritransporter(arr[0], arr[1], arr[2]);
-                                                        }
-                                                        else {
+                                                        } else {
                                                             for (var i = 0; i < arr.length; i++) {
                                                                 membrane.push(arr.pop());
                                                                 i--;
@@ -2785,8 +2900,7 @@ var EMP = (function (global) {
                                                     }
 
                                                     return;
-                                                }
-                                                else
+                                                } else
                                                     mainUtils.srcDescMediatorOfFluxes(); // callback
                                             },
                                             true);
@@ -2844,8 +2958,7 @@ var EMP = (function (global) {
                                             capillaryMembrane,
                                             membrane,
                                             typeOfSearchTerm);
-                                    }
-                                    else {
+                                    } else {
 
                                         console.log("concentration OPB, membrane.length >= 1 membrane: ", membrane);
 
@@ -2865,8 +2978,7 @@ var EMP = (function (global) {
                                     }
 
                                     return;
-                                }
-                                else
+                                } else
                                     mainUtils.srcDescMediatorOfFluxes(); // callback
                             },
                             true);

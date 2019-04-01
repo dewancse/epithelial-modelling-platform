@@ -49,9 +49,9 @@ function handleResponse(request, responseHandler, isJsonResponse) {
 
         if (isJsonResponse) {
 
-            console.log("handleResponse: ", isJsonResponse);
-            console.log("handleResponse request: ", request);
-            console.log("handleResponse request.responseText: ", request.responseText);
+            // console.log("handleResponse: ", isJsonResponse);
+            // console.log("handleResponse request: ", request);
+            // console.log("handleResponse request.responseText: ", request.responseText);
 
             responseHandler(JSON.parse(request.responseText));
         }
@@ -69,14 +69,14 @@ function handleResponse(request, responseHandler, isJsonResponse) {
 // Makes an Ajax POST request to 'requestUrl'
 var sendPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
 
-    console.log("requestUrl: ", requestUrl);
-    console.log("query: ", query);
-    console.log("responseHandler: ", responseHandler);
-    console.log("isJsonResponse: ", isJsonResponse);
+    // console.log("requestUrl: ", requestUrl);
+    // console.log("query: ", query);
+    // console.log("responseHandler: ", responseHandler);
+    // console.log("isJsonResponse: ", isJsonResponse);
 
     var request = getRequestObject();
 
-    console.log("request: ", request);
+    // console.log("request: ", request);
 
     request.onreadystatechange = function () {
         handleResponse(request, responseHandler, isJsonResponse);
@@ -84,14 +84,14 @@ var sendPostRequest = function (requestUrl, query, responseHandler, isJsonRespon
 
     var url = checkRequestUrl(requestUrl);
 
-    console.log("url: ", url);
+    // console.log("url: ", url);
 
     request.open("POST", url, true);
 
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/sparql-results+json");
 
-    console.log("query after setRequestHeader: ", query);
+    // console.log("query after setRequestHeader: ", query);
 
     request.send(query); // for POST only
 };
