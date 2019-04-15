@@ -964,6 +964,43 @@ var epithelialcellID = [
     "http://purl.obolibrary.org/obo/CL_0000187"
 ];
 
+// TODO: replace luminal variants with FMA_74550 (luminal)
+var luminalVariants = [
+    "http://purl.obolibrary.org/obo/FMA_280787", // portion of renal filtrate in proximal convoluted tubule
+    "http://purl.obolibrary.org/obo/FMA_280791", // portion of renal filtrate in distal convoluted tubule
+    "http://purl.obolibrary.org/obo/FMA_280587", // portion of renal filtrate
+    "http://purl.obolibrary.org/obo/FMA_70022", // Extracellular space
+    "http://purl.obolibrary.org/obo/FMA_85358" // region of mucosa
+];
+
+// TODO: replace luminal variants with FMA_74550 (luminal)
+var luminalIDs = [
+    "http://purl.obolibrary.org/obo/FMA_280787", // portion of renal filtrate in proximal convoluted tubule
+    "http://purl.obolibrary.org/obo/FMA_280791", // portion of renal filtrate in distal convoluted tubule
+    "http://purl.obolibrary.org/obo/FMA_280587", // portion of renal filtrate
+    "http://purl.obolibrary.org/obo/FMA_70022", // Extracellular space
+    "http://purl.obolibrary.org/obo/FMA_85358", // region of mucosa
+    "http://purl.obolibrary.org/obo/FMA_74550"
+];
+
+// TODO: remove semgen annotated models as they are not compatible to our modelling platform
+// var abiModels = [
+//     "Ostby_2009_NBC.cellml", "Strieter_1992_NaK.cellml", "Weinstein_2000.cellml", "bindschadler_sneyd_2001.cellml",
+//     "blood_capillary_flux.cellml", "chang_fujita_1999.cellml", "chang_fujita_2001_H_ATPase.cellml", "chang_fujita_2001_Na_H_exchanger.cellml",
+//     "chang_fujita_2001_anion_exchanger.cellml", "chang_fujita_b_1999.cellml", "chang_fujita_b_2_1999.cellml", "chang_fujita_b_3_1999.cellml",
+//     "eskandari_2005.cellml", "mackenzie_1996-mouse-baso.cellml", "mackenzie_1996.cellml", "moss_2009.cellml", "sneyd_1995.cellml", "thomas_2000.cellml",
+//     "warren_2010.cellml", "weinstein_1995-human-baso-v2.cellml", "weinstein_1995-human-baso.cellml", "weinstein_1995-mouse.cellml",
+//     "weinstein_1995-rabbit.cellml", "weinstein_1995.cellml", "weinstein_1998.cellml", "wilkins_sneyd_1998.cellml"
+// ];
+
+var abiModels = [
+    "Ostby_2009_NBC.cellml", "Strieter_1992_NaK.cellml", "Weinstein_2000.cellml", "bindschadler_sneyd_2001.cellml",
+    "blood_capillary_flux.cellml", "chang_fujita_1999.cellml", "chang_fujita_2001_H_ATPase.cellml", "chang_fujita_2001_Na_H_exchanger.cellml",
+    "chang_fujita_2001_anion_exchanger.cellml", "chang_fujita_b_1999.cellml", "eskandari_2005.cellml", "mackenzie_1996.cellml",
+    "moss_2009.cellml", "sneyd_1995.cellml", "thomas_2000.cellml", "warren_2010.cellml", "weinstein_1995-human-baso.cellml",
+    "weinstein_1995-mouse.cellml", "weinstein_1995-rabbit.cellml", "weinstein_1995.cellml", "weinstein_1998.cellml", "wilkins_sneyd_1998.cellml"
+];
+
 var homeHtml = "./snippets/home-snippet.html";
 var viewHtml = "./snippets/view-snippet.html";
 var modelHtml = "./snippets/model-snippet.html";
@@ -977,10 +1014,13 @@ var modelXML = "./snippets/newmodel.xml";
 var apicalID = "http://purl.obolibrary.org/obo/FMA_84666";
 var basolateralID = "http://purl.obolibrary.org/obo/FMA_84669";
 var partOfProteinUri = "http://purl.obolibrary.org/obo/PR";
+var partOfFMAUri = "http://purl.obolibrary.org/obo/FMA";
 var partOfCellUri = "http://purl.obolibrary.org/obo/CL";
 var partOfGOUri = "http://purl.obolibrary.org/obo/GO";
 var partOfCHEBIUri = "http://purl.obolibrary.org/obo/CHEBI";
 var fluxOPB = "http://identifiers.org/opb/OPB_00593";
+// var fluxOPB = "http://identifiers.org/opb/OPB_00318"; // Charge flow rate
+// var fluxOPB = "http://identifiers.org/opb/OPB_00506"; // Electrical potential
 var concentrationOPB = "http://identifiers.org/opb/OPB_00340";
 var epcellofproximaltubule = "http://purl.obolibrary.org/obo/FMA_70973";
 var partOfUBERONUri = "http://purl.obolibrary.org/obo/UBERON";
@@ -1020,7 +1060,8 @@ var uniqueifyCombinedMembrane = function (es) {
     var retval = [];
     es.forEach(function (e) {
         for (var j = 0; j < retval.length; j++) {
-            if ((retval[j].model_entity === e.model_entity) && (retval[j].model_entity2 === e.model_entity2) && (retval[j].model_entity3 === e.model_entity3))
+            if ((retval[j].model_entity === e.model_entity) && (retval[j].model_entity2 === e.model_entity2) &&
+                (retval[j].model_entity3 === e.model_entity3) && (retval[j].med_pr === e.med_pr))
                 return;
         }
         retval.push(e);
@@ -1265,13 +1306,13 @@ var searchInCombinedMembrane = function (model1, model2, model3, combinedMembran
 
 // process EBI similarity matrix
 var similarityMatrixEBI = function (identityMatrix, PID, draggedMedPrID, membraneModelObj) {
-    console.log("identityMatrix: ", identityMatrix);
+    console.log("Identity Matrix: ", identityMatrix);
     console.log("draggedMedPrID: ", draggedMedPrID);
 
     var indexOfColon = identityMatrix.search("1:"), m, n, i, j;
     identityMatrix = identityMatrix.slice(indexOfColon - 1, identityMatrix.length);
 
-    console.log("identityMatrix: ", identityMatrix);
+    console.log("Identity Matrix: ", identityMatrix);
 
     var matrixArray = identityMatrix.match(/[(\w\:)*\d\.]+/gi), twoDMatrix = [];
     for (var i = 0; i < matrixArray.length; i++) {
@@ -1289,12 +1330,13 @@ var similarityMatrixEBI = function (identityMatrix, PID, draggedMedPrID, membran
     }
 
     console.log("twoDMatrix: ", twoDMatrix);
+    console.log("membraneModelObj: ", membraneModelObj);
 
     for (var i = 0; i < twoDMatrix[PID.length - 1].length - 1; i++) {
         membraneModelObj[i].similar = twoDMatrix[PID.length - 1][i];
     }
 
-    console.log("membraneModelObj: ", membraneModelObj);
+    console.log("membraneModelObj After: ", membraneModelObj);
 
     // sorting in descending order of the similarity matrix score
     membraneModelObj.sort(function (a, b) {
@@ -1458,7 +1500,7 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
         membrane.variable_text3 = type;
         membrane.source_fma3 = type;
         membrane.sink_fma3 = type;
-    }
+    };
 
     // Nachannel, Clchannel, Kchannel
     for (var i in membrane) {

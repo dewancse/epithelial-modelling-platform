@@ -22,7 +22,7 @@ And then http://localhost:80 should work.
 ### EMP workflow
 
 #### Discover Relevant Entities
-The first step is to discover entities in PMR relevant to your interests. The discovered entities are typically components or variables in CellML models, but as the annotated content on PMR continues to grow the pool of potentially relevant entities similarly grows. With our current focus on epithelial transport in the kidney, this demonstration is tuned toward the kinds of entities most commonly found in models of such systems - e.g., fluxes of solutes typically found in renal epithelial cells (sodium, potassium, ammonium...) and processes occuring in, or between, the lumen, cytosol, and interstitial compartments.
+The first step is to discover entities in PMR relevant to your interests. The discovered entities are typically components or variables in CellML models, but as the annotated content on PMR continues to grow the pool of potentially relevant entities similarly grows. With our current focus on epithelial transport in the kidney, this demonstration is tuned toward the kinds of entities most commonly found in models of such systems - e.g., fluxes of solutes typically found in renal epithelial cells (sodium, potassium, chloride...) and processes occuring in, or between, the lumen, cytosol, and interstitial compartments.
 
 Presented in the screenshot below is an example of discovered entities from PMR for the entered text `flux of sodium`. From these results, the user can access further information on each discovered entity to help them determine which may be most relevant to their work. The additional information usually consists of the name of the model, component name and variable name; associated biological information about the entity deposited in PMR; protein names; and species and genes used during the experiments. For further investigation, we have provided two options:
 
@@ -39,7 +39,7 @@ We would like users to be able to enter the "plain text" description of what the
 
 | Physical entity | Physical process | Solutes |
 | --- | --- | --- |
-| `concentration` | `flux` | sodium, hydrogen, chloride, potassium, ammonium |
+| `concentration` | `flux` | sodium, chloride, potassium, hydrogen |
 
 #### Collection of Discovered Models
 After discovering a range of models, user will select some models of interests and store these into a separate list, as presented below in the screenshoot. In this case, we have provided the following options: 

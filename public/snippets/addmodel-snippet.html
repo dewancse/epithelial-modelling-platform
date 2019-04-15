@@ -2,7 +2,7 @@
     <div id="proteinBox" class="container input-group">
         <span style="font-size: medium; ">Protein Name</span>
         <input id="proteinTxt" name="proteinTxt" value="" type="text"
-               placeholder="Write a protein (e.g. SGLT4) and press Enter" class="form-control input-lg"
+               placeholder="Write a protein (e.g. SGLT4, NHE3) and press Enter" class="form-control input-lg"
                aria-label="...">
     </div>
     <br/>
@@ -99,14 +99,22 @@
     <br/>
     <div id="sourceFlux2Box" class="container input-group">
         <span style="font-size: medium; ">Source Flux 2</span>
-        <input id="sourceFlux2Txt" name="sourceFlux2Txt" value="" type="text"
-               class="form-control input-lg" aria-label="..." disabled>
+        <select id="sourceFlux2Txt" name="sourceFlux1Txt" class="form-control input-lg">
+            <option value="select a source compartment" selected>select a source compartment</option>
+            <option value="FMA_74550">Luminal</option>
+            <option value="FMA_66836">Cytosol</option>
+            <option value="FMA_9673">Interstitial Fluid</option>
+        </select>
     </div>
     <br/>
     <div id="sinkFlux2Box" class="container input-group">
         <span style="font-size: medium; ">Sink Flux 2</span>
-        <input id="sinkFlux2Txt" name="sinkFlux2Txt" value="" type="text"
-               class="form-control input-lg" aria-label="..." disabled>
+        <select id="sinkFlux2Txt" name="sinkFlux1Txt" class="form-control input-lg">
+            <option value="select a sink compartment" selected>select a sink compartment</option>
+            <option value="FMA_74550">Luminal</option>
+            <option value="FMA_66836">Cytosol</option>
+            <option value="FMA_9673">Interstitial Fluid</option>
+        </select>
     </div>
     <br/>
     <div id="mediatorFlux2Box" class="container input-group">
@@ -137,6 +145,10 @@
         <button id="createCellMLBtn" type="button" onclick="$mainUtils.createCellML();"
                 class="btn btn-default btn-lg">Create CellML
         </button>
+        <br/>
+        <br/>
+        <br/>
+        <div id="msgTxT"></div>
     </div>
     <hr/>
     <div id="proteinList" class="container"></div>

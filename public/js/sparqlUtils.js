@@ -57,7 +57,7 @@ var maketritransporterSPARQL = function (membrane1, membrane2, membrane3) {
         "}}";
 
     return query;
-}
+};
 
 var mediatorSPARQL = function (modelEntity) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +
@@ -71,7 +71,7 @@ var mediatorSPARQL = function (modelEntity) {
         "}";
 
     return query;
-}
+};
 
 var srcDescMediatorOfFluxesSPARQL = function (cellmlModelEntity, model) {
     var query = "PREFIX semsim: <http://www.bhi.washington.edu/SemSim#>" +

@@ -3,6 +3,9 @@
  */
 var similarityModels = function (model2DArray, modelEntityNameArray) {
 
+    console.log("model2DArray: ", model2DArray);
+    console.log("modelEntityNameArray: ", modelEntityNameArray);
+
     var links = [];
 
     // remove duplicate
