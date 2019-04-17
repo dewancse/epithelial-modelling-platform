@@ -2,6 +2,9 @@
  * Created by Dewan Sarwar on 14/01/2018.
  */
 var svgPlatform = function (svg, newg, height, width, w, h, markerWidth, markerHeight) {
+
+    console.log("svgPlatform function");
+
     var newgdefs = svg.append("g");
     newgdefs.append("defs")
         .append("pattern")

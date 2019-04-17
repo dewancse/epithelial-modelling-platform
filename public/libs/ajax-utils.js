@@ -6,12 +6,10 @@ var abiOntoEndpoint = "/.api/ols/ontologies";
 function getRequestObject() {
     if (window.XMLHttpRequest) {
         return (new XMLHttpRequest());
-    }
-    else if (window.ActiveXObject) {
+    } else if (window.ActiveXObject) {
         // For very old IE browsers (optional)
         return (new ActiveXObject("Microsoft.XMLHTTP"));
-    }
-    else {
+    } else {
         alert("Ajax is not supported!");
         return (null);
     }
@@ -54,15 +52,13 @@ function handleResponse(request, responseHandler, isJsonResponse) {
             // console.log("handleResponse request.responseText: ", request.responseText);
 
             responseHandler(JSON.parse(request.responseText));
-        }
-        else {
+        } else {
             responseHandler(request.responseText);
         }
-    }
-
-    else if (request.readyState == 4) {
+    } else if (request.readyState == 4) {
         console.log("ERROR!");
         console.error(request.responseText);
+        responseHandler(request);
     }
 };
 

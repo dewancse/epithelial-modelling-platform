@@ -45,8 +45,13 @@ var EMP = (function (global) {
     var soluteFlux2, soluteFlux2val, sourceFlux2, sourceFlux2val,
         sinkFlux2, sinkFlux2val, mediatorFlux2, mediatorFlux2val;
 
+    // Flag variable to keep track when users search terms in the MODEL DISCOVERY page and switch to
+    // LOAD MODELS page before loading full list of models in the MODEL DISCOVERY page
+    var flagDiscoverLoad = false;
+
     // HOME: load the home page
     mainUtils.loadHomeHtml = function () {
+        console.log("mainUtils.loadHomeHtml");
         showLoading("#main-content");
         sendGetRequest(
             homeHtml,
@@ -58,19 +63,23 @@ var EMP = (function (global) {
 
     // DOCUMENTATION: load documentation from github
     mainUtils.loadDocumentation = function () {
+        console.log("mainUtils.loadDocumentation");
         var uri = "https://github.com/dewancse/epithelial-modelling-platform";
         $("#main-content").html("<div class='alert alert-info'><strong>Documentation can be found at <a href=" + uri + " + target=_blank>README.md in GitHub</a>!</strong></div>");
     };
 
     // On page load (before img or CSS)
     $(document).ready(function () {
+        console.log("$(document).ready(function () {");
 
         // On first load, show home view
         showLoading("#main-content");
 
         if (sessionStorage.getItem("searchListContent")) {
+            console.log("$(document).ready(function () { if (sessionStorage.getItem(searchListContent)) {");
             $("#main-content").html(sessionStorage.getItem("searchListContent"));
         } else {
+            console.log("$(document).ready(function () { else (sessionStorage.getItem(searchListContent)) {");
             // homepage
             sendGetRequest(
                 homeHtml,
@@ -93,7 +102,11 @@ var EMP = (function (global) {
 
         search: function (event) {
 
+            console.log("actions search: ");
+
             if (event.target.className == "checkbox") {
+
+                console.log("actions search:  if (event.target.className == checkbox) {");
 
                 if (event.target.checked) {
                     var tempidWithStr = event.target.id,
@@ -116,9 +129,13 @@ var EMP = (function (global) {
 
         model: function (event) {
 
+            console.log("actions model: ");
+
             var pos, pos2, i;
             // select one by one
             if (event.target.className == "attribute") {
+
+                console.log("actions model:  if (event.target.className == attribute) {");
 
                 if (event.target.checked) {
 
@@ -150,6 +167,8 @@ var EMP = (function (global) {
 
             // select all
             if (event.target.className == "attributeAll") {
+
+                console.log("actions model:  if (event.target.className == attributeAll) {");
 
                 if (event.target.checked == true) {
                     for (var i = 0; i < $(".attribute").length; i++) {
@@ -198,6 +217,9 @@ var EMP = (function (global) {
 
     // ACTIONS: if there is an action with the given name, call it
     $(document).on("click", function (event) {
+
+        console.log("index.js: $(document).on(click, function (event) {");
+
         if (typeof actions[event.target.dataset.action] === "function")
             actions[event.target.dataset.action].call(this, event);
 
@@ -320,7 +342,17 @@ var EMP = (function (global) {
     // MODEL DISCOVERY: enter search texts
     $(document).on("keydown", function (event) {
         if (event.key == "Enter" && document.getElementById("searchTxt")) {
+
+            console.log("if (event.key == Enter && document.getElementById(searchTxt)) {");
+
+            // Flag variable to keep track when users search terms in the MODEL DISCOVERY page and switch to
+            // LOAD MODELS page before loading full list of models in the MODEL DISCOVERY page
+            flagDiscoverLoad = false;
+
             var searchListFunc = function (uriOPB, uriCHEBI, uriFMA, keyValue) {
+
+                console.log("index.js: searchListFunc");
+
                 showLoading("#searchList");
 
                 modelEntity = [];
@@ -370,6 +402,10 @@ var EMP = (function (global) {
                     query,
                     function (jsonModel) {
                         console.log("jsonModel: ", jsonModel);
+
+                        // Two cases: internet connection and PMR SPARQL engine
+                        PMRdown(jsonModel, "#searchList");
+
                         // REMOVE duplicate cellml model and variable name (NOT component name)
                         jsonModel.results.bindings = uniqueifyjsonModel(jsonModel.results.bindings);
                         console.log("After jsonModel: ", jsonModel);
@@ -393,6 +429,9 @@ var EMP = (function (global) {
             };
 
             if (searchStatus == "local") {
+
+                console.log("if (searchStatus == local) {");
+
                 var uriOPB, uriCHEBI, uriFMA, keyValue;
                 var searchTxt = document.getElementById("searchTxt").value.toLowerCase();
 
@@ -429,6 +468,9 @@ var EMP = (function (global) {
 
                 searchListFunc(uriOPB, uriCHEBI, uriFMA, keyValue);
             } else if (searchStatus == "bioportal") {
+
+                console.log("else if (searchStatus == bioportal)");
+
                 var uriOPB = "", uriOPBTxt = "", uriCHEBI = "", uriCHEBITxt = "", uriFMA = "", uriFMATxt = "", keyValue;
                 var dictKeyWordsCHEBI = [
                     "sodium", "hydrogen", "ammonium", "chloride", "potassium", "bicarbonate", "glucose"
@@ -551,6 +593,10 @@ var EMP = (function (global) {
                     endpointbioportal,
                     function (jsonAnnotatorList) {
                         console.log("jsonAnnotatorList: ", jsonAnnotatorList);
+
+                        // BioPortal is temporarily down!
+                        BioPortaldown(jsonAnnotatorList, "#searchList");
+
                         // OPB
                         for (var i = 0; i < jsonAnnotatorList.length; i++) {
                             var id = jsonAnnotatorList[i].annotatedClass["@id"],
@@ -686,6 +732,8 @@ var EMP = (function (global) {
         }
         if (event.key == "Enter" && document.getElementById("proteinTxt")) {
 
+            console.log("if (event.key == Enter && document.getElementById(proteinTxt)) {");
+
             var m = new AddModal({
                 id: "myAddModel",
                 header: "Protein Information from Bioportal and OLS",
@@ -694,9 +742,13 @@ var EMP = (function (global) {
                 footerSaveButton: "Save"
             });
 
+            console.log("index.js: before m.show()");
+
             $("#myAddModel").modal({backdrop: "static", keyboard: false});
             m.getBody().html("<div id=addModalBody></div>");
             m.show();
+
+            console.log("index.js: after m.show()");
 
             showLoading("#addModalBody");
 
@@ -712,6 +764,10 @@ var EMP = (function (global) {
                 endpointbioportal,
                 function (jsonProteinList) {
                     console.log(jsonProteinList);
+
+                    // BioPortal is temporarily down!
+                    BioPortaldown(jsonProteinList, "#addModalBody");
+
                     for (var i = 0; i < jsonProteinList.collection.length; i++) {
                         proteinIDs.push(jsonProteinList.collection[i]["@id"]);
                         console.log("jsonProteinList.collection[i][@id]: ", jsonProteinList.collection[i]["@id"]);
@@ -809,7 +865,7 @@ var EMP = (function (global) {
     // ADD MODAL WINDOW
     var AddModal = function (options) {
 
-        console.log("Add Modal function");
+        console.log("index.js: Add Modal function");
 
         var $this = this;
 
@@ -826,6 +882,9 @@ var EMP = (function (global) {
          * Append modal window html to body
          */
         $this.createModal = function () {
+            console.log("AddModal createModal $this.selector: ", $this.selector);
+            console.log("AddModal createModal $($this.selector): ", $($this.selector));
+
             $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
             $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
             var win = $('.modal-content', $this.selector);
@@ -871,6 +930,9 @@ var EMP = (function (global) {
 
             // close button clicked!
             $("#addModelcloseID").click(function (event) {
+
+                console.log("index.js: Add Modal function - close button clicked");
+
                 $("#proteinTxt").val("");
                 $("#proteinTxt").attr("placeholder", "Write a protein (e.g. SGLT4) and press Enter");
                 $("#speciesTxt").val("");
@@ -881,6 +943,9 @@ var EMP = (function (global) {
 
             // save button clicked!
             $("#addModelsaveID").click(function (event) {
+
+                console.log("index.js: Add Modal function - save button clicked");
+
                 if ($("#addModelTableID").length == 0) {
                     console.log("$(#addModelTableID): ", $("#addModelTableID"));
                     $("#proteinTxt").val("");
@@ -977,6 +1042,9 @@ var EMP = (function (global) {
 
     // RDF for concentration
     var concentrationRDF = function (xmlDoc, propCnt, entCnt, flux, fluxval, soluteFlux, soluteFluxval) {
+
+        console.log("concentrationRDF function");
+
         var entComp, variableName;
         if (luminalIDs.indexOf("http://purl.obolibrary.org/obo/" + fluxval) != -1) {
             entComp = 0;
@@ -1032,6 +1100,9 @@ var EMP = (function (global) {
     var fluxRDF = function (xmlDoc, coTransCnt, propCnt, srcEntCnt, snkEntCnt, processCnt, sourceCnt, sinkCnt, mediatorCnt,
                             mediatorCnt2, soluteFlux, soluteFluxval, sourceFlux, sourceFluxval,
                             sinkFlux, sinkFluxval, mediatorFlux, mediatorFluxval, proteinName, proteinVal) {
+
+        console.log("fluxRDF function");
+
         var entMedComp, entMedPrComp = 5;
         var variableName = "J_" + soluteFlux;
 
@@ -1150,6 +1221,9 @@ var EMP = (function (global) {
 
     // Name of concentration and flux variable
     var conandfluxVariable = function (varCon, fluxval, soluteFlux, unit) {
+
+        console.log("conandfluxVariable function");
+
         var variableName;
         if (unit == "flux")
             variableName = "J_" + soluteFlux;
@@ -1170,6 +1244,9 @@ var EMP = (function (global) {
 
     // Create a CellML model
     mainUtils.createCellML = function () {
+
+        console.log("mainUtils.createCellML");
+
         var flag = false;
         // validation
         if ($("#proteinTxt").val() == "" || $("#proteinTxt").val() == undefined) {
@@ -1338,6 +1415,8 @@ var EMP = (function (global) {
     // ADD MODEL: show proteins from bioportal
     mainUtils.showProteinIDs = function (proteinIDs, proteinNames, speciesNames, geneNames) {
 
+        console.log("mainUtils.showProteinIDs");
+
         if (proteinIDs == "Not Found") {
             var uri = "https://bioportal.bioontology.org/search?q=&ontologies=PR";
             var htmlMsg = "<div class='alert alert-warning'><strong>Protein ID not found!</strong> Please see exact term at " +
@@ -1403,6 +1482,13 @@ var EMP = (function (global) {
     // MODEL DISCOVERY: SPARQL queries to retrieve search results from PMR
     mainUtils.discoverModels = function (jsonModel) {
 
+        console.log("mainUtils.discoverModels");
+
+        // Flag variable to keep track when users search terms in the MODEL DISCOVERY page and switch to
+        // LOAD MODELS page before loading full list of models in the MODEL DISCOVERY page
+        if (flagDiscoverLoad == true)
+            return;
+
         if (jsonModel.results.bindings.length == 0) {
             mainUtils.showDiscoverModels();
             return;
@@ -1419,6 +1505,9 @@ var EMP = (function (global) {
             function (jsonProteinUri) {
 
                 console.log("jsonProteinUri: ", jsonProteinUri);
+
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonProteinUri, "#searchList");
 
                 if (jsonProteinUri.results.bindings.length == 0) {
                     discoverIndex++;
@@ -1462,6 +1551,9 @@ var EMP = (function (global) {
 
                         console.log("jsonepithelialobj: ", jsonepithelialobj);
 
+                        // Two cases: internet connection and PMR SPARQL engine
+                        PMRdown(jsonepithelialobj, "#searchList");
+
                         // epithelial cell
                         if (epithelialcellID.indexOf(pr_uri) != -1) {
                             for (var i = 0; i < jsonepithelialobj.results.bindings.length; i++) {
@@ -1482,6 +1574,9 @@ var EMP = (function (global) {
                             function (jsonProtein) {
 
                                 console.log("jsonProtein: ", jsonProtein);
+
+                                // Two cases: internet connection and Auckland OLS
+                                OLSdown(jsonProtein, "#searchList");
 
                                 var endpointgeneOLS;
                                 if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
@@ -1599,6 +1694,8 @@ var EMP = (function (global) {
     // MODEL DISCOVERY: load the search html
     mainUtils.loadSearchHtml = function () {
 
+        console.log("mainUtils.loadSearchHtml");
+
         if (!sessionStorage.getItem("searchListContent")) {
 
             console.log("loadSearchHtml IF");
@@ -1631,6 +1728,8 @@ var EMP = (function (global) {
 
     // MODEL DISCOVERY: display discovered models from PMR
     mainUtils.showDiscoverModels = function (discoverIndex) {
+
+        console.log("mainUtils.showDiscoverModels");
 
         // Reinitialize for a new search result
         $("#searchList").html("");
@@ -1686,6 +1785,7 @@ var EMP = (function (global) {
     // MODEL DISCOVERY: display discovered models from PMR
     mainUtils.showDiscoverModelsAll = function (head, modelEntity, biologicalMeaning, speciesList, geneList, proteinList, listOfProteinURIsAll) {
 
+        console.log("mainUtils.showDiscoverModelsAll");
         console.log("Testing 1: ", head, modelEntity, listOfProteinURIsAll);
 
         // Empty search result
@@ -1751,6 +1851,9 @@ var EMP = (function (global) {
 
     // ADD MODEL
     mainUtils.loadAddmodelHtml = function () {
+
+        console.log("mainUtils.loadAddmodelHtml");
+
         sendGetRequest(
             addmodelHtml,
             function (addmodelHtmlContent) {
@@ -1762,6 +1865,8 @@ var EMP = (function (global) {
     // VIEW MODEL: load the view page to display details of a selected model
     mainUtils.loadViewHtml = function () {
 
+        console.log("mainUtils.loadViewHtml");
+
         // remove if visited the view html page
         modelEntityName.splice(modelEntityName.indexOf(mainUtils.selectedTempidWithStr), 1);
         workspaceNameList.splice(workspaceNameList.indexOf(mainUtils.selectedWorkspaceName), 1);
@@ -1771,8 +1876,7 @@ var EMP = (function (global) {
         console.log("cellmlModel: ", cellmlModel);
 
         if (cellmlModel == undefined) {
-            $("#main-content").html("Please select a model from MODEL DISCOVERY");
-
+            $("#main-content").html("<div class='alert alert-warning'><strong>Info! </strong>Please select a model from MODEL DISCOVERY</div>");
             return;
         }
 
@@ -1784,7 +1888,11 @@ var EMP = (function (global) {
         sendPostRequest(
             endpoint,
             query,
-            function () {
+            function (jsonObjView) {
+
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonObjView, "#viewList");
+
                 sendGetRequest(
                     viewHtml,
                     function (viewHtmlContent) {
@@ -1798,7 +1906,10 @@ var EMP = (function (global) {
 
     // LOAD MODELS: extract compartments and locations
     // extension of mainUtils.loadModelHtml function
+    // TODO: check HTTP status code
     var compartmentandlocation = function (compartment, location, protein, species, gene) {
+
+        console.log("compartmentandlocation function");
 
         var tempCompartment = "", counterOLS = 0;
 
@@ -1871,6 +1982,7 @@ var EMP = (function (global) {
         }
     };
 
+    // TODO: check HTTP status code
     var loadModelHtmlInner = function (model) {
         console.log("loadModelHtmlInner: ", model);
 
@@ -1885,6 +1997,12 @@ var EMP = (function (global) {
             function (jsonProteinUri) {
 
                 console.log("loadMOdel jsonProteinUri: ", jsonProteinUri);
+
+                if (jsonProteinUri.status != undefined && jsonProteinUri.statusText != undefined) {
+                    alert("HTTP Error " + jsonProteinUri.status + " - " + jsonProteinUri.statusText + ". " +
+                        "Please check your internet connection. Or our server might fail to connect to the PMR server.");
+                    return;
+                }
 
                 var pr_uri, endpointproteinOLS;
                 if (jsonProteinUri.results.bindings.length == 0) {
@@ -1903,8 +2021,8 @@ var EMP = (function (global) {
                         endpointproteinOLS = abiOntoEndpoint + "/pr/terms?iri=" + pr_uri;
                 }
 
-                console.log("loadMOdel pr_uri: ", pr_uri);
-                console.log("loadMOdel endpointproteinOLS: ", endpointproteinOLS);
+                console.log("loadModel pr_uri: ", pr_uri);
+                console.log("loadModel endpointproteinOLS: ", endpointproteinOLS);
 
                 sendGetRequest(
                     endpointproteinOLS,
@@ -2006,11 +2124,19 @@ var EMP = (function (global) {
 
     // LOAD MODELS: load a selected model
     mainUtils.loadModelHtml = function () {
+
+        console.log("mainUtils.loadModelHtml");
+        // Flag variable to keep track when users search terms in the MODEL DISCOVERY page and switch to
+        // LOAD MODELS page before loading full list of models in the MODEL DISCOVERY page
+        flagDiscoverLoad = true;
+
         loadModelHtmlInner(workspaceNameList[workspaceCnt]);
     };
 
     // LOAD MODELS: display a selected model
     mainUtils.showModel = function (jsonObj) {
+
+        console.log("mainUtils.showModel");
 
         for (var i = 0; i < jsonObj.length; i++) {
             // add this model temporarily to display in MODEL DISCOVERY when deleted
@@ -2169,6 +2295,8 @@ var EMP = (function (global) {
     // FILTER BY PROTEIN: filter search results in MODEL DISCOVERY
     mainUtils.filterSearchHtml = function () {
 
+        console.log("mainUtils.filterSearchHtml");
+
         if ($("#membraneId").val() == "all") {
             $("table tr").show();
             console.log("IF: ", $("#membraneId").val());
@@ -2197,6 +2325,9 @@ var EMP = (function (global) {
 
     // FILTER BY PROTEIN: filter dropdown list in MODEL DISCOVERY
     var filterByProtein = function () {
+
+        console.log("filterByProtein function");
+
         // Initialize dropdown list
         $("#membraneId").empty();
         $("#membraneId").append("<option value=all>select all</option>");
@@ -2212,6 +2343,8 @@ var EMP = (function (global) {
 
     // DELETE MODEL: delete a selected model in LOAD MODELS
     mainUtils.deleteRowModelHtml = function () {
+
+        console.log("mainUtils.deleteRowModelHtml");
 
         templistOfModel.forEach(function (element, tempIndex) {
 
@@ -2269,6 +2402,8 @@ var EMP = (function (global) {
     // MODEL OF SIMILARITY: load the SVG diagram through similarityModels function
     mainUtils.loadSimilarityHtml = function () {
 
+        console.log("mainUtils.loadSimilarityHtml");
+
         sendGetRequest(
             similarityHtml,
             function (similarityHtmlContent) {
@@ -2293,6 +2428,8 @@ var EMP = (function (global) {
     // EPITHELIAL PLATFORM: load the epithelial html
     mainUtils.loadEpithelialHtml = function () {
 
+        console.log("mainUtils.loadEpithelialHtml");
+
         // make empty list in LOAD MODELS
         if (lengthOfLoadModelTable == 2) {
             workspaceNameList = [];
@@ -2313,6 +2450,7 @@ var EMP = (function (global) {
     var concentration_fma = [];
     // EPITHELIAL PLATFORM: determine source, mediator and destination of fluxes
     // create objects for fluxes and cotransporters and call epithelial platform interface
+    // TODO: check HTTP status code
     mainUtils.loadEpithelial = function () {
 
         console.log("loadEpithelial modelEntityNameArray: ", modelEntityNameArray);
@@ -2586,8 +2724,7 @@ var EMP = (function (global) {
                         }
                     },
                     true);
-            }
-            else {
+            } else {
                 counter++;
 
                 if (counter == iteration(membrane.length)) {
@@ -2620,6 +2757,8 @@ var EMP = (function (global) {
 
         // make tritransporters between fluxes
         mainUtils.maketritransporter = function (membrane1, membrane2, membrane3) {
+
+            console.log("index.js: mainUtils.maketritransporter");
 
             var query = maketritransporterSPARQL(membrane1.model_entity, membrane2.model_entity, membrane3.model_entity);
 
@@ -2807,6 +2946,8 @@ var EMP = (function (global) {
                 function (jsonObjOPB) {
                     // flux OPB
                     if (jsonObjOPB.results.bindings[0].opb.value == fluxOPB) {
+
+                        console.log("if (jsonObjOPB.results.bindings[0].opb.value == fluxOPB) {");
 
                         console.log("Before srcDescMediatorOfFluxes modelEntityFullNameArray[index]: ", modelEntityFullNameArray[index]);
                         console.log("Before srcDescMediatorOfFluxes model: ", model);
@@ -3154,6 +3295,8 @@ var EMP = (function (global) {
 
                     // make a concentration object to semantically place solutes in the respective compartment
                     else if (jsonObjOPB.results.bindings[0].opb.value == concentrationOPB) {
+
+                        console.log("else if (jsonObjOPB.results.bindings[0].opb.value == concentrationOPB) {");
 
                         query = concentrationOPBSPARQL(modelEntityFullNameArray[index], model);
 

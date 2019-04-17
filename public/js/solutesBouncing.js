@@ -3,6 +3,7 @@
  */
 var solutesBouncing = function (newg, solutes) {
 
+    console.log("solutesBouncing function");
     console.log("solutes: ", solutes);
     console.log("solutes.compartment: ", solutes.compartment);
 

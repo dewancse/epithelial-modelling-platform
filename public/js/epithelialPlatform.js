@@ -4,6 +4,8 @@
 var epithelialPlatform = function (combinedMembrane, concentration_fma, source_fma, sink_fma,
                                    apicalMembrane, basolateralMembrane, capillaryMembrane, membrane, typeOfSearchTerm) {
 
+    console.log("welcome to epithelialPlatform");
+
     var relatedModel = [], membraneModelObj = [], alternativeModelObj = [], relatedModelObj = [],
         modelEntityObj = [], membraneModelID = [], proteinName, proteinText, cellmlModel, biological_meaning,
         biological_meaning2, biological_meaning3, speciesName, geneName, idProtein = 0, idAltProtein = 0,
@@ -281,6 +283,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         .attr("stroke-width", 25)
         .attr("opacity", 0.5);
 
+    console.log("before initializing xrect and yrect, combinedMembrane: ", combinedMembrane);
+
     // Circle and line arrow from lumen to cytosol
     var xrect = $("rect")[0].x.baseVal.value,
         yrect = $("rect")[0].y.baseVal.value;
@@ -304,18 +308,19 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         cyvalueb = yrect + 10 + 50, // initial distance 50
 
         yvaluec = yrect + 10 + 50, // initial distance 50 for capillary
-        cyvaluec = yrect + 10 + 50, // initial distance 50
+        cyvaluec = yrect + 10 + 50; // initial distance 50
 
-        circlewithlineg = [], circlewithtext = [],
+    var circlewithlineg = [], circlewithtext = [],
         linewithlineg = [], linewithlineg2 = [], linewithlineg3 = [],
-        linewithtextg = [], linewithtextg2 = [], linewithtextg3 = [], polygon = [];
+        linewithtextg = [], linewithtextg2 = [], linewithtextg3 = [];
+
+    console.log("Testing circlewithlineg: ", circlewithlineg);
 
     // TODO: does not work for bi-directional arrow, Fix this
     // SVG checkbox with drag on-off
     var checkboxsvg = newg.append("g");
 
-    var checkBox = [], checkedchk = [],
-        ydistancechk = 50, yinitialchk = 215, ytextinitialchk = 230;
+    var checkBox = [], checkedchk = [], ydistancechk = 50, yinitialchk = 215, ytextinitialchk = 230;
 
     var update = function () {
 
@@ -334,6 +339,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 console.log("update else heckedchk[i] == true circlewithlineg: ", circlewithlineg);
             }
         }
+
+        console.log("update combinedMembrane AFTER: ", combinedMembrane);
+        console.log("update circlewithlineg AFTER: ", circlewithlineg);
     };
 
     var combinedMemChk = function (index) {
@@ -358,6 +366,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             yinitialchk += ydistancechk;
             ytextinitialchk += ydistancechk;
         }
+
+        console.log("combinedMemChk combinedMembrane and index AFTER: ", combinedMembrane, index);
     };
 
     // INITIAL call
@@ -371,6 +381,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // closing tooltip
     $(document).on("mousedown", function (event) {
         // console.log("mousedown: ", event.which);
+        console.log("epithelialPlatform: $(document).on(mousedown, function (event) {");
 
         // 1 => left click, 2 => middle click, 3 => right click
         if (event.which == 2)
@@ -381,7 +392,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     // checkboxes enable and disable on the recommender window
     $(document).on("click", function (event) {
 
-        console.log("click FUNCTION!");
+        console.log("epithelialPlatform: click FUNCTION!");
+        console.log("epithelialPlatform: combinedMembrane: ", combinedMembrane);
 
         var totalCheckboxes = $("#myModal input:checkbox").length,
             numberOfChecked = $("#myModal input:checkbox:checked").length,
@@ -408,6 +420,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         // Change marker direction and text position
         if (event.target.localName == "line" && event.target.nodeName == "line") {
+            console.log("if (event.target.localName == line && event.target.nodeName == line) {");
+            console.log("combinedMembrane: ", combinedMembrane);
             console.log("event.target.id: ", event.target.id);
             if (event.target.id == apicalID || event.target.id == basolateralID)
                 modalWindowToAddModels(event.target.id);
@@ -4077,24 +4091,27 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         cthis = this;
 
         console.log("dragcircle icircleGlobal: ", icircleGlobal);
-        // console.log("dragcircle cthis: ", cthis);
+        console.log("dragcircle cthis: ", cthis);
 
         var dx = d3.event.dx;
         var dy = d3.event.dy;
 
         if ($(this).prop("tagName") == "circle") {
+            console.log("dragcircle circle");
             d3.select(this)
                 .attr("cx", parseFloat($(this).prop("cx").baseVal.value) + dx)
                 .attr("cy", parseFloat($(this).prop("cy").baseVal.value) + dy);
         }
 
         if ($(this).prop("tagName") == "text") {
+            console.log("dragcircle text");
             circlewithlineg[icircleGlobal] // text (probably for paracellular flux)
                 .attr("x", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("x")) + dx)
                 .attr("y", parseFloat(d3.select("#" + "linewithtextg" + icircleGlobal).attr("y")) + dy);
         }
 
         if ($(this).prop("tagName") == "polygon") {
+            console.log("dragcircle polygon");
             var xNew = [], yNew = [], points = "";
             var pointsLen = d3.select(this)._groups[0][0].points.length;
 
@@ -4414,6 +4431,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 console.log("jsonLocatedin: ", jsonLocatedin);
 
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonLocatedin, "#modalBody");
+
+                // Two cases: internet connection and Auckland OLS
+                OLSdown(jsonLocatedin, "#modalBody");
+
                 var jsonLocatedinCounter = 0;
                 // Type of model - kidney, lung, etc
                 for (var i = 0; i < jsonLocatedin.results.bindings.length; i++) {
@@ -4474,6 +4497,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         console.log("jsonRelatedModel: ", jsonRelatedModel);
                         console.log("cellmlModelEntity: ", cellmlModelEntity);
 
+                        // Two cases: internet connection and PMR SPARQL engine
+                        PMRdown(jsonRelatedModel, "#modalBody");
+
                         var query = medEntityUriAndPr(cellmlModelEntity);
 
                         sendPostRequest(
@@ -4482,6 +4508,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             function (jsonMediator) {
 
                                 console.log("jsonMediator: ", jsonMediator);
+
+                                // Two cases: internet connection and PMR SPARQL engine
+                                PMRdown(jsonMediator, "#modalBody");
 
                                 for (var i = 0; i < jsonRelatedModel.results.bindings.length; i++) {
                                     for (var j = 0; j < organ[organIndex].key.length; j++) {
@@ -4583,11 +4612,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 footerSaveButton: "Yes"
             });
 
+            console.log("Before m.show() which is welcomeModal combinedMembrane: ", combinedMembrane);
+            console.log("Before m.show() which is welcomeModal circleGlobal: ", icircleGlobal);
+            console.log("Before m.show() which is welcomeModal cthis: ", cthis);
+            console.log("Before m.show() which is welcomeModal circlewithlineg: ", circlewithlineg);
+            console.log("Before m.show() which is welcomeModal this: ", this);
+
             $("#myWelcomeModal").modal({backdrop: "static", keyboard: false});
             m.show();
 
             console.log("After m.show() which is welcomeModal combinedMembrane: ", combinedMembrane);
             console.log("After m.show() which is welcomeModal circleGlobal: ", icircleGlobal);
+            console.log("After m.show() which is welcomeModal cthis: ", cthis);
+            console.log("After m.show() which is welcomeModal circlewithlineg: ", circlewithlineg);
+            console.log("After m.show() which is welcomeModal this: ", this);
         } else {
             console.log("else (cx >= lt && cx <= gt) && (lineb_id != circle_id)");
             moveBack();
@@ -4606,6 +4644,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         console.log("END of dropcircle combinedMembrane: ", combinedMembrane);
+        console.log("END of dropcircle circlewithlineg: ", circlewithlineg);
         console.log("END of dropcircle icircleGlobal: ", icircleGlobal);
     };
 
@@ -4613,7 +4652,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         console.log("welcomeModal function!");
         console.log("welcomeModal function combinedMembrane: ", combinedMembrane);
+        console.log("welcomeModal function circlewithlineg: ", circlewithlineg);
         console.log("welcomeModal function icircleGlobal: ", icircleGlobal);
+        console.log("welcomeModal function cthis: ", cthis);
+        console.log("welcomeModal function this: ", this);
 
         var $this = this;
 
@@ -4630,9 +4672,25 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
          * Append modal window html to body
          */
         $this.createModal = function () {
-            $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
-            $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
-            var win = $('.modal-content', $this.selector);
+            $('.modal-content').empty();
+
+            console.log("welcomeModal createModal $this.selector: ", $this.selector);
+            console.log("welcomeModal createModal $($this.selector): ", $($this.selector));
+
+            var win;
+            if ($($this.selector).length == 0) {
+
+                console.log("welcomeModal IF ($($this.selector).length == 0)");
+
+                $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
+                $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
+                win = $('.modal-content', $this.selector);
+            } else {
+
+                console.log("welcomeModal ELSE ($($this.selector).length == 0)");
+
+                win = $('.modal-content', $this.selector);
+            }
 
             if ($this.options.header) {
                 win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
@@ -4659,6 +4717,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             console.log("welcomeModal function createModal combinedMembrane: ", combinedMembrane);
             console.log("welcomeModal function createModal icircleGlobal: ", icircleGlobal);
+            console.log("welcomeModal function createModal circlewithlineg: ", circlewithlineg);
+            console.log("welcomeModal function createModal cthis: ", cthis);
+            console.log("welcomeModal function createModal this: ", this);
 
             // No button clicked!!
             $("#closeID").click(function (event) {
@@ -4668,6 +4729,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 console.log("No clicked combinedMembrane: ", combinedMembrane);
                 console.log("No clicked icircleGlobal: ", icircleGlobal);
+                console.log("No clicked cthis: ", cthis);
+                console.log("No clicked this: ", this);
                 console.log("No clicked linewithlineg, circlewithlineg: ", linewithlineg, circlewithlineg);
 
                 console.log("No clicked membrane: ", membrane);
@@ -4681,6 +4744,19 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 // reinitialization
                 reinitVariable();
+
+                console.log("AFTER first No clicked and reinitVariable()!");
+
+                console.log("AFTER first No clicked and reinitVariable() combinedMembrane: ", combinedMembrane);
+                console.log("AFTER first No clicked and reinitVariable() icircleGlobal: ", icircleGlobal);
+                console.log("AFTER first No clicked and reinitVariable() linewithlineg, circlewithlineg: ", linewithlineg, circlewithlineg);
+
+                console.log("AFTER first No clicked and reinitVariable() membrane: ", membrane);
+                console.log("AFTER first No clicked and reinitVariable() concentration_fma: ", concentration_fma);
+                console.log("AFTER first No clicked and reinitVariable() apicalMembrane: ", apicalMembrane);
+                console.log("AFTER first No clicked and reinitVariable() basolateralMembrane: ", basolateralMembrane);
+                console.log("AFTER first No clicked and reinitVariable() capillaryMembrane: ", capillaryMembrane);
+
                 return;
             });
 
@@ -4700,11 +4776,20 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     footerSaveButton: "Save"
                 });
 
+                console.log("After var m = new Modal({");
+
                 $("#myModal").modal({backdrop: "static", keyboard: false});
                 m.getBody().html("<div id=modalBody></div>");
                 m.show();
 
+                console.log("After m.show()");
+                console.log("After m.show() combinedMembrane: ", combinedMembrane);
+
                 showLoading("#modalBody");
+
+                console.log("yes clicked combinedMembrane: ", combinedMembrane);
+                console.log("yes clicked icircleGlobal: ", icircleGlobal);
+                console.log("yes clicked linewithlineg, circlewithlineg: ", linewithlineg, circlewithlineg);
 
                 var circleID = $(cthis).prop("id").split(",");
                 console.log("circleID in myWelcomeModal: ", circleID);
@@ -4746,6 +4831,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                         console.log("jsonModel: ", jsonModel);
 
+                        // Two cases: internet connection and PMR SPARQL engine
+                        PMRdown(jsonModel, "#modalBody");
+
                         // chebi URI
                         if (typeOfSearchTerm == "flux") { // flux
                             chebiURI = jsonModel.results.bindings[0].chebi_uri.value;
@@ -4777,6 +4865,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             endpointprOLS,
                             function (jsonPr) {
 
+                                // Two cases: internet connection and Auckland OLS
+                                OLSdown(jsonPr, "#modalBody");
+
                                 var endpointgeneOLS;
                                 if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.has_gene_template == undefined)
                                     endpointgeneOLS = abiOntoEndpoint + "/pr";
@@ -4787,6 +4878,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     endpointgeneOLS,
                                     function (jsonGene) {
 
+                                        // Two cases: internet connection and Auckland OLS
+                                        OLSdown(jsonGene, "#modalBody");
+
                                         var endpointspeciesOLS;
                                         if (jsonPr._embedded == undefined || jsonPr._embedded.terms[0]._links.only_in_taxon == undefined)
                                             endpointspeciesOLS = abiOntoEndpoint + "/pr";
@@ -4796,6 +4890,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                         sendGetRequest(
                                             endpointspeciesOLS,
                                             function (jsonSpecies) {
+
+                                                // Two cases: internet connection and Auckland OLS
+                                                OLSdown(jsonSpecies, "#modalBody");
 
                                                 if (jsonPr._embedded == undefined)
                                                     proteinText = "Numerical model"; // Or undefined
@@ -4867,11 +4964,22 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         };
 
         $this.selector = "#" + $this.options.id;
-        if (!$($this.selector).length) {
-            $this.createModal();
-        }
+
+        console.log("TEST $this.selector: ", $this.selector);
+        console.log("TEST $($this.selector): ", $($this.selector));
+        console.log("TEST typeof $($this.selector): ", typeof $($this.selector));
+        console.log("TEST $($this.selector).length: ", $($this.selector).length);
+        console.log("TEST !$($this.selector).length: ", !$($this.selector).length);
+        console.log("Testing $($this.selector): ", $($this.selector)[0]);
+
+        // if (!$($this.selector).length) {
+        $this.createModal();
+        // }
 
         $this.window = $($this.selector);
+
+        console.log("$this.window: ", $this.window);
+
         $this.setHeader($this.options.header);
     };
 
@@ -4905,6 +5013,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             query,
             function (jsonProtein) {
 
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonProtein, "#modalBody");
+
                 var endpointprOLS;
                 if (jsonProtein.results.bindings.length == 0)
                     endpointprOLS = abiOntoEndpoint + "/pr";
@@ -4923,6 +5034,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 sendGetRequest(
                     endpointprOLS,
                     function (jsonPr) {
+
+                        // Two cases: internet connection and Auckland OLS
+                        OLSdown(jsonPr, "#modalBody");
 
                         if (jsonProtein.results.bindings.length != 0) {
                             if (typeOfModel == checkTypeOfModel(ProteinToOrganDict, jsonProtein.results.bindings[0].Protein.value)) {
@@ -4978,6 +5092,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 // console.log("jsonAltProtein: ", jsonAltProtein);
 
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonAltProtein, "#modalBody");
+
                 if (jsonAltProtein.results.bindings.length == 0)
                     endpointOLS = abiOntoEndpoint + "/pr";
                 else {
@@ -4995,6 +5112,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 sendGetRequest(
                     endpointOLS,
                     function (jsonOLSObj) {
+
+                        // Two cases: internet connection and Auckland OLS
+                        OLSdown(jsonOLSObj, "#modalBody");
 
                         if (jsonAltProtein.results.bindings.length != 0) {
 
@@ -5041,7 +5161,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var makecotransporter = function (membrane1, membrane2, fluxList, membraneName, flag) {
 
-        console.log("makecotransporter");
+        console.log("epithelialPlatform: makecotransporter");
 
         var query = makecotransporterSPARQL(membrane1, membrane2);
         sendPostRequest(
@@ -5049,7 +5169,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             query,
             function (jsonObj) {
 
-                // console.log("jsonObj in makecotransporter: ", jsonObj);
+                console.log("jsonObj in makecotransporter: ", jsonObj);
+
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonObj, "#modalBody");
+
                 var tempProtein = [], tempFMA = [];
                 for (var m = 0; m < jsonObj.results.bindings.length; m++) {
                     var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
@@ -5134,7 +5258,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var maketritransporter = function (membrane1, membrane2, membrane3, fluxList, membraneName, flag) {
 
-        console.log("maketritransporter");
+        console.log("epithelialPlatform: maketritransporter");
 
         var query = maketritransporterSPARQL(membrane1, membrane2, membrane3);
         sendPostRequest(
@@ -5142,7 +5266,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             query,
             function (jsonObj) {
 
-                // console.log("jsonObj in makecotransporter: ", jsonObj);
+                console.log("jsonObj in makecotransporter: ", jsonObj);
+
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonObj, "#modalBody");
+
                 var tempProtein = [], tempFMA = [];
                 for (var m = 0; m < jsonObj.results.bindings.length; m++) {
                     var tmpPro = jsonObj.results.bindings[m].med_entity_uri.value;
@@ -5255,6 +5383,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 console.log("jsonRelatedMembrane: ", jsonRelatedMembrane);
 
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonRelatedMembrane, "#modalBody");
+
                 // TODO: remove semgen annotated models as they are not compatible to our modelling platform
                 for (var i = 0; i < jsonRelatedMembrane.results.bindings.length; i++) {
                     var elem = jsonRelatedMembrane.results.bindings[i].Model_entity.value,
@@ -5353,6 +5484,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var relatedMembraneModel = function (membraneName, cotransporterList, flag) {
 
+        console.log("relatedMembraneModel");
         console.log("flag in relatedMembraneModel: ", flag);
 
         var tempmembraneModel, indexOfHash, indexOfcellml, modelname, query;
@@ -5380,6 +5512,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                 console.log("relatedMembraneModel: jsonRelatedMembraneModel -> ", jsonRelatedMembraneModel);
 
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonRelatedMembraneModel, "#modalBody");
+
                 var endpointprOLS;
                 if (jsonRelatedMembraneModel.results.bindings.length == 0) {
 
@@ -5403,6 +5538,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     endpointprOLS,
                     function (jsonPr) {
 
+                        // Two cases: internet connection and Auckland OLS
+                        OLSdown(jsonPr, "#modalBody");
+
                         var query = relatedMembraneModelSPARQL(modelEntityObj[idMembrane].model_entity, modelEntityObj[idMembrane].model_entity2, modelEntityObj[idMembrane].model_entity3);
 
                         console.log("relatedMembraneModel query: ", query);
@@ -5412,6 +5550,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             query,
                             function (jsonObjFlux) {
                                 console.log("relatedMembraneModel: jsonObjFlux -> ", jsonObjFlux);
+
+                                // Two cases: internet connection and PMR SPARQL engine
+                                PMRdown(jsonObjFlux, "#modalBody");
 
                                 // update luminal ID in jsonObjFlux
                                 for (var i = 0; i < jsonObjFlux.results.bindings.length; i++) {
@@ -5433,6 +5574,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                     endpointOLS,
                                     function (jsonObjOLSChebi) {
 
+                                        // Two cases: internet connection and Auckland OLS
+                                        OLSdown(jsonObjOLSChebi, "#modalBody");
+
                                         var endpointOLS2;
                                         if (jsonObjFlux.results.bindings[0].solute_chebi2 == undefined) {
                                             endpointOLS2 = undefined;
@@ -5445,6 +5589,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                             endpointOLS2,
                                             function (jsonObjOLSChebi2) {
 
+                                                // Two cases: internet connection and Auckland OLS
+                                                OLSdown(jsonObjOLSChebi2, "#modalBody");
+
                                                 var endpointOLS3;
                                                 if (jsonObjFlux.results.bindings[0].solute_chebi3 == undefined) {
                                                     endpointOLS3 = undefined;
@@ -5456,6 +5603,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                 sendGetRequest(
                                                     endpointOLS3,
                                                     function (jsonObjOLSChebi3) {
+
+                                                        // Two cases: internet connection and Auckland OLS
+                                                        OLSdown(jsonObjOLSChebi3, "#modalBody");
 
                                                         // TODO: similar issue where J_mc_Cl is attached to J_mc_Na and J_mc_K
                                                         // TODO: see jsonObjFluxFunction function in the srcDescMediatorOfFluxes()
@@ -5816,6 +5966,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                             endpointOLS,
                                                             function (jsonObjOLSMedPr) {
 
+                                                                // Two cases: internet connection and Auckland OLS
+                                                                OLSdown(jsonObjOLSMedPr, "#modalBody");
+
                                                                 var tempvar, med_pr_text_syn;
                                                                 if (jsonObjOLSMedPr._embedded.terms[0].annotation["has_related_synonym"] == undefined) {
                                                                     med_pr_text_syn = jsonObjOLSMedPr._embedded.terms[0].annotation["id"][0].slice(3);
@@ -5889,6 +6042,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     // Information displayed in the collapsible space when users click a model
     var recommenderSystemInformation = function (membraneName, msg2, model, biological, species, gene, protein) {
+
+        console.log("recommenderSystemInformation function");
+
         // apical or basolateral membrane
         var membraneModel = "<p id=membraneModelsID><b>" + membraneName + " model</b>";
         for (var i = 0; i < membraneModelObj.length; i++) {
@@ -6012,11 +6168,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     var showModalWindow = function (membraneName, flag) {
 
+        console.log("showModalWindow function");
         console.log("flag in showModalWindow: ", flag);
-        console.log("showModalWindow -> combinedMembrane: ", combinedMembrane);
+        console.log("showModalWindow combinedMembrane: ", combinedMembrane);
 
         // add models without dragging
         if (flag == 2) {
+            console.log("flag == 2 in showModalWindow function");
             var relatedOrganModels2 = "<p id=addModelsID>";
             for (var i = 0; i < membraneModelID.length; i++) {
 
@@ -6072,6 +6230,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             return;
         } else if (flag == 1) {
+            console.log("flag == 1 in showModalWindow function");
             idMembrane = 0;
 
             var circleID = $(cthis).prop("id").split(",");
@@ -6180,6 +6339,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 sendGetRequest(
                     dbfectendpoint,
                     function (psequence) {
+
+                        // EBI database fetch (Dbfetch)
+                        Dbfetchdown(psequence, "#modalBody");
+
                         ProteinSeq += psequence;
 
                         // PID is empty
@@ -6203,7 +6366,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                 requestUrl,
                                 requestData,
                                 function (jobId) {
-                                    // console.log("jobId: ", jobId); // jobId
+                                    console.log("jobId: ", jobId); // jobId
+
+                                    // EBI Clustal Omega
+                                    Clustaldown(jobId, "#modalBody");
 
                                     var chkJobStatus = function (jobId) {
                                         var jobIdUrl = baseUrl + "/status/" + jobId;
@@ -6211,6 +6377,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                             jobIdUrl,
                                             function (resultObj) {
                                                 console.log("result: ", resultObj); // jobId status
+
+                                                // EBI Clustal Omega
+                                                Clustaldown(resultObj, "#modalBody");
 
                                                 if (resultObj == "RUNNING") {
                                                     setTimeout(function () {
@@ -6221,6 +6390,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                                                     sendGetRequest(
                                                         pimUrl,
                                                         function (identityMatrix) {
+
+                                                            // EBI Clustal Omega
+                                                            Clustaldown(identityMatrix, "#modalBody");
 
                                                             similarityMatrixEBI(identityMatrix, PID, draggedMedPrID, membraneModelObj);
 
@@ -6393,6 +6565,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         }
 
         reflectCheckbox(icircleGlobal);
+
+        console.log("End of moveBack circlewithlineg: ", circlewithlineg);
+        console.log("End of moveBack icircleGlobal: ", icircleGlobal);
+        console.log("End of moveBack combinedMembrane: ", combinedMembrane);
     };
 
     // retain color of membranes
@@ -6618,6 +6794,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     // reinitialize variable for next iteration
     var reinitVariable = function () {
+
+        console.log("epithelialPlatform: reinitVariable");
+
         idProtein = 0;
         idAltProtein = 0;
         idMembrane = 0;
@@ -6660,11 +6839,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             yinitialchk += ydistancechk;
             ytextinitialchk += ydistancechk;
         }
+
+        console.log("End of reflectCheckbox icircleGlobal: ", icircleGlobal);
+        console.log("End of reflectCheckbox combinedMembrane: ", combinedMembrane);
     };
 
     var Modal = function (options) {
 
-        console.log("Modal function!");
+        console.log("epithelialPlatform: Modal function!");
 
         var $this = this;
 
@@ -6681,6 +6863,9 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
          * Append modal window html to body
          */
         $this.createModal = function () {
+            console.log("Modal createModal $this.selector: ", $this.selector);
+            console.log("Modal createModal $($this.selector): ", $($this.selector));
+
             $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
             $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
             var win = $('.modal-content', $this.selector);
@@ -6741,8 +6926,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             // save button clicked!!
             $("#msaveID").click(function (event) {
 
-                console.log("#msaveID: ", combinedMembrane);
                 console.log("second save button clicked!");
+                console.log("#msaveID combinedMembrane: ", combinedMembrane);
 
                 // add models without dragging
                 for (i = 0; i < $("#addModelsID input").length; i++) {
@@ -6838,25 +7023,26 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 membraneColorBack();
 
                 var circleID = $(cthis).prop("id").split(",");
-                console.log("circleID at the end: ", circleID);
+                console.log("#msaveID circleID at the end: ", circleID);
 
                 var totalCheckboxes = $("input:checkbox").length,
                     numberOfChecked = $("input:checkbox:checked").length,
                     numberOfNotChecked = totalCheckboxes - numberOfChecked;
 
-                console.log("totalCheckboxes, numberOfChecked, numberNotChecked: ", totalCheckboxes, numberOfChecked, numberOfNotChecked);
-                console.log("$(#msaveID).click(function (event): combinedMembrane", combinedMembrane);
+                console.log("#msaveID totalCheckboxes, numberOfChecked, numberNotChecked: ", totalCheckboxes, numberOfChecked, numberOfNotChecked);
+                console.log("#msaveID $(#msaveID).click(function (event): combinedMembrane", combinedMembrane);
 
                 // place the dragged model either on apical or basolateral membrane without any replacement
                 if (totalCheckboxes == numberOfNotChecked) {
-                    console.log("if (totalCheckboxes == numberOfNotChecked");
-                    console.log("totalCheckboxes, numberNotChecked: ", totalCheckboxes, numberOfNotChecked);
-                    console.log("circleID checkboxes: ", circleID[6], circleID[7], circleID[12]);
+                    console.log("#msaveID if (totalCheckboxes == numberOfNotChecked");
+                    console.log("#msaveID totalCheckboxes, numberNotChecked: ", totalCheckboxes, numberOfNotChecked);
+                    console.log("#msaveID circleID checkboxes: ", circleID[6], circleID[7], circleID[12]);
 
-                    console.log("icircleGlobal: ", icircleGlobal);
+                    console.log("#msaveID icircleGlobal: ", icircleGlobal);
 
                     // mediator FMA uri
                     if (combinedMembrane[icircleGlobal].med_fma == apicalID) {
+                        console.log("#msaveID IF (combinedMembrane[icircleGlobal].med_fma == apicalID) {");
                         circleID[12] = basolateralID;
                         combinedMembrane[icircleGlobal].med_fma = basolateralID;
 
@@ -6909,6 +7095,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                             }
                         }
                     } else {
+                        console.log("#msaveID ELSE (combinedMembrane[icircleGlobal].med_fma == apicalID) {");
                         circleID[12] = apicalID;
                         combinedMembrane[icircleGlobal].med_fma = apicalID;
 
@@ -6963,7 +7150,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     }
                 } else {
 
-                    console.log("ELSE totalCheckboxes == numberOfNotChecked");
+                    console.log("#msaveID ELSE totalCheckboxes == numberOfNotChecked");
 
                     // update combinedMembrane, this will be sent to GMS to assemble and reproduce a new cellml model
                     combinedMembrane[icircleGlobal].model_entity = circleID[0]; // cellml model entity (e.g. weinstein_1995.cellml#NHE3.J_NHE3_Na)
@@ -6991,11 +7178,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     combinedMembrane[icircleGlobal].protein_name = circleID[22]; // protein name
                 }
 
-                console.log("circleID at the end 2: ", circleID);
-                console.log("icircleGlobal: ", icircleGlobal);
-                console.log("combinedMembrane: ", combinedMembrane);
-                console.log("circlewithlineg: ", circlewithlineg);
-                console.log("$('#newgid').prop('childNodes'): ", $('#newgid').prop('childNodes'));
+                console.log("#msaveID circleID at the end 2: ", circleID);
+                console.log("#msaveID icircleGlobal: ", icircleGlobal);
+                console.log("#msaveID combinedMembrane: ", combinedMembrane);
+                console.log("#msaveID circlewithlineg: ", circlewithlineg);
+                console.log("#msaveID $('#newgid').prop('childNodes'): ", $('#newgid').prop('childNodes'));
                 // delete the dragged circle if users saved it, otherwise we will see duplicate circle!
                 for (var i = 0; i < $('#newgid').prop('childNodes').length; i++) {
 
@@ -7013,8 +7200,15 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                     }
                 }
 
+                console.log("before circle placement and rearrangement");
+                console.log("#msaveID circleID at the end 3: ", circleID);
+                console.log("#msaveID icircleGlobal: ", icircleGlobal);
+                console.log("#msaveID combinedMembrane: ", combinedMembrane);
+                console.log("#msaveID circlewithlineg: ", circlewithlineg);
+                console.log("#msaveID $('#newgid').prop('childNodes'): ", $('#newgid').prop('childNodes'));
                 // circle placement and rearrangement
                 if ($(cthis).attr("membrane") == apicalID) {
+                    console.log("if ($(cthis).attr(membrane) == apicalID) {");
                     linebasolateral
                         .transition()
                         .delay(1000)
@@ -7022,7 +7216,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .style("stroke", "orange");
 
                     msaveIDflag = true;
+                    console.log("#msaveID before combinedMemFunc(icircleGlobal, msaveIDflag) icircleGlobal: ", icircleGlobal);
+                    console.log("#msaveID before combinedMemFunc(icircleGlobal, msaveIDflag) combinedMembrane: ", combinedMembrane);
+                    console.log("#msaveID before combinedMemFunc(icircleGlobal, msaveIDflag) circlewithlineg: ", circlewithlineg);
                     combinedMemFunc(icircleGlobal, msaveIDflag);
+                    console.log("#msaveID after combinedMemFunc(icircleGlobal, msaveIDflag) icircleGlobal: ", icircleGlobal);
+                    console.log("#msaveID after combinedMemFunc(icircleGlobal, msaveIDflag) combinedMembrane: ", combinedMembrane);
+                    console.log("#msaveID after combinedMemFunc(icircleGlobal, msaveIDflag) circlewithlineg: ", circlewithlineg);
 
                     // decrement y-axis of line and circle
                     yvalue -= ydistance;
@@ -7034,6 +7234,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
                     circleRearrange();
                 } else {
+                    console.log("ELSE ($(cthis).attr(membrane) == apicalID) {");
                     lineapical
                         .transition()
                         .delay(1000)
@@ -7041,7 +7242,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                         .style("stroke", "green");
 
                     msaveIDflag = true;
+                    console.log("#msaveID before combinedMemFunc(icircleGlobal, msaveIDflag) icircleGlobal: ", icircleGlobal);
+                    console.log("#msaveID before combinedMemFunc(icircleGlobal, msaveIDflag) combinedMembrane: ", combinedMembrane);
+                    console.log("#msaveID before combinedMemFunc(icircleGlobal, msaveIDflag) circlewithlineg: ", circlewithlineg);
                     combinedMemFunc(icircleGlobal, msaveIDflag);
+                    console.log("#msaveID after combinedMemFunc(icircleGlobal, msaveIDflag) icircleGlobal: ", icircleGlobal);
+                    console.log("#msaveID after combinedMemFunc(icircleGlobal, msaveIDflag) combinedMembrane: ", combinedMembrane);
+                    console.log("#msaveID after combinedMemFunc(icircleGlobal, msaveIDflag) circlewithlineg: ", circlewithlineg);
 
                     // decrement y-axis of line and circle
                     yvalueb -= ydistance;
@@ -7057,8 +7264,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 // reflect changes in respective checkbox
                 reflectCheckbox(icircleGlobal);
 
-                console.log("circleID at the end 3: ", circleID);
-                console.log("combinedMembrane at the end 3: ", combinedMembrane);
+                console.log("circleID at the end 4: ", circleID);
+                console.log("combinedMembrane at the end 4: ", combinedMembrane);
 
                 // reinitialization
                 reinitVariable();
@@ -7161,6 +7368,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             function (jsonRelatedModelEntity) {
 
                 console.log("modalWindowToAddModels jsonRelatedModelEntity: ", jsonRelatedModelEntity, combinedMembrane);
+
+                // Two cases: internet connection and PMR SPARQL engine
+                PMRdown(jsonRelatedModelEntity, "#modalBody");
+
                 for (var i = 0; i < jsonRelatedModelEntity.results.bindings.length; i++) {
                     if (!isExist(jsonRelatedModelEntity.results.bindings[i].modelEntity.value, relatedModelEntity)) {
                         relatedModelEntity.push(jsonRelatedModelEntity.results.bindings[i].modelEntity.value);
@@ -7267,7 +7478,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
     $("#btnModel").click(function () {
         console.log("inside button model!");
-        console.log("btnModel: !", combinedMembrane);
+        console.log("btnModel combinedMembrane: !", combinedMembrane);
         showLoading("#newmodel");
         var url = "/.api/mas/post";
         sendPostRequest(

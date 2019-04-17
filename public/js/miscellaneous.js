@@ -1055,6 +1055,52 @@ var showLoading = function (selector) {
     $(selector).html("<div class='text-center'><img src='../img/ajax-loader.gif'></div>");
 };
 
+// Two cases: internet connection and PMR SPARQL engine
+var PMRdown = function (jsonobject, selector) {
+    if (jsonobject.status != undefined && jsonobject.statusText != undefined) {
+        $(selector).html("<div class='alert alert-danger'><strong>HTTP Error " + jsonobject.status + " - " + jsonobject.statusText + ". " +
+            "Please check your internet connection. Or our server might fail to connect to the PMR server.</strong></div>");
+        return;
+    }
+};
+
+// Two cases: internet connection and BioPortal
+var BioPortaldown = function (jsonobject, selector) {
+    if (jsonobject.status != undefined && jsonobject.statusText != undefined) {
+        $(selector).html("<div class='alert alert-danger'><strong>HTTP Error " + jsonobject.status + " - " + jsonobject.statusText + ". " +
+            "Please check your internet connection. Or BioPortal might be temporarily down. Please try again later.</strong></div>");
+        return;
+    }
+};
+
+// Auckland OLS
+var OLSdown = function (jsonobject, selector) {
+    if (jsonobject.status != undefined && jsonobject.statusText != undefined) {
+        $(selector).html("<div class='alert alert-danger'><strong>HTTP Error " + jsonobject.status + " - " + jsonobject.statusText + ". " +
+            "Please check your internet connection. Or our Auckland OLS server might be temporarily down.</strong></div>");
+        return;
+    }
+};
+
+// EBI Clustal Omega
+var Clustaldown = function (jsonobject, selector) {
+    if (jsonobject.status != undefined && jsonobject.statusText != undefined) {
+        $(selector).html("<div class='alert alert-danger'><strong>HTTP Error " + jsonobject.status + " - " + jsonobject.statusText + ". " +
+            "Problem at the EBI clustal omega server.</strong></div>");
+        return;
+    }
+};
+
+// EBI database fetch (Dbfetch)
+var Dbfetchdown = function (jsonobject, selector) {
+    if (jsonobject.status != undefined && jsonobject.statusText != undefined) {
+        $(selector).html("<div class='alert alert-danger'><strong>HTTP Error " + jsonobject.status + " - " + jsonobject.statusText + ". " +
+            "Problem at the EBI database fetch server.</strong></div>");
+        return;
+    }
+};
+
+
 // remove duplicate model entity and biological meaning
 var uniqueifyCombinedMembrane = function (es) {
     var retval = [];
