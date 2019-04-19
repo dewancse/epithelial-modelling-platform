@@ -1082,6 +1082,15 @@ var OLSdown = function (jsonobject, selector) {
     }
 };
 
+// Protein Not Found in Auckland OLS
+var ProteinNotInOLS = function (jsonobject, selector) {
+    if (jsonobject.status != undefined && jsonobject.statusText != undefined) {
+        $(selector).html("<div class='alert alert-danger'><strong>HTTP Error " + jsonobject.status + " - " + jsonobject.statusText + ". " +
+            "Please check your internet connection. Or this protein is not found in Auckland OLS.</strong></div>");
+        return;
+    }
+};
+
 // EBI Clustal Omega
 var Clustaldown = function (jsonobject, selector) {
     if (jsonobject.status != undefined && jsonobject.statusText != undefined) {

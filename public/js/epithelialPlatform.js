@@ -296,8 +296,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         ypvalue = yprect + 25,
         ypdistance = 35;
 
-    var radius = 20,
-        lineLen = 50, polygonlineLen = 60, pcellLen = 100,
+    var radius = 20, lineLen = 50, polygonlineLen = 60, pcellLen = 100,
 
         xvalue = xrect - lineLen / 2, // x coordinate before epithelial rectangle
         yvalue = yrect + 10 + 50, // initial distance 50
@@ -404,6 +403,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         $("#myModal input[type='checkbox']").prop("checked", function (i, val) {
             if (val == false) {
+                console.log("if val == false this: ", $(this));
                 $(this).prop({disabled: true});
             }
             return val;
@@ -419,13 +419,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         console.log("click function -> linewithlineg, circlewithlineg: ", linewithlineg, circlewithlineg);
 
         // Change marker direction and text position
-        if (event.target.localName == "line" && event.target.nodeName == "line") {
-            console.log("if (event.target.localName == line && event.target.nodeName == line) {");
-            console.log("combinedMembrane: ", combinedMembrane);
-            console.log("event.target.id: ", event.target.id);
-            if (event.target.id == apicalID || event.target.id == basolateralID)
-                modalWindowToAddModels(event.target.id);
-        }
+        // if (event.target.localName == "line" && event.target.nodeName == "line") {
+        //     console.log("if (event.target.localName == line && event.target.nodeName == line) {");
+        //     console.log("combinedMembrane: ", combinedMembrane);
+        //     console.log("event.target.id: ", event.target.id);
+        //     if (event.target.id == apicalID || event.target.id == basolateralID)
+        //         modalWindowToAddModels(event.target.id);
+        // }
     });
 
     var tooltipFunc = function (div, id, left, top) {
@@ -4092,9 +4092,12 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
         console.log("dragcircle icircleGlobal: ", icircleGlobal);
         console.log("dragcircle cthis: ", cthis);
+        console.log("dragcircle $(cthis): ", $(cthis), d3.select(this)._groups[0][0].points);
 
         var dx = d3.event.dx;
         var dy = d3.event.dy;
+
+        console.log("dragcircle dx,dy: ", dx, dy);
 
         if ($(this).prop("tagName") == "circle") {
             console.log("dragcircle circle");
@@ -4126,6 +4129,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }
 
             d3.select(this).attr("points", points);
+
+            console.log("points: ", points);
         }
 
         if (circlewithtext[icircleGlobal] != undefined) {
@@ -4213,6 +4218,11 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         // detect basolateralMembrane - 0 apical, 1 basolateralMembrane
         var lineb_x = $($("line")[mindex]).prop("x1").baseVal.value;
 
+        if (mindex == 0)
+            console.log("APICAL: ", $($("line")[mindex]).prop("x1").baseVal.value);
+        else if (mindex == 1)
+            console.log("BASOLATERAL: ", $($("line")[mindex]).prop("x1").baseVal.value);
+
         if ($(this).prop("tagName") == "circle") {
             cx = $(this).prop("cx").baseVal.value;
             cy = $(this).prop("cy").baseVal.value;
@@ -4239,6 +4249,23 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         } else if ($(this).prop("tagName") == "polygon") {
             lt = lineb_x + polygonlineLen + 40; //  + 60
             gt = lineb_x + polygonlineLen * 2; //  + 60
+
+            console.log("linewithlineg[icircleGlobal] x1: ", linewithlineg[icircleGlobal].attr("x1"));
+            console.log("linewithlineg[icircleGlobal] x2: ", linewithlineg[icircleGlobal].attr("x2"));
+
+            if (membrane == apicalID) {
+                if (linewithlineg[icircleGlobal].attr("x1") > 530) {
+                    cx = linewithlineg[icircleGlobal].attr("x1");
+                    lt = linewithlineg[icircleGlobal].attr("x1");
+                    gt = 530 + 10;
+                }
+            } else if (membrane == basolateralID) {
+                if (linewithlineg[icircleGlobal].attr("x1") < 240) {
+                    cx = linewithlineg[icircleGlobal].attr("x1");
+                    lt = linewithlineg[icircleGlobal].attr("x1");
+                    gt = 240;
+                }
+            }
         }
 
         if ((cx >= lt && cx <= gt) && (lineb_id != circle_id)) {
@@ -4246,7 +4273,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         } else {
             if (mindex == 1)
                 $($("line")[mindex]).css("stroke", "orange");
-
             else
                 $($("line")[mindex]).css("stroke", "green");
         }
@@ -4692,6 +4718,13 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 win = $('.modal-content', $this.selector);
             }
 
+            // console.log("welcomeModal createModal $this.selector: ", $this.selector);
+            // console.log("welcomeModal createModal $($this.selector): ", $($this.selector));
+            //
+            // $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
+            // $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
+            // var win = $('.modal-content', $this.selector);
+
             if ($this.options.header) {
                 win.append('<div class="modal-header"><h4 class="modal-title" lang="de"></h4></div>');
 
@@ -4723,6 +4756,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             // No button clicked!!
             $("#closeID").click(function (event) {
+
                 console.log("No clicked!");
                 console.log("event: ", event);
                 console.log("first close button clicked!");
@@ -4762,7 +4796,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             // Yes button clicked!!
             $("#saveID").click(function (event) {
-
                 console.log("BEFORE Yes clicked: ", combinedMembrane);
 
                 console.log("Yes clicked!");
@@ -6865,10 +6898,28 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         $this.createModal = function () {
             console.log("Modal createModal $this.selector: ", $this.selector);
             console.log("Modal createModal $($this.selector): ", $($this.selector));
+            console.log("Modal createModal $($this.selector)[0]: ", $($this.selector)[0]);
 
             $('body').append('<div id="' + $this.options.id + '" class="modal fade"></div>');
             $($this.selector).append('<div class="modal-dialog custom-modal"><div class="modal-content"></div></div>');
             var win = $('.modal-content', $this.selector);
+
+            if ($($this.selector)[0] != undefined) {
+                console.log("Modal createModal $($this.selector)[0].childNodes: ", $($this.selector)[0].childNodes);
+
+                for (var i = 0; i < $($this.selector)[0].childNodes.length; i++) {
+                    console.log("Printing childnodes: ", i, $($this.selector)[0].childNodes[i]);
+
+                    if (i != 0) {
+                        $($this.selector)[0].childNodes[i].remove();
+                        i--;
+                    }
+                }
+            }
+
+            console.log("Modal createModal $this.selector AFTER: ", $this.selector);
+            console.log("Modal createModal $($this.selector) AFTER: ", $($this.selector));
+            console.log("Modal createModal $($this.selector)[0] AFTER: ", $($this.selector)[0]);
 
             var someText = "A recommender system or a recommendation system (sometimes replacing " +
                 "\nsystem with a synonym such as platform or engine) is a subclass of information " +
@@ -6890,6 +6941,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             }
 
             win.append('<div class="modal-body"></div>');
+
             if ($this.options.footer) {
                 win.append('<div class="modal-footer"></div>');
 
@@ -6906,7 +6958,6 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
 
             // close button clicked!!
             $("#mcloseID").click(function (event) {
-
                 console.log("second close button clicked!!");
                 console.log("No clicked combinedMembrane: ", combinedMembrane);
                 console.log("No clicked linewithlineg, circlewithlineg: ", linewithlineg, circlewithlineg);
@@ -7327,9 +7378,17 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         };
 
         $this.selector = "#" + $this.options.id;
-        if (!$($this.selector).length) {
-            $this.createModal();
-        }
+
+        console.log("TEST Modal $this.selector: ", $this.selector);
+        console.log("TEST Modal $($this.selector): ", $($this.selector));
+        console.log("TEST Modal typeof $($this.selector): ", typeof $($this.selector));
+        console.log("TEST Modal $($this.selector).length: ", $($this.selector).length);
+        console.log("TEST Modal !$($this.selector).length: ", !$($this.selector).length);
+        console.log("Testing Modal $($this.selector): ", $($this.selector)[0]);
+
+        // if (!$($this.selector).length) {
+        $this.createModal();
+        // }
 
         $this.window = $($this.selector);
         $this.setHeader($this.options.header);
@@ -7421,7 +7480,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         jQuery(window).trigger("resize");
     };
 
-    $("#modelassembly").html("<div><h3>Model Assembly Service:</h3> <button id='btnModel'>Click Here</button></div>");
+    $("#modelassembly").html("<div><h3>Model Assembly Service:</h3><button id='btnModel'>Click Here</button></div>");
 
     // var data = [
     //     {
@@ -7480,13 +7539,35 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         console.log("inside button model!");
         console.log("btnModel combinedMembrane: !", combinedMembrane);
         showLoading("#newmodel");
+
+        // disable main-content and this button
+        $('#main-content').fadeTo('slow', .5);
+        $('#main-content').append('<div id="myMainContent" style="position: absolute;top:0;left:0;width: 100%;height:100%;opacity:0.5;"></div>');
+        $('#btnModel').prop("disabled", true);
+
         var url = "/.api/mas/post";
         sendPostRequest(
             url,
             JSON.stringify(combinedMembrane),
             function (content) {
                 console.log(content);
+
+                if (content.status != undefined && content.statusText != undefined) {
+                    $("#newmodel").html("<div class='alert alert-danger'><strong>HTTP Error " + content.status + " - " + content.statusText + ".</strong></div>");
+
+                    // enable main-content and this button
+                    $("#main-content").css("opacity", "1.0");
+                    $("#myMainContent").remove();
+                    $('#btnModel').prop('disabled', false);
+                    return;
+                }
+
                 $("#newmodel").html(content);
+
+                // enable main-content and this button
+                $("#main-content").css("opacity", "1.0");
+                $("#myMainContent").remove();
+                $('#btnModel').prop("disabled", false);
             },
             false);
     });

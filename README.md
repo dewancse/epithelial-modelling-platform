@@ -10,7 +10,7 @@ git clone https://github.com/dewancse/epithelial-modelling-platform
 docker build -f Dockerfile -t unique-name/mdt-nginx .
 docker run -d -p 80:80 -p 8000:8000 unique-name/mdt-nginx
 ```
-Here EMP is running at port 80 and model assembly service is running at port 8000. Then login to the docker container and execute the `entrypoint.sh` script in the background to start both nginx and python server. Note that python server is proving the model assembly service.
+Here EMP is running at port 80 and model composition service is running at port 8000. Due to have technical issues, users have to login to the docker container and manually execute the `entrypoint.sh` script in the background to initiate nginx and python server. Note that python server receives the assembled models, which are visualized on the modelling platform of the EMP, and then performs model composition.
 ```
 docker ps (to see the container_id)
 docker exec -it container_id /bin/sh

@@ -224,6 +224,7 @@ var EMP = (function (global) {
             actions[event.target.dataset.action].call(this, event);
 
         $('#bioportal').change(function () {
+            console.log("$('#bioportal').change(function () { this: ", $(this));
             if ($(this).is(":checked")) {
                 searchStatus = "bioportal";
                 console.log("searchStatus: ", searchStatus);
@@ -791,6 +792,9 @@ var EMP = (function (global) {
 
                                 console.log("jsonProtein: ", jsonProtein);
 
+                                // Protein Not Found in Auckland OLS
+                                ProteinNotInOLS(jsonProtein, "#addModalBody");
+
                                 var endpointgeneOLS;
                                 if (jsonProtein._embedded.terms[0]._links.has_gene_template != undefined)
                                     endpointgeneOLS = jsonProtein._embedded.terms[0]._links.has_gene_template.href;
@@ -934,7 +938,7 @@ var EMP = (function (global) {
                 console.log("index.js: Add Modal function - close button clicked");
 
                 $("#proteinTxt").val("");
-                $("#proteinTxt").attr("placeholder", "Write a protein (e.g. SGLT4) and press Enter");
+                $("#proteinTxt").attr("placeholder", "Write a protein (e.g. SGLT2, NHE3) and press Enter");
                 $("#speciesTxt").val("");
                 $("#geneTxt").val("");
                 helperFn();
@@ -949,7 +953,7 @@ var EMP = (function (global) {
                 if ($("#addModelTableID").length == 0) {
                     console.log("$(#addModelTableID): ", $("#addModelTableID"));
                     $("#proteinTxt").val("");
-                    $("#proteinTxt").attr("placeholder", "Write a protein (e.g. SGLT4) and press Enter");
+                    $("#proteinTxt").attr("placeholder", "Write a protein (e.g. SGLT2, NHE3) and press Enter");
                     helperFn();
                 } else {
                     for (var i = 0; i < $("#addModelTableID input").length; i++) {
@@ -1246,6 +1250,7 @@ var EMP = (function (global) {
     mainUtils.createCellML = function () {
 
         console.log("mainUtils.createCellML");
+        $("#msgTxT").html("");
 
         var flag = false;
         // validation
@@ -1290,6 +1295,7 @@ var EMP = (function (global) {
 
         if (flag == true) {
             $("#msgTxT").html("<div class='alert alert-warning'><strong>Please fill in the required information!</strong></div>");
+            $("#exampleFormControlTextarea1").html("");
         }
 
         if (flag == false) {
@@ -1398,15 +1404,17 @@ var EMP = (function (global) {
 
                     console.log(xmlText);
 
-                    var uri = 'data:application/xml;charset=utf-8,' + xmlText;
+                    $("#exampleFormControlTextarea1").html(xmlText);
 
-                    var downloadLink = document.createElement("a");
-                    downloadLink.href = uri;
-                    downloadLink.download = "model.xml";
-
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    document.body.removeChild(downloadLink);
+                    // var uri = 'data:application/xml;charset=utf-8,' + xmlText;
+                    //
+                    // var downloadLink = document.createElement("a");
+                    // downloadLink.href = uri;
+                    // downloadLink.download = "model.xml";
+                    //
+                    // document.body.appendChild(downloadLink);
+                    // downloadLink.click();
+                    // document.body.removeChild(downloadLink);
                 },
                 false);
         }
@@ -1433,6 +1441,7 @@ var EMP = (function (global) {
 
             // Table header
             var thead = $("<thead/>"), tr = $("<tr/>"), i;
+            var head = ["Protein", "Species", "Gene"];
             for (var i in head) {
                 // Empty header for checkbox column
                 if (i == 0)
