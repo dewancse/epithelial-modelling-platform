@@ -4247,8 +4247,8 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             lt = lineb_x - radius / 2;
             gt = lineb_x + radius / 2;
         } else if ($(this).prop("tagName") == "polygon") {
-            lt = lineb_x + polygonlineLen + 40; //  + 60
-            gt = lineb_x + polygonlineLen * 2; //  + 60
+            // lt = lineb_x + polygonlineLen + 40; //  + 60
+            // gt = lineb_x + polygonlineLen * 2; //  + 60
 
             console.log("linewithlineg[icircleGlobal] x1: ", linewithlineg[icircleGlobal].attr("x1"));
             console.log("linewithlineg[icircleGlobal] x2: ", linewithlineg[icircleGlobal].attr("x2"));
