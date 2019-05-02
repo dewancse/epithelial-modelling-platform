@@ -80,6 +80,15 @@ This system will appear as a window when user will drag and drop a model across 
 
 *A screenshot illustrating an example recommender session, where the user has dragged the Weinstein model from apical to basolateral membrane.*
 
+#### Model Assembly Service
+Model assembly service is an application to compose [CellML](https://www.cellml.org/) model entities from disparate source models in order to serialize a new CellML model. To perform model composition, this application utilizes the python bindings of the [libcellML](https://github.com/cellml/libcellml) library. libCellML requires some software packages to up and running, therefore, we have mentioned relevant commands in the `Dockerfile` to install the packages.
+
+Presented below in the screenshot demonstrates an object which consists of some background information of the visualized assembled models in the above `Modelling Platform` section. Based on this information, our model assembly service performs model composition with a view to constructing a new epithelial model. 
+
+![Combined Membrane session](public/img/combinedMembrane.png)
+
+*A screenshot illustrating an object which consists of some background information of the visualized assembled models in the above "Modelling Platform" section.*
+
 ## Docker Image in Nectar Cloud
 We have deployed our Docker image to Nectar Cloud. In order to begin with the deployment process, please navigate to [Dashboard](https://dashboard.rc.nectar.org.au/auth/login/) in Nectar Cloud and provide login credentials. As a student at the University of Auckland, I have provided my login credentials, as illustrated below. Following screenshots are examples of our Docker image's deployment to Nectar. Please read texts below of each screenshot to know in details.  
 
