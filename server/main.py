@@ -17,7 +17,7 @@ def modelAssemblyService(model_recipe):
     modelName = "epithelialModel"
     m.setName(modelName)
 
-    # print("Model: ", m, "\nModel Id: ", m.getId(), "\nModel Name: ", m.getName())
+    # print("Model: ", m, "\nModel Id: ", m.getId(), "\nModel Name: ", m.name())
 
     # epithelial component which encapsulates other components
     epithelial = Component()
@@ -68,9 +68,9 @@ def modelAssemblyService(model_recipe):
         name_of_variable_flux = component_variable_flux[component_variable_flux.find('.') + 1:]
 
         # add this flux's component in the lumen/cytosol/interstitial fluid component
-        # compartment.addComponent(m.getComponent(name_of_component_flux))
-        if epithelial.getComponent(name_of_component_flux) == None:
-            epithelial.addComponent(m.getComponent(name_of_component_flux))
+        # compartment.addComponent(m.component(name_of_component_flux))
+        if epithelial.component(name_of_component_flux) == None:
+            epithelial.addComponent(m.component(name_of_component_flux))
 
         print("\n")
         print("MODELENTITY FLUX:", modelentity)
@@ -97,16 +97,16 @@ def modelAssemblyService(model_recipe):
         # check a valid model
         if p.errorCount() > 0:
             for i in range(p.errorCount()):
-                desc = p.getError(i).getDescription()
+                desc = p.error(i).description()
                 cellmlNullNamespace = "Model element is in invalid namespace 'null'"
                 cellml10Namespace = "Model element is in invalid namespace 'http://www.cellml.org/cellml/1.0#'"
                 cellml11Namespace = "Model element is in invalid namespace 'http://www.cellml.org/cellml/1.1#'"
 
                 if desc.find(cellmlNullNamespace) != -1:
-                    print("Error in main.py: ", p.getError(i).getDescription())
+                    print("Error in main.py: ", p.error(i).description())
                     exit()
                 elif desc.find(cellml10Namespace) != -1 or desc.find(cellml11Namespace) != -1:
-                    print("Msg in main.py: ", p.getError(i).getDescription())
+                    print("Msg in main.py: ", p.error(i).description())
 
                     # parsing cellml 1.0 or 1.1 to 2.0
                     dom = ET.fromstring(r.text.encode("utf-8"))
@@ -120,7 +120,7 @@ def modelAssemblyService(model_recipe):
                     # parse the string representation of the model to access by libcellml
                     importedModel = p.parseModel(mstr)
                 else:
-                    print("Error in main.py: ", p.getError(i).getDescription())
+                    print("Error in main.py: ", p.error(i).description())
                     exit()
 
         # iterate over the sparql's each result in the results
@@ -144,33 +144,33 @@ def modelAssemblyService(model_recipe):
                 print("name_of_variable_cons: ", name_of_variable_cons)
 
                 # iteratively checking a flux variable
-                c = importedModel.getComponent(name_of_component_flux)
+                c = importedModel.component(name_of_component_flux)
                 for i in range(c.variableCount()):
-                    v_flux = c.getVariable(i)
+                    v_flux = c.variable(i)
                     # if flux variable exists then find its associated concentration variable
-                    if v_flux.getName() == name_of_variable_flux:
+                    if v_flux.name() == name_of_variable_flux:
                         break
 
                 # iteratively checking a concentration variable
-                c = importedModel.getComponent(name_of_component_cons)
+                c = importedModel.component(name_of_component_cons)
                 for i in range(c.variableCount()):
-                    v_cons = c.getVariable(i)
-                    if v_cons.getName() == name_of_variable_cons and model_name_cons == model_name_flux and v_cons.getInitialValue() != "":
+                    v_cons = c.variable(i)
+                    if v_cons.name() == name_of_variable_cons and model_name_cons == model_name_flux and v_cons.initialValue() != "":
                         # add units of concentration and flux variables
-                        addUnitsModel(v_cons.getUnits(), importedModel, m)
-                        addUnitsModel(v_flux.getUnits(), importedModel, m)
+                        addUnitsModel(v_cons.units(), importedModel, m)
+                        addUnitsModel(v_flux.units(), importedModel, m)
 
                         # concentration variable
-                        if compartment.getVariable(v_cons.getName()) == None:
+                        if compartment.variable(v_cons.name()) == None:
                             v_cons_compartment = Variable()
-                            createComponent(v_cons_compartment, v_cons.getName(), v_cons.getUnits(), "public",
-                                            v_cons.getInitialValue(), compartment, v_cons)
+                            createComponent(v_cons_compartment, v_cons.name(), v_cons.units(), "public",
+                                            v_cons.initialValue(), compartment, v_cons)
 
                         # flux variable
-                        if compartment.getVariable(v_flux.getName()) == None:
+                        if compartment.variable(v_flux.name()) == None:
                             v_flux_compartment = Variable()
-                            createComponent(v_flux_compartment, v_flux.getName(), v_flux.getUnits(), "public",
-                                            v_flux.getInitialValue(), compartment, v_flux)
+                            createComponent(v_flux_compartment, v_flux.name(), v_flux.units(), "public",
+                                            v_flux.initialValue(), compartment, v_flux)
 
                         # assign plus or minus sign in the ODE based equations
                         sign = odeSignNotation(compartment, source_fma, sink_fma)
@@ -193,8 +193,8 @@ def modelAssemblyService(model_recipe):
         # ODE equations for channels and diffusive fluxes
         # Include all variables that are in the channels and diffusive fluxes equations
         if source_fma2 == "channel" or source_fma2 == "diffusiveflux":
-            c = importedModel.getComponent(name_of_component_flux)
-            getChannelsEquation(c.getMath().splitlines(), name_of_variable_flux, compartment, importedModel, m,
+            c = importedModel.component(name_of_component_flux)
+            getChannelsEquation(c.math().splitlines(), name_of_variable_flux, compartment, importedModel, m,
                                 epithelial)
             # assign plus or minus sign in the equations
             sign = odeSignNotation(compartment, source_fma, sink_fma)
@@ -340,15 +340,15 @@ def modelAssemblyService(model_recipe):
         interstitialfluid.appendMath(fullMathTotalFlux(key, math_dict_Total_Flux[0]["interstitialfluid"][key]))
 
     # include time variable to lumen, cytosol, and interstitial fluid
-    if "time" in lumen.getMath():
+    if "time" in lumen.math():
         v_lumen = Variable()
         createComponent(v_lumen, "time", "second", "public", None, lumen, None)
 
-    if "time" in cytosol.getMath():
+    if "time" in cytosol.math():
         v_cytosol = Variable()
         createComponent(v_cytosol, "time", "second", "public", None, cytosol, None)
 
-    if "time" in interstitialfluid.getMath():
+    if "time" in interstitialfluid.math():
         v_interstitial = Variable()
         createComponent(v_interstitial, "time", "second", "public", None, interstitialfluid, None)
 
@@ -369,29 +369,29 @@ def modelAssemblyService(model_recipe):
 
     # insert list_of_solutes variables in the lumen component
     for item in list_of_solutes:
-        if "J_" + item + "_" + lumen.getName() in lumen.getMath():
+        if "J_" + item + "_" + lumen.name() in lumen.math():
             v = Variable()
-            createComponent(v, "J_" + item + "_" + lumen.getName(), "flux", "public", None, lumen, None)
+            createComponent(v, "J_" + item + "_" + lumen.name(), "flux", "public", None, lumen, None)
 
     # insert list_of_solutes variables in the cytosol component
     for item in list_of_solutes:
-        if "J_" + item + "_" + cytosol.getName() in cytosol.getMath():
+        if "J_" + item + "_" + cytosol.name() in cytosol.math():
             v = Variable()
-            createComponent(v, "J_" + item + "_" + cytosol.getName(), "flux", "public", None, cytosol, None)
+            createComponent(v, "J_" + item + "_" + cytosol.name(), "flux", "public", None, cytosol, None)
 
     # insert list_of_solutes variables in the interstitial fluid component
     for item in list_of_solutes:
-        if "J_" + item + "_" + interstitialfluid.getName() in interstitialfluid.getMath():
+        if "J_" + item + "_" + interstitialfluid.name() in interstitialfluid.math():
             v = Variable()
-            createComponent(v, "J_" + item + "_" + interstitialfluid.getName(), "flux", "public", None,
+            createComponent(v, "J_" + item + "_" + interstitialfluid.name(), "flux", "public", None,
                             interstitialfluid,
                             None)
 
     # add lumen, cytosol, interstitial fluid, and imported components to epithelial component
     for i in range(m.componentCount()):
-        c = m.getComponent(i)
-        if c.getName() != "epithelial":
-            if epithelial.getComponent(c.getName()) == None:
+        c = m.component(i)
+        if c.name() != "epithelial":
+            if epithelial.component(c.name()) == None:
                 epithelial.addComponent(c)
 
     epithelial.addComponent(lumen)
@@ -403,23 +403,23 @@ def modelAssemblyService(model_recipe):
     # Initially, make a list of epithelial component's variables
     epithelial_var_list = []
     for i in range(epithelial.variableCount()):
-        v = epithelial.getVariable(i)
-        epithelial_var_list.append(v.getName())
+        v = epithelial.variable(i)
+        epithelial_var_list.append(v.name())
 
     # Iterate over lumen, cytosol and interstitial fluid component
     # for example, remove C_c_Na from ['C_c_Na', 'RT', 'psi_c', 'P_mc_Na', 'F', 'psi_m']
     for i in range(epithelial.componentCount()):
-        compName = epithelial.getComponent(i)
-        if compName.getName() == "lumen" or compName.getName() == "cytosol" or compName.getName() == "interstitialfluid":
+        compName = epithelial.component(i)
+        if compName.name() == "lumen" or compName.name() == "cytosol" or compName.name() == "interstitialfluid":
             for j in range(compName.variableCount()):
-                varName = compName.getVariable(j)
-                if varName.getName() in epithelial_var_list and varName.getInitialValue() != "":
-                    epithelial.removeVariable(varName.getName())
+                varName = compName.variable(j)
+                if varName.name() in epithelial_var_list and varName.initialValue() != "":
+                    epithelial.removeVariable(varName.name())
 
     # remove multiple instances of MathML tag in the lumen, cytosol and interstitial fluid component
     for i in range(epithelial.componentCount()):
-        c = epithelial.getComponent(i)
-        str_math = c.getMath().splitlines()
+        c = epithelial.component(i)
+        str_math = c.math().splitlines()
         str_math_2 = ""
         for j in range(len(str_math)):
             if "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in str_math[j] or "</math>" in str_math[j]:
@@ -430,12 +430,12 @@ def modelAssemblyService(model_recipe):
 
     # Mapping connection between epithelial and its encapsulated components
     for i in range(epithelial.componentCount()):
-        c = epithelial.getComponent(i)
+        c = epithelial.component(i)
         for j in range(epithelial.variableCount()):
-            v1 = epithelial.getVariable(j)
+            v1 = epithelial.variable(j)
             for k in range(c.variableCount()):
-                v2 = c.getVariable(k)
-                if v1.getName() == v2.getName():
+                v2 = c.variable(k)
+                if v1.name() == v2.name():
                     variable = Variable()
                     variable.addEquivalence(v1, v2)
 
@@ -443,19 +443,19 @@ def modelAssemblyService(model_recipe):
     for i in range(epithelial.componentCount()):
         if i == epithelial.componentCount() - 1:
             break
-        c1 = epithelial.getComponent(i)
+        c1 = epithelial.component(i)
         for j in range(epithelial.componentCount()):
             if j + i == epithelial.componentCount():
                 break
-            c2 = epithelial.getComponent(j + i)
-            if c1.getName() == c2.getName():
+            c2 = epithelial.component(j + i)
+            if c1.name() == c2.name():
                 continue
             for k in range(c1.variableCount()):
-                v_c1 = c1.getVariable(k)
+                v_c1 = c1.variable(k)
                 for l in range(c2.variableCount()):
-                    v_c2 = c2.getVariable(l)
-                    if v_c1.getName() == v_c2.getName():
-                        # print(c1.getName(), c2.getName(), v_c1.getName(), v_c2.getName())
+                    v_c2 = c2.variable(l)
+                    if v_c1.name() == v_c2.name():
+                        # print(c1.name(), c2.name(), v_c1.name(), v_c2.name())
                         variable = Variable()
                         variable.addEquivalence(v_c1, v_c2)
 

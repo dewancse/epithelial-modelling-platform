@@ -382,7 +382,7 @@ def getChannelsEquation(str_channel, v, compartment, importedModel, m, epithelia
                     channel_str = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">\n" + channel_str + "</apply>\n</math>\n"
                     # check that whether this channel already exists in this component
                     # we are doing this because G_mc_Na, etc comes twice in the epithelial component!
-                    mth = compartment.getMath()
+                    mth = compartment.math()
                     if channel_str not in mth:
                         compartment.appendMath(channel_str)
                     # extract variables from this math string
@@ -399,11 +399,11 @@ def getChannelsEquation(str_channel, v, compartment, importedModel, m, epithelia
 
     # remove variables if already exists in the component
     for i in range(compartment.variableCount()):
-        var = compartment.getVariable(i)
+        var = compartment.variable(i)
         # we will remove C_c_Na from the list below after constructing lumen, cytosol and interstitial fluid component
         # e.g. ['C_c_Na', 'RT', 'psi_c', 'P_mc_Na', 'F', 'psi_m']
-        if var.getName() in list_of_variables:
-            list_of_variables.remove(var.getName())
+        if var.name() in list_of_variables:
+            list_of_variables.remove(var.name())
 
     # unique elements in the list
     list_of_variables = list(set(list_of_variables))
@@ -412,36 +412,36 @@ def getChannelsEquation(str_channel, v, compartment, importedModel, m, epithelia
     # for now, we have considered 3 encapsulation stages: grandparent -> parent -> children
     mycomponent = Component()
     for i in range(importedModel.componentCount()):
-        c = importedModel.getComponent(i)
+        c = importedModel.component(i)
         mycomponent.addComponent(c)
         for j in range(c.componentCount()):
-            c2 = c.getComponent(j)
+            c2 = c.component(j)
             mycomponent.addComponent(c2)
             for k in range(c2.componentCount()):
-                c3 = c2.getComponent(k)
+                c3 = c2.component(k)
                 mycomponent.addComponent(c3)
 
     for item in list_of_variables:
         # iterate over components
         for i in range(mycomponent.componentCount()):
-            c = mycomponent.getComponent(i)
+            c = mycomponent.component(i)
             # variables within a component
             for j in range(c.variableCount()):
-                v = c.getVariable(j)
-                if v.getName() == item and v.getInitialValue() != "":
+                v = c.variable(j)
+                if v.name() == item and v.initialValue() != "":
                     # add units
-                    addUnitsModel(v.getUnits(), importedModel, m)
+                    addUnitsModel(v.units(), importedModel, m)
 
-                    if epithelial.getVariable(v.getName()) == None:
+                    if epithelial.variable(v.name()) == None:
                         v_epithelial = Variable()
                         # insert this variable in the epithelial component
-                        createComponent(v_epithelial, v.getName(), v.getUnits(), "public_and_private",
-                                        v.getInitialValue(), epithelial, v)
+                        createComponent(v_epithelial, v.name(), v.units(), "public_and_private",
+                                        v.initialValue(), epithelial, v)
 
-                    if compartment.getVariable(v.getName()) == None:
+                    if compartment.variable(v.name()) == None:
                         v_compartment = Variable()
                         # insert this variable in the lumen/cytosol/interstitial fluid component
-                        createComponent(v_compartment, v.getName(), v.getUnits(), "public", None, compartment, v)
+                        createComponent(v_compartment, v.name(), v.units(), "public", None, compartment, v)
 
 
 # user-defined function to append a substring of ODE based equations
@@ -475,26 +475,26 @@ def fullMath(vConcentration, subMath):
 # insert ODE equations for lumen, cytosol and interstitial fluid component
 def insertODEMathEquation(math_dict, compartment, v_cons, v_flux, sign):
     # ODE equations for lumen
-    if compartment.getName() == "lumen":
-        if v_cons.getName() not in math_dict[0]["lumen"].keys():
-            math_dict[0]["lumen"][v_cons.getName()] = subMath(sign, v_flux.getName())
+    if compartment.name() == "lumen":
+        if v_cons.name() not in math_dict[0]["lumen"].keys():
+            math_dict[0]["lumen"][v_cons.name()] = subMath(sign, v_flux.name())
         else:
-            math_dict[0]["lumen"][v_cons.getName()] = \
-                math_dict[0]["lumen"][v_cons.getName()] + "\n" + subMath(sign, v_flux.getName())
+            math_dict[0]["lumen"][v_cons.name()] = \
+                math_dict[0]["lumen"][v_cons.name()] + "\n" + subMath(sign, v_flux.name())
     # ODE equations for cytosol
-    if compartment.getName() == "cytosol":
-        if v_cons.getName() not in math_dict[0]["cytosol"].keys():
-            math_dict[0]["cytosol"][v_cons.getName()] = subMath(sign, v_flux.getName())
+    if compartment.name() == "cytosol":
+        if v_cons.name() not in math_dict[0]["cytosol"].keys():
+            math_dict[0]["cytosol"][v_cons.name()] = subMath(sign, v_flux.name())
         else:
-            math_dict[0]["cytosol"][v_cons.getName()] = \
-                math_dict[0]["cytosol"][v_cons.getName()] + "\n" + subMath(sign, v_flux.getName())
+            math_dict[0]["cytosol"][v_cons.name()] = \
+                math_dict[0]["cytosol"][v_cons.name()] + "\n" + subMath(sign, v_flux.name())
     # ODE equations for interstitial fluid
-    if compartment.getName() == "interstitialfluid":
-        if v_cons.getName() not in math_dict[0]["interstitialfluid"].keys():
-            math_dict[0]["interstitialfluid"][v_cons.getName()] = subMath(sign, v_flux.getName())
+    if compartment.name() == "interstitialfluid":
+        if v_cons.name() not in math_dict[0]["interstitialfluid"].keys():
+            math_dict[0]["interstitialfluid"][v_cons.name()] = subMath(sign, v_flux.name())
         else:
-            math_dict[0]["interstitialfluid"][v_cons.getName()] = \
-                math_dict[0]["interstitialfluid"][v_cons.getName()] + "\n" + subMath(sign, v_flux.getName())
+            math_dict[0]["interstitialfluid"][v_cons.name()] = \
+                math_dict[0]["interstitialfluid"][v_cons.name()] + "\n" + subMath(sign, v_flux.name())
 
 
 # math for total fluxes in the lumen, cytosol and interstitial fluid component
@@ -521,39 +521,39 @@ def subMathTotalFluxAndChannel(sign, vFlux):
 
 # insert equations for total fluxes
 def insertMathsForTotalFluxes(compartment, math_dict_Total_Flux, dict_solutes, chebi, sign, v_flux):
-    if compartment.getName() == "lumen":
+    if compartment.name() == "lumen":
         lumen_flux = "J_" + dict_solutes[0][chebi] + "_lumen"
         if lumen_flux not in math_dict_Total_Flux[0]["lumen"].keys():
-            math_dict_Total_Flux[0]["lumen"][lumen_flux] = subMathTotalFluxAndChannel(sign, v_flux.getName())
+            math_dict_Total_Flux[0]["lumen"][lumen_flux] = subMathTotalFluxAndChannel(sign, v_flux.name())
         else:
             math_dict_Total_Flux[0]["lumen"][lumen_flux] = \
                 math_dict_Total_Flux[0]["lumen"][lumen_flux] + "\n" + \
-                subMathTotalFluxAndChannel(sign, v_flux.getName())
+                subMathTotalFluxAndChannel(sign, v_flux.name())
 
-    if compartment.getName() == "cytosol":
+    if compartment.name() == "cytosol":
         cytosol_flux = "J_" + dict_solutes[0][chebi] + "_cytosol"
         if cytosol_flux not in math_dict_Total_Flux[0]["cytosol"].keys():
             math_dict_Total_Flux[0]["cytosol"][cytosol_flux] = \
-                subMathTotalFluxAndChannel(sign, v_flux.getName())
+                subMathTotalFluxAndChannel(sign, v_flux.name())
         else:
             math_dict_Total_Flux[0]["cytosol"][cytosol_flux] = \
                 math_dict_Total_Flux[0]["cytosol"][cytosol_flux] + "\n" + \
-                subMathTotalFluxAndChannel(sign, v_flux.getName())
+                subMathTotalFluxAndChannel(sign, v_flux.name())
 
-    if compartment.getName() == "interstitialfluid":
+    if compartment.name() == "interstitialfluid":
         interstitialfluid_flux = "J_" + dict_solutes[0][chebi] + "_interstitialfluid"
         if interstitialfluid_flux not in math_dict_Total_Flux[0]["interstitialfluid"].keys():
             math_dict_Total_Flux[0]["interstitialfluid"][interstitialfluid_flux] = \
-                subMathTotalFluxAndChannel(sign, v_flux.getName())
+                subMathTotalFluxAndChannel(sign, v_flux.name())
         else:
             math_dict_Total_Flux[0]["interstitialfluid"][interstitialfluid_flux] = \
                 math_dict_Total_Flux[0]["interstitialfluid"][interstitialfluid_flux] + "\n" + \
-                subMathTotalFluxAndChannel(sign, v_flux.getName())
+                subMathTotalFluxAndChannel(sign, v_flux.name())
 
 
 # insert equations for channels and diffusive fluxes
 def insertMathsForTotalChannels(compartment, math_dict_Total_Flux, dict_solutes, chebi, sign, flux_name):
-    if compartment.getName() == "lumen":
+    if compartment.name() == "lumen":
         lumen_flux = "J_" + dict_solutes[0][chebi] + "_lumen"
         if lumen_flux not in math_dict_Total_Flux[0]["lumen"].keys():
             math_dict_Total_Flux[0]["lumen"][lumen_flux] = subMathTotalFluxAndChannel(sign, flux_name)
@@ -561,7 +561,7 @@ def insertMathsForTotalChannels(compartment, math_dict_Total_Flux, dict_solutes,
             math_dict_Total_Flux[0]["lumen"][lumen_flux] = \
                 math_dict_Total_Flux[0]["lumen"][lumen_flux] + "\n" + subMathTotalFluxAndChannel(sign, flux_name)
 
-    if compartment.getName() == "cytosol":
+    if compartment.name() == "cytosol":
         cytosol_flux = "J_" + dict_solutes[0][chebi] + "_cytosol"
         if cytosol_flux not in math_dict_Total_Flux[0]["cytosol"].keys():
             math_dict_Total_Flux[0]["cytosol"][cytosol_flux] = subMathTotalFluxAndChannel(sign, flux_name)
@@ -569,7 +569,7 @@ def insertMathsForTotalChannels(compartment, math_dict_Total_Flux, dict_solutes,
             math_dict_Total_Flux[0]["cytosol"][cytosol_flux] = \
                 math_dict_Total_Flux[0]["cytosol"][cytosol_flux] + "\n" + subMathTotalFluxAndChannel(sign, flux_name)
 
-    if compartment.getName() == "interstitialfluid":
+    if compartment.name() == "interstitialfluid":
         interstitialfluid_flux = "J_" + dict_solutes[0][chebi] + "_interstitialfluid"
         if interstitialfluid_flux not in math_dict_Total_Flux[0]["interstitialfluid"].keys():
             math_dict_Total_Flux[0]["interstitialfluid"][interstitialfluid_flux] = \
@@ -583,7 +583,7 @@ def insertMathsForTotalChannels(compartment, math_dict_Total_Flux, dict_solutes,
 # assign plus or minus sign in the equations
 def odeSignNotation(compartment, source_fma, sink_fma):
     # lumen
-    if compartment.getName() == "lumen":
+    if compartment.name() == "lumen":
         if source_fma == lumen_fma and sink_fma == cytosol_fma:
             sign = "minus"
         elif source_fma == lumen_fma and sink_fma == interstitialfluid_fma:
@@ -594,7 +594,7 @@ def odeSignNotation(compartment, source_fma, sink_fma):
             sign = "plus"
 
     # cytosol
-    if compartment.getName() == "cytosol":
+    if compartment.name() == "cytosol":
         if source_fma == cytosol_fma and sink_fma == lumen_fma:
             sign = "minus"
         elif source_fma == cytosol_fma and sink_fma == interstitialfluid_fma:
@@ -605,7 +605,7 @@ def odeSignNotation(compartment, source_fma, sink_fma):
             sign = "plus"
 
     # interstitial fluid
-    if compartment.getName() == "interstitialfluid":
+    if compartment.name() == "interstitialfluid":
         if source_fma == interstitialfluid_fma and sink_fma == cytosol_fma:
             sign = "minus"
         elif source_fma == interstitialfluid_fma and sink_fma == lumen_fma:
@@ -630,9 +630,9 @@ def createComponent(v, name, unit, interface, initialvalue, component, v2):
         v.setInitialValue(initialvalue)
 
     if v2 == None:
-        v.setId(component.getName() + "." + v.getName())
+        v.setId(component.name() + "." + v.name())
     else:
-        v.setId(component.getName() + "." + v2.getName())
+        v.setId(component.name() + "." + v2.name())
 
     component.addVariable(v)
 
@@ -657,12 +657,12 @@ def concentrationSparql(fma, chebi):
 # add required units from the imported models
 def addUnitsModel(unit_name, importedModel, m):
     i = 0
-    while importedModel.getUnits(i) != None:
-        u = importedModel.getUnits(i)
+    while importedModel.units(i) != None:
+        u = importedModel.units(i)
         # u.getUnitAttributes(reference, prefix, exponent, multiplier, id))
-        if u.getName() == unit_name:
+        if u.name() == unit_name:
             # if this unit not exists, then add in the model
-            if m.getUnits(unit_name) == None:
+            if m.units(unit_name) == None:
                 m.addUnits(u)
                 break
         i += 1
@@ -678,10 +678,10 @@ def instantiateImportedComponent(sourceurl, component, epithelial, m):
     importedComponent.setSourceComponent(imp, component)
 
     # m.addComponent(importedComponent)
-    if m.getComponent(importedComponent.getName()) is None:
+    if m.component(importedComponent.name()) is None:
         m.addComponent(importedComponent)
 
-    # if epithelial.getComponent(importedComponent.getName()) == None:
+    # if epithelial.component(importedComponent.name()) == None:
     #     epithelial.addComponent(importedComponent)
     # making http request to the source model
     r = requests.get(sourceurl)
@@ -693,16 +693,16 @@ def instantiateImportedComponent(sourceurl, component, epithelial, m):
     # check a valid model
     if p.errorCount() > 0:
         for i in range(p.errorCount()):
-            desc = p.getError(i).getDescription()
+            desc = p.error(i).description()
             cellmlNullNamespace = "Model element is in invalid namespace 'null'"
             cellml10Namespace = "Model element is in invalid namespace 'http://www.cellml.org/cellml/1.0#'"
             cellml11Namespace = "Model element is in invalid namespace 'http://www.cellml.org/cellml/1.1#'"
 
             if desc.find(cellmlNullNamespace) != -1:
-                print("Error in miscellaneous.py: ", p.getError(i).getDescription())
+                print("Error in miscellaneous.py: ", p.error(i).description())
                 exit()
             elif desc.find(cellml10Namespace) != -1 or desc.find(cellml11Namespace) != -1:
-                print("Msg in miscellaneous.py: ", p.getError(i).getDescription())
+                print("Msg in miscellaneous.py: ", p.error(i).description())
 
                 # parsing cellml 1.0 or 1.1 to 2.0
                 dom = ET.fromstring(r.text.encode("utf-8"))
@@ -716,18 +716,18 @@ def instantiateImportedComponent(sourceurl, component, epithelial, m):
                 # parse the string representation of the model to access by libcellml
                 impModel = p.parseModel(mstr)
             else:
-                print("Error in miscellaneous.py: ", p.getError(i).getDescription())
+                print("Error in miscellaneous.py: ", p.error(i).description())
                 exit()
 
-    impComponent = impModel.getComponent(importedComponent.getName())
+    impComponent = impModel.component(importedComponent.name())
 
     # in order to later define the connections we need, we must make sure all the variables from
     # the source model are present in the imported component, we only need the name so just grab
     # that from the source.
     for i in range(impComponent.variableCount()):
-        impVariable = impComponent.getVariable(i)
+        impVariable = impComponent.variable(i)
         v = Variable()
-        v.setName(impVariable.getName())
+        v.setName(impVariable.name())
         importedComponent.addVariable(v)
 
 
