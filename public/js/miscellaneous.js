@@ -1637,6 +1637,7 @@ var processCombinedMembrane = function (apicalMembrane, basolateralMembrane, cap
 function d3CheckBox() {
 
     var size = 20,
+        id = 0,
         x = 0,
         y = 0,
         rx = 0,
@@ -1653,6 +1654,7 @@ function d3CheckBox() {
         var g = selection.append("g"),
             box = g.append("rect")
                 .attr("width", size)
+                .attr("id", id)
                 .attr("height", size)
                 .attr("x", x)
                 .attr("y", y)
@@ -1703,6 +1705,11 @@ function d3CheckBox() {
 
     checkBox.size = function (val) {
         size = val;
+        return checkBox;
+    };
+
+    checkBox.id = function (val) {
+        id = val;
         return checkBox;
     };
 

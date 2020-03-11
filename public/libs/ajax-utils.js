@@ -62,6 +62,33 @@ function handleResponse(request, responseHandler, isJsonResponse) {
     }
 };
 
+
+function handleResponseMAS(request, responseHandler, isJsonResponse) {
+
+    if ((request.readyState == 4) && (request.status == 200)) {
+
+        // Default to isJsonResponse = true
+        if (isJsonResponse == undefined) {
+            isJsonResponse = true;
+        }
+
+        if (isJsonResponse) {
+            responseHandler(JSON.parse(request.responseText));
+        } else {
+            responseHandler(request.responseText);
+        }
+    } else if (request.readyState == 4) {
+        console.log("ERROR!");
+        console.error(request.responseText);
+        responseHandler(request);
+
+        // enable main-content and this button
+        $("#main-content").css("opacity", "1.0");
+        $("#myMainContent").remove();
+        $('#btnModel').prop("disabled", false);
+    }
+};
+
 // Makes an Ajax POST request to 'requestUrl'
 var sendPostRequest = function (requestUrl, query, responseHandler, isJsonResponse) {
 
@@ -88,6 +115,25 @@ var sendPostRequest = function (requestUrl, query, responseHandler, isJsonRespon
     request.setRequestHeader("Accept", "application/sparql-results+json");
 
     // console.log("query after setRequestHeader: ", query);
+
+    request.send(query); // for POST only
+};
+
+// POST request for Model Assembly Service
+var sendPostRequestMAS = function (requestUrl, query, responseHandler, isJsonResponse) {
+
+    var request = getRequestObject();
+
+    request.onreadystatechange = function () {
+        handleResponseMAS(request, responseHandler, isJsonResponse);
+    };
+
+    var url = checkRequestUrl(requestUrl);
+
+    request.open("POST", url, true);
+
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/sparql-results+json");
 
     request.send(query); // for POST only
 };

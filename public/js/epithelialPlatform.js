@@ -330,12 +330,14 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             checkedchk[i] = checkBox[i].checked();
             if (checkedchk[i] == true) {
                 circlewithlineg[i].call(d3.drag().on("drag", dragcircle).on("end", dropcircle));
-                console.log("update if heckedchk[i] == true combinedMembrane: ", combinedMembrane);
-                console.log("update if heckedchk[i] == true circlewithlineg: ", circlewithlineg);
+                console.log("update if checkedchk[i] == true combinedMembrane: ", combinedMembrane);
+                console.log("update if checkedchk[i] == true circlewithlineg: ", circlewithlineg);
+                console.log("update if checkedchk[i] == true checkBox[i], checkboxsvg: ", checkBox[i], checkboxsvg);
             } else {
                 circlewithlineg[i].call(d3.drag().on("end", dragcircleunchecked));
-                console.log("update else heckedchk[i] == true combinedMembrane: ", combinedMembrane);
-                console.log("update else heckedchk[i] == true circlewithlineg: ", circlewithlineg);
+                console.log("update else checkedchk[i] == true combinedMembrane: ", combinedMembrane);
+                console.log("update else checkedchk[i] == true circlewithlineg: ", circlewithlineg);
+                console.log("update else checkedchk[i] == true checkBox[i], checkboxsvg: ", checkBox[i], checkboxsvg);
             }
         }
 
@@ -357,6 +359,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
                 indexOfParen = textvaluechk.indexOf("(");
             textvaluechk = textvaluechk.slice(0, indexOfParen - 1) + " (" + combinedMembrane[i].med_pr_text_syn + ")";
 
+            checkBox[i].id("checkbox" + i);
             checkBox[i].x(960).y(yinitialchk).checked(false).clickEvent(update);
             checkBox[i].xtext(1000).ytext(ytextinitialchk).text("" + textvaluechk + "");
 
@@ -373,9 +376,10 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     combinedMemChk(0);
 
     // tooltip
-    // var div = d3.select("#svgVisualize").append("div")
-    //     .attr("class", "tooltip")
-    //     .style("opacity", 0);
+    var div = d3.select("#svgVisualize").append("div")
+        .attr("class", "tooltip")
+        .attr("id", "divtooltip")
+        .style("opacity", 0);
 
     // closing tooltip
     $(document).on("mousedown", function (event) {
@@ -431,6 +435,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
     var tooltipFunc = function (div, id, left, top) {
 
         console.log("tooltipFunc");
+        console.log("id: ", id);
 
         div.style("display", "inline");
         div.transition()
@@ -442,18 +447,22 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
             tempworkspace = "https://models.physiomeproject.org/workspace/267" + "/" +
                 "rawfile" + "/" + "HEAD" + "/" + id.slice(0, indexOfComma);
 
+        console.log("id indexOfComma: ", indexOfComma);
+
         div.html(
             "<b>CellML </b> " +
             "<a href=" + tempworkspace + " + target=_blank>" +
-            "<img border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
+            "<img id='cellimg' border=0 alt=CellML src=img/cellml.png width=30 height=20></a>" +
             "<br/>" +
             "<b>SEDML </b> " +
             "<a href=" + uriSEDML + " + target=_blank>" +
-            "<img border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
+            "<img id='sedmlimg' border=0 alt=SEDML src=img/SEDML.png width=30 height=20></a>" +
             "<br/>" +
-            "<b>Click middle mouse to close</b>")
-            .style("left", left + 240 + "px") // 540
-            .style("top", top + 90 + "px");
+            "<b id='clkmiddle'>Click middle mouse to close</b>")
+            .style("left", (d3.event.x + 5) + "px")
+            .style("top", (d3.event.y - 85) + "px"); // 50
+        // .style("left", left + 240 + "px") // 540
+        // .style("top", top + 90 + "px");
     };
 
     // apical, basolateral and paracellular membrane
@@ -7546,7 +7555,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         $('#btnModel').prop("disabled", true);
 
         var url = "/.api/mas/post";
-        sendPostRequest(
+        sendPostRequestMAS(
             url,
             JSON.stringify(combinedMembrane),
             function (content) {

@@ -25,7 +25,6 @@ async def post_handler(request):
 async def handle_request(request):
     return await response.file('model.xml')
 
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, workers=4)
 

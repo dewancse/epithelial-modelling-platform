@@ -4,7 +4,9 @@
   "description": "A web-based epithelial transport discovery, exploration and assembly tool",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest",
+    "test:e2e": "cypress open"
   },
   "authors": [
     "Dewan Sarwar <dsar941@aucklanduni.ac.nz>"
@@ -16,6 +18,8 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "cypress": "^4.1.0",
+    "d3": "^5.15.0",
     "mocha": "^4.0.1",
     "mocha-phantomjs": "^4.1.0"
   },

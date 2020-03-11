@@ -218,7 +218,7 @@ var EMP = (function (global) {
     // ACTIONS: if there is an action with the given name, call it
     $(document).on("click", function (event) {
 
-        console.log("index.js: $(document).on(click, function (event) {");
+        console.log("index.js: $(document).on(click, function (event) {: ", event);
 
         if (typeof actions[event.target.dataset.action] === "function")
             actions[event.target.dataset.action].call(this, event);
@@ -435,6 +435,16 @@ var EMP = (function (global) {
 
                 var uriOPB, uriCHEBI, uriFMA, keyValue;
                 var searchTxt = document.getElementById("searchTxt").value.toLowerCase();
+
+                /*
+                *
+                * Call a POST request to the sanic server with the "searchTxt" as input.
+                * Sanic server will return a list of model entities and relevant biological meanings.
+                * Utilise discoverModels function to find protein, species and genes for each of the discovered
+                * model entities and relevant biological meanings.
+                * Utilise showDiscoveredModels to display on the web interface
+                *
+                * */
 
                 // set local storage
                 sessionStorage.setItem("searchTxtContent", searchTxt);
