@@ -136,6 +136,7 @@ The application is accessible by navigating::
 
 ### Programming Language
 - JavaScript
+- Python
 - SPARQL
 
 ### Limitations

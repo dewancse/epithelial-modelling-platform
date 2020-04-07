@@ -149,7 +149,7 @@ describe("#Test 2", () => {
 
         cy.wait(2000);
 
-        cy.url().should("contain", "#AddtoModel");
+        cy.url().should("contain", "#listModels");
 
         cy.wait(5000) // wait to switch to Load Model page
     });
@@ -248,7 +248,7 @@ describe("#Test 3", () => {
 
         cy.wait(2000);
 
-        cy.url().should("contain", "#AddtoModel");
+        cy.url().should("contain", "#listModels");
 
         cy.wait(20000); // 20000
     });
@@ -293,7 +293,7 @@ describe("#Test 3", () => {
 
         cy.wait(2000);
 
-        cy.url().should("contain", "#AddtoModel");
+        cy.url().should("contain", "#listModels");
 
         cy.wait(5000); // wait to switch to Load Model page
 

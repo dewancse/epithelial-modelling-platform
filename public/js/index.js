@@ -51,7 +51,6 @@ var EMP = (function (global) {
 
     // HOME: load the home page
     mainUtils.loadHomeHtml = function () {
-        console.log("mainUtils.loadHomeHtml");
         showLoading("#main-content");
         sendGetRequest(
             homeHtml,
@@ -63,41 +62,35 @@ var EMP = (function (global) {
 
     // DOCUMENTATION: load documentation from github
     mainUtils.loadDocumentation = function () {
-        console.log("mainUtils.loadDocumentation");
         var uri = "https://github.com/dewancse/epithelial-modelling-platform";
-        $("#main-content").html("<div class='alert alert-info'><strong>Documentation can be found at <a href=" + uri + " + target=_blank>README.md in GitHub</a>!</strong></div>");
+        $("#main-content").html("<div class='alert alert-info'>" +
+            "<strong>Documentation can be found at <a href=" + uri + " + target=_blank>README.md in GitHub</a>!</strong></div>");
     };
 
     // On page load (before img or CSS)
-    $(document).ready(function () {
-        console.log("$(document).ready(function () {");
+    $(function () {
+        console.log("$(function () {");
 
         // On first load, show home view
         showLoading("#main-content");
 
-        if (sessionStorage.getItem("searchListContent")) {
-            console.log("$(document).ready(function () { if (sessionStorage.getItem(searchListContent)) {");
-            $("#main-content").html(sessionStorage.getItem("searchListContent"));
-        } else {
-            console.log("$(document).ready(function () { else (sessionStorage.getItem(searchListContent)) {");
-            // homepage
-            sendGetRequest(
-                homeHtml,
-                function (homeHtmlContent) {
-                    $("#main-content").html(homeHtmlContent);
+        console.log("On first load, show home view");
+        sendGetRequest(
+            homeHtml,
+            function (homeHtmlContent) {
+                $("#main-content").html(homeHtmlContent);
 
-                    $(".carousel").carousel({
-                        interval: 2000
-                    });
-                },
-                false);
-        }
+                $(".carousel").carousel({
+                    interval: 2000
+                });
+            },
+            false);
 
         $(".dropdown-toggle").dropdown();
     });
 
-    // ACTIONS: event handling for MODEL DISCOVERY and LOAD MODELS
-    // Retrieve and save model name for clicking a checkbox in MODEL DISCOVERY and LOAD MODELS
+    // ACTIONS: event handling for MODEL DISCOVERY and LIST OF MODELS
+    // Retrieve and save model name for clicking a checkbox in MODEL DISCOVERY and LIST OF MODELS
     var actions = {
 
         search: function (event) {
@@ -159,6 +152,9 @@ var EMP = (function (global) {
 
                 var tempidWithStr = event.target.id,
                     workspaceName = tempidWithStr.slice(0, tempidWithStr.search("#"));
+
+                console.log("event.target.id or tempidWithStr: ", tempidWithStr);
+                console.log("workspaceName: ", workspaceName);
 
                 // @modelEntityNameArray for similarity graph
                 workspaceNameList.push(workspaceName);
@@ -1936,7 +1932,8 @@ var EMP = (function (global) {
 
             var fma_uri = compartment[i].Compartment.value;
             console.log("fma_uri: ", fma_uri);
-            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
+            // Uncomment the below line when we will use our auckland OLS
+            // fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
 
             var endpointOLS = abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
@@ -1958,7 +1955,8 @@ var EMP = (function (global) {
                         for (var i in location) {
 
                             var fma_uri = location[i].Located_in.value;
-                            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
+                            // Uncomment the below line when we will use our auckland OLS
+                            // fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
 
                             var endpointOLS = abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
@@ -2141,21 +2139,23 @@ var EMP = (function (global) {
             true);
     };
 
-    // LOAD MODELS: load a selected model
+    // LIST OF MODELS: load a selected model
     mainUtils.loadModelHtml = function () {
 
         console.log("mainUtils.loadModelHtml");
         // Flag variable to keep track when users search terms in the MODEL DISCOVERY page and switch to
-        // LOAD MODELS page before loading full list of models in the MODEL DISCOVERY page
+        // LIST OF MODELS page before loading full list of models in the MODEL DISCOVERY page
         flagDiscoverLoad = true;
 
         loadModelHtmlInner(workspaceNameList[workspaceCnt]);
     };
 
-    // LOAD MODELS: display a selected model
+    // LIST OF MODELS: display a selected model
     mainUtils.showModel = function (jsonObj) {
 
         console.log("mainUtils.showModel");
+        console.log("jsonObj: ", jsonObj);
+        console.log("workspaceNameList: ", workspaceNameList);
 
         for (var i = 0; i < jsonObj.length; i++) {
             // add this model temporarily to display in MODEL DISCOVERY when deleted
@@ -2182,6 +2182,8 @@ var EMP = (function (global) {
                 listOfProteinURIsAll.splice(index, 1);
             }
         }
+
+        console.log("showModel modelEntityInLoadModels: ", modelEntityInLoadModels);
 
         // Empty result
         if ($.isEmptyObject(jsonObj)) {
@@ -2384,8 +2386,9 @@ var EMP = (function (global) {
 
                     // Remove from modelEntityInLoadModels
                     modelEntityInLoadModels.forEach(function (elem, index) {
+                        console.log("modelEntityInLoadModels.forEach element, elem, index: ", element, elem, index);
                         if (element == elem[0]) {
-
+                            console.log("modelEntityInLoadModels.forEach elem: ", elem);
                             // push it back to MODEL DISCOVERY
                             modelEntity.push(elem[0]);
                             biologicalMeaning.push(elem[1]);
@@ -2397,6 +2400,7 @@ var EMP = (function (global) {
                             modelEntityInLoadModels.splice(index, 1);
                         }
                     });
+                    console.log("deleteRowModelHtml: ", modelEntityInLoadModels);
 
                     // Remove from modelEntityNameArray
                     modelEntityNameArray.splice(tempIndex, 1);

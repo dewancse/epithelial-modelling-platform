@@ -1005,7 +1005,6 @@ var homeHtml = "./snippets/home-snippet.html";
 var viewHtml = "./snippets/view-snippet.html";
 var modelHtml = "./snippets/model-snippet.html";
 var searchHtml = "./snippets/search-snippet.html";
-var usecaseHtml = "./snippets/usecase-snippet.html";
 var similarityHtml = "./snippets/similarity-snippet.html";
 var epithelialHtml = "./snippets/epithelial-snippet.html";
 var addmodelHtml = "./snippets/addmodel-snippet.html";

@@ -6214,6 +6214,7 @@ var epithelialPlatform = function (combinedMembrane, concentration_fma, source_f
         console.log("flag in showModalWindow: ", flag);
         console.log("showModalWindow combinedMembrane: ", combinedMembrane);
 
+
         // add models without dragging
         if (flag == 2) {
             console.log("flag == 2 in showModalWindow function");
