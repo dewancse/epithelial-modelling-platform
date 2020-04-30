@@ -1932,8 +1932,7 @@ var EMP = (function (global) {
 
             var fma_uri = compartment[i].Compartment.value;
             console.log("fma_uri: ", fma_uri);
-            // Uncomment the below line when we will use our auckland OLS
-            // fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
+            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
 
             var endpointOLS = abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
@@ -1955,8 +1954,7 @@ var EMP = (function (global) {
                         for (var i in location) {
 
                             var fma_uri = location[i].Located_in.value;
-                            // Uncomment the below line when we will use our auckland OLS
-                            // fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
+                            fma_uri = "http://purl.org/sig/ont/fma/fma" + fma_uri.slice(fma_uri.indexOf("FMA_") + 4);
 
                             var endpointOLS = abiOntoEndpoint + "/fma/terms?iri=" + fma_uri;
 
