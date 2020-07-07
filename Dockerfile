@@ -29,8 +29,8 @@ RUN apk add --no-cache python3 \
     rm -r /root/.cache
 
 # pip installing so shouldn't need this
-#ENV PYTHONPATH=/libcellml/build/src/bindings/python
+# ENV PYTHONPATH=/libcellml/build/src/bindings/python
 
 COPY server/server.py server/main.py server/miscellaneous.py server/cellml1to2.xsl entrypoint.sh /
 
-ENTRYPOINT ["/entrypoint.sh"]
+# ENTRYPOINT ["/entrypoint.sh"]

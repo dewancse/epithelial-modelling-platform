@@ -25,6 +25,8 @@
   },
   "dependencies": {
     "@dewancse/addition-test": "^1.0.0",
+    "babel-preset-env": "1.5.2",
+    "babel-preset-react": "6.24.1",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
